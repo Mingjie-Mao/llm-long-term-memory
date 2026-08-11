@@ -1,0 +1,27 @@
+__pycache__/
+*.py[cod]
+.venv/
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Datasets are large (hundreds of MB) — downloaded on demand, never committed.
+data/
+
+# Memory stores, vector indexes, ingestion checkpoints.
+stores/
+*.db
+*.db-wal
+*.db-shm
+*.npy
+
+# Eval outputs. The per-question JSONL is committed on purpose: it is the evidence
+# behind every number in the README, it lets `chronomem eval report` regenerate the
+# table without re-spending quota, and at ~30KB per run it costs nothing.
+results/cache/
+results/labels-*.csv
+
+.env
+.DS_Store

@@ -1,0 +1,52 @@
+# Model assignment shared by every variant.
+#
+# Pinned to explicit versioned IDs — never the floating `-latest` aliases — so that
+# a run from week 1 stays comparable to a run from week 8 (D3).
+#
+# Verified available on the free tier by probe on 2026-08-10. Note gemini-2.5-*
+# now returns 404 and all Pro models return 429 with `limit: 0`, i.e. Pro is not
+# offered on the free tier at all.
+name: baselines
+description: Model roles and quota, shared by full_context and naive_rag
+
+# Probed 2026-08-10. The full-fat flash models (gemini-3.5-flash, gemini-3.6-flash)
+# allow only 20 requests/day on the free tier — not enough for one 50-question run —
+# while the flash-lite models are limited per *minute* and not per day. Every role
+# therefore runs on flash-lite, on three different models so that each gets its own
+# per-model quota pool.
+models:
+  # P2 ingestion is the heavy consumer; it gets a pool nothing else touches.
+  # Needs throughput above all: ~6.1M tokens for one dev-subset pass. Only the
+  # 250k-TPM models can do that in minutes rather than hours (gemma's 16k TPM makes
+  # the same work a 6.4-hour job regardless of its generous request budget).
+  extractor: gemini-3.1-flash-lite
+  # The system under test. Held constant across every variant.
+  answerer: gemini-3.5-flash-lite
+  # A different model from the answerer, so no system grades its own prose.
+  # Its own pool, and chosen for the shape of the work rather than its size: judge
+  # inputs are ~200 tokens, so the 16k TPM that rules gemma out for extraction is
+  # irrelevant here, while its 1,500 requests/day is exactly what judging needs.
+  # Keeping judge and extractor on separate pools is what stops a large ingest
+  # starving the evaluation (D3).
+  judge: gemma-4-31b-it
+  embedder: sentence-transformers/all-MiniLM-L6-v2
+  embedding_dim: 384
+
+quota:
+  # Per model, not per project — the 429 body reports
+  # GenerateRequestsPerDayPerProjectPerModel-FreeTier. Conservative placeholders;
+  # tighten from observed 429s rather than from documentation.
+  rpm: 10
+  tpm: 250000
+  rpd: 1500
+  max_wait_seconds: 300.0
+
+dataset_variant: s
+dataset_limit: 50
+
+# P4. Ingestion applies temporal resolution; the eval variant
+# `chronomem_no_temporal` reads the same store with the filter off.
+temporal_resolution: true
+
+retrieval:
+  top_k: 20

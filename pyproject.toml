@@ -1,0 +1,46 @@
+[project]
+name = "chronomem"
+version = "0.1.0"
+description = "An adaptive long-term memory engine for LLM agents"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "numpy>=2.0",
+    "httpx>=0.27",
+    "pydantic>=2.7",
+    "pydantic-settings>=2.3",
+    "typer>=0.12",
+    "rich>=13.7",
+    "structlog>=24.1",
+    "pyyaml>=6.0",
+]
+
+[project.optional-dependencies]
+# Pulls torch (~2GB). Needed from P1 onward; skip it for dataset/stats work.
+embed = ["sentence-transformers>=3.0"]
+# Added in P2, when the extraction pipeline needs an API key.
+llm = ["google-genai>=1.0"]
+
+[project.scripts]
+chronomem = "chronomem.cli:app"
+
+[dependency-groups]
+dev = ["pytest>=8.2", "pytest-cov>=5.0", "ruff>=0.6"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/chronomem"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q --strict-markers"

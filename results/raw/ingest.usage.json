@@ -1,0 +1,66 @@
+{
+  "summary": {
+    "total_requests": 5,
+    "total_tokens": 0,
+    "failures": 5,
+    "by_role": {
+      "extractor": {
+        "role": "extractor",
+        "calls": 5,
+        "failures": 5,
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "p50_ms": 908.780875033699,
+        "p95_ms": 998.5981249483302,
+        "max_ms": 998.5981249483302
+      }
+    }
+  },
+  "calls": [
+    {
+      "role": "extractor",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 947.859707986936,
+      "ok": false,
+      "error": "ClientError: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev"
+    },
+    {
+      "role": "extractor",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 998.5981249483302,
+      "ok": false,
+      "error": "ClientError: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev"
+    },
+    {
+      "role": "extractor",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 889.6006250288337,
+      "ok": false,
+      "error": "ClientError: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev"
+    },
+    {
+      "role": "extractor",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 716.9997920282185,
+      "ok": false,
+      "error": "ClientError: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev"
+    },
+    {
+      "role": "extractor",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 908.780875033699,
+      "ok": false,
+      "error": "ClientError: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev"
+    }
+  ]
+}
