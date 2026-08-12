@@ -32,13 +32,12 @@ LongMemEval-S · 50-question stratified subset (seed 0) · answerer
 Latency is API time and excludes free-tier rate-limit queueing. Every number is
 regenerated from the JSONL artifacts in `results/raw/`.
 
-| Variant | Accuracy | SS-user | Multi-sess | Temporal | Know-update | Abstention | Evid. recall | Ctx tokens | p95 |
-|---|---|---|---|---|---|---|---|---|---|
-| `full_context` | 56.0% | 100.0% | 38.5% | 23.1% | 87.5% | 50.0% | — | 109,260 | 7.9s |
-| `naive_rag` | 54.0% | 71.4% | 38.5% | 46.2% | 75.0% | 100.0% | 94.0% | 13,057 | 2.1s |
-| `+ temporal resolution` | — | — | — | — | — | — | — | — | — |
-| `+ consolidation` | — | — | — | — | — | — | — | — | — |
-| `+ budget-aware packing` | — | — | — | — | — | — | — | — | — |
+| Variant | n | Accuracy | SS-user | SS-asst | Multi-sess | Temporal | Know-update | Abstention | Evid. recall | Ctx tokens | p95 |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| `full_context` | 50 | **56.0%** | 100% | 100% | 38.5% | 23.1% | 87.5% | 50.0% | — | 109,260 | 7.9s |
+| `naive_rag` | 50 | **54.0%** | 71.4% | 83.3% | 38.5% | 46.2% | 75.0% | 100% | 94.0% | 13,057 | 2.1s |
+| `chronomem_no_temporal` | — | — | — | — | — | — | — | — | — | — | — |
+| `chronomem` | — | — | — | — | — | — | — | — | — | — | — |
 
 Regenerate with `chronomem eval report`; the full table including
 single-session-assistant and preference splits is in
@@ -89,10 +88,19 @@ claim about any third-party system: cross-system memory numbers are only compara
 under an identical judge and prompt, which is not the case across published results.
 
 **Judge reliability is not assumed.** The free tier offers no model stronger than
-the answerer to grade with, so the judge was cross-checked against an independent
-labelling of all 50 questions: **100% agreement (n=50)**. That labelling was done by
-an LLM, not a person, so it establishes that the rubric is unambiguous rather than
-that the judge is right — it is reported as a cross-check, not as human validation.
+the answerer to grade with, so the judge is cross-checked against an independent
+labelling of all 50 questions: **94% agreement (n=50)** — 1 case where the judge was
+more lenient than the label, 2 where it was stricter. The absence of a systematic
+direction matters more than the headline number.
+
+Two caveats are stated rather than buried. First, the labelling was done by an LLM,
+not a person, so it establishes that the rubric is reproducible, not that the judge
+is right. Second, the first pass scored 92% and one of those disagreements was the
+*labeller's* error: it read a truncated 220-character view of the answer and missed
+a conclusion in the last sentence. Labelling now reads full text. The remaining
+three disagreements are genuine judgement calls — a misspelt app name (`Memorse`
+for `Memrise`), a count that is numerically right but includes a planned purchase,
+and an answer naming a specific artist where the gold describes an unnamed band.
 
 **Every number here is regenerated from the JSONL artifacts**, not from console
 output. `run_eval` refuses to return a result when the two disagree: an earlier run
