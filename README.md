@@ -1,3 +1,6 @@
+[![English](https://img.shields.io/badge/English-2962FF?style=for-the-badge)](README.md)
+[![中文](https://img.shields.io/badge/%E4%B8%AD%E6%96%87-555555?style=for-the-badge)](README.zh-CN.md)
+
 # ChronoMem
 
 An adaptive long-term memory engine for LLM agents — temporal fact resolution,
