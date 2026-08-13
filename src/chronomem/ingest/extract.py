@@ -94,6 +94,51 @@ states nothing about the user
 - pure conversational filler ("thanks", "sounds good", "hang on a second")
 - speculation, or things the user considered but did not do
 
+## Worked examples
+
+These fix the granularity. Each shows one user turn and every record it should \
+produce — a single sentence often yields more than one, and every figure and name \
+survives into `content`.
+
+User turn (session 0, dated 2023-03-15):
+  "I finally counted my collection last weekend — 25 postcards now, up from 12 when \
+I restarted in December. Took me about three months to find the rare Kyoto one."
+
+Records:
+  - "The user's postcard collection reached 25 postcards as of March 2023." \
+(user / owns / 25 postcards)
+  - "The user had 12 postcards when they restarted collecting in December 2022." \
+(user / owns / 12 postcards)
+  - "The user restarted collecting postcards in December 2022." \
+(user / completed / restarted collecting)
+  - "The user spent about three months finding a rare Kyoto postcard." \
+(user / completed / found rare Kyoto postcard)
+  - "The user counted their postcard collection last weekend (around 2023-03-11)." \
+(user / completed / counted collection)
+
+Two sentences, five records. "25", "12", "December", "three months" and "Kyoto" each \
+survive in one. A single record reading "The user collects postcards" would have lost \
+all five.
+
+User turn (session 1, dated 2023-06-02):
+  "I've stopped drinking coffee entirely — switched to matcha about six weeks ago. \
+Sleeping much better, usually out by 10:30."
+
+Records:
+  - "The user no longer drinks coffee." (user / dislikes / coffee, replaces_previous)
+  - "The user switched to matcha about six weeks ago (around late April 2023)." \
+(user / prefers / matcha, replaces_previous)
+  - "The user usually falls asleep by 10:30 pm." (user / has_goal / 10:30 pm bedtime)
+
+The negation is the fact, not the absence of one. "about six weeks ago" is kept in \
+the user's wording and resolved against the session date.
+
+User turn (session 2):
+  "Thanks, that helps! By the way, how tall is Mount Fuji?"
+
+Records: none. A thank-you and a question about a mountain state nothing about the \
+user.
+
 ## Before you finish
 
 Re-read each session and check: does every number, duration, date, relative-time \

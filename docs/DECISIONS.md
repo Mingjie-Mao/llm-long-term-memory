@@ -801,6 +801,69 @@ arithmetic alone.
 
 ---
 
+## D30 — Worked examples beat rules, and the metric was wrong a third time (measured)
+
+**What other systems do.** Mem0's fact-extraction prompt was read directly rather
+than guessed at. Three differences from ChronoMem's mattered:
+
+| | Mem0 | ChronoMem v2 |
+|---|---|---|
+| teaching device | six input→output examples | prose rules |
+| granularity | one sentence split into several facts, shown | asserted in a rule |
+| output schema | a flat list of strings | nine fields per memory |
+
+**Adding worked examples (v4).** Same 60 held-out sessions, same batch size, same
+metric:
+
+| facet | v1 | v2 (rules) | v4 (rules + examples) |
+|---|---|---|---|
+| quantity | 33.3% | 42.6% | **51.9%** |
+| duration | 35.7% | 50.0% | **57.1%** |
+| relative_time | 25.0% | 50.0% | 33.3% |
+| proper_noun | 16.7% | 17.0% | 17.0% |
+| **overall** | **25.0%** | **33.6%** | **36.6%** |
+
+Showing a four-sentence turn expanded into five records moved quantity retention
+nine points where a rule saying "one record per fact" had not. `relative_time` fell,
+on a base of twelve — two items, at or below the noise of this sample.
+
+**The v3 detour is kept as a negative result.** Framing extraction as pure
+transcription — "you do not decide what is worth remembering" — produced *more*
+memories per session and lower fidelity across every facet (31.3% overall). Removing
+the model's judgement did not make it more faithful; it made it verbose.
+
+**Proper nouns never moved across four prompt versions, and the extractor was
+right.** Inspecting the misses:
+
+```
+"I'd like to know more about The 7½ Deaths of Evelyn Hardcastle."
+"I'm curious to know more about the author, Stuart Turton."
+"I've heard great things about the Sonos One."
+```
+
+Every one is a request for information phrased as a statement. The denominator
+excludes sentences ending in `?`, which does not catch these, so the extractor was
+being penalised for correctly declining to record "the user owns a Sonos One".
+
+That is the third time a low score was the metric rather than the system — after
+list markers counted as quantities and sentence openers as proper nouns. The
+practice that caught all three was reading the misses before acting on the number,
+and it has now paid for itself three times over.
+
+**A real design question sits underneath it.** Mem0 explicitly tracks "Plans and
+Intentions"; ChronoMem's prompt says not to record things the user considered but
+did not do. "The user is considering a Sonos One" is a defensible memory, and
+LongMemEval asks preference questions where it would matter. Deferred rather than
+changed mid-comparison: it alters what a memory *means*, so it needs its own
+before-and-after rather than being folded into a fidelity fix.
+
+**Still not enough to ingest.** 36.6% against v1's 25.0% is a 46% relative
+improvement and remains far from a representation that can carry the answers. The
+next lever is the output schema — nine fields per memory against Mem0's bare
+strings — which is a structural change, not another prompt edit.
+
+---
+
 ## D26 — ChronoMem loses to both baselines, and the cause is upstream of P4 (measured)
 
 **Result** (LongMemEval-S, stratified 50, same answerer and judge as every other row):
