@@ -170,6 +170,26 @@ def stratify(instances: list[Instance], limit: int, seed: int = 0) -> list[Insta
     return picked
 
 
+def split_dev_test(
+    instances: list[Instance], dev_size: int = 50, test_size: int = 100, seed: int = 0
+) -> tuple[list[Instance], list[Instance]]:
+    """Disjoint stratified dev and test sets.
+
+    The dev 50 are burned. Batch size, the predicate arity list, the v2 extraction
+    prompt, and the decision to build temporal resolution before hybrid retrieval
+    were all chosen by looking at them, so a number produced on those questions
+    measures the fit of those choices as much as the system. Every headline claim
+    has to land on questions no decision has ever been made against.
+
+    Test is drawn from what dev did not take, with the same stratification, and is
+    meant to be run once. Nothing about it should be inspected before that.
+    """
+    dev = stratify(instances, dev_size, seed=seed)
+    dev_ids = {i.question_id for i in dev}
+    remaining = [i for i in instances if i.question_id not in dev_ids]
+    return dev, stratify(remaining, test_size, seed=seed)
+
+
 def load(
     variant: str = "s",
     data_dir: str | Path = "data",

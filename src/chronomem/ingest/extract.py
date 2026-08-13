@@ -22,17 +22,22 @@ from chronomem.store import Memory
 from .schemas import COMMON_PREDICATES, ExtractedMemory, ExtractionResult
 
 EXTRACT_SYSTEM = """\
-You extract facts about a user from their chat history, for a long-term memory \
-system. Be accurate: never record something the user did not say. But be thorough \
-about specifics — the details the user states about themselves are exactly what \
-they will ask about later.\
+You transcribe what a user said about themselves into individual, self-contained \
+records, for a long-term memory system.
+
+You are a transcriber, not a summariser. Summarising is the failure mode: a record \
+that reads as true but has dropped the number, the date, or the name is worse than \
+no record, because it will be recalled later and answer the question wrongly.\
 """
 
 _PROMPT = """\
 Below are {n} separate chat sessions with the same user, each with its date and a \
 0-based index.
 
-Extract the facts worth remembering long-term. For each fact:
+Record every distinct thing the user states about themselves. One record per fact — \
+if a session contains six facts, produce six records, not one summary of them.
+
+For each record:
 
 - `session_index`: which session it came from (0 to {max_index})
 - `type`:
@@ -41,46 +46,62 @@ Extract the facts worth remembering long-term. For each fact:
     - `semantic`    general durable facts about the user's world
     - `episodic`    a specific dated event that happened
     - `procedural`  how the user does something, or wants things done
-- `content`: a self-contained sentence. It will be read with no surrounding \
-context, so resolve every pronoun and reference. Write "The user's sister Mei lives \
-in Osaka", never "She lives there".
+- `content`: a self-contained sentence, read later with no surrounding context, so \
+resolve every pronoun. "The user's sister Mei lives in Osaka", never "She lives there".
 - `subject` / `predicate` / `object`: the fact as a triple. `subject` is usually \
-"user". Prefer these predicates when one fits, so that repeated mentions of the \
-same attribute line up: {predicates}. Invent a snake_case predicate only if none \
-fits.
+"user". Prefer these predicates when one fits: {predicates}. Invent a snake_case \
+predicate only if none does.
 - `entities`: named people, places, products, organizations.
-- `importance` 0.0-1.0: how likely this is to be needed in a later conversation. \
-A job change is 0.9; the user mentioning they had toast is 0.1.
-- `replaces_previous`: true only when the user signalled that this *replaces* \
-something they said before — "I switched to X", "I no longer do Y", "I moved from A \
-to B", "I've stopped Z". A plain new statement is false. This is what tells the \
-system an old fact stopped being true, so do not set it speculatively.
+- `importance` 0.0-1.0: how likely this is to be needed later.
+- `replaces_previous`: true only when the user signals this supersedes something \
+earlier — "I switched to X", "I no longer do Y", "I moved from A to B".
 
-**Keep the specifics.** Quantities, durations, prices, dates, counts, and proper \
-names that the user states about themselves are the single most important thing to \
-record — they are what gets asked about later. Write "The user watched 10 hours of \
-documentaries on Netflix last month", not "The user watches documentaries". Write \
-"The user attended The Glass Menagerie at the local community theater", not "The \
-user went to a play". A memory that drops the number or the name has failed, even \
-though it reads as true.
+## What must survive, verbatim
 
-Prefer several precise memories over one general one. If the user mentions three \
-separate purchases, that is three memories with three amounts, not one memory about \
-shopping.
+These are the things later questions are actually about. Copy them into `content` \
+exactly as the user gave them — do not round, generalise, or paraphrase them away.
 
-**Also record what the assistant told this specific user, when it is concrete \
-enough to be referred back to.** Users ask "what was that sealant you \
-recommended?" or "what was item 27 on that list?", and the answer only exists in \
-the assistant's turn. Record these with `subject` set to "assistant": a named \
-product, a specific number, a particular item from a list it gave. Do not record \
-the assistant's generic advice, its filler, or anything about the assistant itself.
+1. **Quantities.** "25 postcards", "16GB", "four courses". Never "several", "some".
+2. **Durations.** "three months", "45 minutes each way", "two years". A duration \
+dropped is unrecoverable — nothing else in the record implies it.
+3. **Dates and times.** "March 15", "9:15 AM", "in 2019".
+4. **Relative time.** "last week", "two months ago", "next Friday", "yesterday". \
+Keep the user's own wording *and* resolve it against the session date where you \
+can: "The user adopted the cat last month (around February 2023)".
+5. **Proper nouns.** Titles, brands, products, people: "The Glass Menagerie", \
+"Mod Podge", "Sonos One". Never "a play", "a sealant", "a speaker".
+6. **Negations.** "no longer", "stopped", "does not", "gave up". Record the \
+negation as the fact — "The user no longer drinks coffee" — never drop it and \
+never soften it to a preference.
+7. **State changes.** When the user reports a change, record the new state, the old \
+one if stated, and set `replaces_previous`: "The user moved from Canberra to Sydney \
+in August 2023".
+8. **Qualifiers.** "about", "roughly", "at least", "usually", "only on weekdays". \
+They change what the fact means; keep them.
 
-Do NOT extract:
+## Also record what the assistant told this user
+
+Users ask "what sealant did you recommend?" and the answer exists only in the \
+assistant's turn. Record those with `subject` set to "assistant": a named product, \
+a specific figure, a particular item from a list it gave. Not its generic advice, \
+not its filler, not statements about itself.
+
+## Do not record
+
 - generic knowledge that is not about this user
-- pure conversational filler ("thanks", "sounds good")
-- speculation, or things the user asked about but did not assert
+- anything the user only *asked about* — a question about Osama bin Laden's height \
+states nothing about the user
+- pure conversational filler ("thanks", "sounds good", "hang on a second")
+- speculation, or things the user considered but did not do
 
-If a session contains nothing worth remembering, extract nothing from it.
+## Before you finish
+
+Re-read each session and check: does every number, duration, date, relative-time \
+expression, and proper noun the user stated appear in one of your records? If one \
+does not, either add a record for it or you have decided it was not about the user. \
+There is no third case.
+
+If a session contains nothing about the user, extract nothing from it.
 
 {sessions}
 """

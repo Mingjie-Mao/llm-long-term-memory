@@ -1,0 +1,61 @@
+=== EXTRACT_SYSTEM ===
+You extract facts about a user from their chat history, for a long-term memory \
+system. Be accurate: never record something the user did not say. But be thorough \
+about specifics — the details the user states about themselves are exactly what \
+they will ask about later.\
+
+=== _PROMPT ===
+Below are {n} separate chat sessions with the same user, each with its date and a \
+0-based index.
+
+Extract the facts worth remembering long-term. For each fact:
+
+- `session_index`: which session it came from (0 to {max_index})
+- `type`:
+    - `profile`     stable identity: name, age, location, job, family
+    - `preference`  likes, dislikes, habitual choices
+    - `semantic`    general durable facts about the user's world
+    - `episodic`    a specific dated event that happened
+    - `procedural`  how the user does something, or wants things done
+- `content`: a self-contained sentence. It will be read with no surrounding \
+context, so resolve every pronoun and reference. Write "The user's sister Mei lives \
+in Osaka", never "She lives there".
+- `subject` / `predicate` / `object`: the fact as a triple. `subject` is usually \
+"user". Prefer these predicates when one fits, so that repeated mentions of the \
+same attribute line up: {predicates}. Invent a snake_case predicate only if none \
+fits.
+- `entities`: named people, places, products, organizations.
+- `importance` 0.0-1.0: how likely this is to be needed in a later conversation. \
+A job change is 0.9; the user mentioning they had toast is 0.1.
+- `replaces_previous`: true only when the user signalled that this *replaces* \
+something they said before — "I switched to X", "I no longer do Y", "I moved from A \
+to B", "I've stopped Z". A plain new statement is false. This is what tells the \
+system an old fact stopped being true, so do not set it speculatively.
+
+**Keep the specifics.** Quantities, durations, prices, dates, counts, and proper \
+names that the user states about themselves are the single most important thing to \
+record — they are what gets asked about later. Write "The user watched 10 hours of \
+documentaries on Netflix last month", not "The user watches documentaries". Write \
+"The user attended The Glass Menagerie at the local community theater", not "The \
+user went to a play". A memory that drops the number or the name has failed, even \
+though it reads as true.
+
+Prefer several precise memories over one general one. If the user mentions three \
+separate purchases, that is three memories with three amounts, not one memory about \
+shopping.
+
+**Also record what the assistant told this specific user, when it is concrete \
+enough to be referred back to.** Users ask "what was that sealant you \
+recommended?" or "what was item 27 on that list?", and the answer only exists in \
+the assistant's turn. Record these with `subject` set to "assistant": a named \
+product, a specific number, a particular item from a list it gave. Do not record \
+the assistant's generic advice, its filler, or anything about the assistant itself.
+
+Do NOT extract:
+- generic knowledge that is not about this user
+- pure conversational filler ("thanks", "sounds good")
+- speculation, or things the user asked about but did not assert
+
+If a session contains nothing worth remembering, extract nothing from it.
+
+{sessions}

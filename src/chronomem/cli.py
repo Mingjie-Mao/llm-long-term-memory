@@ -705,5 +705,138 @@ def eval_variability(
     console.print(v.summary())
 
 
+@ingest_app.command("fidelity")
+def ingest_fidelity(
+    config: str = typer.Option("configs/baselines.yaml", "--config", "-c"),
+    sessions: int = typer.Option(30, help="How many sessions to extract and score"),
+    show_misses: int = typer.Option(5, help="Missed values to print per facet"),
+    holdout: bool = typer.Option(
+        True, help="Score sessions from the held-out split, never the dev questions"
+    ),
+    batch: int | None = typer.Option(None, help="Override sessions per request"),
+) -> None:
+    """What fraction of the user's own specifics survive extraction?
+
+    Needs no gold answers, so it cannot be fitted to the evaluation set — the
+    reference is the source text. Run it before spending an ingest on a prompt
+    change.
+    """
+    from chronomem.config import ExperimentConfig
+    from chronomem.ingest import Extractor
+    from chronomem.ingest.fidelity import score_sessions
+    from chronomem.llm import Limits, QuotaManager, UsageTracker
+    from chronomem.llm.client import GeminiClient
+    from chronomem.store import Memory
+
+    settings = Settings()
+    cfg = ExperimentConfig.from_yaml(config)
+    quota = QuotaManager(
+        state_dir=settings.store_dir / "quota",
+        default=Limits(rpm=cfg.quota.rpm, tpm=cfg.quota.tpm, rpd=cfg.quota.rpd),
+    )
+    quota.load_learned()
+    usage = UsageTracker()
+    client = GeminiClient(settings.require_api_key(), quota=quota, usage=usage)
+    extractor = Extractor(client, cfg.models.extractor)
+
+    with console.status("Loading corpus…"):
+        every = lme.load(cfg.dataset_variant, settings.data_dir)
+        dev, test = lme.split_dev_test(every)
+        pool = test if holdout else dev
+        picked: list = []
+        for inst in pool:
+            for sess in inst.sessions:
+                picked.append(sess)
+                if len(picked) >= sessions:
+                    break
+            if len(picked) >= sessions:
+                break
+
+    batch = batch or cfg.ingest.sessions_per_request
+    console.print(
+        f"[bold]fidelity[/bold] · {len(picked)} sessions from the "
+        f"{'held-out' if holdout else 'dev'} split · {batch}/request · "
+        f"{cfg.models.extractor}\n"
+    )
+
+    # Cache the extraction so a change to the *metric* can be re-scored for free.
+    # The same sessions were re-extracted four times while the denominator was being
+    # corrected; each pass cost requests and returned identical memories.
+    import hashlib
+    import json as _json
+
+    from chronomem.ingest.extract import _PROMPT, EXTRACT_SYSTEM
+
+    fingerprint = hashlib.sha1(
+        (EXTRACT_SYSTEM + _PROMPT + cfg.models.extractor + str(batch)).encode()
+    ).hexdigest()[:12]
+    cache_path = settings.store_dir / "fidelity-cache" / f"{fingerprint}.json"
+    cached = _json.loads(cache_path.read_text()) if cache_path.exists() else {}
+    if cached:
+        console.print(
+            f"[dim]reusing cached extraction {fingerprint} ({len(cached)} sessions)[/dim]"
+        )
+
+    pairs = []
+    for i in range(0, len(picked), batch):
+        chunk = picked[i : i + batch]
+        if all(s.session_id in cached for s in chunk):
+            for s in chunk:
+                mems = [
+                    Memory(**{**d, "event_time": None, "valid_from": None, "valid_to": None})
+                    for d in cached[s.session_id]
+                ]
+                pairs.append((s, mems))
+            continue
+        outcome = extractor.extract(chunk)
+        by_session: dict[str, list] = {s.session_id: [] for s in chunk}
+        for m in outcome.memories:
+            if m.source_session_id in by_session:
+                by_session[m.source_session_id].append(m)
+        pairs.extend((s, by_session[s.session_id]) for s in chunk)
+        for s in chunk:
+            cached[s.session_id] = [
+                {
+                    "id": m.id,
+                    "user_id": m.user_id,
+                    "type": m.type,
+                    "content": m.content,
+                    "token_count": m.token_count,
+                    "subject": m.subject,
+                    "predicate": m.predicate,
+                    "object": m.object,
+                }
+                for m in by_session[s.session_id]
+            ]
+        cache_path.parent.mkdir(parents=True, exist_ok=True)
+        cache_path.write_text(_json.dumps(cached))
+        console.print(f"  batch {i // batch + 1}: +{len(outcome.memories)} memories")
+
+    report = score_sessions(pairs)
+
+    t = Table(title="extraction fidelity", show_header=True)
+    t.add_column("facet", style="cyan")
+    t.add_column("stated", justify="right")
+    t.add_column("retained", justify="right")
+    t.add_column("recall", justify="right")
+    for facet, score in sorted(report.per_facet.items(), key=lambda kv: kv[1].recall):
+        style = "red" if score.recall < 0.4 else ("yellow" if score.recall < 0.7 else "green")
+        t.add_row(
+            facet, str(score.stated), str(score.retained), f"[{style}]{score.recall:.1%}[/{style}]"
+        )
+    console.print(t)
+    console.print(
+        f"[bold]overall {report.overall:.1%}[/bold] · "
+        f"{report.memories_per_session:.1f} memories/session · {report.memories} memories"
+    )
+
+    for facet, misses in report.missed_examples.items():
+        console.print(
+            f"\n[red]dropped {facet}[/red]: " + ", ".join(repr(m) for m in misses[:show_misses])
+        )
+
+    usage.save(settings.results_dir / "raw" / "fidelity.usage.json")
+
+
 if __name__ == "__main__":
     app()

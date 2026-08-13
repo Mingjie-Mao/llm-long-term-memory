@@ -709,6 +709,98 @@ looking at real output shows it was told the wrong thing.
 
 ---
 
+## D27 — v1 is frozen, the dev 50 are burned, and fidelity is measured without gold
+
+Three decisions taken together after D26, before any attempt to fix extraction.
+
+**1. `results/frozen/chronomem-v1/` is immutable.** The 26% run, its four result
+files, and the exact extraction prompt that produced it (sha256 `e6e7a4e4…`) are
+kept verbatim. Aggressive compression cut context ~28x and cost half the accuracy;
+that is the measurement the next phase is designed against, and a reader who cannot
+see it has to take the diagnosis on trust. Tuning until the number looks better and
+reporting only that would delete the reason for everything that follows.
+
+**2. The 50-question subset is dev, not test.** Batch size, the predicate arity
+list, the v2 extraction prompt, and the decision to build P4 before P3 were all
+chosen by looking at those questions. A headline number produced on them measures
+the fit of those choices as much as the system. `split_dev_test` draws a disjoint
+stratified 100 from the remaining 450, to be run once, at the end.
+
+**3. Fidelity is measured against the source text, not the answer key.** The
+coverage gate (D18) needs a gold answer to appear verbatim in a memory, which is a
+minority of LongMemEval and blind to the categories that failed. The new gate asks a
+question with no answer key at all: of the quantities, durations, dates,
+relative-time expressions and proper nouns *the user stated*, how many survive
+extraction? It cannot be fitted to the evaluation set, it runs on sessions no
+evaluation will touch, and it is per-category, so it says which clause of the prompt
+to write rather than just that something is wrong.
+
+---
+
+## D28 — The fidelity metric was wrong twice before the extractor was (measured)
+
+Both times, a low score turned out to be the denominator counting specifics no
+extractor should keep. Both were caught by reading the misses instead of acting on
+the number.
+
+| | symptom | cause | effect on the score |
+|---|---|---|---|
+| quantity | "dropped: `1`, `2`, `3`, `4`" | a user pasted a numbered document; list markers counted as stated quantities | 90 → 39 stated; recall 18.9% → 38.5% |
+| proper_noun | "dropped: `as i'm`" | capitalised sentence openers matched the multi-word pattern | ~10% of matches |
+| quantity | `16GB` never counted | `\b\d+\b` has no word boundary between `16` and `GB`, so unit-suffixed numbers were invisible | silently excluded the most useful cases |
+
+A third correction excluded interrogative sentences and assistant turns: a user
+asking *"how tall was Osama bin Laden?"* has stated nothing about themselves, and
+scoring those proper nouns as losses would push the prompt toward storing trivia.
+
+**The rule this establishes.** A metric that disagrees with the system is not
+evidence about the system until its denominator has been read. Tuning a prompt
+against an uninspected denominator does not produce a better extractor; it produces
+one fitted to the metric's mistakes. All four corrections are pinned as tests.
+
+---
+
+## D29 — v2 improves extraction, and not enough to spend an ingest on (measured)
+
+Same 60 held-out sessions, same batch size, same corrected metric. v1 restored from
+git to be scored under the same rules rather than compared against its own older,
+looser measurement.
+
+| facet | v1 | v2 |
+|---|---|---|
+| duration | 35.7% | **50.0%** |
+| relative_time | 25.0% | **50.0%** |
+| quantity | 33.3% | 38.5% |
+| proper_noun | 16.7% | 16.7% |
+| **overall** | **25.0%** | **30.8%** |
+| memories/session | 0.9 | 1.1 |
+
+The prompt rewrite works where it was specific — durations and relative time, both
+named with examples, both roughly doubled. It does nothing for proper nouns, which
+were named with examples too.
+
+**Decision: do not run the full ingest yet.** v1's 25% fidelity produced 26%
+end-to-end accuracy. 30.8% is a real improvement and not one that plausibly changes
+the outcome, and an ingest plus two evaluation runs costs most of a day's quota. The
+gate exists precisely so that this judgement can be made for four requests.
+
+**Batch size is not the constraint, which was worth knowing.** Extracting one
+session per request instead of fifteen triples memory density and does not improve
+fidelity at all:
+
+| sessions/request | memories/session | overall fidelity |
+|---|---|---|
+| 15 | 1.1 | 24.0% |
+| 5 | 2.2 | 23.9% |
+| 1 | 3.4 | 22.4% |
+
+More records about the same subset of the content. The model is not running out of
+room; it is deciding most specifics are not worth recording. That rules out the
+cheapest hypothesis and keeps the D5 batch size on evidence rather than on quota
+arithmetic alone.
+
+---
+
 ## D26 — ChronoMem loses to both baselines, and the cause is upstream of P4 (measured)
 
 **Result** (LongMemEval-S, stratified 50, same answerer and judge as every other row):
