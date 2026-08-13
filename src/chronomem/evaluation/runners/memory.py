@@ -66,6 +66,9 @@ class MemoryRunner:
         index: NumpyFlatIndex,
         temporal: bool = False,
         top_k: int = 20,
+        token_budget: int = 0,
+        utility_model=None,
+        type_floors: dict[str, float] | None = None,
         max_output_tokens: int = 512,
         chars_per_token: float = 4.6,
     ) -> None:
@@ -76,6 +79,11 @@ class MemoryRunner:
         self.index = index
         self.temporal = temporal
         self.top_k = top_k
+        # 0 disables packing and keeps the plain top-k truncation, so the P6 rows
+        # are a change of selection policy against an otherwise identical pipeline.
+        self.token_budget = token_budget
+        self.utility_model = utility_model
+        self.type_floors = type_floors
         self.max_output_tokens = max_output_tokens
         self.chars_per_token = chars_per_token
         # A plain attribute, not a property: the CLI overrides it so that the
@@ -109,9 +117,46 @@ class MemoryRunner:
             memories = [m for m in memories if m.status == "active"]
         return memories[: self.top_k]
 
+    def _pack(self, candidates: list[Memory], scores: dict[str, float], query: str):
+        """Select under a token budget instead of truncating at top_k.
+
+        Utilities come from the predictor when one is supplied and from the
+        retrieval score otherwise. The fallback is not a placeholder: "pack by
+        relevance" is the control the utility-aware packer has to beat, and running
+        both through the same knapsack is what isolates the utility signal from the
+        packing.
+        """
+        from chronomem.influence import build as build_features
+        from chronomem.pack import pack
+
+        if self.utility_model is None:
+            utilities = [scores.get(m.id, 0.0) for m in candidates]
+        else:
+            import numpy as np
+
+            rows = [
+                build_features(
+                    m,
+                    query=query,
+                    semantic_score=scores.get(m.id, 0.0),
+                    rank=i,
+                    neighbours=candidates,
+                ).as_list()
+                for i, m in enumerate(candidates)
+            ]
+            utilities = self.utility_model.predict(np.array(rows, dtype=float)).tolist()
+
+        return pack(candidates, utilities, self.token_budget, type_floors=self.type_floors)
+
     def answer(self, instance: Instance) -> Answer:
         query = self.encoder.encode_one(instance.question)
+        hits = dict(self.index.search(query, limit=len(self.index)))
         selected = self._select(query, instance.question_id)
+
+        packed = None
+        if self.token_budget:
+            packed = self._pack(selected, hits, instance.question)
+            selected = packed.selected
 
         body = "\n".join(render_memory(m, self.temporal) for m in selected)
         context = f"{TEMPORAL_NOTE}\n\n{body}" if self.temporal else body
@@ -141,6 +186,9 @@ class MemoryRunner:
                 "top_k": self.top_k,
                 "temporal": self.temporal,
                 "superseded_shown": sum(1 for m in selected if m.status != "active"),
+                "token_budget": self.token_budget,
+                "packed_utilisation": packed.utilisation if packed else None,
+                "dropped_negative": packed.dropped_negative if packed else None,
                 "evidence_recalled": bool(
                     evidence & {m.source_session_id for m in selected if m.source_session_id}
                 ),

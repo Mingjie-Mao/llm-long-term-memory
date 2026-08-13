@@ -838,5 +838,88 @@ def ingest_fidelity(
     usage.save(settings.results_dir / "raw" / "fidelity.usage.json")
 
 
+influence_app = typer.Typer(help="P6: memory utility measurement and packing")
+app.add_typer(influence_app, name="influence")
+
+
+@influence_app.command("cost")
+def influence_cost(
+    questions: int = typer.Option(50),
+    top_k: int = typer.Option(20),
+    leave_one_in: bool = typer.Option(True),
+) -> None:
+    """What a full influence measurement costs, before committing to it."""
+    from chronomem.influence import requests_needed
+
+    answers = requests_needed(questions, top_k, leave_one_in)
+    t = Table(show_header=False)
+    t.add_column(style="cyan")
+    t.add_column(justify="right")
+    t.add_row("answer calls", f"{answers:,}")
+    t.add_row("judge calls", f"{answers:,}")
+    t.add_row("total requests", f"{answers * 2:,}")
+    t.add_row("days at 500/day", f"{answers * 2 / 500:.1f}")
+    console.print(t)
+    console.print(
+        "[dim]This is why the measurement is offline and its output is a training "
+        "set: a packer running it per query would spend far more inference than the "
+        "tokens it saves.[/dim]"
+    )
+
+
+@influence_app.command("fit")
+def influence_fit(
+    labels: str = typer.Option("results/raw/influence.jsonl"),
+    alpha: float = typer.Option(1.0, help="Ridge penalty"),
+) -> None:
+    """Fit the utility predictor on measured labels, held out by question."""
+    import numpy as np
+
+    from chronomem.influence import InfluenceDataset, fit_grouped
+
+    path = Path(labels)
+    if not path.exists():
+        console.print(f"[yellow]No labels at {path}.[/yellow] Run the measurement first.")
+        raise typer.Exit(1)
+
+    data = InfluenceDataset.load(path)
+    features_path = path.with_suffix(".features.npy")
+    if not features_path.exists():
+        console.print(f"[yellow]No features at {features_path}.[/yellow]")
+        raise typer.Exit(1)
+
+    x = np.load(features_path)
+    y = np.array([r.utility for r in data.rows])
+    groups = [r.question_id for r in data.rows]
+
+    model, report = fit_grouped(x, y, groups, alpha=alpha)
+    model.save(Settings().store_dir / "utility-predictor.json")
+
+    t = Table(title="utility predictor", show_header=False)
+    t.add_column(style="cyan")
+    t.add_column(justify="right")
+    t.add_row("rows", f"{report.n_train:,}")
+    t.add_row("held-out rows", f"{report.n_test:,}")
+    t.add_row("RMSE", f"{report.rmse:.3f}")
+    t.add_row("baseline (predict the mean)", f"{report.baseline_rmse:.3f}")
+    t.add_row("beats baseline", "[green]yes[/green]" if report.beats_baseline else "[red]no[/red]")
+    t.add_row("rank corr. with relevance", f"{report.spearman_vs_relevance:.2f}")
+    console.print(t)
+
+    if report.spearman_vs_relevance > 0.9:
+        console.print(
+            "\n[yellow]Predicted utility tracks the retrieval score almost exactly.[/yellow] "
+            "The experiment's question — can downstream utility beat relevance for "
+            "selection — is answered no at this scale."
+        )
+
+    ct = Table(title="coefficients")
+    ct.add_column("feature", style="cyan")
+    ct.add_column("weight", justify="right")
+    for name, w in sorted(report.coefficients.items(), key=lambda kv: -abs(kv[1])):
+        ct.add_row(name, f"{w:+.3f}")
+    console.print(ct)
+
+
 if __name__ == "__main__":
     app()
