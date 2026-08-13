@@ -116,6 +116,20 @@ class TemporalResolver:
             self._resolve_key(user_id, subject, predicate, stats)
         return stats
 
+    def resolve_everything(self) -> ResolutionStats:
+        """Full pass over every namespace in the store.
+
+        `resolve_all` takes one user id; this walks them all. The distinction is not
+        cosmetic — the corpus is 50 independent simulated users (D25), so
+        `resolve_all("user")` against this store examines zero keys and reports
+        success, which is how a whole-store repair pass can silently do nothing.
+        """
+        stats = ResolutionStats()
+        for user_id in self.store.user_ids():
+            for subject, predicate in self.store.predicate_keys(user_id):
+                self._resolve_key(user_id, subject, predicate, stats)
+        return stats
+
     def resolve_memories(self, memories: list[Memory]) -> ResolutionStats:
         """Resolve only the keys touched by a batch — the ingestion hot path."""
         stats = ResolutionStats()

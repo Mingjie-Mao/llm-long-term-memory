@@ -490,12 +490,16 @@ def ingest_run(
     if resolver is not None:
         # A final pass over every key: incremental resolution can leave a key stale
         # when a fact arrives in a later batch than the one it belongs before.
-        final = resolver.resolve_all("user")
+        final = resolver.resolve_everything()
         t.add_row("final pass: superseded", f"{final.superseded:,}")
         t.add_row("final pass: restatements", f"{final.restatements:,}")
         t.add_row("undated (unresolvable)", f"{final.skipped_undated:,}")
     console.print(t)
-    console.print(store.count_by_type("user"))
+    by_type: dict[str, int] = {}
+    for ns in store.user_ids():
+        for k, v in store.count_by_type(ns).items():
+            by_type[k] = by_type.get(k, 0) + v
+    console.print(dict(sorted(by_type.items(), key=lambda kv: -kv[1])))
 
     if not outcome.completed:
         console.print(f"\n[yellow]Stopped:[/yellow] {outcome.stopped_reason}")
@@ -614,7 +618,7 @@ def resolve(
     settings = Settings()
     store = SQLiteMemoryStore(settings.store_dir / f"{store_name}.db")
     store.initialize()
-    stats = TemporalResolver(store).resolve_all("user")
+    stats = TemporalResolver(store).resolve_everything()
 
     t = Table(title="temporal resolution", show_header=False)
     t.add_column(style="cyan")
@@ -625,7 +629,7 @@ def resolve(
     t.add_row("restatements", f"{stats.restatements:,}")
     t.add_row("promoted back", f"{stats.promoted:,}")
     t.add_row("undated (unresolvable)", f"{stats.skipped_undated:,}")
-    t.add_row("active memories", f"{store.count('user', status='active'):,}")
+    t.add_row("active memories", f"{store.count(status='active'):,}")
     console.print(t)
     store.close()
 

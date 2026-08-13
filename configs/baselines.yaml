@@ -50,3 +50,13 @@ temporal_resolution: true
 
 retrieval:
   top_k: 20
+
+# 15, not the 10 D5 chose. That decision assumed a 1,500/day extractor budget;
+# the measured limit is 500, which makes a 10-session batch cost ~470 requests —
+# 94% of the day, with no room for a single retry. 15 costs ~314 (63%) and the
+# quality risk is small: at batch size 10 the model mis-attributed zero facts to
+# the wrong session, so it had headroom to spare.
+ingest:
+  sessions_per_request: 15
+  checkpoint_every: 5
+  dedupe_similarity_threshold: 0.92

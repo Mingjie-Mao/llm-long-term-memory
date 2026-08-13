@@ -709,6 +709,66 @@ looking at real output shows it was told the wrong thing.
 
 ---
 
+## D26 — ChronoMem loses to both baselines, and the cause is upstream of P4 (measured)
+
+**Result** (LongMemEval-S, stratified 50, same answerer and judge as every other row):
+
+| variant | accuracy | temporal | know-update | evid. recall | ctx tokens |
+|---|---|---|---|---|---|
+| `full_context` | 56.0% | 23.1% | 87.5% | — | 109,260 |
+| `naive_rag` | 54.0% | 46.2% | 75.0% | 94.0% | 13,057 |
+| `chronomem_no_temporal` | **26.0%** | 7.7% | 37.5% | 80.0% | 331 |
+| `chronomem` | **26.0%** | 7.7% | 62.5% | 80.0% | 465 |
+
+Temporal resolution changes nothing detectable: 3 wins, 3 losses, p = 1.000.
+
+**Where the loss is, precisely.** Retrieval is not the problem. The evidence
+session's memories are recalled for **40 of 50** questions — and of those 40, only
+**12 are answered correctly**. **28 of 50** answers are "I do not know". The right
+memories are in the prompt and the answer is not in them.
+
+One case traced end to end. *"How long have I been collecting vintage cameras?"*,
+gold `three months`. The evidence session yielded three memories, ranked first:
+
+```
+- The user owns 17 vintage cameras, including a Brownie Hawkeye acquired in May 2023.
+- The user owns a rare 1978 pressing of Fleetwood Mac's Rumours.
+- The user owns a Mondo poster featuring Hogwarts castle.
+```
+
+The duration was never extracted. The neighbouring question (`25` postcards) failed
+the same way and the model answered `17` — the nearest number in context.
+
+**This is the coverage gate's prediction arriving end to end.** D18 measured
+measurable answer coverage at 50% and said explicitly that the number was a
+regression detector rather than a target. 50% is the ceiling this store can support;
+26% is what remains after retrieval and reasoning take their share.
+
+**The sequencing call was wrong.** P4 was promoted ahead of P3 because temporal
+reasoning was the worst category for both baselines (D16). That reasoning treated a
+category score as a diagnosis. It was a symptom: temporal questions need dates and
+durations, and those are exactly the specifics extraction drops. The timeline
+machinery is correct — 35 supersessions, chains verified by hand, 16 tests — and it
+is **not load-bearing**, because it orders facts that no longer contain the answer.
+Building it did not waste the quota it cost, but it could not have paid off before
+the representation did.
+
+**What this changes.** The next constraint is extraction fidelity, not ranking and
+not the timeline. The concrete handle is memories per session: **0.8**, against
+sessions of ~12 substantive turns. Options, cheapest first:
+
+1. Raise extraction density — the current prompt asks for facts worth remembering,
+   which quietly excludes durations, counts, and relative time expressions.
+2. Smaller batches. 15 sessions per request was chosen for quota (D5 revision), and
+   compression per session may be the price.
+3. Keep the source session text addressable so the packer can fall back to it. This
+   changes what is being measured and needs its own row rather than a silent switch.
+
+**Reported, not buried.** A memory system that scores half of naive RAG is the
+result. It is in the README table with the others.
+
+---
+
 ## D25 — One namespace per question, and sessions are not shared across them
 
 **The bug.** The first real ingest wrote every question's haystack under a single

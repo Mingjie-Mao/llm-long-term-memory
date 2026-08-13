@@ -120,6 +120,10 @@ class MemoryStore(Protocol):
         """
         ...
 
+    def user_ids(self) -> list[str]:
+        """Every namespace present. Whole-store passes must walk all of them."""
+        ...
+
     def predicate_keys(self, user_id: str) -> list[tuple[str, str]]:
         """Every (subject, predicate) present, for a full re-resolution pass."""
         ...

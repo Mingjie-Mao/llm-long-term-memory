@@ -198,6 +198,16 @@ class SQLiteMemoryStore:
         ).fetchall()
         return [self._row_to_memory(r) for r in rows]
 
+    def user_ids(self) -> list[str]:
+        """Every namespace present in the store.
+
+        The corpus is not one user: LongMemEval questions are independent
+        simulated people, so memories are namespaced per question (D25). Any
+        whole-store pass has to walk all of them — `resolve_all("user")` against a
+        50-namespace store silently resolves nothing and reports success.
+        """
+        return [r[0] for r in self._conn.execute("SELECT DISTINCT user_id FROM memories")]
+
     def predicate_keys(self, user_id: str) -> list[tuple[str, str]]:
         """Every (subject, predicate) pair present, for a full re-resolution pass."""
         rows = self._conn.execute(

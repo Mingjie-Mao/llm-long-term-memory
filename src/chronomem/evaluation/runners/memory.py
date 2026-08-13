@@ -93,11 +93,16 @@ class MemoryRunner:
     def _select(self, query: np.ndarray, namespace: str) -> list[Memory]:
         # Filtering after ranking, not before, so the two variants share an
         # identical ranking and the ablation isolates the timeline.
-        # Over-fetch: the index is global, so a question's own memories are a small
-        # slice of it and the namespace filter discards most hits. Without the
-        # filter, retrieval for one question returns another question's evidence —
-        # LongMemEval questions are independent users with no shared history.
-        hits = self.index.search(query, limit=self.top_k * 40)
+        #
+        # The whole index is scanned rather than a top-N slice of it. The index is
+        # global while a question's memories are one namespace of fifty, so any
+        # fixed over-fetch returns mostly other questions' facts and the survivors
+        # fall well short of top_k: at `top_k * 40` the packed context came to ~250
+        # tokens against a ~40-memory namespace, and accuracy read 20% — a
+        # measurement of the over-fetch factor, not of the memory system.
+        # Scanning is affordable precisely because the store is small (2k vectors),
+        # and it makes the namespace filter exact instead of best-effort.
+        hits = self.index.search(query, limit=len(self.index))
         memories = self.store.get_many([mid for mid, _ in hits])
         memories = [m for m in memories if m.user_id == namespace]
         if self.temporal:

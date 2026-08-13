@@ -7,11 +7,11 @@ An adaptive long-term memory engine for LLM agents — temporal fact resolution,
 memory consolidation, decay-aware hybrid retrieval, and token-budgeted context
 assembly, evaluated on [LongMemEval](https://github.com/xiaowu0162/LongMemEval).
 
-> **Status: P4 built, evaluation pending.** Storage, quota-aware LLM client,
-> evaluation harness, both baselines, extraction, and temporal resolution are in;
-> the baselines are measured. The `chronomem` rows need a full re-ingest under the
-> per-question namespace fix ([D25](docs/DECISIONS.md)) — ~528 requests, currently
-> blocked on the extractor model's daily free-tier quota.
+> **Status: P4 measured, and it lost.** All four rows below are real runs. The
+> memory system scores 26% against naive RAG's 54%, and the cause is diagnosed:
+> extraction discards the specifics the questions ask about, so the timeline has
+> nothing to order. Extraction fidelity is the next constraint, not ranking
+> ([D26](docs/DECISIONS.md)).
 
 ## Why
 
@@ -35,12 +35,44 @@ LongMemEval-S · 50-question stratified subset (seed 0) · answerer
 Latency is API time and excludes free-tier rate-limit queueing. Every number is
 regenerated from the JSONL artifacts in `results/raw/`.
 
-| Variant | n | Accuracy | SS-user | SS-asst | Multi-sess | Temporal | Know-update | Abstention | Evid. recall | Ctx tokens | p95 |
-|---|---|---|---|---|---|---|---|---|---|---|---|
-| `full_context` | 50 | **56.0%** | 100% | 100% | 38.5% | 23.1% | 87.5% | 50.0% | — | 109,260 | 7.9s |
-| `naive_rag` | 50 | **54.0%** | 71.4% | 83.3% | 38.5% | 46.2% | 75.0% | 100% | 94.0% | 13,057 | 2.1s |
-| `chronomem_no_temporal` | — | — | — | — | — | — | — | — | — | — | — |
-| `chronomem` | — | — | — | — | — | — | — | — | — | — | — |
+| Variant | n | Accuracy | Temporal | Know-update | Abstention | Evid. recall | Ctx tokens | p95 |
+|---|---|---|---|---|---|---|---|---|
+| `full_context` | 50 | **56.0%** | 23.1% | 87.5% | 50.0% | — | 109,260 | 7.9s |
+| `naive_rag` | 50 | **54.0%** | 46.2% | 75.0% | 100% | 94.0% | 13,057 | 2.1s |
+| `chronomem_no_temporal` | 50 | **26.0%** | 7.7% | 37.5% | 100% | 80.0% | 331 | 7.0s |
+| `chronomem` | 50 | **26.0%** | 7.7% | 62.5% | 100% | 80.0% | 465 | 1.2s |
+
+**The memory system loses, and the reason is not where P4 was aimed.** 26% against
+naive RAG's 54%, and temporal resolution makes no detectable difference
+(3W-3L, p = 1.000).
+
+Retrieval is not the failure. The evidence session's memories are recalled for
+**40 of 50** questions, and of those 40 only **12 are answered correctly**. **28 of
+50** answers are "I do not know". The right memories reach the prompt; the answer is
+not in them.
+
+One case, traced end to end — *"How long have I been collecting vintage cameras?"*,
+gold `three months`. The evidence session produced three memories, ranked first:
+
+```
+- The user owns 17 vintage cameras, including a Brownie Hawkeye acquired in May 2023.
+- The user owns a rare 1978 pressing of Fleetwood Mac's Rumours.
+- The user owns a Mondo poster featuring Hogwarts castle.
+```
+
+The duration was never extracted. The next question (`25` postcards) failed the same
+way, and the model answered `17` — the nearest number in context.
+
+This is the coverage gate arriving end to end. It measured 50% answer coverage
+before any evaluation was run and was documented as a ceiling; 26% is what survives
+retrieval and reasoning on top of it. **The sequencing was wrong**: P4 was promoted
+because temporal reasoning was the baselines' worst category, which treated a
+symptom as a diagnosis. Temporal questions need durations and dates, and those are
+precisely what extraction drops. The timeline machinery is correct — 35
+supersessions, chains verified by hand, 16 tests — and it cannot pay off until the
+representation it orders contains the answers. Extraction fidelity is the next
+constraint; see [D26](docs/DECISIONS.md).
+
 
 Regenerate with `chronomem eval report`; the full table including
 single-session-assistant and preference splits is in
@@ -74,7 +106,8 @@ not above naive retrieval. Both sit at 54–56%, and full context is *worse* on 
 reasoning — **23.1% against 46.2%** — which is the one category split large enough
 to survive the noise floor in the direction that matters. Handing the model 109k
 tokens of undifferentiated history makes it worse at working out which fact is
-current. That is the gap P4 exists to close.
+current. That was the gap P4 was built to close — and the measurement above shows it
+did not, for a reason that had nothing to do with the timeline.
 
 Two category-level splits survive the noise floor as leads worth pulling on:
 
