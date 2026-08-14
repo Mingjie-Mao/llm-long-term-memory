@@ -129,7 +129,7 @@ class UtilityPredictor:
         return m
 
 
-RELEVANCE_COLUMN = FEATURE_NAMES.index("semantic_score")
+RELEVANCE_COLUMN = FEATURE_NAMES.index("retrieval_score")
 
 
 def fit_grouped(

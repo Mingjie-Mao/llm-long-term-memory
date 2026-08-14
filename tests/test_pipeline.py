@@ -112,6 +112,17 @@ def test_happy_path_writes_everything(build):
     store.close()
 
 
+def test_pipeline_retains_raw_turns_for_later_evidence_hydration(build):
+    pipeline, store, _ = build(FakeExtractor())
+    source = session("s0")
+
+    pipeline.run([("u1", source)])
+
+    turns = store.turns_for_session("s0")
+    assert [(turn.role, turn.content) for turn in turns] == [("user", "content of s0")]
+    store.close()
+
+
 def test_quota_exhaustion_keeps_completed_batches(build):
     quota = DailyQuotaExhausted("m", Wait(3600.0, "rpd"))
     pipeline, store, _ = build(FakeExtractor(fail_on_batch=3, exc=quota))

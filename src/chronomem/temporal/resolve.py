@@ -87,6 +87,11 @@ def _value(memory: Memory) -> str:
     return (memory.object or memory.content or "").strip().lower()
 
 
+def _is_removal(memory: Memory) -> bool:
+    """A removal mentions the old value, but is never a restatement of it."""
+    return memory.update_op == "removes"
+
+
 def as_of(memories: list[Memory], when: datetime) -> list[Memory]:
     """Which of these facts were in force at `when`.
 
@@ -186,7 +191,12 @@ class TemporalResolver:
         # interval; the rest are restatements of a value already in force.
         runs: list[list[Memory]] = []
         for m in dated:
-            if runs and _value(runs[-1][0]) == _value(m):
+            if (
+                runs
+                and not _is_removal(runs[-1][0])
+                and not _is_removal(m)
+                and _value(runs[-1][0]) == _value(m)
+            ):
                 runs[-1].append(m)
             else:
                 runs.append([m])
@@ -195,7 +205,18 @@ class TemporalResolver:
             owner, repeats = run[0], run[1:]
             nxt = runs[i + 1][0] if i + 1 < len(runs) else None
 
-            if nxt is None:
+            # Resolvability is decided per key, but *closing* a fact is decided per
+            # successor. Without this check a single `replaces` anywhere on a key
+            # made the whole chain resolvable and then retired every consecutive
+            # pair on it — including successors that explicitly said `coexists`.
+            # Observed live: "averaging $100 per week on groceries" was retired by
+            # "spent $75 at Walmart last Saturday", two facts that are both true,
+            # because some third fact on `grocery_spending` had signalled a change.
+            #
+            # Stage B's gate scores 0% false supersede in isolation; the loss was
+            # entirely in the integration, which is why the per-fact verdict has to
+            # be honoured here rather than summarised into a per-key one.
+            if nxt is None or not nxt.replaces_previous:
                 self._make_current(owner, stats)
             else:
                 self._supersede(owner, nxt, stats)

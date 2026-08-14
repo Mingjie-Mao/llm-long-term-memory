@@ -7,11 +7,11 @@ An adaptive long-term memory engine for LLM agents — temporal fact resolution,
 memory consolidation, decay-aware hybrid retrieval, and token-budgeted context
 assembly, evaluated on [LongMemEval](https://github.com/xiaowu0162/LongMemEval).
 
-> **Status: P4 measured, and it lost.** All four rows below are real runs. The
-> memory system scores 26% against naive RAG's 54%, and the cause is diagnosed:
-> extraction discards the specifics the questions ask about, so the timeline has
-> nothing to order. Extraction fidelity is the next constraint, not ranking
-> ([D26](docs/DECISIONS.md)).
+> **Status: a negative result localized the representation failure.** On a
+> 50-question development subset, v1 ChronoMem scores 26% against naive RAG's 54%.
+> Source-session retrieval often succeeds, but the structured representation drops
+> answer-bearing details. The next experiment is provenance-backed evidence
+> hydration, not ranking tuning. See [the evaluation protocol](docs/EVALUATION.md).
 
 ## Why
 
@@ -32,24 +32,25 @@ of them is worth spending context-window tokens on.
 
 LongMemEval-S · 50-question stratified subset (seed 0) · answerer
 `gemini-3.5-flash-lite` · judge `gemma-4-31b-it`, both pinned across every row.
-Latency is API time and excludes free-tier rate-limit queueing. Every number is
-regenerated from the JSONL artifacts in `results/raw/`.
+The subset is for development and failure localization, not a final benchmark
+claim. p95 is observed answer-provider API latency and excludes free-tier rate-limit
+queueing. Every number is regenerated from the JSONL artifacts in `results/raw/`.
 
-| Variant | n | Accuracy | Temporal | Know-update | Abstention | Evid. recall | Ctx tokens | p95 |
+| Variant | n | Accuracy | Temporal | Know-update | Abstention | Source-session recall | Ctx tokens | p95 API |
 |---|---|---|---|---|---|---|---|---|
 | `full_context` | 50 | **56.0%** | 23.1% | 87.5% | 50.0% | — | 109,260 | 7.9s |
 | `naive_rag` | 50 | **54.0%** | 46.2% | 75.0% | 100% | 94.0% | 13,057 | 2.1s |
 | `chronomem_no_temporal` | 50 | **26.0%** | 7.7% | 37.5% | 100% | 80.0% | 331 | 7.0s |
 | `chronomem` | 50 | **26.0%** | 7.7% | 62.5% | 100% | 80.0% | 465 | 1.2s |
 
-**The memory system loses, and the reason is not where P4 was aimed.** 26% against
-naive RAG's 54%, and temporal resolution makes no detectable difference
-(3W-3L, p = 1.000).
+**The memory system loses, and the root cause is upstream of temporal resolution.**
+Temporal filtering has 3 wins and 3 losses (`p = 1.000`): no detectable difference
+at n=50, not evidence that the variants are equivalent.
 
-Retrieval is not the failure. The evidence session's memories are recalled for
-**40 of 50** questions, and of those 40 only **12 are answered correctly**. **28 of
-50** answers are "I do not know". The right memories reach the prompt; the answer is
-not in them.
+**40 of 50 source sessions have a selected memory**, but only **12 of those 40**
+answers are correct. That is source-session recall, not answer-support recall: the
+selected memory can cite the right session while dropping the duration, date, or
+number the answer needs. **28 of 50** answers are "I do not know".
 
 One case, traced end to end — *"How long have I been collecting vintage cameras?"*,
 gold `three months`. The evidence session produced three memories, ranked first:
@@ -63,15 +64,11 @@ gold `three months`. The evidence session produced three memories, ranked first:
 The duration was never extracted. The next question (`25` postcards) failed the same
 way, and the model answered `17` — the nearest number in context.
 
-This is the coverage gate arriving end to end. It measured 50% answer coverage
-before any evaluation was run and was documented as a ceiling; 26% is what survives
-retrieval and reasoning on top of it. **The sequencing was wrong**: P4 was promoted
-because temporal reasoning was the baselines' worst category, which treated a
-symptom as a diagnosis. Temporal questions need durations and dates, and those are
-precisely what extraction drops. The timeline machinery is correct — 35
-supersessions, chains verified by hand, 16 tests — and it cannot pay off until the
-representation it orders contains the answers. Extraction fidelity is the next
-constraint; see [D26](docs/DECISIONS.md).
+The v1 literal-coverage gate was a regression detector, not an accuracy ceiling.
+It nevertheless exposed the same failure: a lossy structured memory is not enough
+when the question depends on local wording or temporal detail. New stores retain raw
+turns and memory-to-span anchors; the `two_stage_hydrated` ablation restores only
+bounded source evidence after structured retrieval.
 
 
 Regenerate with `chronomem eval report`; the full table including
@@ -96,18 +93,13 @@ full_context vs naive_rag
   17 disagreements, p = 1.000  ->  no detectable difference
 ```
 
-**So the headline finding is not that full context wins by two points — it is that
-109,260 tokens buy nothing over 13,057.** An 8.4x context cost, and the two systems
-disagree on 17 of 50 questions in both directions equally.
+**The supported finding is narrower than "more context buys nothing"**: on this
+50-question subset, 8.4x more context produced no detectable accuracy improvement
+over naive RAG. The two systems disagree on 17 questions in both directions.
 
-That is a stronger result than a small win would have been, and it sharpens the
-target: the ceiling is not "get closer to full context", because full context is
-not above naive retrieval. Both sit at 54–56%, and full context is *worse* on temporal
-reasoning — **23.1% against 46.2%** — which is the one category split large enough
-to survive the noise floor in the direction that matters. Handing the model 109k
-tokens of undifferentiated history makes it worse at working out which fact is
-current. That was the gap P4 was built to close — and the measurement above shows it
-did not, for a reason that had nothing to do with the timeline.
+Both systems sit at 54–56%. The temporal split (23.1% vs 46.2%) is a directional
+lead for follow-up, not a claim that it survives sampling noise: its denominator is
+small and it needs repeated and held-out evaluation.
 
 Two category-level splits survive the noise floor as leads worth pulling on:
 
@@ -115,9 +107,8 @@ Two category-level splits survive the noise floor as leads worth pulling on:
   it does not know; handed the whole history it confabulates half the time. Any
   variant that packs in more relevant material risks trading this away, so the
   column stays visible rather than folded into an average.
-- **Single-session-user, 100% vs 71.4%.** Retrieval is dropping evidence full
-  context has. Evidence recall is 94%, so this is the missing 6% and the ranking,
-  not a structural failure.
+- **Single-session-user, 100% vs 71.4%.** This is a follow-up lead, not a retrieval
+  conclusion: 94% source-session recall does not measure answer-support recall.
 
 These compare ChronoMem's own variants against two baselines. They are **not** a
 claim about any third-party system: cross-system memory numbers are only comparable
@@ -126,8 +117,8 @@ under an identical judge and prompt, which is not the case across published resu
 **Judge reliability is not assumed.** The free tier offers no model stronger than
 the answerer to grade with, so the judge is cross-checked against an independent
 labelling of all 50 questions: **94% agreement (n=50)** — 1 case where the judge was
-more lenient than the label, 2 where it was stricter. The absence of a systematic
-direction matters more than the headline number.
+more lenient than the label, 2 where it was stricter. No directional bias was
+observed in those three disagreements; this does not prove the judge is unbiased.
 
 Two caveats are stated rather than buried. First, the labelling was done by an LLM,
 not a person, so it establishes that the rubric is reproducible, not that the judge
@@ -142,6 +133,9 @@ and an answer naming a specific artist where the gold describes an unnamed band.
 output. `run_eval` refuses to return a result when the two disagree: an earlier run
 printed `50 questions, 56.0%` over a file holding 30, and both numbers looked
 reasonable ([D25](docs/DECISIONS.md)).
+
+Detailed metric definitions, failure taxonomy, repeat-run protocol, and latency
+interpretation are in [docs/EVALUATION.md](docs/EVALUATION.md).
 
 ## Extraction
 

@@ -868,7 +868,7 @@ strings — which is a structural change, not another prompt edit.
 
 **Result** (LongMemEval-S, stratified 50, same answerer and judge as every other row):
 
-| variant | accuracy | temporal | know-update | evid. recall | ctx tokens |
+| variant | accuracy | temporal | know-update | source-session recall | ctx tokens |
 |---|---|---|---|---|---|
 | `full_context` | 56.0% | 23.1% | 87.5% | — | 109,260 |
 | `naive_rag` | 54.0% | 46.2% | 75.0% | 94.0% | 13,057 |
@@ -877,10 +877,11 @@ strings — which is a structural change, not another prompt edit.
 
 Temporal resolution changes nothing detectable: 3 wins, 3 losses, p = 1.000.
 
-**Where the loss is, precisely.** Retrieval is not the problem. The evidence
-session's memories are recalled for **40 of 50** questions — and of those 40, only
-**12 are answered correctly**. **28 of 50** answers are "I do not know". The right
-memories are in the prompt and the answer is not in them.
+**Where the loss is, precisely.** A selected memory cites an answer session for
+**40 of 50** questions — and of those 40, only **12 are answered correctly**.
+**28 of 50** answers are "I do not know". This is source-session recall, not
+answer-support recall: the selected structured memory can have dropped the fact the
+answer requires.
 
 One case traced end to end. *"How long have I been collecting vintage cameras?"*,
 gold `three months`. The evidence session yielded three memories, ranked first:
@@ -895,9 +896,10 @@ The duration was never extracted. The neighbouring question (`25` postcards) fai
 the same way and the model answered `17` — the nearest number in context.
 
 **This is the coverage gate's prediction arriving end to end.** D18 measured
-measurable answer coverage at 50% and said explicitly that the number was a
-regression detector rather than a target. 50% is the ceiling this store can support;
-26% is what remains after retrieval and reasoning take their share.
+measurable literal coverage at 50% and said explicitly that the number was a
+regression detector rather than a target. It is not an accuracy ceiling: derived
+answers can be supported without appearing verbatim, while literal facts can be lost
+before retrieval begins.
 
 **The sequencing call was wrong.** P4 was promoted ahead of P3 because temporal
 reasoning was the worst category for both baselines (D16). That reasoning treated a

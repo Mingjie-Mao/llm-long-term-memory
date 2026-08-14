@@ -19,6 +19,7 @@ from chronomem.evaluation.datasets.longmemeval import HaystackSession
 from chronomem.llm.client import GeminiClient
 from chronomem.store import Memory
 
+from .provenance import attach_source_span
 from .schemas import COMMON_PREDICATES, ExtractedMemory, ExtractionResult
 
 EXTRACT_SYSTEM = """\
@@ -180,6 +181,13 @@ def memory_id(user_id: str, session_id: str, content: str) -> str:
 class ExtractionOutcome:
     memories: list[Memory]
     dropped_bad_index: int
+    requests: int = 1
+    """API calls this extraction actually cost.
+
+    Reported by the extractor rather than assumed by the caller, because the
+    two-stage path spends two per batch and the pipeline counted one — the budget
+    for a full ingest read half its true size until an end-to-end run showed 19
+    calls against a reported 10."""
     """Records the model attributed to a session outside the batch. Tracked rather
     than silently discarded — a nonzero rate means the batch is too large for the
     model to keep straight, which is the signal to lower sessions_per_request."""
@@ -200,7 +208,7 @@ class Extractor:
 
     def extract(self, sessions: list[HaystackSession]) -> ExtractionOutcome:
         if not sessions:
-            return ExtractionOutcome([], 0)
+            return ExtractionOutcome([], 0, requests=0)
 
         rendered = render_batch(sessions)
         prompt = _PROMPT.format(
@@ -239,25 +247,28 @@ class Extractor:
                 continue
 
             memories.append(
-                Memory(
-                    id=memory_id(self.user_id, session.session_id, content),
-                    user_id=self.user_id,
-                    type=item.type,
-                    content=content,
-                    token_count=max(1, int(len(content) / self.chars_per_token)),
-                    subject=item.subject,
-                    predicate=item.predicate,
-                    object=item.object.strip(),
-                    importance=item.importance,
-                    replaces_previous=item.replaces_previous,
-                    event_time=event_time,
-                    # valid_from starts at the event; valid_to stays open until P4
-                    # finds something that supersedes it.
-                    valid_from=event_time,
-                    valid_to=None,
-                    ingested_at=now,
-                    entities=[e.strip() for e in item.entities if e.strip()],
-                    source_session_id=session.session_id,
+                attach_source_span(
+                    Memory(
+                        id=memory_id(self.user_id, session.session_id, content),
+                        user_id=self.user_id,
+                        type=item.type,
+                        content=content,
+                        token_count=max(1, int(len(content) / self.chars_per_token)),
+                        subject=item.subject,
+                        predicate=item.predicate,
+                        object=item.object.strip(),
+                        importance=item.importance,
+                        replaces_previous=item.replaces_previous,
+                        event_time=event_time,
+                        # valid_from starts at the event; valid_to stays open until P4
+                        # finds something that supersedes it.
+                        valid_from=event_time,
+                        valid_to=None,
+                        ingested_at=now,
+                        entities=[e.strip() for e in item.entities if e.strip()],
+                        source_session_id=session.session_id,
+                    ),
+                    session,
                 )
             )
         return ExtractionOutcome(memories, bad_index)

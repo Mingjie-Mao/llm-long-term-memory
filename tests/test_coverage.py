@@ -8,13 +8,14 @@ from __future__ import annotations
 
 from datetime import datetime
 
-from chronomem.evaluation.datasets.longmemeval import Instance
+from chronomem.evaluation.datasets.longmemeval import HaystackSession, HaystackTurn, Instance
 from chronomem.ingest.coverage import (
     UNMEASURABLE_TYPES,
     CoverageCase,
     CoverageReport,
     answer_present,
     evaluate_coverage,
+    source_literal_present,
 )
 from chronomem.store import Memory
 
@@ -59,6 +60,19 @@ def test_structured_triple_fields_are_searched():
 def test_absent_answer_is_absent():
     assert not answer_present("The Glass Menagerie", [mem("The user auditioned for The Crucible")])
     assert not answer_present("10", [mem("The user wants to cut Netflix time")])
+
+
+def test_source_literal_coverage_is_distinct_from_structured_coverage():
+    inst = instance("q1", "single-session-user", "three months")
+    inst.sessions = [
+        HaystackSession(
+            "s1",
+            "2026-01-01",
+            [HaystackTurn("user", "I started collecting cameras three months ago.")],
+        )
+    ]
+    assert source_literal_present("three months", inst)
+    assert not answer_present("three months", [mem("The user owns 17 vintage cameras")])
 
 
 def test_empty_gold_is_never_covered():
@@ -116,6 +130,7 @@ def test_abstention_questions_are_skipped():
     report = evaluate_coverage(instances, lambda sessions: [mem("The user lives in Sydney")])
     assert report.n == 1
     assert report.rate == 1.0
+    assert report.source_literal_rate == 0.0
 
 
 def test_by_type_counts_only_answerable_questions():

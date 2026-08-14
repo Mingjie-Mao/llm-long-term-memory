@@ -48,7 +48,7 @@ def render_table(reports: list[RunReport]) -> str:
     header = (
         ["Variant", "n", "Accuracy"]
         + [label for _, label in TYPE_COLUMNS]
-        + ["Abstention", "Evid. recall", "Ctx tokens", "p95 latency"]
+        + ["Abstention", "Source-session recall", "Ctx tokens", "p95 API latency"]
     )
     lines = ["| " + " | ".join(header) + " |", "|" + "---|" * len(header)]
 
@@ -64,7 +64,7 @@ def render_table(reports: list[RunReport]) -> str:
             b = by_type.get(key)
             row.append(_pct(b.accuracy) if b else "—")
         row.append(_pct(sum(r.correct for r in abst) / len(abst)) if abst else "—")
-        row.append(_pct(rep.evidence_recall))
+        row.append(_pct(rep.source_session_recall))
         row.append(f"{rep.median_context_tokens:,.0f}")
         row.append(f"{rep.p95_latency_ms / 1000:.1f}s")
         lines.append("| " + " | ".join(row) + " |")
@@ -82,10 +82,10 @@ def render_summary(rep: RunReport) -> str:
         f"- questions: **{rep.n}**",
         f"- accuracy: **{_pct(rep.accuracy)}**",
         f"- median context tokens: **{rep.median_context_tokens:,.0f}**",
-        f"- p95 latency: **{rep.p95_latency_ms / 1000:.1f}s**",
+        f"- observed p95 answer API latency: **{rep.p95_latency_ms / 1000:.1f}s**",
     ]
-    if rep.evidence_recall is not None:
-        out.append(f"- evidence recall: **{_pct(rep.evidence_recall)}**")
+    if rep.source_session_recall is not None:
+        out.append(f"- source-session recall: **{_pct(rep.source_session_recall)}**")
     if not rep.completed:
         out.append(f"- ⚠️ stopped early: {rep.stopped_reason}")
     out += ["", "| question type | n | accuracy |", "|---|---|---|"]

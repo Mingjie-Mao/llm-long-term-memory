@@ -69,29 +69,39 @@ def measure_influence(
     """
     path = Path(out_path)
     features_path = path.with_suffix(".features.npy")
+    header_path = features_path.with_suffix(".json")
     path.parent.mkdir(parents=True, exist_ok=True)
 
     rows: list[MemoryInfluence] = []
     feature_rows: list[list[float]] = []
     done_questions: set[str] = set()
 
-    if resume and path.exists():
+    if resume and path.exists() and features_path.exists() and header_path.exists():
         existing = InfluenceDataset.load(path)
-        rows = existing.rows
-        done_questions = {r.question_id for r in rows}
-        if features_path.exists():
+        try:
             loaded = np.load(features_path)
-            # Only reuse features that line up with the labels; a mismatch means one
-            # of the two files was written by an interrupted run, and silently
-            # pairing them would fit the model on shuffled rows.
-            if len(loaded) == len(rows):
-                feature_rows = loaded.tolist()
-            else:
-                rows, done_questions, feature_rows = [], set(), []
+            header = json.loads(header_path.read_text())
+            completed = set(header.get("completed_questions", []))
+            if (
+                tuple(header.get("features", ())) == FEATURE_NAMES
+                and len(loaded) == len(existing.rows)
+                and all(isinstance(question_id, str) for question_id in completed)
+            ):
+                committed = [
+                    (row, features)
+                    for row, features in zip(existing.rows, loaded.tolist(), strict=True)
+                    if row.question_id in completed
+                ]
+                rows = [row for row, _ in committed]
+                feature_rows = [features for _, features in committed]
+                done_questions = completed
+        except (json.JSONDecodeError, OSError, ValueError):
+            pass
 
     def flush() -> None:
         InfluenceDataset(rows=rows).save(path)
         np.save(features_path, np.array(feature_rows, dtype=float).reshape(-1, len(FEATURE_NAMES)))
+        write_feature_header(header_path, done_questions)
 
     for instance in instances:
         if instance.question_id in done_questions:
@@ -99,10 +109,16 @@ def measure_influence(
         try:
             retrieved = retrieve_fn(instance)
             if not retrieved:
+                done_questions.add(instance.question_id)
+                flush()
+                if on_question:
+                    on_question(instance, InfluenceDataset(rows=rows))
                 continue
             memories = [m for m, _ in retrieved]
 
             full_correct = _answer_and_judge(answer_fn, judge, instance, memories)
+            question_rows: list[MemoryInfluence] = []
+            question_features: list[list[float]] = []
 
             for rank, (memory, score) in enumerate(retrieved):
                 without = [m for m in memories if m.id != memory.id]
@@ -112,7 +128,7 @@ def measure_influence(
                 if leave_one_in:
                     alone_correct = _answer_and_judge(answer_fn, judge, instance, [memory])
 
-                rows.append(
+                question_rows.append(
                     MemoryInfluence(
                         question_id=instance.question_id,
                         memory_id=memory.id,
@@ -121,15 +137,17 @@ def measure_influence(
                         alone_correct=alone_correct,
                     )
                 )
-                feature_rows.append(
+                question_features.append(
                     build(
                         memory,
                         query=instance.question,
-                        semantic_score=score,
+                        retrieval_score=score,
                         rank=rank,
                         neighbours=memories,
                     ).as_list()
                 )
+            rows.extend(question_rows)
+            feature_rows.extend(question_features)
         except DailyQuotaExhausted as exc:
             flush()
             return MeasurementOutcome(
@@ -163,10 +181,17 @@ def measure_influence(
     )
 
 
-def write_feature_header(path: str | Path) -> None:
+def write_feature_header(path: str | Path, completed_questions: set[str]) -> None:
     """Record the column order beside the array.
 
     `fit_grouped` reads the retrieval score from column 0 by convention. Persisting
     the names makes that checkable rather than assumed.
     """
-    Path(path).write_text(json.dumps({"features": list(FEATURE_NAMES)}))
+    Path(path).write_text(
+        json.dumps(
+            {
+                "features": list(FEATURE_NAMES),
+                "completed_questions": sorted(completed_questions),
+            }
+        )
+    )

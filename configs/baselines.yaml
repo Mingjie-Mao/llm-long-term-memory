@@ -34,11 +34,11 @@ models:
 
 quota:
   # Per model, not per project — the 429 body reports
-  # GenerateRequestsPerDayPerProjectPerModel-FreeTier. Conservative placeholders;
-  # tighten from observed 429s rather than from documentation.
+  # GenerateRequestsPerDayPerProjectPerModel-FreeTier. The flash-lite extractor
+  # has reported 500 RPD; runtime also loads any model-specific learned limit.
   rpm: 10
   tpm: 250000
-  rpd: 1500
+  rpd: 500
   max_wait_seconds: 300.0
 
 dataset_variant: s
@@ -51,12 +51,17 @@ temporal_resolution: true
 retrieval:
   top_k: 20
 
-# 15, not the 10 D5 chose. That decision assumed a 1,500/day extractor budget;
-# the measured limit is 500, which makes a 10-session batch cost ~470 requests —
-# 94% of the day, with no room for a single retry. 15 costs ~314 (63%) and the
-# quality risk is small: at batch size 10 the model mis-attributed zero facts to
-# the wrong session, so it had headroom to spare.
+# 15, not the 10 D5 chose. With 2,400 namespaced dev-50 sessions, two-stage
+# extraction takes 160 batches / 320 extractor calls before deduplication. The
+# measured 500-RPD limit leaves room for the observed dedupe calls and retries on
+# an otherwise unused quota day; quality risk is small because batch size 10 had
+# zero cross-session misattributions.
 ingest:
   sessions_per_request: 15
+  # Stage A emits bare fact strings, Stage B keys them with a second LLM call.
+  # Two requests per batch instead of one: the rule-based Stage B scored 43%
+  # predicate accuracy and produced zero supersessions, while this passes the
+  # temporal gate on all four metrics.
+  two_stage: true
   checkpoint_every: 5
   dedupe_similarity_threshold: 0.92

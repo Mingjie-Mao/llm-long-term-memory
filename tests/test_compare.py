@@ -121,3 +121,10 @@ def test_a_single_run_has_no_measurable_spread():
     v = Variability("naive_rag", [0.48])
     assert v.spread == 0.0
     assert v.stdev == 0.0
+
+
+def test_bootstrap_interval_is_deterministic_and_contains_the_mean():
+    v = Variability("naive_rag", [0.48, 0.50, 0.56])
+    low, high = v.bootstrap_interval
+    assert low <= v.mean <= high
+    assert (low, high) == v.bootstrap_interval

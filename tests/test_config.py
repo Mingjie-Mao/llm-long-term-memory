@@ -12,6 +12,7 @@ def test_defaults_are_the_naive_rag_baseline():
     assert not cfg.temporal_resolution
     assert not cfg.consolidation
     assert not cfg.decay.enabled
+    assert not cfg.pack.enabled
 
 
 def test_enabled_lists_only_nonzero_signals():
@@ -27,6 +28,7 @@ def test_yaml_roundtrip(tmp_path):
     )
     cfg.retrieval.weights = RetrievalWeights(semantic=1.0, bm25=0.6, recency=0.3)
     cfg.pack.token_budget = 4_000
+    cfg.pack.enabled = True
 
     path = tmp_path / "v4.yaml"
     cfg.to_yaml(path)
@@ -35,6 +37,7 @@ def test_yaml_roundtrip(tmp_path):
     assert loaded.name == "v4-temporal"
     assert loaded.temporal_resolution
     assert loaded.pack.token_budget == 4_000
+    assert loaded.pack.enabled
     assert loaded.retrieval.weights.enabled() == ["semantic", "bm25", "recency"]
 
 

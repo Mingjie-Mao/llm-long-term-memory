@@ -13,7 +13,7 @@ import sqlite3
 from datetime import datetime
 from pathlib import Path
 
-from .base import LexicalHit, Memory, MemoryStatus, MemoryType, Session
+from .base import LexicalHit, Memory, MemoryStatus, MemoryType, Session, Turn
 
 _SCHEMA = Path(__file__).with_name("schema.sql")
 
@@ -24,9 +24,11 @@ _FTS_TOKEN = re.compile(r"[A-Za-z0-9_]+")
 
 _MEMORY_COLUMNS = (
     "id, user_id, type, content, subject, predicate, object, importance, confidence, "
-    "event_time, valid_from, valid_to, ingested_at, replaces_previous, superseded_by, status, "
+    "event_time, valid_from, valid_to, ingested_at, update_op, replaces_previous, "
+    "superseded_by, status, "
     "strength, "
-    "access_count, last_accessed_at, token_count, source_session_id"
+    "access_count, last_accessed_at, strength_updated_at, token_count, source_session_id, "
+    "source_turn_index, source_char_start, source_char_end"
 )
 
 
@@ -47,7 +49,33 @@ class SQLiteMemoryStore:
 
     def initialize(self) -> None:
         self._conn.executescript(_SCHEMA.read_text())
+        self._migrate()
         self._conn.commit()
+
+    def _migrate(self) -> None:
+        """Apply additive migrations to stores created by earlier project phases.
+
+        The schema file is deliberately a clean description of a new database, but
+        SQLite's `CREATE TABLE IF NOT EXISTS` never adds columns to an existing
+        table. Without this small migration runner, opening a v1 store after adding
+        Stage B's `update_op` fails at the next insert — or, worse, leaves a store
+        whose code and metadata silently disagree.
+        """
+        columns = {
+            row["name"] for row in self._conn.execute("PRAGMA table_info(memories)").fetchall()
+        }
+        if "update_op" not in columns:
+            self._conn.execute(
+                "ALTER TABLE memories ADD COLUMN update_op TEXT NOT NULL DEFAULT 'coexists'"
+            )
+        if "strength_updated_at" not in columns:
+            self._conn.execute("ALTER TABLE memories ADD COLUMN strength_updated_at TEXT")
+        if "source_turn_index" not in columns:
+            self._conn.execute("ALTER TABLE memories ADD COLUMN source_turn_index INTEGER")
+        if "source_char_start" not in columns:
+            self._conn.execute("ALTER TABLE memories ADD COLUMN source_char_start INTEGER")
+        if "source_char_end" not in columns:
+            self._conn.execute("ALTER TABLE memories ADD COLUMN source_char_end INTEGER")
 
     # ---------------------------------------------------------------- sessions
 
@@ -86,18 +114,23 @@ class SQLiteMemoryStore:
                 _dt(m.valid_from),
                 _dt(m.valid_to),
                 _dt(m.ingested_at or datetime.now()),
+                m.update_op,
                 int(m.replaces_previous),
                 m.superseded_by,
                 m.status,
                 m.strength,
                 m.access_count,
                 _dt(m.last_accessed_at),
+                _dt(m.strength_updated_at),
                 m.token_count,
                 m.source_session_id,
+                m.source_turn_index,
+                m.source_char_start,
+                m.source_char_end,
             )
             for m in memories
         ]
-        placeholders = ",".join(["?"] * 21)
+        placeholders = ",".join(["?"] * 26)
         with self._conn:
             self._conn.executemany(
                 f"INSERT OR REPLACE INTO memories({_MEMORY_COLUMNS}) VALUES ({placeholders})",
@@ -146,13 +179,18 @@ class SQLiteMemoryStore:
             valid_from=_parse(row["valid_from"]),
             valid_to=_parse(row["valid_to"]),
             ingested_at=_parse(row["ingested_at"]),
+            update_op=row["update_op"],
             replaces_previous=bool(row["replaces_previous"]),
             superseded_by=row["superseded_by"],
             status=row["status"],
             strength=row["strength"],
             access_count=row["access_count"],
             last_accessed_at=_parse(row["last_accessed_at"]),
+            strength_updated_at=_parse(row["strength_updated_at"]),
             source_session_id=row["source_session_id"],
+            source_turn_index=row["source_turn_index"],
+            source_char_start=row["source_char_start"],
+            source_char_end=row["source_char_end"],
             entities=entities,
         )
 
@@ -190,7 +228,12 @@ class SQLiteMemoryStore:
         are ingested in arbitrary order, so a memory arriving now can be *older*
         than one already stored and has to slot in before it.
         """
-        clause = "" if include_superseded else " AND status = 'active'"
+        # Evicted memories remain in the database for auditability but must never
+        # re-enter a rebuilt timeline. `include_superseded` means active plus
+        # superseded, not every historical status.
+        clause = " AND status != 'evicted'"
+        if not include_superseded:
+            clause += " AND status = 'active'"
         rows = self._conn.execute(
             f"SELECT {_MEMORY_COLUMNS} FROM memories WHERE user_id = ? AND subject = ? "
             f"AND predicate = ?{clause}",
@@ -219,15 +262,20 @@ class SQLiteMemoryStore:
 
     # --------------------------------------------------------------- retrieval
 
-    def search_lexical(self, user_id: str, query: str, limit: int) -> list[LexicalHit]:
+    def search_lexical(
+        self, user_id: str, query: str, limit: int, include_superseded: bool = False
+    ) -> list[LexicalHit]:
         tokens = _FTS_TOKEN.findall(query)
         if not tokens:
             return []
         match = " OR ".join(f'"{t}"' for t in tokens)
+        status_clause = "m.status != 'evicted'"
+        if not include_superseded:
+            status_clause += " AND m.status = 'active'"
         rows = self._conn.execute(
             "SELECT m.id AS id, bm25(memories_fts) AS score "
             "FROM memories_fts JOIN memories m ON m.rowid = memories_fts.rowid "
-            "WHERE memories_fts MATCH ? AND m.user_id = ? AND m.status = 'active' "
+            f"WHERE memories_fts MATCH ? AND m.user_id = ? AND {status_clause} "
             "ORDER BY score LIMIT ?",  # bm25() is negative; more negative = better
             (match, user_id, limit),
         ).fetchall()
@@ -262,15 +310,86 @@ class SQLiteMemoryStore:
                 "UPDATE memories SET valid_to=? WHERE id=?", (_dt(valid_to), memory_id)
             )
 
-    def record_access(self, memory_ids: list[str], at: datetime) -> None:
+    def record_access(
+        self, memory_ids: list[str], at: datetime, reinforcement: float = 0.30
+    ) -> None:
+        if not memory_ids:
+            return
+        reinforcement = min(1.0, max(0.0, reinforcement))
+        with self._conn:
+            self._conn.executemany(
+                "UPDATE memories SET access_count = access_count + 1, "
+                "strength = MIN(1.0, strength + ? * (1.0 - strength)), "
+                "last_accessed_at = ?, strength_updated_at = ? "
+                "WHERE id = ?",
+                [(reinforcement, _dt(at), _dt(at), mid) for mid in memory_ids],
+            )
+
+    def set_strengths(self, strengths: dict[str, float], at: datetime | None = None) -> None:
+        if not strengths:
+            return
+        values = [
+            (min(1.0, max(0.0, strength)), memory_id) for memory_id, strength in strengths.items()
+        ]
+        with self._conn:
+            if at is None:
+                self._conn.executemany("UPDATE memories SET strength = ? WHERE id = ?", values)
+            else:
+                self._conn.executemany(
+                    "UPDATE memories SET strength = ?, strength_updated_at = ? WHERE id = ?",
+                    [(strength, _dt(at), memory_id) for strength, memory_id in values],
+                )
+
+    def mark_evicted(self, memory_ids: list[str]) -> None:
         if not memory_ids:
             return
         with self._conn:
             self._conn.executemany(
-                "UPDATE memories SET access_count = access_count + 1, last_accessed_at = ? "
-                "WHERE id = ?",
-                [(_dt(at), mid) for mid in memory_ids],
+                "UPDATE memories SET status = 'evicted' WHERE id = ? AND status = 'active'",
+                [(memory_id,) for memory_id in memory_ids],
             )
+
+    def add_evidence(self, memory_id: str, source_memory_ids: list[str]) -> None:
+        if not source_memory_ids:
+            return
+        with self._conn:
+            self._conn.executemany(
+                "INSERT OR IGNORE INTO evidence(memory_id, source_memory_id) VALUES (?, ?)",
+                [
+                    (memory_id, source_id)
+                    for source_id in source_memory_ids
+                    if source_id != memory_id
+                ],
+            )
+
+    def evidence_for(self, memory_id: str) -> list[str]:
+        rows = self._conn.execute(
+            "SELECT source_memory_id FROM evidence WHERE memory_id = ? ORDER BY source_memory_id",
+            (memory_id,),
+        ).fetchall()
+        return [row["source_memory_id"] for row in rows]
+
+    def evidence_source_ids(self) -> set[str]:
+        rows = self._conn.execute("SELECT DISTINCT source_memory_id FROM evidence").fetchall()
+        return {row["source_memory_id"] for row in rows}
+
+    def turns_for_session(self, session_id: str) -> list[Turn]:
+        rows = self._conn.execute(
+            "SELECT id, session_id, turn_index, role, content, ts FROM turns "
+            "WHERE session_id = ? ORDER BY turn_index",
+            (session_id,),
+        ).fetchall()
+        return [
+            Turn(
+                id=row["id"],
+                session_id=row["session_id"],
+                turn_index=row["turn_index"],
+                role=row["role"],
+                content=row["content"],
+                ts=_parse(row["ts"]),
+            )
+            for row in rows
+        ]
 
     def count(self, user_id: str | None = None, status: MemoryStatus | None = None) -> int:
         clauses, params = [], []

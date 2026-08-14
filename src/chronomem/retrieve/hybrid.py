@@ -1,0 +1,179 @@
+"""Deterministic, explainable hybrid retrieval.
+
+All five signals are normalized to ``[0, 1]`` before weights are applied. This is
+not cosmetic: SQLite FTS5's BM25 values are negative and unbounded, whereas cosine
+similarity is bounded. Adding their raw values would make the lexical term dominate
+or vanish according to an implementation detail instead of a configured weight.
+"""
+
+from __future__ import annotations
+
+import math
+import re
+from collections.abc import Mapping
+from dataclasses import dataclass
+from datetime import datetime
+
+import numpy as np
+
+from chronomem.store import Memory, MemoryStore, VectorIndex
+
+_TOKEN = re.compile(r"[a-z0-9]+")
+
+
+@dataclass(frozen=True, slots=True)
+class RetrievalSignals:
+    semantic: float
+    bm25: float
+    recency: float
+    importance: float
+    entity: float
+
+    def weighted(self, weights: Mapping[str, float]) -> float:
+        return sum(
+            getattr(self, name) * float(weights.get(name, 0.0))
+            for name in self.__dataclass_fields__
+        )
+
+    def to_dict(self) -> dict[str, float]:
+        return {
+            "semantic": self.semantic,
+            "bm25": self.bm25,
+            "recency": self.recency,
+            "importance": self.importance,
+            "entity": self.entity,
+        }
+
+
+@dataclass(frozen=True, slots=True)
+class RetrievedMemory:
+    memory: Memory
+    score: float
+    signals: RetrievalSignals
+    semantic_raw: float
+    bm25_raw: float | None
+    strength: float
+
+
+def _clip(value: float) -> float:
+    return min(1.0, max(0.0, float(value)))
+
+
+def _tokens(text: str) -> set[str]:
+    return {token for token in _TOKEN.findall(text.lower()) if len(token) > 2}
+
+
+def _min_max(values: dict[str, float], *, lower_is_better: bool = False) -> dict[str, float]:
+    """Normalize observed candidates; one unambiguous hit gets full credit."""
+    if not values:
+        return {}
+    low, high = min(values.values()), max(values.values())
+    if math.isclose(low, high):
+        return {key: 1.0 for key in values}
+    if lower_is_better:
+        return {key: (high - value) / (high - low) for key, value in values.items()}
+    return {key: (value - low) / (high - low) for key, value in values.items()}
+
+
+class HybridRetriever:
+    """Union semantic and lexical candidates, then score five independent signals."""
+
+    def __init__(
+        self,
+        store: MemoryStore,
+        index: VectorIndex,
+        *,
+        weights: Mapping[str, float],
+        candidate_limit: int = 50,
+        recency_halflife_days: float = 30.0,
+        use_strength: bool = False,
+        now: datetime | None = None,
+    ) -> None:
+        self.store = store
+        self.index = index
+        self.weights = {name: float(value) for name, value in weights.items()}
+        self.candidate_limit = max(1, candidate_limit)
+        self.recency_halflife_days = max(0.001, recency_halflife_days)
+        self.use_strength = use_strength
+        self.now = now
+
+    def retrieve(
+        self, query: np.ndarray, query_text: str, namespace: str, *, temporal: bool, limit: int
+    ) -> list[RetrievedMemory]:
+        """Return ranked candidates without leaking namespaces or evicted records."""
+        semantic_hits = self.index.search(query, limit=len(self.index))
+        semantic_raw = dict(semantic_hits)
+        semantic_memories = self.store.get_many([memory_id for memory_id, _ in semantic_hits])
+        semantic_ids = [
+            memory.id
+            for memory in semantic_memories
+            if memory.user_id == namespace
+            and memory.status != "evicted"
+            and (not temporal or memory.status == "active")
+        ][: self.candidate_limit]
+
+        lexical_hits = self.store.search_lexical(
+            namespace,
+            query_text,
+            self.candidate_limit,
+            include_superseded=not temporal,
+        )
+        bm25_raw = {hit.memory_id: hit.score for hit in lexical_hits}
+
+        candidate_ids = list(dict.fromkeys([*semantic_ids, *bm25_raw]))
+        memories = self.store.get_many(candidate_ids)
+        memories = [
+            memory
+            for memory in memories
+            if memory.user_id == namespace
+            and memory.status != "evicted"
+            and (not temporal or memory.status == "active")
+        ]
+        if not memories:
+            return []
+
+        bm25 = _min_max(
+            {memory.id: bm25_raw[memory.id] for memory in memories if memory.id in bm25_raw},
+            lower_is_better=True,
+        )
+        query_terms = _tokens(query_text)
+        now = self.now or datetime.now()
+        scored = []
+        for memory in memories:
+            raw = semantic_raw.get(memory.id, -1.0)
+            when = memory.event_time or memory.ingested_at
+            age_days = max(0.0, (now - when).total_seconds() / 86_400) if when else 0.0
+            recency = math.exp(-math.log(2) * age_days / self.recency_halflife_days)
+            entity = self._entity_overlap(memory, query_terms)
+            signals = RetrievalSignals(
+                semantic=_clip((raw + 1.0) / 2.0),
+                bm25=_clip(bm25.get(memory.id, 0.0)),
+                recency=_clip(recency),
+                importance=_clip(memory.importance),
+                entity=_clip(entity),
+            )
+            scored.append(
+                RetrievedMemory(
+                    memory=memory,
+                    score=signals.weighted(self.weights)
+                    * (memory.strength if self.use_strength else 1.0),
+                    signals=signals,
+                    semantic_raw=raw,
+                    bm25_raw=bm25_raw.get(memory.id),
+                    strength=memory.strength,
+                )
+            )
+
+        scored.sort(key=lambda hit: (-hit.score, -hit.semantic_raw, hit.memory.id))
+        return scored[:limit]
+
+    @staticmethod
+    def _entity_overlap(memory: Memory, query_terms: set[str]) -> float:
+        if not memory.entities or not query_terms:
+            return 0.0
+        overlaps = []
+        for entity in memory.entities:
+            entity_terms = _tokens(entity)
+            if entity_terms:
+                overlaps.append(len(entity_terms & query_terms) / len(entity_terms))
+        return max(overlaps, default=0.0)

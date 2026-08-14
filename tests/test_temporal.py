@@ -308,10 +308,14 @@ def test_a_wrong_arity_call_is_undone_on_re_resolution(store, monkeypatch):
         ]
     )
 
-    # Resolve while the predicate is (wrongly) considered single-valued.
-    monkeypatch.setattr(resolve_mod, "is_single_valued", lambda p: p == "has_goal")
-    TemporalResolver(store).resolve_all("u1")
-    assert store.get("g1").status == "superseded", "the bug being reproduced"
+    # Put the store into the damaged state directly. Constructing it through the
+    # resolver no longer works, and that is the point: closing a fact now requires
+    # its successor to say so, so a wrong arity call alone cannot retire anything.
+    # The repair path still has to exist for stores damaged before that fix.
+    from datetime import datetime
+
+    store.mark_superseded("g1", "g2", datetime(2023, 5, 1))
+    assert store.get("g1").status == "superseded", "the damaged state to repair"
 
     # Now with the corrected list.
     monkeypatch.setattr(resolve_mod, "is_single_valued", lambda p: False)
@@ -348,3 +352,68 @@ def test_goals_and_schedules_are_multi_valued():
     assert not is_single_valued("owns")
     assert is_single_valued("lives_in")
     assert is_single_valued("works_as")
+
+
+def test_a_coexisting_successor_does_not_close_its_predecessor(store):
+    """Resolvability is per key; closing a fact is per successor.
+
+    Found by running the real pipeline after Stage B's gate had scored 0% false
+    supersede in isolation. One `replaces` anywhere on a key made the whole key
+    resolvable, and the chain rewrite then retired every consecutive pair on it —
+    including successors that had explicitly said `coexists`. Live example: "The
+    user has been averaging around $100 per week on groceries" was retired by "The
+    user spent around $75 at Walmart last Saturday".
+    """
+    store.add_memories(
+        [
+            fact("avg", "$100 per week", 3, predicate="grocery_spending", replaces_previous=False),
+            fact(
+                "trip", "$75 at Walmart", 5, predicate="grocery_spending", replaces_previous=False
+            ),
+            # A genuine change on the same key, which is what made the key resolvable.
+            fact("moved", "$150 per week", 7, predicate="grocery_spending", replaces_previous=True),
+        ]
+    )
+    TemporalResolver(store).resolve_all("u1")
+
+    assert store.get("avg").status == "active", "a coexisting successor must not retire it"
+    assert store.get("moved").status == "active"
+
+    # `trip` *is* closed, by `moved`, which did say replaces. Correct as far as the
+    # per-successor rule goes — and it exposes the residual limitation: a
+    # replacement closes whatever immediately precedes it in event order, which
+    # here is the one-off Walmart trip rather than the weekly average it actually
+    # supersedes. Interleaved coexisting facts make "the previous value" ambiguous,
+    # and the chain model cannot express that yet.
+    assert store.get("trip").status == "superseded"
+    assert store.get("trip").superseded_by == "moved"
+
+
+def test_a_replacing_successor_still_closes_its_predecessor(store):
+    """The other half: the fix must not disable supersede altogether."""
+    store.add_memories(
+        [
+            fact("old", "Canberra", 3, predicate="home_city", replaces_previous=False),
+            fact("new", "Sydney", 8, predicate="home_city", replaces_previous=True),
+        ]
+    )
+    TemporalResolver(store).resolve_all("u1")
+
+    assert store.get("old").status == "superseded"
+    assert store.get("old").superseded_by == "new"
+    assert store.get("new").status == "active"
+
+
+def test_a_removal_is_not_folded_into_the_value_it_ends(store):
+    """Selling a Honda repeats its name but is not a second ownership statement."""
+    owned = fact("owned", "Honda Civic", 3, predicate="car", replaces_previous=False)
+    removed = fact("sold", "Honda Civic", 7, predicate="car", replaces_previous=True)
+    removed.content = "The user sold their Honda Civic"
+    removed.update_op = "removes"
+    store.add_memories([owned, removed])
+
+    TemporalResolver(store).resolve_all("u1")
+
+    assert store.get("owned").status == "superseded"
+    assert store.get("owned").superseded_by == "sold"
+    assert store.get("sold").status == "active"

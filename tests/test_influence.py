@@ -94,7 +94,7 @@ def test_every_feature_is_computable_without_an_llm_or_a_gold_answer():
     f = build(
         mem("m1", "The user owns 25 postcards since March 2023"),
         query="how many postcards?",
-        semantic_score=0.8,
+        retrieval_score=0.8,
         rank=0,
         neighbours=[],
     )
@@ -111,8 +111,8 @@ def test_duplicate_rate_sees_a_near_copy():
     twin = mem("m2", "The user lives in Canberra and has two cats")
     unrelated = mem("m3", "The user prefers oat milk")
 
-    with_twin = build(target, query="q", semantic_score=0.5, rank=0, neighbours=[twin])
-    alone = build(target, query="q", semantic_score=0.5, rank=0, neighbours=[unrelated])
+    with_twin = build(target, query="q", retrieval_score=0.5, rank=0, neighbours=[twin])
+    alone = build(target, query="q", retrieval_score=0.5, rank=0, neighbours=[unrelated])
     assert with_twin.duplicate_content_rate > alone.duplicate_content_rate
 
 

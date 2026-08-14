@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import sqlite3
 from datetime import UTC, datetime, timedelta
 
 import pytest
@@ -39,6 +40,9 @@ def test_roundtrip_preserves_all_fields(store):
         importance=0.8,
         event_time=NOW,
         valid_from=NOW,
+        source_turn_index=3,
+        source_char_start=12,
+        source_char_end=40,
         entities=["PyTorch"],
     )
     store.add_memories([original])
@@ -50,6 +54,7 @@ def test_roundtrip_preserves_all_fields(store):
     assert got.predicate == "prefers_framework"
     assert got.importance == pytest.approx(0.8)
     assert got.event_time == NOW
+    assert (got.source_turn_index, got.source_char_start, got.source_char_end) == (3, 12, 40)
     assert got.entities == ["PyTorch"]
     assert got.is_current
 
@@ -114,13 +119,76 @@ def test_supersede_marks_old_and_excludes_from_active(store):
 
 
 def test_record_access_reinforces(store):
-    store.add_memories([mem("m1", "a fact")])
+    store.add_memories([mem("m1", "a fact", strength=0.2)])
     later = NOW + timedelta(days=1)
-    store.record_access(["m1"], later)
-    store.record_access(["m1"], later)
+    store.record_access(["m1"], later, reinforcement=0.5)
+    store.record_access(["m1"], later, reinforcement=0.5)
     got = store.get("m1")
     assert got.access_count == 2
     assert got.last_accessed_at == later
+    assert got.strength == pytest.approx(0.8)
+
+
+def test_initialize_migrates_a_v1_database_with_no_update_op(tmp_path):
+    """`CREATE TABLE IF NOT EXISTS` does not upgrade an existing SQLite table."""
+    path = tmp_path / "v1.db"
+    conn = sqlite3.connect(path)
+    conn.execute(
+        """CREATE TABLE memories (
+        id TEXT PRIMARY KEY, user_id TEXT NOT NULL, type TEXT NOT NULL, content TEXT NOT NULL,
+        subject TEXT, predicate TEXT, object TEXT, importance REAL NOT NULL DEFAULT 0.5,
+        confidence REAL NOT NULL DEFAULT 1.0, event_time TEXT, valid_from TEXT, valid_to TEXT,
+        ingested_at TEXT NOT NULL, replaces_previous INTEGER NOT NULL DEFAULT 0,
+        superseded_by TEXT, status TEXT NOT NULL DEFAULT 'active',
+        strength REAL NOT NULL DEFAULT 1.0, access_count INTEGER NOT NULL DEFAULT 0,
+        last_accessed_at TEXT, token_count INTEGER NOT NULL,
+        source_session_id TEXT)"""
+    )
+    conn.commit()
+    conn.close()
+
+    store = SQLiteMemoryStore(path)
+    store.initialize()
+    store.add_memories([mem("m1", "the user moved to Sydney", update_op="replaces")])
+    assert store.get("m1").update_op == "replaces"
+    store.close()
+
+
+def test_eviction_hides_memory_but_preserves_it_for_audit(store):
+    store.add_memories([mem("m1", "temporary note"), mem("m2", "durable note")])
+    store.mark_evicted(["m1"])
+
+    assert store.get("m1").status == "evicted"
+    assert [m.id for m in store.iter_active("u1")] == ["m2"]
+    assert store.count("u1") == 2
+    assert store.count("u1", status="evicted") == 1
+
+
+def test_evicted_facts_are_not_reopened_by_temporal_rebuild(store):
+    store.add_memories(
+        [
+            mem("m1", "user lives in Canberra", subject="user", predicate="lives_in"),
+            mem("m2", "user lives in Sydney", subject="user", predicate="lives_in"),
+        ]
+    )
+    store.mark_evicted(["m1"])
+
+    assert [m.id for m in store.find_by_predicate("u1", "user", "lives_in", True)] == ["m2"]
+
+
+def test_evidence_is_deduplicated_and_stably_ordered(store):
+    store.add_memories([mem("raw-b", "raw B"), mem("raw-a", "raw A"), mem("summary", "summary")])
+    store.add_evidence("summary", ["raw-b", "raw-a", "raw-a", "summary"])
+
+    assert store.evidence_for("summary") == ["raw-a", "raw-b"]
+
+
+def test_set_strengths_clamps_to_the_valid_range(store):
+    store.add_memories([mem("m1", "fact")])
+    store.set_strengths({"m1": 2.0})
+    assert store.get("m1").strength == 1.0
+    store.set_strengths({"m1": -1.0})
+    assert store.get("m1").strength == 0.0
 
 
 def test_content_update_keeps_fts_in_sync(store):
@@ -145,6 +213,7 @@ def test_sessions_and_turns(store):
     store.add_session(session)
     store.add_memories([mem("m1", "greeting exchange", source_session_id="s1")])
     assert store.get("m1").source_session_id == "s1"
+    assert [turn.content for turn in store.turns_for_session("s1")] == ["hi", "hello"]
 
 
 def test_count_by_type(store):

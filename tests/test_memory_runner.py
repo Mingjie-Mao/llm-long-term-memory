@@ -15,7 +15,7 @@ import pytest
 
 from chronomem.evaluation.datasets.longmemeval import Instance
 from chronomem.evaluation.runners.memory import MemoryRunner, render_memory
-from chronomem.store import Memory, NumpyFlatIndex, Session, SQLiteMemoryStore
+from chronomem.store import Memory, NumpyFlatIndex, Session, SQLiteMemoryStore, Turn
 
 
 class ScriptedClient:
@@ -177,6 +177,52 @@ def test_render_without_temporal_carries_no_dates():
 def test_evidence_recall_is_reported_from_source_sessions(wired):
     answer = wired(temporal=True).answer(instance())
     assert answer.notes["evidence_recalled"] is True
+    assert answer.notes["source_session_recalled"] is True
+
+
+def test_hydration_adds_local_verbatim_evidence_to_the_prompt(tmp_path):
+    store = SQLiteMemoryStore(tmp_path / "m.db")
+    store.initialize()
+    raw = "I started collecting vintage cameras three months ago. I now own 17 cameras."
+    store.add_session(
+        Session(
+            id="s1",
+            user_id="q1",
+            started_at=datetime(2023, 1, 1),
+            turns=[Turn("s1:0", "s1", 0, "user", raw, datetime(2023, 1, 1))],
+        )
+    )
+    start = raw.index("I now own")
+    memory = Memory(
+        id="m1",
+        user_id="q1",
+        type="semantic",
+        content="The user owns 17 vintage cameras.",
+        token_count=8,
+        source_session_id="s1",
+        source_turn_index=0,
+        source_char_start=start,
+        source_char_end=len(raw),
+    )
+    store.add_memories([memory])
+    index = NumpyFlatIndex(tmp_path / "idx", dim=2)
+    index.add([memory.id], np.ones((1, 2), dtype=np.float32))
+    client = ScriptedClient()
+    runner = MemoryRunner(
+        client,
+        model="m",
+        encoder=StubEncoder(),
+        store=store,
+        index=index,
+        evidence_hydration=True,
+    )
+
+    answer = runner.answer(instance())
+
+    assert "Verbatim source evidence" in client.prompts[0]
+    assert "three months ago" in client.prompts[0]
+    assert answer.notes["hydrated_memory_ids"] == ["m1"]
+    store.close()
 
 
 def test_prepare_is_a_no_op_because_the_store_is_prebuilt(wired):
@@ -194,6 +240,9 @@ def test_runner_names_match_the_config_variants(wired):
 def test_answer_is_json_serialisable_for_the_harness(wired):
     answer = wired(temporal=True).answer(instance())
     json.dumps(answer.notes)  # must not raise
+    assert answer.notes["retrieval_latency_ms"] >= 0
+    assert answer.notes["assembly_latency_ms"] >= 0
+    assert answer.notes["answerer_api_latency_ms"] == 4.0
 
 
 def test_another_questions_memories_are_never_retrieved(tmp_path):

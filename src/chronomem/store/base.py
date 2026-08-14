@@ -41,6 +41,11 @@ class Memory:
     valid_to: datetime | None = None
     ingested_at: datetime | None = None
 
+    update_op: str = "coexists"
+    """Stage B's verdict on what this fact does to earlier ones on its key.
+    `replaces_previous` is the boolean the resolver acts on today; this keeps the
+    `removes` case distinguishable for when it gets its own handling."""
+
     replaces_previous: bool = False
     """The user explicitly framed this as replacing an earlier statement. Lets the
     temporal resolver act on keys whose predicate is not structurally single-valued."""
@@ -51,8 +56,12 @@ class Memory:
     strength: float = 1.0
     access_count: int = 0
     last_accessed_at: datetime | None = None
+    strength_updated_at: datetime | None = None
 
     source_session_id: str | None = None
+    source_turn_index: int | None = None
+    source_char_start: int | None = None
+    source_char_end: int | None = None
     entities: list[str] = field(default_factory=list)
 
     @property
@@ -128,7 +137,9 @@ class MemoryStore(Protocol):
         """Every (subject, predicate) present, for a full re-resolution pass."""
         ...
 
-    def search_lexical(self, user_id: str, query: str, limit: int) -> list[LexicalHit]: ...
+    def search_lexical(
+        self, user_id: str, query: str, limit: int, include_superseded: bool = False
+    ) -> list[LexicalHit]: ...
 
     def mark_superseded(self, memory_id: str, superseded_by: str, valid_to: datetime) -> None: ...
 
@@ -142,8 +153,34 @@ class MemoryStore(Protocol):
 
     def set_validity(self, memory_id: str, valid_to: datetime | None) -> None: ...
 
-    def record_access(self, memory_ids: list[str], at: datetime) -> None:
+    def record_access(
+        self, memory_ids: list[str], at: datetime, reinforcement: float = 0.30
+    ) -> None:
         """Reinforcement half of decay (P5): bumps access_count and last_accessed_at."""
+        ...
+
+    def set_strengths(self, strengths: dict[str, float], at: datetime | None = None) -> None:
+        """Persist decayed strengths without changing retrieval metadata."""
+        ...
+
+    def mark_evicted(self, memory_ids: list[str]) -> None:
+        """Hide low-value active memories while preserving their provenance."""
+        ...
+
+    def add_evidence(self, memory_id: str, source_memory_ids: list[str]) -> None:
+        """Record the raw memories supporting a consolidated memory."""
+        ...
+
+    def evidence_for(self, memory_id: str) -> list[str]:
+        """Return source-memory IDs in a stable order for inspection and auditing."""
+        ...
+
+    def evidence_source_ids(self) -> set[str]:
+        """Sources already folded into a consolidation, used to prevent re-folding."""
+        ...
+
+    def turns_for_session(self, session_id: str) -> list[Turn]:
+        """Return the lossless source turns in their original order."""
         ...
 
     def count(self, user_id: str | None = None, status: MemoryStatus | None = None) -> int: ...

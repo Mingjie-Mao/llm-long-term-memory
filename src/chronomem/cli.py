@@ -125,7 +125,7 @@ def data_stats(
 def data_plan(
     variant: str = typer.Option("s"),
     data_dir: str = typer.Option("data"),
-    rpd: int = typer.Option(1_500, help="Requests/day allowed by your quota tier"),
+    rpd: int = typer.Option(500, help="Requests/day allowed by your quota tier"),
 ) -> None:
     """How many days does one full ingestion take at each batch size?
 
@@ -167,7 +167,12 @@ eval_app = typer.Typer(help="Run and report evaluations")
 app.add_typer(eval_app, name="eval")
 
 
-def _build(variant: str, cfg_path: str):
+def _default_store_name(variant: str) -> str:
+    """Keep new extraction variants physically separate from frozen v1 data."""
+    return "two-stage" if variant.startswith("two_stage") else "memories"
+
+
+def _build(variant: str, cfg_path: str, store_name: str | None = None):
     """Wire up client, judge, and runner for one variant."""
     from chronomem.config import ExperimentConfig
     from chronomem.embed import Encoder
@@ -200,14 +205,31 @@ def _build(variant: str, cfg_path: str):
         runner = FullContextRunner(client, model=cfg.models.answerer)
     elif variant == "naive_rag":
         runner = NaiveRAGRunner(client, model=cfg.models.answerer, encoder=Encoder())
-    elif variant in ("chronomem", "chronomem_no_temporal"):
+    elif variant in (
+        "chronomem",
+        "chronomem_no_temporal",
+        "two_stage",
+        "two_stage_no_temporal",
+        "two_stage_hydrated",
+        "two_stage_hydrated_no_temporal",
+    ):
         from chronomem.store import NumpyFlatIndex, SQLiteMemoryStore
 
-        store = SQLiteMemoryStore(settings.store_dir / "memories.db")
+        utility_model = None
+        if cfg.pack.enabled and cfg.pack.utility_model_path:
+            from chronomem.influence import UtilityPredictor
+
+            utility_model = UtilityPredictor.load(cfg.pack.utility_model_path)
+
+        stem = store_name or _default_store_name(variant)
+        store = SQLiteMemoryStore(settings.store_dir / f"{stem}.db")
         store.initialize()
-        index = NumpyFlatIndex(settings.store_dir / "memories-index", dim=cfg.models.embedding_dim)
+        index = NumpyFlatIndex(settings.store_dir / f"{stem}-index", dim=cfg.models.embedding_dim)
         if not len(index):
-            raise typer.BadParameter("the memory store is empty — run `chronomem ingest run` first")
+            raise typer.BadParameter(
+                f"the {stem!r} memory store is empty — run `chronomem ingest run "
+                f"--store-name {stem}` first"
+            )
         runner = MemoryRunner(
             client,
             model=cfg.models.answerer,
@@ -215,7 +237,19 @@ def _build(variant: str, cfg_path: str):
             store=store,
             index=index,
             top_k=cfg.retrieval.top_k,
-            temporal=(variant == "chronomem"),
+            temporal=not variant.endswith("_no_temporal"),
+            retrieval_weights=cfg.retrieval.weights.model_dump(),
+            candidate_limit=cfg.retrieval.candidate_limit,
+            recency_halflife_days=cfg.retrieval.recency_halflife_days,
+            decay_enabled=cfg.decay.enabled,
+            decay_halflife_days=cfg.decay.halflife_days,
+            reinforcement=cfg.decay.reinforcement,
+            evidence_hydration="_hydrated" in variant,
+            hydration_neighbouring_sentences=cfg.hydration.neighbouring_sentences,
+            hydration_max_tokens=cfg.hydration.max_tokens,
+            token_budget=cfg.pack.token_budget if cfg.pack.enabled else 0,
+            utility_model=utility_model,
+            type_floors=cfg.pack.type_floors if cfg.pack.enabled else None,
         )
         runner.name = variant
     else:
@@ -226,17 +260,26 @@ def _build(variant: str, cfg_path: str):
 @eval_app.command("run")
 def eval_run(
     variant: str = typer.Argument(
-        ..., help="full_context | naive_rag | chronomem | chronomem_no_temporal"
+        ...,
+        help=(
+            "full_context | naive_rag | two_stage | two_stage_no_temporal | "
+            "two_stage_hydrated | two_stage_hydrated_no_temporal. "
+            "The chronomem* names belong to the frozen v1 run and are kept so its "
+            "rows are not overwritten by a re-measurement of a different pipeline."
+        ),
     ),
     config: str = typer.Option("configs/baselines.yaml", "--config", "-c"),
     limit: int | None = typer.Option(None, help="Override dataset_limit from config"),
+    store_name: str | None = typer.Option(
+        None, help="Store filename stem; two_stage defaults to an isolated two-stage store"
+    ),
     fresh: bool = typer.Option(False, help="Ignore existing results and start over"),
 ) -> None:
     """Evaluate one variant on LongMemEval. Resumes automatically if interrupted."""
     from chronomem.evaluation.harness import run_eval
     from chronomem.evaluation.report import render_summary
 
-    cfg, settings, runner, judge, usage = _build(variant, config)
+    cfg, settings, runner, judge, usage = _build(variant, config, store_name)
     n = limit if limit is not None else cfg.dataset_limit
 
     with console.status("Loading dataset…"):
@@ -271,6 +314,107 @@ def eval_run(
             f"\n[yellow]Stopped on quota:[/yellow] {report.stopped_reason}\n"
             f"[dim]Rerun the same command tomorrow — it resumes from {report.n}.[/dim]"
         )
+
+
+@eval_app.command("budget-sweep")
+def eval_budget_sweep(
+    variant: str = typer.Option("two_stage", help="Memory-backed evaluation variant"),
+    config: str = typer.Option("configs/baselines.yaml", "--config", "-c"),
+    budgets: str = typer.Option("1000,2000,4000,8000", help="Comma-separated token budgets"),
+    store_name: str | None = typer.Option(None, help="Memory store filename stem"),
+    utility_model: str | None = typer.Option(None, help="Override utility-predictor JSON path"),
+    limit: int | None = typer.Option(None, help="Override dataset_limit from config"),
+    fresh: bool = typer.Option(False, help="Discard existing checkpoints for every budget"),
+) -> None:
+    """Evaluate relevance or utility packing over token budgets and draw a Pareto curve."""
+    import json
+    from dataclasses import asdict
+
+    from chronomem.evaluation.budget import (
+        BudgetPoint,
+        pareto_frontier,
+        render_pareto_svg,
+        sweep_artifact_stem,
+    )
+    from chronomem.evaluation.harness import run_eval
+    from chronomem.evaluation.report import render_summary
+    from chronomem.evaluation.runners.memory import MemoryRunner
+    from chronomem.influence import UtilityPredictor
+
+    try:
+        parsed_budgets = sorted(
+            {int(value.strip()) for value in budgets.split(",") if value.strip()}
+        )
+    except ValueError as exc:
+        raise typer.BadParameter("budgets must be comma-separated positive integers") from exc
+    if not parsed_budgets or any(budget <= 0 for budget in parsed_budgets):
+        raise typer.BadParameter("budgets must contain at least one positive integer")
+
+    points: list[BudgetPoint] = []
+    settings = None
+    selector = "relevance"
+    for budget in parsed_budgets:
+        cfg, settings, runner, judge, usage = _build(variant, config, store_name)
+        if not isinstance(runner, MemoryRunner):
+            raise typer.BadParameter("budget sweep requires a memory-backed variant")
+
+        model_path = utility_model or cfg.pack.utility_model_path
+        if model_path:
+            runner.utility_model = UtilityPredictor.load(model_path)
+            selector = "utility"
+        runner.token_budget = budget
+        runner.type_floors = cfg.pack.type_floors
+        runner.name = f"{variant}_{selector}_pack_{budget}"
+
+        n = limit if limit is not None else cfg.dataset_limit
+        with console.status(f"Loading dataset for {budget:,} tokens…"):
+            instances = lme.load(cfg.dataset_variant, settings.data_dir, limit=n)
+        path = settings.results_dir / "raw" / f"{runner.name}.jsonl"
+        report = run_eval(runner, judge, instances, path, usage=usage, resume=not fresh)
+        points.append(
+            BudgetPoint(
+                budget=budget,
+                accuracy=report.accuracy,
+                median_context_tokens=report.median_context_tokens,
+                p95_latency_ms=report.p95_latency_ms,
+                n=report.n,
+                completed=report.completed,
+            )
+        )
+        console.print(render_summary(report))
+        if not report.completed:
+            console.print(f"[yellow]Paused at {budget:,} tokens; rerun to resume.[/yellow]")
+            break
+
+    assert settings is not None
+    payload = {
+        "variant": variant,
+        "selector": selector,
+        "points": [asdict(point) for point in points],
+        "pareto_budgets": [point.budget for point in pareto_frontier(points)],
+    }
+    stem = sweep_artifact_stem(variant, selector)
+    json_path = settings.results_dir / f"{stem}.json"
+    svg_path = settings.results_dir / f"{stem}.svg"
+    json_path.write_text(json.dumps(payload, indent=2) + "\n")
+    svg_path.write_text(render_pareto_svg(points, f"{variant}: {selector} packing"))
+
+    table = Table(title=f"P6 budget sweep — {selector} packing")
+    table.add_column("budget", justify="right", style="cyan")
+    table.add_column("n", justify="right")
+    table.add_column("accuracy", justify="right")
+    table.add_column("median context", justify="right")
+    table.add_column("p95 latency", justify="right")
+    for point in points:
+        table.add_row(
+            f"{point.budget:,}",
+            str(point.n),
+            f"{point.accuracy:.1%}",
+            f"{point.median_context_tokens:,.0f}",
+            f"{point.p95_latency_ms / 1000:.1f}s",
+        )
+    console.print(table)
+    console.print(f"[green]✓[/green] {json_path}\n[green]✓[/green] {svg_path}")
 
 
 @eval_app.command("report")
@@ -373,6 +517,57 @@ def eval_agreement(
     save_agreement(agreement, settings.results_dir / f"agreement-{variant}.json")
 
 
+@eval_app.command("failure-audit")
+def eval_failure_audit(
+    variant: str = typer.Argument(..., help="Which evaluated variant to audit"),
+    config: str = typer.Option("configs/baselines.yaml", "--config", "-c"),
+    out: str | None = typer.Option(None, help="CSV destination"),
+) -> None:
+    """Write one worksheet row for every judged-wrong answer."""
+    from chronomem.config import ExperimentConfig
+    from chronomem.evaluation.failures import FAILURE_CODES, write_failure_worksheet
+    from chronomem.evaluation.report import load_report
+
+    settings = Settings()
+    source = settings.results_dir / "raw" / f"{variant}.jsonl"
+    if not source.exists():
+        console.print(f"[red]No run at {source}[/red]")
+        raise typer.Exit(1)
+    cfg = ExperimentConfig.from_yaml(config)
+    instances = lme.load(cfg.dataset_variant, settings.data_dir, limit=cfg.dataset_limit)
+    destination = Path(out) if out else settings.results_dir / f"failure-audit-{variant}.csv"
+    report = load_report(source, variant=variant)
+    questions = {item.question_id: item.question for item in instances}
+    write_failure_worksheet(report.results, questions, destination)
+    console.print(f"[green]✓[/green] {destination}")
+    console.print("Label each row with exactly one primary failure:")
+    console.print(", ".join(f"{code}={description}" for code, description in FAILURE_CODES.items()))
+    console.print("For E1, add a detail such as number, date, duration, or entity.")
+    console.print("Use event, relation, or negation when applicable.")
+
+
+@eval_app.command("failure-report")
+def eval_failure_report(
+    worksheet: str = typer.Argument(..., help="Completed failure-audit CSV"),
+) -> None:
+    """Summarize a completed single-cause failure taxonomy worksheet."""
+    from chronomem.evaluation.failures import FAILURE_CODES, summarize_failure_worksheet
+
+    report = summarize_failure_worksheet(worksheet)
+    table = Table(title="failure decomposition")
+    table.add_column("cause", style="cyan")
+    table.add_column("count", justify="right")
+    for code, description in FAILURE_CODES.items():
+        table.add_row(f"{code} — {description}", str(report.by_code.get(code, 0)))
+    console.print(table)
+    console.print(f"classified: {report.classified}/{report.total}")
+    if report.extraction_details:
+        details = ", ".join(f"{key}={value}" for key, value in report.extraction_details.items())
+        console.print("E1 details: " + details)
+    if report.unclassified_ids:
+        console.print("[yellow]Unclassified:[/yellow] " + ", ".join(report.unclassified_ids))
+
+
 ingest_app = typer.Typer(help="Build the memory store from a corpus")
 app.add_typer(ingest_app, name="ingest")
 
@@ -383,12 +578,20 @@ def ingest_run(
     limit: int | None = typer.Option(None, help="Override dataset_limit from config"),
     sessions: int | None = typer.Option(None, help="Cap unique sessions (for a trial run)"),
     fresh: bool = typer.Option(False, help="Discard the checkpoint and start over"),
-    store_name: str = typer.Option("memories", help="Store filename stem"),
+    store_name: str | None = typer.Option(
+        None, help="Store filename stem; two-stage extraction defaults to two-stage"
+    ),
 ) -> None:
     """Extract memories from the corpus. Resumes after a daily-quota stop."""
     from chronomem.config import ExperimentConfig
     from chronomem.embed import Encoder
-    from chronomem.ingest import Deduplicator, Extractor, IngestionPipeline, namespaced_sessions
+    from chronomem.ingest import (
+        Deduplicator,
+        Extractor,
+        IngestionPipeline,
+        TwoStageExtractor,
+        namespaced_sessions,
+    )
     from chronomem.llm import Limits, QuotaManager, UsageTracker
     from chronomem.llm.client import GeminiClient
     from chronomem.store import NumpyFlatIndex, SQLiteMemoryStore
@@ -396,6 +599,7 @@ def ingest_run(
 
     settings = Settings()
     cfg = ExperimentConfig.from_yaml(config)
+    store_name = store_name or ("two-stage" if cfg.ingest.two_stage else "memories")
 
     quota = QuotaManager(
         state_dir=settings.store_dir / "quota",
@@ -410,7 +614,11 @@ def ingest_run(
     store.initialize()
     index = NumpyFlatIndex(settings.store_dir / f"{store_name}-index", dim=cfg.models.embedding_dim)
 
-    extractor = Extractor(client, cfg.models.extractor)
+    extractor = (
+        TwoStageExtractor(client, cfg.models.extractor)
+        if cfg.ingest.two_stage
+        else Extractor(client, cfg.models.extractor)
+    )
     dedup = Deduplicator(
         client,
         cfg.models.extractor,
@@ -456,9 +664,10 @@ def ingest_run(
         all_sessions = all_sessions[:sessions]
 
     n_batches = -(-len(all_sessions) // per_request)
+    extraction_calls_per_batch = 2 if cfg.ingest.two_stage else 1
     console.print(
         f"[bold]ingest[/bold] · {len(all_sessions):,} unique sessions · "
-        f"{per_request}/request = ~{n_batches:,} requests · "
+        f"{per_request}/batch = ~{n_batches * extraction_calls_per_batch:,} extraction requests · "
         f"extractor={cfg.models.extractor}\n"
     )
 
@@ -472,7 +681,10 @@ def ingest_run(
 
     outcome = pipeline.run(all_sessions, resume=not fresh, on_batch=on_batch)
     p = outcome.progress
-    usage.save(settings.results_dir / "raw" / "ingest.usage.json")
+    usage_name = (
+        "ingest.usage.json" if store_name == "memories" else f"{store_name}.ingest.usage.json"
+    )
+    usage.save(settings.results_dir / "raw" / usage_name)
 
     t = Table(title="ingestion", show_header=False)
     t.add_column(style="cyan")
@@ -553,11 +765,12 @@ def ingest_coverage(
     )
 
     console.print()
-    t = Table(title="answer coverage", show_header=False)
+    t = Table(title="literal coverage", show_header=False)
     t.add_column(style="cyan")
     t.add_column(justify="right")
-    t.add_row("[bold]coverage (measurable)[/bold]", f"[bold]{report.rate:.1%}[/bold]")
-    t.add_row("[dim]coverage (all types)[/dim]", f"[dim]{report.rate_all:.1%}[/dim]")
+    t.add_row("[bold]structured literal (measurable)[/bold]", f"[bold]{report.rate:.1%}[/bold]")
+    t.add_row("source literal (measurable)", f"{report.source_literal_rate:.1%}")
+    t.add_row("[dim]structured literal (all types)[/dim]", f"[dim]{report.rate_all:.1%}[/dim]")
     t.add_row("measurable questions", str(len(report.measurable)))
     t.add_row("questions", str(report.n))
     t.add_row("memories / question", f"{report.memories_per_session:.1f}")
@@ -592,6 +805,7 @@ def ingest_coverage(
             {
                 "rate_measurable": report.rate,
                 "rate_all": report.rate_all,
+                "source_literal_rate_measurable": report.source_literal_rate,
                 "memories_per_question": report.memories_per_session,
                 "cases": [_asdict(c) for c in report.cases],
             },
@@ -682,7 +896,7 @@ def eval_variability(
     """Spread across repeats of one unchanged configuration.
 
     Reads `<variant>.jsonl` plus any `<variant>.rep*.jsonl`. This is the yardstick
-    every reported difference has to clear.
+    every reported difference has to clear; create repeats with `eval repeat`.
     """
     from chronomem.evaluation.compare import Variability
     from chronomem.evaluation.report import load_report
@@ -696,13 +910,43 @@ def eval_variability(
     if len(paths) < 2:
         console.print(
             f"[yellow]Need at least two runs.[/yellow] Found {len(paths)}. "
-            f"Re-run with --fresh and copy to {variant}.rep1.jsonl, etc."
+            f"Run `chronomem eval repeat {variant} --runs 3`."
         )
         raise typer.Exit(1)
 
     accuracies = [load_report(p).accuracy for p in paths]
     v = Variability(variant, accuracies)
     console.print(v.summary())
+
+
+@eval_app.command("repeat")
+def eval_repeat(
+    variant: str = typer.Argument(..., help="Variant to run repeatedly"),
+    runs: int = typer.Option(3, min=2, max=5, help="Independent repetitions"),
+    config: str = typer.Option("configs/baselines.yaml", "--config", "-c"),
+    limit: int | None = typer.Option(None, help="Override dataset_limit from config"),
+    store_name: str | None = typer.Option(None, help="Memory store filename stem"),
+    fresh: bool = typer.Option(False, help="Discard each repeat checkpoint"),
+) -> None:
+    """Run 2-5 independently checkpointed repetitions of one configuration."""
+    from chronomem.evaluation.compare import Variability
+    from chronomem.evaluation.harness import run_eval
+
+    accuracies = []
+    for number in range(1, runs + 1):
+        cfg, settings, runner, judge, usage = _build(variant, config, store_name)
+        runner.name = f"{variant}.rep{number}"
+        n = limit if limit is not None else cfg.dataset_limit
+        with console.status(f"Loading dataset for repeat {number}/{runs}…"):
+            instances = lme.load(cfg.dataset_variant, settings.data_dir, limit=n)
+        path = settings.results_dir / "raw" / f"{runner.name}.jsonl"
+        report = run_eval(runner, judge, instances, path, usage=usage, resume=not fresh)
+        accuracies.append(report.accuracy)
+        console.print(f"repeat {number}/{runs}: {report.accuracy:.1%} ({report.n} questions)")
+        if not report.completed:
+            console.print(f"[yellow]Paused repeat {number}; rerun to resume.[/yellow]")
+            return
+    console.print(Variability(variant, accuracies).summary())
 
 
 @ingest_app.command("fidelity")
@@ -714,6 +958,7 @@ def ingest_fidelity(
         True, help="Score sessions from the held-out split, never the dev questions"
     ),
     batch: int | None = typer.Option(None, help="Override sessions per request"),
+    two_stage: bool | None = typer.Option(None, help="Override the two-stage flag"),
 ) -> None:
     """What fraction of the user's own specifics survive extraction?
 
@@ -722,7 +967,7 @@ def ingest_fidelity(
     change.
     """
     from chronomem.config import ExperimentConfig
-    from chronomem.ingest import Extractor
+    from chronomem.ingest import Extractor, TwoStageExtractor
     from chronomem.ingest.fidelity import score_sessions
     from chronomem.llm import Limits, QuotaManager, UsageTracker
     from chronomem.llm.client import GeminiClient
@@ -737,7 +982,12 @@ def ingest_fidelity(
     quota.load_learned()
     usage = UsageTracker()
     client = GeminiClient(settings.require_api_key(), quota=quota, usage=usage)
-    extractor = Extractor(client, cfg.models.extractor)
+    use_two_stage = cfg.ingest.two_stage if two_stage is None else two_stage
+    extractor = (
+        TwoStageExtractor(client, cfg.models.extractor)
+        if use_two_stage
+        else Extractor(client, cfg.models.extractor)
+    )
 
     with console.status("Loading corpus…"):
         every = lme.load(cfg.dataset_variant, settings.data_dir)
@@ -756,7 +1006,7 @@ def ingest_fidelity(
     console.print(
         f"[bold]fidelity[/bold] · {len(picked)} sessions from the "
         f"{'held-out' if holdout else 'dev'} split · {batch}/request · "
-        f"{cfg.models.extractor}\n"
+        f"{'two-stage' if use_two_stage else 'single-stage'} · {cfg.models.extractor}\n"
     )
 
     # Cache the extraction so a change to the *metric* can be re-scored for free.
@@ -766,9 +1016,18 @@ def ingest_fidelity(
     import json as _json
 
     from chronomem.ingest.extract import _PROMPT, EXTRACT_SYSTEM
+    from chronomem.ingest.extract_facts import _PROMPT as FACTS_PROMPT
+    from chronomem.ingest.extract_facts import FACTS_SYSTEM
+    from chronomem.ingest.keying import _PROMPT as KEYING_PROMPT
+    from chronomem.ingest.keying import KEYING_SYSTEM
 
+    active_prompt = (
+        FACTS_SYSTEM + FACTS_PROMPT + KEYING_SYSTEM + KEYING_PROMPT
+        if use_two_stage
+        else EXTRACT_SYSTEM + _PROMPT
+    )
     fingerprint = hashlib.sha1(
-        (EXTRACT_SYSTEM + _PROMPT + cfg.models.extractor + str(batch)).encode()
+        (active_prompt + cfg.models.extractor + str(batch) + str(use_two_stage)).encode()
     ).hexdigest()[:12]
     cache_path = settings.store_dir / "fidelity-cache" / f"{fingerprint}.json"
     cached = _json.loads(cache_path.read_text()) if cache_path.exists() else {}
@@ -838,6 +1097,102 @@ def ingest_fidelity(
     usage.save(settings.results_dir / "raw" / "fidelity.usage.json")
 
 
+lifecycle_app = typer.Typer(help="P5: decay, eviction, and traceable consolidation")
+app.add_typer(lifecycle_app, name="lifecycle")
+
+
+@lifecycle_app.command("run")
+def lifecycle_run(
+    config: str = typer.Option("configs/baselines.yaml", "--config", "-c"),
+    store_name: str = typer.Option("two-stage", help="Memory store filename stem"),
+    user_id: str | None = typer.Option(None, help="Only process one namespace"),
+) -> None:
+    """Apply configured strength decay and optional capacity eviction."""
+    from datetime import datetime
+
+    from chronomem.config import ExperimentConfig
+    from chronomem.lifecycle import apply_decay, evict_to_limit
+    from chronomem.store import SQLiteMemoryStore
+
+    cfg = ExperimentConfig.from_yaml(config)
+    settings = Settings()
+    store = SQLiteMemoryStore(settings.store_dir / f"{store_name}.db")
+    store.initialize()
+    users = [user_id] if user_id else store.user_ids()
+    now = datetime.now()
+    try:
+        for namespace in users:
+            if cfg.decay.enabled:
+                decay = apply_decay(
+                    store,
+                    namespace,
+                    now=now,
+                    halflife_days=cfg.decay.halflife_days,
+                )
+            else:
+                decay = None
+            eviction = (
+                evict_to_limit(store, namespace, limit=cfg.decay.max_memories_per_user)
+                if cfg.decay.max_memories_per_user
+                else None
+            )
+            console.print(
+                f"{namespace}: decayed={decay.updated if decay else 0} "
+                f"evicted={len(eviction.evicted_ids) if eviction else 0}"
+            )
+    finally:
+        store.close()
+
+
+@lifecycle_app.command("consolidate")
+def lifecycle_consolidate(
+    config: str = typer.Option("configs/baselines.yaml", "--config", "-c"),
+    store_name: str = typer.Option("two-stage", help="Memory store filename stem"),
+    user_id: str | None = typer.Option(None, help="Only process one namespace"),
+) -> None:
+    """Synthesize related active memories while retaining their source evidence."""
+    from chronomem.config import ExperimentConfig
+    from chronomem.consolidate import Consolidator
+    from chronomem.embed import Encoder
+    from chronomem.llm import Limits, QuotaManager, UsageTracker
+    from chronomem.llm.client import GeminiClient
+    from chronomem.store import NumpyFlatIndex, SQLiteMemoryStore
+
+    cfg = ExperimentConfig.from_yaml(config)
+    settings = Settings()
+    store = SQLiteMemoryStore(settings.store_dir / f"{store_name}.db")
+    store.initialize()
+    index = NumpyFlatIndex(settings.store_dir / f"{store_name}-index", dim=cfg.models.embedding_dim)
+    quota = QuotaManager(
+        state_dir=settings.store_dir / "quota",
+        default=Limits(rpm=cfg.quota.rpm, tpm=cfg.quota.tpm, rpd=cfg.quota.rpd),
+    )
+    quota.load_learned()
+    usage = UsageTracker()
+    consolidator = Consolidator(
+        GeminiClient(settings.require_api_key(), quota=quota, usage=usage),
+        cfg.models.extractor,
+        Encoder(),
+        store,
+        index,
+        similarity_threshold=cfg.consolidation_config.similarity_threshold,
+        min_cluster_size=cfg.consolidation_config.min_cluster_size,
+        source_strength_multiplier=cfg.consolidation_config.source_strength_multiplier,
+    )
+    users = [user_id] if user_id else store.user_ids()
+    try:
+        for namespace in users:
+            report = consolidator.consolidate(namespace)
+            console.print(
+                f"{namespace}: clusters={report.clusters_found} "
+                f"created={len(report.memories_created)}"
+            )
+    finally:
+        index.save()
+        usage.save(settings.results_dir / "raw" / f"consolidate-{store_name}.usage.json")
+        store.close()
+
+
 influence_app = typer.Typer(help="P6: memory utility measurement and packing")
 app.add_typer(influence_app, name="influence")
 
@@ -867,15 +1222,77 @@ def influence_cost(
     )
 
 
+@influence_app.command("measure")
+def influence_measure(
+    variant: str = typer.Option("two_stage", help="Memory-backed evaluation variant"),
+    config: str = typer.Option("configs/baselines.yaml", "--config", "-c"),
+    limit: int | None = typer.Option(None, help="Override dataset_limit from config"),
+    store_name: str | None = typer.Option(None, help="Memory store filename stem"),
+    out: str | None = typer.Option(None, help="Output JSONL; defaults by variant"),
+    leave_one_in: bool = typer.Option(True, help="Also test each memory on its own"),
+    fresh: bool = typer.Option(False, help="Discard the existing checkpoint"),
+) -> None:
+    """Measure retrieved memories' answer utility for a fixed evaluation variant."""
+    from chronomem.evaluation.runners.memory import MemoryRunner
+    from chronomem.influence import measure_influence
+
+    cfg, settings, runner, judge, usage = _build(variant, config, store_name)
+    if not isinstance(runner, MemoryRunner):
+        raise typer.BadParameter("utility measurement requires a memory-backed variant")
+
+    n = limit if limit is not None else cfg.dataset_limit
+    with console.status("Loading dataset…"):
+        instances = lme.load(cfg.dataset_variant, settings.data_dir, limit=n)
+
+    path = Path(out) if out else settings.results_dir / "raw" / f"influence-{variant}.jsonl"
+    console.print(
+        f"[bold]{variant}[/bold] · {len(instances)} questions · top_k={runner.top_k} · "
+        f"leave-one-in={leave_one_in}\n[dim]→ {path}[/dim]"
+    )
+
+    def retrieve(instance):
+        return [(hit.memory, hit.score) for hit in runner.retrieve(instance)]
+
+    def progress(instance, dataset) -> None:
+        done = len({row.question_id for row in dataset.rows})
+        console.print(f"[green]✓[/green] {done}/{len(instances)} {instance.question_id}")
+
+    outcome = measure_influence(
+        instances,
+        retrieve,
+        runner.answer_with_memories,
+        judge,
+        path,
+        leave_one_in=leave_one_in,
+        resume=not fresh,
+        on_question=progress,
+    )
+    usage.save(path.with_suffix(".usage.json"))
+
+    if outcome.completed:
+        console.print(
+            f"[green]✓[/green] Measured {outcome.questions_done} questions "
+            f"({len(outcome.dataset.rows)} memory labels)."
+        )
+    else:
+        console.print(
+            f"[yellow]Paused after {outcome.questions_done} questions:[/yellow] "
+            f"{outcome.stopped_reason}\nRerun the same command to resume."
+        )
+
+
 @influence_app.command("fit")
 def influence_fit(
     labels: str = typer.Option("results/raw/influence.jsonl"),
     alpha: float = typer.Option(1.0, help="Ridge penalty"),
+    out: str | None = typer.Option(None, help="Predictor path; defaults beside the store"),
 ) -> None:
     """Fit the utility predictor on measured labels, held out by question."""
+    import json
+
     import numpy as np
 
-    from chronomem.influence import InfluenceDataset, fit_grouped
+    from chronomem.influence import FEATURE_NAMES, InfluenceDataset, fit_grouped
 
     path = Path(labels)
     if not path.exists():
@@ -887,13 +1304,24 @@ def influence_fit(
     if not features_path.exists():
         console.print(f"[yellow]No features at {features_path}.[/yellow]")
         raise typer.Exit(1)
+    header_path = features_path.with_suffix(".json")
+    if not header_path.exists():
+        console.print(f"[yellow]No feature header at {header_path}.[/yellow] Rerun measurement.")
+        raise typer.Exit(1)
+    feature_names = tuple(json.loads(header_path.read_text()).get("features", ()))
+    if feature_names != FEATURE_NAMES:
+        console.print(
+            "[yellow]Feature header does not match this code. Rerun measurement.[/yellow]"
+        )
+        raise typer.Exit(1)
 
     x = np.load(features_path)
     y = np.array([r.utility for r in data.rows])
     groups = [r.question_id for r in data.rows]
 
-    model, report = fit_grouped(x, y, groups, alpha=alpha)
-    model.save(Settings().store_dir / "utility-predictor.json")
+    model, report = fit_grouped(x, y, groups, alpha=alpha, feature_names=feature_names)
+    model_path = Path(out) if out else Settings().store_dir / f"{path.stem}-utility-predictor.json"
+    model.save(model_path)
 
     t = Table(title="utility predictor", show_header=False)
     t.add_column(style="cyan")
@@ -904,6 +1332,7 @@ def influence_fit(
     t.add_row("baseline (predict the mean)", f"{report.baseline_rmse:.3f}")
     t.add_row("beats baseline", "[green]yes[/green]" if report.beats_baseline else "[red]no[/red]")
     t.add_row("rank corr. with relevance", f"{report.spearman_vs_relevance:.2f}")
+    t.add_row("saved model", str(model_path))
     console.print(t)
 
     if report.spearman_vs_relevance > 0.9:
@@ -919,6 +1348,93 @@ def influence_fit(
     for name, w in sorted(report.coefficients.items(), key=lambda kv: -abs(kv[1])):
         ct.add_row(name, f"{w:+.3f}")
     console.print(ct)
+
+
+@ingest_app.command("temporal-gate")
+def ingest_temporal_gate(
+    config: str = typer.Option("configs/baselines.yaml", "--config", "-c"),
+    stability: bool = typer.Option(True, help="Run the keyer twice to measure drift"),
+) -> None:
+    """Can Stage B key facts well enough for temporal resolution to work?
+
+    Four numbers against fixed thresholds. Costs 2-3 requests, against ~380 for an
+    ingest plus two evaluation runs — the point is to decide before spending that.
+    """
+    import json
+
+    from chronomem.config import ExperimentConfig
+    from chronomem.ingest.keying import FactKeyer
+    from chronomem.ingest.temporal_gate import THRESHOLDS, score, stability_between, unusable
+    from chronomem.ingest.temporal_pairs import ALL_PAIRS
+    from chronomem.llm import Limits, QuotaManager, UsageTracker
+    from chronomem.llm.client import GeminiClient
+
+    settings = Settings()
+    cfg = ExperimentConfig.from_yaml(config)
+    quota = QuotaManager(
+        state_dir=settings.store_dir / "quota",
+        default=Limits(rpm=cfg.quota.rpm, tpm=cfg.quota.tpm, rpd=cfg.quota.rpd),
+    )
+    quota.load_learned()
+    usage = UsageTracker()
+    keyer = FactKeyer(
+        GeminiClient(settings.require_api_key(), quota=quota, usage=usage), cfg.models.extractor
+    )
+
+    # Flattened and interleaved, so the keyer never sees which two facts form a
+    # pair. Presenting them adjacently would hand it the answer.
+    flat = [f for p in ALL_PAIRS for f in (p.before, p.after)]
+    console.print(f"[bold]temporal gate[/bold] · {len(ALL_PAIRS)} pairs · {cfg.models.extractor}\n")
+
+    first = keyer.key(flat)
+    drift = None
+    if stability:
+        drift = stability_between(first, keyer.key(flat))
+
+    report = score(
+        ALL_PAIRS, [(first[2 * i], first[2 * i + 1]) for i in range(len(ALL_PAIRS))], drift
+    )
+
+    t = Table(title="Stage B temporal gate")
+    t.add_column("metric", style="cyan")
+    t.add_column("measured", justify="right")
+    t.add_column("threshold", justify="right")
+    t.add_column("", justify="center")
+    rows = [
+        ("key consistency", report.key_consistency, THRESHOLDS["key_consistency"], ">="),
+        ("replacement recall", report.replacement_recall, THRESHOLDS["replacement_recall"], ">="),
+        ("false supersede", report.false_supersede, THRESHOLDS["false_supersede"], "<="),
+    ]
+    if drift is not None:
+        rows.append(("cross-run stability", drift, THRESHOLDS["cross_run_stability"], ">="))
+    passes = report.passes()
+    for name, value, threshold, direction in rows:
+        ok = passes.get(name.replace(" ", "_").replace("-", "_"))
+        mark = "[green]PASS[/green]" if ok else "[red]FAIL[/red]"
+        t.add_row(name, f"{value:.1%}", f"{direction}{threshold:.1%}", mark)
+    console.print(t)
+    console.print(
+        f"removal recall {report.removal_recall:.1%} · unkeyable {unusable(first)}/{len(flat)}"
+    )
+
+    if report.gate_open:
+        console.print("\n[green]Gate open.[/green] A full ingest is worth its quota.")
+    else:
+        console.print("\n[yellow]Gate closed.[/yellow] Fix Stage B before spending the ingest.")
+
+    for o in report.failures()[:10]:
+        why = []
+        if not o.same_key:
+            why.append(f"keys differ ({o.before.temporal_key} / {o.after.temporal_key})")
+        if not o.correct:
+            why.append(f"want {o.expected}, got {o.actual}")
+        console.print(f"  [dim]{o.attribute}: {'; '.join(why)}[/dim]")
+
+    artifact = settings.results_dir / "raw" / "temporal-gate.json"
+    artifact.parent.mkdir(parents=True, exist_ok=True)
+    artifact.write_text(json.dumps(report.to_dict(), indent=2) + "\n")
+    console.print(f"[dim]→ {artifact}[/dim]")
+    usage.save(settings.results_dir / "raw" / "temporal-gate.usage.json")
 
 
 if __name__ == "__main__":

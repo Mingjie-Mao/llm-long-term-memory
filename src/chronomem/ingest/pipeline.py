@@ -229,13 +229,13 @@ class IngestionPipeline:
 
         `memories.source_session_id` is a real foreign key, which is what keeps
         provenance honest — a memory cannot claim to come from a session that was
-        never ingested. Turn bodies are omitted by default: storing them would copy
-        the entire 245MB corpus into SQLite for no gain, since the demo can reload
-        turns from the dataset by id when it needs to show one.
+        never ingested. Turn bodies are deliberately retained: structured memories
+        are an index and temporal state, not a lossy replacement for the answer-
+        bearing source evidence that a later query may need to hydrate.
         """
         from datetime import datetime
 
-        from chronomem.store import Session
+        from chronomem.store import Session, Turn
 
         from .extract import _parse_date
 
@@ -246,7 +246,17 @@ class IngestionPipeline:
                     user_id=namespace,
                     started_at=_parse_date(sess.date) or datetime.now(),
                     source=f"longmemeval:{sess.session_id}",
-                    turns=[],
+                    turns=[
+                        Turn(
+                            id=f"{sess.session_id}:{turn_index}",
+                            session_id=sess.session_id,
+                            turn_index=turn_index,
+                            role=turn.role,
+                            content=turn.content,
+                            ts=_parse_date(sess.date) or datetime.now(),
+                        )
+                        for turn_index, turn in enumerate(sess.turns)
+                    ],
                 )
             )
 
@@ -258,7 +268,7 @@ class IngestionPipeline:
         # per batch rather than per pipeline.
         self.extractor.user_id = namespace
         outcome = self.extractor.extract(batch)
-        progress.extraction_requests += 1
+        progress.extraction_requests += outcome.requests
         progress.bad_session_index += outcome.dropped_bad_index
         if not outcome.memories:
             return

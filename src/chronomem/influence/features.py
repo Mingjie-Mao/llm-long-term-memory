@@ -18,7 +18,7 @@ from datetime import datetime
 from chronomem.store import Memory
 
 FEATURE_NAMES = (
-    "semantic_score",
+    "retrieval_score",
     "rank",
     "token_count",
     "importance",
@@ -36,7 +36,7 @@ FEATURE_NAMES = (
 
 @dataclass(slots=True)
 class Features:
-    semantic_score: float
+    retrieval_score: float
     rank: float
     token_count: float
     importance: float
@@ -103,7 +103,7 @@ def build(
     memory: Memory,
     *,
     query: str,
-    semantic_score: float,
+    retrieval_score: float,
     rank: int,
     neighbours: list[Memory],
     now: datetime | None = None,
@@ -122,7 +122,7 @@ def build(
         shared = 0.0
 
     return Features(
-        semantic_score=float(semantic_score),
+        retrieval_score=float(retrieval_score),
         rank=float(rank),
         token_count=float(memory.token_count),
         importance=float(memory.importance),

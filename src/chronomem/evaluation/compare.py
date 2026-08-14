@@ -28,6 +28,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from math import comb
+from random import Random
 
 from .harness import RunReport
 
@@ -158,10 +159,25 @@ class Variability:
         m = self.mean
         return (sum((x - m) ** 2 for x in self.accuracies) / (self.n_runs - 1)) ** 0.5
 
+    @property
+    def bootstrap_interval(self) -> tuple[float, float]:
+        """Deterministic bootstrap interval for the mean observed accuracy."""
+        if not self.accuracies:
+            return 0.0, 0.0
+        rng = Random(0)
+        means = []
+        for _ in range(10_000):
+            sample = [rng.choice(self.accuracies) for _ in self.accuracies]
+            means.append(sum(sample) / len(sample))
+        means.sort()
+        return means[250], means[9_749]
+
     def summary(self) -> str:
         runs = ", ".join(f"{a:.1%}" for a in self.accuracies)
+        low, high = self.bootstrap_interval
         return (
             f"`{self.variant}` re-run {self.n_runs}x with nothing changed: {runs} "
-            f"(mean {self.mean:.1%}, spread {self.spread:.1%}, sd {self.stdev:.1%}). "
+            f"(mean {self.mean:.1%}, sd {self.stdev:.1%}, observed spread {self.spread:.1%}, "
+            f"bootstrap mean interval {low:.1%}-{high:.1%}). "
             f"Differences below this are not evidence."
         )

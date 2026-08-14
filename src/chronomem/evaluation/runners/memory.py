@@ -16,11 +16,21 @@ attributable to the timeline, not to ranking.
 
 from __future__ import annotations
 
+from datetime import datetime
+from time import perf_counter
+
 import numpy as np
 
 from chronomem.embed import Encoder
 from chronomem.evaluation.datasets.longmemeval import Instance
 from chronomem.llm.client import GeminiClient
+from chronomem.retrieve import (
+    EvidenceHydrator,
+    HybridRetriever,
+    HydrationResult,
+    RetrievedMemory,
+    render_evidence,
+)
 from chronomem.store import Memory, MemoryStore, NumpyFlatIndex
 
 from .base import ANSWER_SYSTEM, Answer
@@ -66,6 +76,15 @@ class MemoryRunner:
         index: NumpyFlatIndex,
         temporal: bool = False,
         top_k: int = 20,
+        retrieval_weights: dict[str, float] | None = None,
+        candidate_limit: int = 50,
+        recency_halflife_days: float = 30.0,
+        decay_enabled: bool = False,
+        decay_halflife_days: float = 60.0,
+        reinforcement: float = 0.30,
+        evidence_hydration: bool = False,
+        hydration_neighbouring_sentences: int = 1,
+        hydration_max_tokens: int = 800,
         token_budget: int = 0,
         utility_model=None,
         type_floors: dict[str, float] | None = None,
@@ -79,6 +98,24 @@ class MemoryRunner:
         self.index = index
         self.temporal = temporal
         self.top_k = top_k
+        self.retriever = HybridRetriever(
+            store,
+            index,
+            weights=retrieval_weights or {"semantic": 1.0},
+            candidate_limit=candidate_limit,
+            recency_halflife_days=recency_halflife_days,
+            use_strength=decay_enabled,
+        )
+        self.decay_enabled = decay_enabled
+        self.decay_halflife_days = decay_halflife_days
+        self.reinforcement = reinforcement
+        self.evidence_hydration = evidence_hydration
+        self.hydration_max_tokens = hydration_max_tokens
+        self.hydrator = EvidenceHydrator(
+            store,
+            neighbouring_sentences=hydration_neighbouring_sentences,
+            chars_per_token=chars_per_token,
+        )
         # 0 disables packing and keeps the plain top-k truncation, so the P6 rows
         # are a change of selection policy against an otherwise identical pipeline.
         self.token_budget = token_budget
@@ -98,26 +135,21 @@ class MemoryRunner:
         per-question latency — ingestion is paid once, up front.
         """
 
-    def _select(self, query: np.ndarray, namespace: str) -> list[Memory]:
-        # Filtering after ranking, not before, so the two variants share an
-        # identical ranking and the ablation isolates the timeline.
-        #
-        # The whole index is scanned rather than a top-N slice of it. The index is
-        # global while a question's memories are one namespace of fifty, so any
-        # fixed over-fetch returns mostly other questions' facts and the survivors
-        # fall well short of top_k: at `top_k * 40` the packed context came to ~250
-        # tokens against a ~40-memory namespace, and accuracy read 20% — a
-        # measurement of the over-fetch factor, not of the memory system.
-        # Scanning is affordable precisely because the store is small (2k vectors),
-        # and it makes the namespace filter exact instead of best-effort.
-        hits = self.index.search(query, limit=len(self.index))
-        memories = self.store.get_many([mid for mid, _ in hits])
-        memories = [m for m in memories if m.user_id == namespace]
-        if self.temporal:
-            memories = [m for m in memories if m.status == "active"]
-        return memories[: self.top_k]
+    def _retrieve(self, query: np.ndarray, question: str, namespace: str) -> list[RetrievedMemory]:
+        return self.retriever.retrieve(
+            query,
+            question,
+            namespace,
+            temporal=self.temporal,
+            limit=self.top_k,
+        )
 
-    def _pack(self, candidates: list[Memory], scores: dict[str, float], query: str):
+    def retrieve(self, instance: Instance) -> list[RetrievedMemory]:
+        """Retrieve exactly the candidates used by normal answering."""
+        query = self.encoder.encode_one(instance.question)
+        return self._retrieve(query, instance.question, instance.question_id)
+
+    def _pack(self, candidates: list[Memory], retrieved: dict[str, RetrievedMemory], query: str):
         """Select under a token budget instead of truncating at top_k.
 
         Utilities come from the predictor when one is supplied and from the
@@ -130,7 +162,7 @@ class MemoryRunner:
         from chronomem.pack import pack
 
         if self.utility_model is None:
-            utilities = [scores.get(m.id, 0.0) for m in candidates]
+            utilities = [retrieved[m.id].score for m in candidates]
         else:
             import numpy as np
 
@@ -138,7 +170,7 @@ class MemoryRunner:
                 build_features(
                     m,
                     query=query,
-                    semantic_score=scores.get(m.id, 0.0),
+                    retrieval_score=retrieved[m.id].score,
                     rank=i,
                     neighbours=candidates,
                 ).as_list()
@@ -149,30 +181,35 @@ class MemoryRunner:
         return pack(candidates, utilities, self.token_budget, type_floors=self.type_floors)
 
     def answer(self, instance: Instance) -> Answer:
-        query = self.encoder.encode_one(instance.question)
-        hits = dict(self.index.search(query, limit=len(self.index)))
-        selected = self._select(query, instance.question_id)
+        now = datetime.now()
+        if self.decay_enabled:
+            from chronomem.lifecycle import apply_decay
 
+            apply_decay(
+                self.store,
+                instance.question_id,
+                now=now,
+                halflife_days=self.decay_halflife_days,
+            )
+        retrieval_started = perf_counter()
+        retrieved = self.retrieve(instance)
+        retrieval_latency_ms = (perf_counter() - retrieval_started) * 1000
+        selected = [hit.memory for hit in retrieved]
+        retrieved_by_id = {hit.memory.id: hit for hit in retrieved}
+
+        assembly_started = perf_counter()
         packed = None
         if self.token_budget:
-            packed = self._pack(selected, hits, instance.question)
+            packed = self._pack(selected, retrieved_by_id, instance.question)
             selected = packed.selected
 
-        body = "\n".join(render_memory(m, self.temporal) for m in selected)
-        context = f"{TEMPORAL_NOTE}\n\n{body}" if self.temporal else body
-
-        prompt = _TEMPLATE.format(
-            context=context, date=instance.question_date, question=instance.question
-        )
-        completion = self.client.generate(
-            role="answerer",
-            model=self.model,
-            prompt=prompt,
-            system=ANSWER_SYSTEM,
-            temperature=0.0,
-            max_output_tokens=self.max_output_tokens,
-            est_input_tokens=int(len(prompt) / self.chars_per_token),
-        )
+        context, hydration = self._assemble_context(selected)
+        assembly_latency_ms = (perf_counter() - assembly_started) * 1000
+        completion = self._complete(instance, context)
+        if self.decay_enabled:
+            self.store.record_access(
+                [memory.id for memory in selected], now, reinforcement=self.reinforcement
+            )
 
         evidence = set(instance.answer_session_ids)
         return Answer(
@@ -185,12 +222,68 @@ class MemoryRunner:
             notes={
                 "top_k": self.top_k,
                 "temporal": self.temporal,
+                "retrieval_weights": self.retriever.weights,
+                "retrieval": [
+                    {
+                        "memory_id": memory.id,
+                        "score": retrieved_by_id[memory.id].score,
+                        "strength": retrieved_by_id[memory.id].strength,
+                        "signals": retrieved_by_id[memory.id].signals.to_dict(),
+                    }
+                    for memory in selected
+                ],
+                "decay_enabled": self.decay_enabled,
                 "superseded_shown": sum(1 for m in selected if m.status != "active"),
                 "token_budget": self.token_budget,
                 "packed_utilisation": packed.utilisation if packed else None,
                 "dropped_negative": packed.dropped_negative if packed else None,
+                "source_session_recalled": bool(
+                    evidence & {m.source_session_id for m in selected if m.source_session_id}
+                ),
                 "evidence_recalled": bool(
                     evidence & {m.source_session_id for m in selected if m.source_session_id}
                 ),
+                "evidence_hydration": self.evidence_hydration,
+                "hydrated_memory_ids": [item.memory_id for item in hydration.evidence],
+                "hydrated_tokens": hydration.tokens,
+                "hydration_missing_anchors": hydration.missing_anchors,
+                "hydration_skipped_for_budget": hydration.skipped_for_budget,
+                "retrieval_latency_ms": retrieval_latency_ms,
+                "assembly_latency_ms": assembly_latency_ms,
+                "answerer_api_latency_ms": completion.api_latency_ms,
             },
         )
+
+    def answer_with_memories(self, instance: Instance, memories: list[Memory]) -> str:
+        """Answer a fixed memory set without retrieval or lifecycle side effects."""
+        context, _ = self._assemble_context(memories)
+        completion = self._complete(instance, context)
+        return completion.text.strip()
+
+    def _assemble_context(self, memories: list[Memory]) -> tuple[str, HydrationResult]:
+        body = "\n".join(render_memory(memory, self.temporal) for memory in memories)
+        context = f"{TEMPORAL_NOTE}\n\n{body}" if self.temporal else body
+        hydration = HydrationResult()
+        if self.evidence_hydration:
+            hydration = self.hydrator.hydrate(memories, max_tokens=self.hydration_max_tokens)
+            if hydration.evidence:
+                context = (
+                    f"Structured memories:\n{context}\n\n"
+                    f"Verbatim source evidence:\n{render_evidence(hydration.evidence)}"
+                )
+        return context, hydration
+
+    def _complete(self, instance: Instance, context: str):
+        prompt = _TEMPLATE.format(
+            context=context, date=instance.question_date, question=instance.question
+        )
+        completion = self.client.generate(
+            role="answerer",
+            model=self.model,
+            prompt=prompt,
+            system=ANSWER_SYSTEM,
+            temperature=0.0,
+            max_output_tokens=self.max_output_tokens,
+            est_input_tokens=int(len(prompt) / self.chars_per_token),
+        )
+        return completion

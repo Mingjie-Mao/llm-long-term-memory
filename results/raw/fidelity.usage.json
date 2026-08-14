@@ -1,18 +1,18 @@
 {
   "summary": {
-    "total_requests": 4,
-    "total_tokens": 158152,
-    "failures": 0,
+    "total_requests": 5,
+    "total_tokens": 152921,
+    "failures": 1,
     "by_role": {
       "extractor": {
         "role": "extractor",
-        "calls": 4,
-        "failures": 0,
-        "input_tokens": 152612,
-        "output_tokens": 5540,
-        "p50_ms": 6855.899291113019,
-        "p95_ms": 8666.386833181605,
-        "max_ms": 8666.386833181605
+        "calls": 5,
+        "failures": 1,
+        "input_tokens": 148512,
+        "output_tokens": 4409,
+        "p50_ms": 14678.755125030875,
+        "p95_ms": 30527.70150010474,
+        "max_ms": 30527.70150010474
       }
     }
   },
@@ -20,36 +20,45 @@
     {
       "role": "extractor",
       "model": "gemini-3.1-flash-lite",
-      "input_tokens": 38556,
-      "output_tokens": 1645,
-      "latency_ms": 8666.386833181605,
+      "input_tokens": 37531,
+      "output_tokens": 832,
+      "latency_ms": 6638.496667146683,
       "ok": true,
       "error": null
     },
     {
       "role": "extractor",
       "model": "gemini-3.1-flash-lite",
-      "input_tokens": 32272,
-      "output_tokens": 848,
-      "latency_ms": 6855.899291113019,
+      "input_tokens": 31247,
+      "output_tokens": 1375,
+      "latency_ms": 8271.447791950777,
       "ok": true,
       "error": null
     },
     {
       "role": "extractor",
       "model": "gemini-3.1-flash-lite",
-      "input_tokens": 35977,
-      "output_tokens": 1555,
-      "latency_ms": 5677.472916897386,
+      "input_tokens": 34952,
+      "output_tokens": 944,
+      "latency_ms": 14678.755125030875,
       "ok": true,
       "error": null
     },
     {
       "role": "extractor",
       "model": "gemini-3.1-flash-lite",
-      "input_tokens": 45807,
-      "output_tokens": 1492,
-      "latency_ms": 6219.845124986023,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 30527.70150010474,
+      "ok": false,
+      "error": "ServerError: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+    },
+    {
+      "role": "extractor",
+      "model": "gemini-3.1-flash-lite",
+      "input_tokens": 44782,
+      "output_tokens": 1258,
+      "latency_ms": 16702.528624795377,
       "ok": true,
       "error": null
     }

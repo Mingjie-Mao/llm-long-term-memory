@@ -60,6 +60,13 @@ CREATE TABLE IF NOT EXISTS memories (
     -- costs no extra request. The arity list is the default; this is the override.
     replaces_previous INTEGER NOT NULL DEFAULT 0,
 
+    -- What Stage B said this fact does to earlier facts on the same key:
+    -- coexists | replaces | removes | none. Stored raw rather than collapsed into
+    -- `replaces_previous` because `removes` ends an attribute with no successor,
+    -- which is a different timeline shape from a replacement and will need its own
+    -- handling. Keeping the distinction now avoids re-ingesting to recover it.
+    update_op         TEXT NOT NULL DEFAULT 'coexists',
+
     superseded_by   TEXT REFERENCES memories(id),
     status          TEXT NOT NULL DEFAULT 'active',  -- active|superseded|evicted
 
@@ -68,9 +75,16 @@ CREATE TABLE IF NOT EXISTS memories (
     strength         REAL NOT NULL DEFAULT 1.0,
     access_count     INTEGER NOT NULL DEFAULT 0,
     last_accessed_at TEXT,
+    -- The point in time `strength` itself was last brought forward to. This is
+    -- separate from access: otherwise applying decay twice at the same moment
+    -- would compound the same interval twice.
+    strength_updated_at TEXT,
 
     token_count       INTEGER NOT NULL,
-    source_session_id TEXT REFERENCES sessions(id)
+    source_session_id TEXT REFERENCES sessions(id),
+    source_turn_index INTEGER,
+    source_char_start INTEGER,
+    source_char_end   INTEGER
 );
 
 CREATE INDEX IF NOT EXISTS idx_mem_user_status ON memories(user_id, status);

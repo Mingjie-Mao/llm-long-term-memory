@@ -15,6 +15,7 @@ import os
 from contextlib import contextmanager
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
+from typing import Any
 
 from chronomem.evaluation.datasets.longmemeval import Instance
 from chronomem.evaluation.judge import Judge
@@ -37,6 +38,8 @@ class QuestionResult:
     output_tokens: int
     latency_ms: float
     evidence_recalled: bool | None = None
+    source_session_recalled: bool | None = None
+    notes: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass(slots=True)
@@ -80,15 +83,26 @@ class RunReport:
         return vals[min(len(vals) - 1, round(0.95 * (len(vals) - 1)))]
 
     @property
-    def evidence_recall(self) -> float | None:
-        """Share of answerable questions whose evidence session was retrieved.
+    def source_session_recall(self) -> float | None:
+        """Share of questions whose source session has a selected memory.
 
-        Splits a wrong answer into "retrieval missed it" and "the context had it and
-        the model still failed" — without this the accuracy column cannot tell you
-        which half of the system to fix.
+        This is deliberately not called answer-support recall: a structured memory
+        can point at the correct session while having already dropped the needed
+        number, date, or duration during extraction.
         """
-        vals = [r.evidence_recalled for r in self.results if r.evidence_recalled is not None]
+        vals = [
+            r.source_session_recalled
+            if r.source_session_recalled is not None
+            else r.evidence_recalled
+            for r in self.results
+            if r.source_session_recalled is not None or r.evidence_recalled is not None
+        ]
         return sum(vals) / len(vals) if vals else None
+
+    @property
+    def evidence_recall(self) -> float | None:
+        """Compatibility alias for result artifacts written before the rename."""
+        return self.source_session_recall
 
     def by_type(self) -> dict[str, TypeBreakdown]:
         out: dict[str, TypeBreakdown] = {}
@@ -173,6 +187,8 @@ def _run_eval_locked(runner, judge, instances, path, usage, resume, on_progress)
                 output_tokens=answer.output_tokens,
                 latency_ms=answer.latency_ms,
                 evidence_recalled=answer.notes.get("evidence_recalled"),
+                source_session_recalled=answer.notes.get("source_session_recalled"),
+                notes=answer.notes,
             )
             report.results.append(result)
             sink.write(json.dumps(asdict(result)) + "\n")

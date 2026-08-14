@@ -17,6 +17,9 @@ stores/
 *.db-shm
 *.npy
 
+# P6 feature matrices are compact evaluation evidence, not vector indexes.
+!results/raw/*.features.npy
+
 # Eval outputs. The per-question JSONL is committed on purpose: it is the evidence
 # behind every number in the README, it lets `chronomem eval report` regenerate the
 # table without re-spending quota, and at ~30KB per run it costs nothing.

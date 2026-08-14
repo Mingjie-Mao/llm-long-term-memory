@@ -86,6 +86,10 @@ class IngestConfig(BaseModel):
     sessions_per_request: int = 10
     dedupe_sessions: bool = True
     dedupe_similarity_threshold: float = 0.92
+    two_stage: bool = False
+    """Stage A emits bare fact strings and Stage B structures them with rules,
+    instead of asking for nine fields per memory in one call. A config flag rather
+    than a replacement so the two can be compared on the same sessions."""
     checkpoint_every: int = 25
 
 
@@ -111,7 +115,9 @@ class RetrievalConfig(BaseModel):
 
 
 class PackConfig(BaseModel):
+    enabled: bool = False
     token_budget: int = 2_000
+    utility_model_path: str | None = None
     # Floors guarantee a slice of the budget per memory type so that a flood of
     # high-scoring episodic memories cannot evict the user profile entirely.
     type_floors: dict[str, float] = Field(
@@ -126,6 +132,17 @@ class DecayConfig(BaseModel):
     max_memories_per_user: int = 0  # 0 = no eviction
 
 
+class ConsolidationConfig(BaseModel):
+    similarity_threshold: float = 0.84
+    min_cluster_size: int = 3
+    source_strength_multiplier: float = 0.5
+
+
+class HydrationConfig(BaseModel):
+    neighbouring_sentences: int = 1
+    max_tokens: int = 800
+
+
 class ExperimentConfig(BaseModel):
     """One ablation variant."""
 
@@ -137,6 +154,8 @@ class ExperimentConfig(BaseModel):
     retrieval: RetrievalConfig = Field(default_factory=RetrievalConfig)
     pack: PackConfig = Field(default_factory=PackConfig)
     decay: DecayConfig = Field(default_factory=DecayConfig)
+    consolidation_config: ConsolidationConfig = Field(default_factory=ConsolidationConfig)
+    hydration: HydrationConfig = Field(default_factory=HydrationConfig)
 
     temporal_resolution: bool = False
     consolidation: bool = False

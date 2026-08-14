@@ -74,6 +74,11 @@ def _searchable(m: Memory) -> str:
     return " ".join(parts)
 
 
+def _source_text(instance: Instance) -> str:
+    turns = [turn.content for session in instance.sessions for turn in session.turns]
+    return " ".join(turns)
+
+
 def answer_present(gold: str, memories: list[Memory]) -> bool:
     """Whether any memory plausibly carries the gold answer."""
     gold_norm = _norm(gold)
@@ -100,6 +105,32 @@ def answer_present(gold: str, memories: list[Memory]) -> bool:
     return False
 
 
+def source_literal_present(gold: str, instance: Instance) -> bool:
+    """Whether the gold is literally available in the lossless source sessions.
+
+    This is a diagnostic ceiling for literal answers, not an answer-support claim:
+    derived answers can be fully supported even when no source turn contains the
+    final wording. The difference from `answer_present` exposes losses introduced
+    by the structured representation itself.
+    """
+    gold_norm = _norm(gold)
+    if not gold_norm:
+        return False
+    haystack = _norm(_source_text(instance))
+    if gold_norm in haystack:
+        return True
+    gold_numbers = _NUM.findall(gold)
+    if gold_numbers:
+        found = set(_NUM.findall(haystack))
+        if all(number in found for number in gold_numbers):
+            return True
+    tokens = gold_norm.split()
+    if len(tokens) > 1:
+        hits = sum(1 for token in tokens if token in haystack.split())
+        return hits / len(tokens) >= 0.8
+    return False
+
+
 @dataclass(slots=True)
 class CoverageCase:
     question_id: str
@@ -108,7 +139,13 @@ class CoverageCase:
     gold: str
     covered: bool
     n_memories: int
+    source_literal_covered: bool = False
     memories: list[str] = field(default_factory=list)
+
+    @property
+    def structured_literal_covered(self) -> bool:
+        """The original `covered` field, named precisely for new reports."""
+        return self.covered
 
 
 @dataclass(slots=True)
@@ -138,6 +175,11 @@ class CoverageReport:
     def rate_all(self) -> float:
         answerable = [c for c in self.cases if c.gold]
         return sum(c.covered for c in answerable) / len(answerable) if answerable else 0.0
+
+    @property
+    def source_literal_rate(self) -> float:
+        cases = self.measurable
+        return sum(c.source_literal_covered for c in cases) / len(cases) if cases else 0.0
 
     @property
     def memories_per_session(self) -> float:
@@ -171,6 +213,7 @@ def evaluate_coverage(instances: list[Instance], extract_fn, on_case=None) -> Co
             gold=inst.answer,
             covered=answer_present(inst.answer, memories),
             n_memories=len(memories),
+            source_literal_covered=source_literal_present(inst.answer, inst),
             memories=[m.content for m in memories],
         )
         report.cases.append(case)
