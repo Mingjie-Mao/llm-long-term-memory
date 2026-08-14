@@ -198,7 +198,7 @@ def _run_eval_locked(runner, judge, instances, path, usage, resume, on_progress)
                 on_progress(result, report)
 
     if usage:
-        usage.save(path.with_suffix(".usage.json"))
+        usage.save(path.with_suffix(".usage.json"), merge=resume)
 
     _verify_artifact_matches(path, report)
     return report

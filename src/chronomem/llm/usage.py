@@ -14,7 +14,7 @@ from __future__ import annotations
 import json
 import time
 from collections import defaultdict
-from contextlib import contextmanager
+from contextlib import contextmanager, suppress
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 
@@ -136,11 +136,25 @@ class UsageTracker:
             "by_role": {k: asdict(v) for k, v in self.by_role().items()},
         }
 
-    def save(self, path: str | Path) -> None:
+    @classmethod
+    def _load_records(cls, path: Path) -> list[CallRecord]:
+        payload = json.loads(path.read_text())
+        calls = payload.get("calls", [])
+        if not isinstance(calls, list):
+            raise ValueError("usage artifact has a non-list calls field")
+        return [CallRecord(**call) for call in calls]
+
+    def save(self, path: str | Path, *, merge: bool = False) -> None:
         p = Path(path)
         p.parent.mkdir(parents=True, exist_ok=True)
+        records = self.records
+        if merge and p.exists():
+            with suppress(OSError, TypeError, ValueError, json.JSONDecodeError):
+                records = [*self._load_records(p), *records]
+        combined = UsageTracker(records=records)
         p.write_text(
             json.dumps(
-                {"summary": self.summary(), "calls": [asdict(r) for r in self.records]}, indent=2
+                {"summary": combined.summary(), "calls": [asdict(r) for r in combined.records]},
+                indent=2,
             )
         )

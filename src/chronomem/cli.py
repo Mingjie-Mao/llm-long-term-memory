@@ -684,7 +684,7 @@ def ingest_run(
     usage_name = (
         "ingest.usage.json" if store_name == "memories" else f"{store_name}.ingest.usage.json"
     )
-    usage.save(settings.results_dir / "raw" / usage_name)
+    usage.save(settings.results_dir / "raw" / usage_name, merge=not fresh)
 
     t = Table(title="ingestion", show_header=False)
     t.add_column(style="cyan")
@@ -1267,7 +1267,7 @@ def influence_measure(
         resume=not fresh,
         on_question=progress,
     )
-    usage.save(path.with_suffix(".usage.json"))
+    usage.save(path.with_suffix(".usage.json"), merge=not fresh)
 
     if outcome.completed:
         console.print(
