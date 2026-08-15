@@ -196,6 +196,13 @@ class ExtractionOutcome:
 class Extractor:
     version = "single-stage-v1"
 
+    @staticmethod
+    def prompt_texts() -> tuple[str, ...]:
+        """Every prompt whose wording changes what gets extracted. Read by the
+        ingest fingerprint, so editing one of these is enough to make a resumed
+        ingest refuse — no version constant to remember."""
+        return (EXTRACT_SYSTEM, _PROMPT)
+
     def __init__(
         self,
         client: GeminiClient,

@@ -29,6 +29,7 @@ from llm_long_term_memory.evaluation.datasets.longmemeval import HaystackSession
 from llm_long_term_memory.llm.client import DailyQuotaExhausted
 from llm_long_term_memory.store import MemoryStore, NumpyFlatIndex
 
+from . import fingerprint
 from .dedup import Deduplicator
 from .extract import Extractor
 
@@ -166,6 +167,10 @@ class IngestOutcome:
     stopped_reason: str | None = None
 
 
+class ExtractorChanged(RuntimeError):
+    """A resume would append memories from a different extractor than the store holds."""
+
+
 class IngestionPipeline:
     def __init__(
         self,
@@ -199,12 +204,49 @@ class IngestionPipeline:
     ) -> IngestOutcome:
         """`pairs` is (namespace, session); one namespace per question."""
         # Stamp the store with the extractor that wrote it, so a result row can
-        # report the version of the *data* rather than of the checked-out code. A
-        # resumed ingest overwrites it with the same value; a re-ingest under a new
-        # extractor correctly relabels the store it is rebuilding.
-        version = getattr(self.extractor, "version", None)
-        if version and hasattr(self.store, "set_meta"):
-            self.store.set_meta("extractor_version", version)
+        # report the version of the *data* rather than of the checked-out code.
+        #
+        # Stamping used to be unconditional, on the reasoning that "a re-ingest under
+        # a new extractor correctly relabels the store it is rebuilding". That is
+        # true of a rebuild and false of a resume, and this code could not tell them
+        # apart. It cost a real store: 4,843 memories written by the pre-P10
+        # extractor were resumed to completion by the P10 extractor, which files
+        # ~53% of facts under `assistant` where its predecessor filed ~7%. Both runs
+        # succeeded, the checkpoint stayed consistent, and the store passed every
+        # structural check while being the product of two systems. Section 10 of the
+        # engineering report is the post-mortem.
+        #
+        # So: a resume into a non-empty store must match what is already there.
+        # `--fresh` remains the way to rebuild under a new extractor, and it is the
+        # honest one, because it replaces the data rather than relabelling it.
+        #
+        # The comparison is against a fingerprint of the *inputs* — prompt text,
+        # schema text, model, batch size — not against `extractor_version` alone.
+        # A version string is edited by hand, so it catches a deliberate generation
+        # change and misses the likelier one: a prompt reworded with the version left
+        # alone, which produces exactly the same mixed store with nothing to notice
+        # it by.
+        if hasattr(self.store, "set_meta"):
+            current = fingerprint.build(
+                self.extractor,
+                sessions_per_request=self.sessions_per_request,
+                dedup=self.deduplicator,
+            )
+            previous = fingerprint.loads(self.store.get_meta("ingest_fingerprint"))
+            if resume and previous and self.store.count():
+                moved = fingerprint.differences(previous, current)
+                if moved:
+                    raise ExtractorChanged(
+                        "this store was written by a different ingestion setup:\n  "
+                        + "\n  ".join(moved)
+                        + "\nContinuing would produce a store whose memories come "
+                        "from two different systems, labelled as one. Rebuild with "
+                        "--fresh, or ingest into a new --store-name."
+                    )
+            self.store.set_meta("ingest_fingerprint", fingerprint.dumps(current))
+            # Kept as its own key: result rows report it, and it stays readable
+            # without parsing JSON.
+            self.store.set_meta("extractor_version", current["extractor_version"])
 
         progress = IngestProgress.load(self.checkpoint_path) if resume else IngestProgress()
         pending = [p for p in pairs if _key(*p) not in progress.done_sessions]

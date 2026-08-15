@@ -44,13 +44,19 @@ original assistant turn, and the answer carried the exact URL extraction had dro
 (`results/live-regression-v2.md`). Those 7 questions were selected because they
 failed, so this is a regression signal, not a measurement of the system.
 
-Shipped: a REST API, Docker image, structured request logging, an MCP-ready service
-layer, and a Memory Inspector that shows why each memory was selected, passed over,
-or superseded — with shareable URLs. 352 tests, three-platform CI.
+Shipped: a REST API, Docker image (2.95GB), structured request logging, an MCP
+server over the same service layer, and a Memory Inspector that shows why each
+memory was selected, passed over, or superseded — with shareable URLs. 357 tests,
+three-platform CI.
 
 **Not claimed:** any comparison against a third-party system, or any result on
 held-out data. The dev-50 set has been used for prompt iteration and gate tuning, so
 it measures the fit of those choices as much as the system.
+
+**No formal dev-50 result yet.** The run that was to produce it was made on a store
+that turned out to mix two extractor generations, so its 60.0% is recorded in
+section 10 as a diagnostic and is deliberately not carried into this summary, the
+README, or any comparison table. A clean rebuild is in progress.
 
 ---
 
@@ -590,16 +596,212 @@ frontend bug look like a backend failure.
 
 ---
 
-## 10. Current limitations
+## 10. Evaluation integrity: the mixed-extractor store incident
+
+*2026-08-15. This section documents a defect that invalidated a planned formal
+result, the diagnostic run made in its place, and the rebuild that replaces it.
+Nothing in it is a benchmark claim.*
+
+### 10.1 Incident
+
+The ingestion checkpoint records nine progress counters — `done_sessions`,
+`memories_written`, `duplicates_dropped` and so on — and **no extractor or schema
+version**. `store.set_meta("extractor_version", …)` overwrites the store's version
+marker on every run rather than comparing it. Resume therefore has no way to notice
+that the code writing into a store is not the code that wrote the rest of it.
+
+That is what happened. A store ingested to 63% by the pre-P10 extractor was resumed
+to completion by the P10 extractor. Both runs succeeded, the checkpoint was
+consistent, and the resulting store passed every structural check.
+
+The two generations are not a version drift. They behave differently in the exact
+dimension P10 changed:
+
+| | rows | `scope` | `source_role` split |
+|---|---:|---|---|
+| written 2026-08-14 (pre-P10) | 4,843 | all `NULL` | user 93.3% / assistant 6.7% |
+| written 2026-08-15 (P10) | 2,265 | populated | user 44.8% / assistant 54.4% / system 19 rows |
+
+The pre-P10 extractor filed 93.3% of everything as `user`, which is the schema
+defect P10 fixed: `subject` was derived from a string prefix and so acted as a
+two-valued speaker flag with nowhere to put a third-party fact.
+
+**The 68% / 32% split is a proportion of memory rows — 4,843 and 2,265 of 7,108 —
+not of sessions.** Session-level attribution is not recoverable from the store,
+because a session ingested by one generation can be superseded or deduplicated
+against memories written by the other.
+
+The store is complete and internally consistent: 2,348 sessions, 50 namespaces,
+24,590 turns, 7,108 memories. It is simply not the product of one system version,
+which is the property a formal result needs.
+
+### 10.2 Diagnostic A2 — `diagnostic only, excluded from formal benchmark claims`
+
+Run on the mixed store rather than discarded, because it costs nothing from the
+extractor's quota pool (the answerer and judge draw on separate pools) and because
+a measurement of a known-heterogeneous system is still worth having on record.
+
+`results/raw/two_stage_hydrated.a2-mixed-store.jsonl`
+
+| | |
+|---|---|
+| questions | 50 / 50, matching the frozen `dev50` manifest exactly (0 missing, 0 extra) |
+| accuracy | 60.0% (30/50) |
+| source-session recall | 94.0% |
+| median context | 1,346 tokens |
+| p95 answer latency | 42.2 s |
+| answer prompt | `memory-aware-v2` |
+| judge prompt | `lme-type-aware-v2` |
+| store fingerprint | `two-stage-p10-v2@7108`, single-valued across all 50 rows |
+
+**The fingerprint proves less than its name suggests.** A single value across 50
+rows establishes that every answer came from one store *state* — which is what it
+was built for, and which it did. It cannot establish that the store is internally
+homogeneous, because it is derived from the store's `meta` marker, and that marker
+records only the most recent writer. For this run the honest identifier is the
+filename, `a2-mixed-store`, not the fingerprint.
+
+This number does not belong beside the baselines as a headline. It is not carried
+into the README, and the formal `dev50` result remains unrun.
+
+**Category split (mixed-store diagnostic observation only).**
+`single-session-assistant` scored 1/6. That is the category the P10 `source_role`
+fix targets, and 68% of the rows in this store predate the fix — so the result is
+consistent with the fix not being exercised, and is equally consistent with several
+other explanations. **It cannot be used to judge whether P10 works.** The clean
+rebuild is what will answer that.
+
+**Paired against the earlier pilot** (the 31 pilot questions are a strict subset of
+`dev50`): 16/31 → 18/31, two questions flipped wrong→right, none the other way,
+exact McNemar p = 0.500. Completing the last 37% of the ingest produced **no
+detectable change** on those questions.
+
+### 10.3 Three evaluation-integrity failures found in one run
+
+**A completion invariant compared the wrong two numbers.** The preflight checked
+`COUNT(DISTINCT session_id)` against 2,400 and stopped at 2,348. Both numbers are
+correct and they measure different things: the corpus has 2,400 session *entries*
+but 2,348 unique session *IDs* — 51 IDs recur, for 52 extra copies, because
+LongMemEval-S uses one session as evidence for more than one question. The pipeline
+counts entries; the store deduplicates by ID.
+
+**The failure message asserted a cause that had not been checked, and is
+withdrawn.** It read `2348/2400 sessions — quota probably ran out`. The ingest had
+run all 69 of 69 batches and reported 2,400 sessions with no quota stop. Nothing
+about quota was verified before that sentence was written. It was wrong, and it is
+retracted here rather than quietly corrected: an error message that guesses a cause
+is worse than one that reports only what it observed, because it directs the next
+person away from the real problem.
+
+**Ingestion resume has no guard on what produced the store.** This is the same
+defect class that was fixed for evaluation resume the same day — an artifact
+resumed across a change in one of its inputs — caught there before it could do
+damage, and already realised here.
+
+The fix is not a version-string comparison. `extractor_version` is edited by hand,
+so it catches a deliberate generation change and misses the likelier drift: a
+prompt reworded, a schema column added, or a batch size changed with the version
+left alone, which produces the same two-systems-in-one-store with nothing to notice
+it by. Resume now compares a fingerprint computed from the inputs themselves —
+Stage A and Stage B prompt text, `schema.sql`, the model id, sessions per request,
+the dedup threshold — and names which component moved rather than reporting that a
+hash differs:
+
+```
+this store was written by a different ingestion setup:
+  model: m -> m2
+  sessions_per_request: 2 -> 4
+```
+
+`--fresh` remains the way to change extractor, because it replaces the data instead
+of relabelling it. The guard cannot detect stores that are *already* mixed: their
+label was overwritten before it existed. That is what the row-level homogeneity
+check below is for.
+
+Two further findings from the same session, both about automation rather than data:
+
+**A gate that prints its verdict is not a gate.** `ingest temporal-gate` printed
+`Gate closed` and exited 0. That reads correctly to a human and is invisible to
+anything checking a return code, so an unattended sequence would have continued
+into the run the gate exists to prevent. `ingest fidelity` had no threshold at all.
+
+**A gate artifact must be proved fresh.** Reading `gate_open: true` from
+`temporal-gate.json` is not evidence that this run's gate passed — if the gate
+crashed before writing, the file on disk is the previous run's verdict. Freshness is
+now checked against the run's own start time. This is the quiet failure mode in
+automated evaluation pipelines: stale artifacts do not look like errors.
+
+### 10.4 Resolution
+
+1. **The mixed store is kept**, unmodified, as the diagnostic record. Its A2 result
+   keeps the `a2-mixed-store` label permanently.
+2. **A clean store is being built from zero** under a separate name
+   (`two-stage-p10`), so nothing depends on deleting the evidence. At the time of
+   writing it is mid-rebuild; the extractor's daily quota makes this a two-day job
+   (~378 requests against a 500/day pool already partly spent).
+3. **A homogeneity gate runs before the formal A2**, because `meta` is a claim and
+   not evidence — it records the last writer, which is how the mixed store came to
+   describe itself as `two-stage-p10-v2`. The fingerprint and the rows are both
+   checked, and they do different jobs. The fingerprint establishes that the code
+   matches what is running now; for a store first written before the guard existed
+   it is stamped on trust, since the resume that stamps it cannot inspect rows
+   already on disk. **The row checks are the evidence**: `scope IS NULL` is a
+   pre-P10 signature and separates the two real stores cleanly — 4,843 such rows in
+   the mixed store, 0 in the clean one — so a store that lies in `meta` still fails.
+   Also checked: no `source_role` outside {user, assistant, system}, unique sessions
+   equal to the corpus-derived target, and 50 namespaces.
+
+   Deliberately *not* checked by `ingested_at` date. A rebuild spanning two days of
+   quota is the normal case here, so "all rows share a date" would fail a healthy
+   store and pass an unhealthy one that fit inside a day — which is how the mix was
+   first spotted, but is not a rule that generalises.
+4. **Gates then formal A2.** Both gates ran against the current extractor and
+   passed — recorded here because they measure the extractor, not the store, and so
+   carry over to the clean build:
+   - temporal gate: key consistency 100%, replacement recall 100%, false supersede
+     0%, cross-run stability 100% — 4/4, gate open.
+   - fidelity: **44.0% (22 of 50 stated values)**, against a historical baseline of
+     36.6%. **This is not an improvement.** With n = 50 the interval around 44.0% is
+     roughly ±14 points and the baseline sits well inside it; the two are not
+     distinguishable. The 0.30 threshold is a catastrophic-regression floor, not an
+     acceptance line — it is set far below the baseline precisely so that it fires
+     on breakage rather than on noise, and this project has no measured run-to-run
+     noise figure for fidelity, only for end-to-end accuracy. The number still
+     requires comparison against the baseline by a human.
+
+### 10.5 Placeholder — clean P10 result
+
+*To be filled when the clean rebuild completes and the formal `dev50` A2 runs.*
+
+| | mixed store (diagnostic) | clean P10 store (formal) |
+|---|---|---|
+| rows by extractor generation | 4,843 pre-P10 / 2,265 P10 | 100% P10 |
+| dev50 accuracy | 60.0% | *pending* |
+| source-session recall | 94.0% | *pending* |
+| `single-session-assistant` | 1/6 | *pending* |
+| median context | 1,346 tokens | *pending* |
+
+The comparison is worth stating in advance: the intended single variable between
+these two columns is the extractor generation. It is not a clean experiment — the
+clean store also re-extracts the 63% that the pre-P10 run produced, so supersession
+chains and deduplication differ — and the difference should be read as "the same
+pipeline rebuilt under one extractor", not as an isolated measurement of the P10
+fix.
+
+---
+
+## 11. Current limitations
 
 1. **No held-out result.** Every number comes from the dev-50 questions, used for
    prompt iteration, gate tuning and predictor fitting. A pre-registered run on a
    disjoint stratified sample is designed but unrun.
 2. **The pilot is 31 unstratified questions.** An ingest-order prefix, not a sample.
    Category splits are descriptive only.
-3. **The store is 64% ingested** — 1,528 of 2,400 sessions, 32 of 50 namespaces —
-   and was built by the *pre*-P10 extractor, so `source_role`/`scope` are not yet
-   exercised on real data.
+3. **The completed store mixes two extractor generations** — 4,843 memory rows from
+   the pre-P10 extractor and 2,265 from P10 (section 10). It is complete (2,348
+   sessions, 50 namespaces, 7,108 memories) but is not one system version, so the
+   only result measured on it is labelled diagnostic. A clean rebuild is in
+   progress; `source_role`/`scope` remain unexercised on a homogeneous store.
 4. **`source_local` fallback has no live confirmation.** The live regression
    exercised `archive_wide` 18 times and `answer` 3 times; the answerer never
    returned `need_source`, which is correct for those questions but leaves level 1
@@ -608,16 +810,22 @@ frontend bug look like a backend failure.
    2026-08-14; every number measured before it came from a different answerer. The
    trade was deliberate — the old prompt was measurably wrong — and is recorded
    rather than smoothed over.
-6. **Single-writer.** SQLite, no concurrency lock on ingestion; two simultaneous
-   ingests overwrite each other's quota accounting, observed live.
+6. **Single-writer.** SQLite. Ingestion and evaluation now take a cross-process lock
+   (`llm_long_term_memory/locking.py`) after two simultaneous ingests were observed
+   overwriting each other's quota accounting — 211 requests recorded against ~320
+   made, with nothing wrong-looking in the store. The lock is advisory and
+   pid-based; it stops a second run from another shell, which is the case that has
+   actually occurred.
 7. **No cost accounting.** Free tier, no verified price schedule.
 
 ---
 
-## 11. Future work
+## 12. Future work
 
-**Immediate:** finish the ingest, run A2 on the frozen `dev50` manifest, re-ingest
-under the P10 extractor, and verify the answerer/judge fixes end to end.
+**Immediate:** finish the clean P10 rebuild, run both gates against it, then the
+formal `dev50` A2, and fill in section 10.5 with the mixed-vs-clean comparison.
+Add the missing extractor-version guard to ingestion resume — the defect that made
+section 10 necessary — once the rebuild is no longer in flight.
 
 **Then, in order of evidence behind them:**
 
@@ -635,7 +843,6 @@ under the P10 extractor, and verify the answerer/judge fixes end to end.
   this report.)*
 - **Temporal and aggregation layers**, which sections 8.3 identifies as the largest
   class of remaining failures that no retriever change can address.
-- **MCP server** over the existing service layer.
 - **Multimodal memory** as a demo capability, with the caveat that the caption-then-
   index path leaves the downstream pipeline unchanged and the schema work is the
   image anchor replacing character spans.
@@ -651,8 +858,14 @@ under the P10 extractor, and verify the answerer/judge fixes end to end.
 | Reranker: identical answers at k=10, recall 87.1→83.9 | `results/rerank-pareto.md`, `two_stage.k10_{plain,ce}.jsonl` | yes |
 | BM25 R@1 93.5/54.8/6.9 by query type | `results/raw-recall-diagnostic.md` | yes |
 | 5/5 Mayo paraphrases at rank 1 | `results/raw-retrieval-regressions.json` | yes |
-| 326 assistant / 4,517 user memories | `stores/two-stage-hydrated.db` | yes |
-| 4,843/4,843 provenance anchors | `stores/two-stage-hydrated.db` | yes |
+| 326 assistant / 4,517 user memories | `stores/two-stage-hydrated.db`, rows written 2026-08-14 (pre-P10 generation only; the store now totals 1,558 / 5,531) | yes, 2026-08-15 |
+| 7,108/7,108 provenance anchors (session id and char span) | `stores/two-stage-hydrated.db` | yes, 2026-08-15 |
+| Mixed store: 4,843 pre-P10 / 2,265 P10 rows | `stores/two-stage-hydrated.db`, grouped by `date(ingested_at)` | yes, 2026-08-15 |
+| Diagnostic A2: 60.0% (30/50), recall 94.0%, 1,346 tokens, p95 42.2s | `results/raw/two_stage_hydrated.a2-mixed-store.jsonl` | yes, 2026-08-15 — **diagnostic, not a benchmark claim** |
+| Pilot→full-store pairing: 16/31 → 18/31, p=0.500 | `two_stage_hydrated.jsonl` vs `.a2-mixed-store.jsonl`, exact McNemar | yes, 2026-08-15 |
+| Fidelity 44.0% (22/50 stated values) vs 36.6% baseline | `results/raw/fidelity.json` | yes, 2026-08-15 — **not distinguishable at n=50** |
+| Temporal gate 100/100/0/100, 4/4 pass | `results/raw/temporal-gate.json` | yes, 2026-08-15 |
+| Corpus: 2,400 session entries, 2,348 unique ids | LongMemEval-S via `lme.load`, `Counter` over session ids | yes, 2026-08-15 |
 | Warm-up 12,486ms → 181ms | live measurement, 2026-08-14 | single run |
 | 26.0% vs 54.0%; abstention 100% vs 50%; repeat 48.0–54.0% | `results/table.md` (frozen v1, stratified 50) | not re-run |
 | Live regression 6/7, 3/3 consistent | `results/raw/two_stage_fallback.live_v2_run{1,2,3}.jsonl` | yes, 2026-08-14 |

@@ -14,6 +14,7 @@ from rich.table import Table
 
 from llm_long_term_memory.config import Settings
 from llm_long_term_memory.evaluation.datasets import longmemeval as lme
+from llm_long_term_memory.locking import exclusive
 
 app = typer.Typer(add_completion=False, help="LLTM — long-term memory for LLM agents")
 data_app = typer.Typer(help="Benchmark data: download, inspect, plan")
@@ -682,122 +683,133 @@ def ingest_run(
     cfg = ExperimentConfig.from_yaml(config)
     store_name = store_name or ("two-stage" if cfg.ingest.two_stage else "memories")
 
-    quota = QuotaManager(
-        state_dir=settings.store_dir / "quota",
-        default=Limits(rpm=cfg.quota.rpm, tpm=cfg.quota.tpm, rpd=cfg.quota.rpd),
-    )
-    quota.load_learned()
-    usage = UsageTracker()
-    client = GeminiClient(settings.require_api_key(), quota=quota, usage=usage)
-    encoder = Encoder(cfg.models.embedder)
+    # A second ingest into the same store is the failure that has actually happened
+    # here: two processes ran concurrently, each recorded its own usage, and the
+    # totals under-reported the spend by roughly a third — 211 requests logged
+    # against ~320 actually made. The store looked fine, so the only symptom was
+    # the daily quota ending early.
+    with exclusive(settings.store_dir / f"{store_name}.db", what="ingest"):
+        quota = QuotaManager(
+            state_dir=settings.store_dir / "quota",
+            default=Limits(rpm=cfg.quota.rpm, tpm=cfg.quota.tpm, rpd=cfg.quota.rpd),
+        )
+        quota.load_learned()
+        usage = UsageTracker()
+        client = GeminiClient(settings.require_api_key(), quota=quota, usage=usage)
+        encoder = Encoder(cfg.models.embedder)
 
-    store = SQLiteMemoryStore(settings.store_dir / f"{store_name}.db")
-    store.initialize()
-    index = NumpyFlatIndex(settings.store_dir / f"{store_name}-index", dim=cfg.models.embedding_dim)
+        store = SQLiteMemoryStore(settings.store_dir / f"{store_name}.db")
+        store.initialize()
+        index = NumpyFlatIndex(
+            settings.store_dir / f"{store_name}-index", dim=cfg.models.embedding_dim
+        )
 
-    extractor = (
-        TwoStageExtractor(client, cfg.models.extractor)
-        if cfg.ingest.two_stage
-        else Extractor(client, cfg.models.extractor)
-    )
-    dedup = Deduplicator(
-        client,
-        cfg.models.extractor,
-        encoder,
-        store=store,
-        index=index,
-        threshold=cfg.ingest.dedupe_similarity_threshold,
-    )
-    resolver = TemporalResolver(store) if cfg.temporal_resolution else None
-    from llm_long_term_memory.ingest.pipeline import fit_batch_size
+        extractor = (
+            TwoStageExtractor(client, cfg.models.extractor)
+            if cfg.ingest.two_stage
+            else Extractor(client, cfg.models.extractor)
+        )
+        dedup = Deduplicator(
+            client,
+            cfg.models.extractor,
+            encoder,
+            store=store,
+            index=index,
+            threshold=cfg.ingest.dedupe_similarity_threshold,
+        )
+        resolver = TemporalResolver(store) if cfg.temporal_resolution else None
+        from llm_long_term_memory.ingest.pipeline import fit_batch_size
 
-    # ~2,560 tokens per session, measured in D5.
-    per_request = fit_batch_size(
-        cfg.ingest.sessions_per_request,
-        quota.for_model(cfg.models.extractor).limits.tpm,
-        tokens_per_session=2_560,
-    )
-    if per_request != cfg.ingest.sessions_per_request:
+        # ~2,560 tokens per session, measured in D5.
+        per_request = fit_batch_size(
+            cfg.ingest.sessions_per_request,
+            quota.for_model(cfg.models.extractor).limits.tpm,
+            tokens_per_session=2_560,
+        )
+        if per_request != cfg.ingest.sessions_per_request:
+            console.print(
+                f"[yellow]batch size {cfg.ingest.sessions_per_request} -> {per_request}[/yellow] "
+                f"[dim]({cfg.models.extractor} allows "
+                f"{quota.for_model(cfg.models.extractor).limits.tpm:,} tokens/min)[/dim]"
+            )
+
+        pipeline = IngestionPipeline(
+            extractor,
+            dedup,
+            store,
+            index,
+            encoder,
+            resolver=resolver,
+            checkpoint_path=settings.store_dir / f"{store_name}-ingest.json",
+            sessions_per_request=per_request,
+            checkpoint_every=cfg.ingest.checkpoint_every,
+        )
+
+        with console.status("Loading corpus…"):
+            instances = lme.load(
+                cfg.dataset_variant, settings.data_dir, limit=limit or cfg.dataset_limit
+            )
+            all_sessions = namespaced_sessions(instances)
+        if sessions:
+            all_sessions = all_sessions[:sessions]
+
+        n_batches = namespace_batch_count(all_sessions, per_request)
+        extraction_calls_per_batch = 2 if cfg.ingest.two_stage else 1
         console.print(
-            f"[yellow]batch size {cfg.ingest.sessions_per_request} -> {per_request}[/yellow] "
-            f"[dim]({cfg.models.extractor} allows "
-            f"{quota.for_model(cfg.models.extractor).limits.tpm:,} tokens/min)[/dim]"
+            f"[bold]ingest[/bold] · {len(all_sessions):,} unique sessions · "
+            f"{per_request}/batch = "
+            f"~{n_batches * extraction_calls_per_batch:,} extraction requests · "
+            f"extractor={cfg.models.extractor}\n"
         )
 
-    pipeline = IngestionPipeline(
-        extractor,
-        dedup,
-        store,
-        index,
-        encoder,
-        resolver=resolver,
-        checkpoint_path=settings.store_dir / f"{store_name}-ingest.json",
-        sessions_per_request=per_request,
-        checkpoint_every=cfg.ingest.checkpoint_every,
-    )
+        def on_batch(n, total, progress) -> None:
+            console.print(
+                f"[{n}/{total}] +{progress.memories_written} memories  "
+                f"dup={progress.duplicates_dropped} upd={progress.updates_detected}  "
+                f"reqs={progress.extraction_requests + progress.adjudication_requests}",
+                highlight=False,
+            )
 
-    with console.status("Loading corpus…"):
-        instances = lme.load(
-            cfg.dataset_variant, settings.data_dir, limit=limit or cfg.dataset_limit
+        outcome = pipeline.run(all_sessions, resume=not fresh, on_batch=on_batch)
+        p = outcome.progress
+        usage_name = (
+            "ingest.usage.json" if store_name == "memories" else f"{store_name}.ingest.usage.json"
         )
-        all_sessions = namespaced_sessions(instances)
-    if sessions:
-        all_sessions = all_sessions[:sessions]
+        usage.save(settings.results_dir / "raw" / usage_name, merge=not fresh)
 
-    n_batches = namespace_batch_count(all_sessions, per_request)
-    extraction_calls_per_batch = 2 if cfg.ingest.two_stage else 1
-    console.print(
-        f"[bold]ingest[/bold] · {len(all_sessions):,} unique sessions · "
-        f"{per_request}/batch = ~{n_batches * extraction_calls_per_batch:,} extraction requests · "
-        f"extractor={cfg.models.extractor}\n"
-    )
+        t = Table(title="ingestion", show_header=False)
+        t.add_column(style="cyan")
+        t.add_column(justify="right")
+        t.add_row("sessions ingested", f"{len(p.done_sessions):,}")
+        t.add_row("memories written", f"{p.memories_written:,}")
+        t.add_row("duplicates dropped", f"{p.duplicates_dropped:,}")
+        t.add_row("updates detected", f"{p.updates_detected:,}")
+        t.add_row("bad session_index", f"{p.bad_session_index:,}")
+        t.add_row("superseded", f"{p.superseded:,}")
+        t.add_row("extraction requests", f"{p.extraction_requests:,}")
+        t.add_row("adjudication requests", f"{p.adjudication_requests:,}")
+        if p.memories_written:
+            t.add_row(
+                "memories / session", f"{p.memories_written / max(1, len(p.done_sessions)):.1f}"
+            )
+        if resolver is not None:
+            # A final pass over every key: incremental resolution can leave a key stale
+            # when a fact arrives in a later batch than the one it belongs before.
+            final = resolver.resolve_everything()
+            t.add_row("final pass: superseded", f"{final.superseded:,}")
+            t.add_row("final pass: restatements", f"{final.restatements:,}")
+            t.add_row("undated (unresolvable)", f"{final.skipped_undated:,}")
+        console.print(t)
+        by_type: dict[str, int] = {}
+        for ns in store.user_ids():
+            for k, v in store.count_by_type(ns).items():
+                by_type[k] = by_type.get(k, 0) + v
+        console.print(dict(sorted(by_type.items(), key=lambda kv: -kv[1])))
 
-    def on_batch(n, total, progress) -> None:
-        console.print(
-            f"[{n}/{total}] +{progress.memories_written} memories  "
-            f"dup={progress.duplicates_dropped} upd={progress.updates_detected}  "
-            f"reqs={progress.extraction_requests + progress.adjudication_requests}",
-            highlight=False,
-        )
-
-    outcome = pipeline.run(all_sessions, resume=not fresh, on_batch=on_batch)
-    p = outcome.progress
-    usage_name = (
-        "ingest.usage.json" if store_name == "memories" else f"{store_name}.ingest.usage.json"
-    )
-    usage.save(settings.results_dir / "raw" / usage_name, merge=not fresh)
-
-    t = Table(title="ingestion", show_header=False)
-    t.add_column(style="cyan")
-    t.add_column(justify="right")
-    t.add_row("sessions ingested", f"{len(p.done_sessions):,}")
-    t.add_row("memories written", f"{p.memories_written:,}")
-    t.add_row("duplicates dropped", f"{p.duplicates_dropped:,}")
-    t.add_row("updates detected", f"{p.updates_detected:,}")
-    t.add_row("bad session_index", f"{p.bad_session_index:,}")
-    t.add_row("superseded", f"{p.superseded:,}")
-    t.add_row("extraction requests", f"{p.extraction_requests:,}")
-    t.add_row("adjudication requests", f"{p.adjudication_requests:,}")
-    if p.memories_written:
-        t.add_row("memories / session", f"{p.memories_written / max(1, len(p.done_sessions)):.1f}")
-    if resolver is not None:
-        # A final pass over every key: incremental resolution can leave a key stale
-        # when a fact arrives in a later batch than the one it belongs before.
-        final = resolver.resolve_everything()
-        t.add_row("final pass: superseded", f"{final.superseded:,}")
-        t.add_row("final pass: restatements", f"{final.restatements:,}")
-        t.add_row("undated (unresolvable)", f"{final.skipped_undated:,}")
-    console.print(t)
-    by_type: dict[str, int] = {}
-    for ns in store.user_ids():
-        for k, v in store.count_by_type(ns).items():
-            by_type[k] = by_type.get(k, 0) + v
-    console.print(dict(sorted(by_type.items(), key=lambda kv: -kv[1])))
-
-    if not outcome.completed:
-        console.print(f"\n[yellow]Stopped:[/yellow] {outcome.stopped_reason}")
-        console.print("[dim]Rerun the same command tomorrow — it resumes.[/dim]")
-    store.close()
+        if not outcome.completed:
+            console.print(f"\n[yellow]Stopped:[/yellow] {outcome.stopped_reason}")
+            console.print("[dim]Rerun the same command tomorrow — it resumes.[/dim]")
+        store.close()
 
 
 @ingest_app.command("coverage")
@@ -1121,6 +1133,11 @@ def ingest_fidelity(
     ),
     batch: int | None = typer.Option(None, help="Override sessions per request"),
     two_stage: bool | None = typer.Option(None, help="Override the two-stage flag"),
+    min_score: float | None = typer.Option(
+        None,
+        help="Exit non-zero if overall fidelity falls below this (0-1). Turns the "
+        "report into a gate for unattended runs.",
+    ),
 ) -> None:
     """What fraction of the user's own specifics survive extraction?
 
@@ -1257,6 +1274,38 @@ def ingest_fidelity(
         )
 
     usage.save(settings.results_dir / "raw" / "fidelity.usage.json")
+    artifact = settings.results_dir / "raw" / "fidelity.json"
+    artifact.parent.mkdir(parents=True, exist_ok=True)
+    artifact.write_text(
+        _json.dumps(
+            {
+                "overall": report.overall,
+                "memories": report.memories,
+                "memories_per_session": report.memories_per_session,
+                "sessions": sessions,
+                "holdout": holdout,
+                "per_facet": {f: s.recall for f, s in report.per_facet.items()},
+            },
+            indent=2,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    console.print(f"[dim]→ {artifact}[/dim]")
+
+    # Without --min-score this stays a report, which is what it is when a human is
+    # reading it. Automation needs a verdict it cannot misread as success: printing
+    # a bad number and exiting 0 is how a closed gate gets walked through.
+    if min_score is not None and report.overall < min_score:
+        console.print(
+            f"\n[red]Fidelity gate closed.[/red] "
+            f"overall {report.overall:.1%} < required {min_score:.1%}"
+        )
+        raise typer.Exit(1)
+    if min_score is not None:
+        console.print(
+            f"\n[green]Fidelity gate open.[/green] overall {report.overall:.1%} >= {min_score:.1%}"
+        )
 
 
 lifecycle_app = typer.Typer(help="P5: decay, eviction, and traceable consolidation")
@@ -1613,6 +1662,14 @@ def ingest_temporal_gate(
     artifact.write_text(json.dumps(report.to_dict(), indent=2) + "\n", encoding="utf-8")
     console.print(f"[dim]→ {artifact}[/dim]")
     usage.save(usage_artifact)
+
+    # A closed gate has to be a non-zero exit. It printed "Gate closed" and exited 0,
+    # which reads fine to a human and is invisible to anything checking a return
+    # code — so an unattended sequence would have gone straight on to spend ~250
+    # requests on the run this gate exists to prevent. Exit 2 is already taken by the
+    # quota stop above, which is a pause rather than a verdict.
+    if not report.gate_open:
+        raise typer.Exit(1)
 
 
 if __name__ == "__main__":

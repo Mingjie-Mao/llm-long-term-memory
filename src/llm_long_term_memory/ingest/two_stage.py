@@ -26,7 +26,8 @@ from llm_long_term_memory.llm.client import GeminiClient
 from llm_long_term_memory.store import Memory
 
 from .extract import ExtractionOutcome, _parse_date, memory_id
-from .extract_facts import EXTRACTOR_VERSION, FactExtractor, FactLine
+from .extract_facts import _PROMPT as FACTS_PROMPT
+from .extract_facts import EXTRACTOR_VERSION, FACTS_SYSTEM, FactExtractor, FactLine
 from .keying import FactKeyer, Keying, UpdateOp
 from .provenance import attach_source_span
 from .structure import (
@@ -56,6 +57,15 @@ def _rule_keying(fact: str) -> Keying:
 
 class TwoStageExtractor:
     version = EXTRACTOR_VERSION
+
+    @staticmethod
+    def prompt_texts() -> tuple[str, ...]:
+        """Both stages. Stage B's wording decides temporal keying, so it belongs in
+        the fingerprint just as much as Stage A's."""
+        from .keying import _PROMPT as KEYING_PROMPT
+        from .keying import KEYING_SYSTEM
+
+        return (FACTS_SYSTEM, FACTS_PROMPT, KEYING_SYSTEM, KEYING_PROMPT)
 
     def __init__(
         self,

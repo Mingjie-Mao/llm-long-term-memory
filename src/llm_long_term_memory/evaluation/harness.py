@@ -11,7 +11,6 @@ Hitting the daily cap therefore returns a partial `RunReport` rather than raisin
 from __future__ import annotations
 
 import json
-import os
 from contextlib import contextmanager
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
@@ -22,6 +21,7 @@ from llm_long_term_memory.evaluation.judge import JUDGE_PROMPT_VERSION, Judge
 from llm_long_term_memory.evaluation.runners.base import ANSWER_PROMPT_VERSION, Runner
 from llm_long_term_memory.llm.client import DailyQuotaExhausted
 from llm_long_term_memory.llm.usage import UsageTracker
+from llm_long_term_memory.locking import AlreadyRunning, exclusive
 
 
 @dataclass(slots=True)
@@ -256,45 +256,10 @@ def _run_eval_locked(runner, judge, instances, path, usage, resume, on_progress)
     return report
 
 
-class RunAlreadyInProgress(RuntimeError):
-    """Another process is already writing this artifact."""
-
-
-def _process_alive(pid: int) -> bool:
-    """Does this pid belong to a running process?
-
-    `os.kill(pid, 0)` is the POSIX idiom and is *not* portable: on Windows signal 0
-    is CTRL_C_EVENT, so the "existence check" delivers a real interrupt to the
-    console group. Here that meant a lock check aimed at another evaluation would
-    have sent Ctrl+C to it — the opposite of the lock's purpose, which is to leave a
-    running evaluation alone. The Windows CI job surfaced it as a KeyboardInterrupt
-    landing in a different library on each run, after every test had passed.
-    """
-    if os.name == "nt":
-        import ctypes
-
-        PROCESS_QUERY_LIMITED_INFORMATION = 0x1000
-        STILL_ACTIVE = 259
-        kernel32 = ctypes.windll.kernel32  # type: ignore[attr-defined]
-        handle = kernel32.OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, False, pid)
-        if not handle:
-            return False  # no such pid, or it is gone
-        try:
-            code = ctypes.c_ulong()
-            if kernel32.GetExitCodeProcess(handle, ctypes.byref(code)):
-                # A handle outlives the process it names, so "openable" is not
-                # "running": an exited process still answers, with its exit code.
-                return code.value == STILL_ACTIVE
-            return True  # cannot tell; treat as live rather than steal the lock
-        finally:
-            kernel32.CloseHandle(handle)
-    try:
-        os.kill(pid, 0)
-    except ProcessLookupError:
-        return False
-    except PermissionError:
-        return True  # exists but is not ours
-    return True
+# The lock lives in llm_long_term_memory.locking because ingest needs the same one:
+# a duplicate ingest corrupts usage accounting, which is harder to notice than a
+# corrupted artifact. Re-exported under the old name so callers do not have to care.
+RunAlreadyInProgress = AlreadyRunning
 
 
 @contextmanager
@@ -306,29 +271,9 @@ def _exclusive(path: Path):
     and, if either was started with `--fresh`, one truncates the other's completed
     work — observed as a 50-question file dropping to 34 and a second file being
     deleted outright mid-run.
-
-    A stale lock from a killed process is reclaimed rather than being a permanent
-    block: a crash during a quota-limited run is the normal case here, and a lock
-    that outlives its owner would make the resume path unusable.
     """
-    lock = path.with_suffix(path.suffix + ".lock")
-    if lock.exists():
-        try:
-            owner = int(lock.read_text(encoding="utf-8").strip())
-        except ValueError:
-            lock.unlink(missing_ok=True)  # unreadable; not something to trust
-        else:
-            if _process_alive(owner):
-                raise RunAlreadyInProgress(
-                    f"pid {owner} is already writing {path}. "
-                    f"Wait for it, or kill it and delete {lock}."
-                )
-            lock.unlink(missing_ok=True)  # stale
-    lock.write_text(str(os.getpid()), encoding="utf-8")
-    try:
+    with exclusive(path, what="evaluation"):
         yield
-    finally:
-        lock.unlink(missing_ok=True)
 
 
 class ArtifactMismatch(RuntimeError):

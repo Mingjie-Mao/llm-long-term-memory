@@ -215,7 +215,7 @@ def test_a_second_run_on_the_same_file_is_refused(tmp_path):
     lock = out.with_suffix(out.suffix + ".lock")
     lock.write_text(str(os.getpid()), encoding="utf-8")  # a live owner: this process
 
-    with pytest.raises(RunAlreadyInProgress, match="already writing"):
+    with pytest.raises(RunAlreadyInProgress, match="already running this evaluation"):
         run_eval(StubRunner(), StubJudge(), [instance("q1")], out)
 
 
@@ -239,7 +239,7 @@ def test_liveness_check_does_not_signal_the_process_it_asks_about():
     the check signals anything, this test takes the hit."""
     import os
 
-    from llm_long_term_memory.evaluation.harness import _process_alive
+    from llm_long_term_memory.locking import process_alive as _process_alive
 
     assert _process_alive(os.getpid()) is True
     assert _process_alive(999999) is False

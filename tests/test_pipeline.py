@@ -291,3 +291,115 @@ def test_batch_estimate_respects_namespace_boundaries():
 
     assert namespace_batch_count(pairs, 3) == 4
     assert -(-len(pairs) // 3) == 3, "the old global estimate undercounted partial batches"
+
+
+class VersionedExtractor(FakeExtractor):
+    """A FakeExtractor that fingerprints itself, like the real ones do."""
+
+    def __init__(self, version: str, prompt: str = "extract the facts", model: str = "m"):
+        super().__init__()
+        self.version = version
+        self.model = model
+        self._prompt = prompt
+
+    def prompt_texts(self):
+        return (self._prompt,)
+
+
+def test_resume_refuses_to_append_memories_from_a_different_extractor(build):
+    """The mixed-store incident, pinned.
+
+    A store ingested to 63% by the pre-P10 extractor was resumed to completion by
+    the P10 extractor. Both runs succeeded and the store passed every structural
+    check while holding 4,843 memories from one system and 2,265 from another,
+    labelled as one. Stamping was unconditional, so the second run relabelled the
+    whole store as its own.
+    """
+    from llm_long_term_memory.ingest.pipeline import ExtractorChanged
+
+    pipeline, store, _ = build(VersionedExtractor("two-stage-v4"))
+    pipeline.run([("u1", session(f"s{i}")) for i in range(4)])
+    assert store.get_meta("extractor_version") == "two-stage-v4"
+
+    pipeline2, store2, _ = build(VersionedExtractor("two-stage-p10-v2"))
+    with pytest.raises(ExtractorChanged, match="two different systems"):
+        pipeline2.run([("u1", session(f"s{i}")) for i in range(8)])
+
+    # The label must not have moved either: a refused run leaves no trace.
+    assert store2.get_meta("extractor_version") == "two-stage-v4"
+
+
+def test_fresh_may_rebuild_under_a_new_extractor(build):
+    """--fresh replaces the data rather than relabelling it, so it is allowed."""
+    pipeline, _, _ = build(VersionedExtractor("two-stage-v4"))
+    pipeline.run([("u1", session(f"s{i}")) for i in range(4)])
+
+    pipeline2, store2, _ = build(VersionedExtractor("two-stage-p10-v2"))
+    outcome = pipeline2.run([("u1", session(f"s{i}")) for i in range(4)], resume=False)
+
+    assert outcome.completed
+    assert store2.get_meta("extractor_version") == "two-stage-p10-v2"
+
+
+def test_resume_under_the_same_extractor_still_works(build):
+    """The case resume exists for: a run stopped by the daily quota, continued."""
+    pipeline, _, _ = build(VersionedExtractor("two-stage-p10-v2"))
+    pipeline.run([("u1", session(f"s{i}")) for i in range(4)])
+
+    pipeline2, store2, _ = build(VersionedExtractor("two-stage-p10-v2"))
+    outcome = pipeline2.run([("u1", session(f"s{i}")) for i in range(8)])
+
+    assert outcome.completed
+    assert store2.count() == 8
+
+
+def test_resume_refuses_a_reworded_prompt_under_an_unchanged_version(build):
+    """The failure `extractor_version` alone cannot see.
+
+    A version string is edited by hand. The likelier drift is a prompt reworded, a
+    schema column added, or a batch size changed, with the version left alone — and
+    that produces the same two-systems-in-one-store with no label to notice it by.
+    The fingerprint is computed from the inputs, so the edit is the signal.
+    """
+    from llm_long_term_memory.ingest.pipeline import ExtractorChanged
+
+    pipeline, _, _ = build(VersionedExtractor("v1", prompt="extract the facts"))
+    pipeline.run([("u1", session(f"s{i}")) for i in range(4)])
+
+    reworded = VersionedExtractor("v1", prompt="extract the facts, including dates")
+    pipeline2, _, _ = build(reworded)
+    with pytest.raises(ExtractorChanged, match="prompts"):
+        pipeline2.run([("u1", session(f"s{i}")) for i in range(8)])
+
+
+def test_the_mismatch_names_which_input_moved(build):
+    """ "Fingerprint differs" sends the reader looking everywhere. The error lists
+    the components, so a batch-size change does not read like a prompt change."""
+    from llm_long_term_memory.ingest.pipeline import ExtractorChanged
+
+    pipeline, _, _ = build(VersionedExtractor("v1"), sessions_per_request=2)
+    pipeline.run([("u1", session(f"s{i}")) for i in range(4)])
+
+    pipeline2, _, _ = build(VersionedExtractor("v1", model="m2"), sessions_per_request=4)
+    with pytest.raises(ExtractorChanged) as exc:
+        pipeline2.run([("u1", session(f"s{i}")) for i in range(8)])
+
+    message = str(exc.value)
+    assert "model: m -> m2" in message
+    assert "sessions_per_request: 2 -> 4" in message
+    assert "prompts" not in message, "unchanged components must not be listed"
+
+
+def test_a_schema_change_alone_is_enough_to_refuse(build, monkeypatch):
+    """The schema is part of what produced the rows: a column added mid-corpus means
+    earlier memories have it NULL and later ones do not."""
+    from llm_long_term_memory.ingest import fingerprint
+    from llm_long_term_memory.ingest.pipeline import ExtractorChanged
+
+    pipeline, _, _ = build(VersionedExtractor("v1"))
+    pipeline.run([("u1", session(f"s{i}")) for i in range(4)])
+
+    monkeypatch.setattr(fingerprint, "schema_version", lambda: "deadbeef0000")
+    pipeline2, _, _ = build(VersionedExtractor("v1"))
+    with pytest.raises(ExtractorChanged, match="schema_version"):
+        pipeline2.run([("u1", session(f"s{i}")) for i in range(8)])
