@@ -1,8 +1,8 @@
 """Verbatim source anchors for fidelity-preserving memory."""
 
-from chronomem.evaluation.datasets.longmemeval import HaystackSession, HaystackTurn
-from chronomem.ingest.provenance import attach_source_span, source_span_for
-from chronomem.store import Memory
+from llm_long_term_memory.evaluation.datasets.longmemeval import HaystackSession, HaystackTurn
+from llm_long_term_memory.ingest.provenance import attach_source_span, source_span_for
+from llm_long_term_memory.store import Memory
 
 
 def session() -> HaystackSession:

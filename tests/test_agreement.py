@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import csv
 
-from chronomem.evaluation.agreement import score_worksheet, write_worksheet
-from chronomem.evaluation.harness import QuestionResult
+from llm_long_term_memory.evaluation.agreement import score_worksheet, write_worksheet
+from llm_long_term_memory.evaluation.harness import QuestionResult
 
 
 def result(qid: str, correct: bool) -> QuestionResult:
@@ -26,7 +26,7 @@ def test_worksheet_hides_the_judge_verdict(tmp_path):
     """Showing it would anchor the labeler, and the resulting agreement number
     would measure nothing."""
     path = write_worksheet([result("q1", True)], {"q1": "which framework?"}, tmp_path / "w.csv")
-    rows = list(csv.DictReader(path.open()))
+    rows = list(csv.DictReader(path.open(newline="", encoding="utf-8")))
 
     assert rows[0]["human"] == ""
     assert "correct" not in rows[0]
@@ -40,8 +40,8 @@ def test_sampling_is_capped_and_deterministic(tmp_path):
     a = write_worksheet(results, {}, tmp_path / "a.csv", n=10, seed=3)
     b = write_worksheet(results, {}, tmp_path / "b.csv", n=10, seed=3)
 
-    ids_a = [r["question_id"] for r in csv.DictReader(a.open())]
-    ids_b = [r["question_id"] for r in csv.DictReader(b.open())]
+    ids_a = [r["question_id"] for r in csv.DictReader(a.open(newline="", encoding="utf-8"))]
+    ids_b = [r["question_id"] for r in csv.DictReader(b.open(newline="", encoding="utf-8"))]
     assert len(ids_a) == 10
     assert ids_a == ids_b
 
@@ -51,9 +51,9 @@ def test_agreement_splits_lenient_from_strict(tmp_path):
     sheet = tmp_path / "w.csv"
     write_worksheet(results, {}, sheet)
 
-    rows = list(csv.DictReader(sheet.open()))
+    rows = list(csv.DictReader(sheet.open(newline="", encoding="utf-8")))
     labels = {"q1": "1", "q2": "0", "q3": "1", "q4": "0"}
-    with sheet.open("w", newline="") as fh:
+    with sheet.open("w", newline="", encoding="utf-8") as fh:
         writer = csv.DictWriter(fh, fieldnames=rows[0].keys())
         writer.writeheader()
         for row in rows:
@@ -73,8 +73,8 @@ def test_unlabeled_rows_are_skipped_not_counted_as_agreement(tmp_path):
     sheet = tmp_path / "w.csv"
     write_worksheet(results, {}, sheet)
 
-    rows = list(csv.DictReader(sheet.open()))
-    with sheet.open("w", newline="") as fh:
+    rows = list(csv.DictReader(sheet.open(newline="", encoding="utf-8")))
+    with sheet.open("w", newline="", encoding="utf-8") as fh:
         writer = csv.DictWriter(fh, fieldnames=rows[0].keys())
         writer.writeheader()
         rows[0]["human"] = "1"
@@ -89,10 +89,10 @@ def test_label_spellings_are_accepted(tmp_path):
     sheet = tmp_path / "w.csv"
     write_worksheet(results, {}, sheet)
 
-    rows = list(csv.DictReader(sheet.open()))
+    rows = list(csv.DictReader(sheet.open(newline="", encoding="utf-8")))
     for row, label in zip(rows, ["yes", "TRUE", "n", "0"], strict=True):
         row["human"] = label
-    with sheet.open("w", newline="") as fh:
+    with sheet.open("w", newline="", encoding="utf-8") as fh:
         writer = csv.DictWriter(fh, fieldnames=rows[0].keys())
         writer.writeheader()
         writer.writerows(rows)
@@ -103,7 +103,7 @@ def test_label_spellings_are_accepted(tmp_path):
 
 
 def test_low_agreement_is_flagged_in_the_summary():
-    from chronomem.evaluation.agreement import Agreement
+    from llm_long_term_memory.evaluation.agreement import Agreement
 
     assert (
         "⚠️"

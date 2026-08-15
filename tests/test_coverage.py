@@ -8,8 +8,12 @@ from __future__ import annotations
 
 from datetime import datetime
 
-from chronomem.evaluation.datasets.longmemeval import HaystackSession, HaystackTurn, Instance
-from chronomem.ingest.coverage import (
+from llm_long_term_memory.evaluation.datasets.longmemeval import (
+    HaystackSession,
+    HaystackTurn,
+    Instance,
+)
+from llm_long_term_memory.ingest.coverage import (
     UNMEASURABLE_TYPES,
     CoverageCase,
     CoverageReport,
@@ -17,7 +21,7 @@ from chronomem.ingest.coverage import (
     evaluate_coverage,
     source_literal_present,
 )
-from chronomem.store import Memory
+from llm_long_term_memory.store import Memory
 
 
 def mem(content: str, event_time: datetime | None = None, **kw) -> Memory:

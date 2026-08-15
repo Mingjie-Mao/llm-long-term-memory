@@ -9,8 +9,8 @@ body captured on 2026-08-10.
 
 from __future__ import annotations
 
-from chronomem.llm import Limits, QuotaManager
-from chronomem.llm.client import parse_quota_violations
+from llm_long_term_memory.llm import Limits, QuotaManager
+from llm_long_term_memory.llm.client import parse_quota_violations
 
 _METRIC = "generativelanguage.googleapis.com/generate_content_free_tier_requests"
 

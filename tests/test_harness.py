@@ -9,9 +9,9 @@ from __future__ import annotations
 
 import pytest
 
-from chronomem.evaluation.datasets.longmemeval import Instance
-from chronomem.evaluation.harness import ArtifactMismatch, run_eval
-from chronomem.evaluation.runners.base import Answer
+from llm_long_term_memory.evaluation.datasets.longmemeval import Instance
+from llm_long_term_memory.evaluation.harness import ArtifactMismatch, run_eval
+from llm_long_term_memory.evaluation.runners.base import Answer
 
 
 def instance(qid: str, qtype: str = "single-session-user") -> Instance:
@@ -43,11 +43,13 @@ class StubJudge:
     def __init__(self, correct=True):
         self.correct = correct
         self.calls = 0
+        self.graded_types: list[str | None] = []
 
-    def grade(self, question, gold, hypothesis, is_abstention=False):
-        from chronomem.evaluation.judge import JudgeResult
+    def grade(self, question, gold, hypothesis, is_abstention=False, question_type=None):
+        from llm_long_term_memory.evaluation.judge import JudgeResult
 
         self.calls += 1
+        self.graded_types.append(question_type)
         return JudgeResult(self.correct, "ok", 5, 2)
 
 
@@ -56,7 +58,22 @@ def test_results_are_written_as_they_complete(tmp_path):
     report = run_eval(StubRunner(), StubJudge(), [instance(f"q{i}") for i in range(5)], out)
 
     assert report.n == 5
-    assert len(out.read_text().strip().splitlines()) == 5
+    assert len(out.read_text(encoding="utf-8").strip().splitlines()) == 5
+
+
+def test_the_question_type_reaches_the_judge(tmp_path):
+    """The judge routes on it: preference questions are graded against a rubric
+    rather than a reference answer. If the harness drops the type, that routing
+    silently never fires."""
+    judge = StubJudge()
+    run_eval(
+        StubRunner(),
+        judge,
+        [instance("q1", "single-session-preference"), instance("q2", "temporal-reasoning")],
+        tmp_path / "r.jsonl",
+    )
+
+    assert judge.graded_types == ["single-session-preference", "temporal-reasoning"]
 
 
 def test_resume_skips_completed_questions(tmp_path):
@@ -82,7 +99,7 @@ def test_fresh_truncates_rather_than_appending(tmp_path):
     report = run_eval(StubRunner(), StubJudge(correct=False), instances, out, resume=False)
 
     assert report.n == 4, "not 8"
-    assert len(out.read_text().strip().splitlines()) == 4
+    assert len(out.read_text(encoding="utf-8").strip().splitlines()) == 4
     assert report.accuracy == 0.0, "the second run's grades, not a blend of both"
 
 
@@ -96,7 +113,9 @@ def test_a_diverged_artifact_raises_instead_of_reporting_a_number(tmp_path):
         def grade(self, *a, **kw):
             result = super().grade(*a, **kw)
             if self.calls == 3:
-                out.write_text("")  # stand-in for another process rewriting the file
+                out.write_text(
+                    "", encoding="utf-8"
+                )  # stand-in for another process rewriting the file
             return result
 
     with pytest.raises(ArtifactMismatch, match=r"holds \d+ results but the run reported 3"):
@@ -106,7 +125,7 @@ def test_a_diverged_artifact_raises_instead_of_reporting_a_number(tmp_path):
 def test_report_regenerates_from_the_file_alone(tmp_path):
     """`eval report` reads only the artifacts, so a table can be rebuilt without
     re-spending quota."""
-    from chronomem.evaluation.report import load_report
+    from llm_long_term_memory.evaluation.report import load_report
 
     out = tmp_path / "naive_rag.jsonl"
     run_eval(StubRunner(), StubJudge(correct=True), [instance(f"q{i}") for i in range(6)], out)
@@ -116,12 +135,27 @@ def test_report_regenerates_from_the_file_alone(tmp_path):
     assert loaded.accuracy == 1.0
 
 
+def test_default_report_excludes_diagnostic_jsonl_artifacts(tmp_path):
+    from llm_long_term_memory.evaluation.report import default_report_variants
+
+    for name in (
+        "chronomem",
+        "full_context",
+        "naive_rag.rep1",
+        "chronomem_relevance_pack_250",
+        "influence-chronomem",
+    ):
+        (tmp_path / f"{name}.jsonl").touch()
+
+    assert default_report_variants(tmp_path) == ["full_context", "chronomem"]
+
+
 def test_partial_final_line_from_a_killed_process_is_skipped(tmp_path):
-    from chronomem.evaluation.report import load_report
+    from llm_long_term_memory.evaluation.report import load_report
 
     out = tmp_path / "r.jsonl"
     run_eval(StubRunner(), StubJudge(), [instance(f"q{i}") for i in range(3)], out)
-    with out.open("a") as fh:
+    with out.open("a", encoding="utf-8") as fh:
         fh.write('{"question_id": "q9", "corr')  # killed mid-write
 
     assert load_report(out).n == 3
@@ -133,11 +167,11 @@ def test_a_second_run_on_the_same_file_is_refused(tmp_path):
     dropped to 34 and a second file was deleted mid-run."""
     import os
 
-    from chronomem.evaluation.harness import RunAlreadyInProgress
+    from llm_long_term_memory.evaluation.harness import RunAlreadyInProgress
 
     out = tmp_path / "r.jsonl"
     lock = out.with_suffix(out.suffix + ".lock")
-    lock.write_text(str(os.getpid()))  # a live owner: this process
+    lock.write_text(str(os.getpid()), encoding="utf-8")  # a live owner: this process
 
     with pytest.raises(RunAlreadyInProgress, match="already writing"):
         run_eval(StubRunner(), StubJudge(), [instance("q1")], out)
@@ -148,7 +182,7 @@ def test_a_lock_left_by_a_dead_process_is_reclaimed(tmp_path):
     its owner must not block the resume path forever."""
     out = tmp_path / "r.jsonl"
     lock = out.with_suffix(out.suffix + ".lock")
-    lock.write_text("999999")  # a pid that does not exist
+    lock.write_text("999999", encoding="utf-8")  # a pid that does not exist
 
     report = run_eval(StubRunner(), StubJudge(), [instance("q1")], out)
     assert report.n == 1

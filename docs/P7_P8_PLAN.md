@@ -8,16 +8,16 @@ default.
 
 ## Preflight: finish the P1–P6 evidence loop
 
-1. Run `chronomem ingest temporal-gate` with `configs/baselines.yaml`. Archive the
+1. Run `lltm ingest temporal-gate` with `configs/baselines.yaml`. Archive the
    JSON gate report and stop if it misses a threshold.
 2. Ingest into the isolated `two-stage` store, then evaluate `two_stage` and
    `two_stage_no_temporal`. Keep the frozen v1 artifacts unchanged and compare the
    paired results before selecting a default.
-3. Run `chronomem lifecycle run` and `chronomem lifecycle consolidate` only as
+3. Run `lltm lifecycle run` and `lltm lifecycle consolidate` only as
    separately recorded variants; lifecycle policies change retrieval and therefore
    must not be mixed into an earlier row.
-4. Run `chronomem influence measure`, `chronomem influence fit`, then
-   `chronomem eval budget-sweep`. Publish the resulting JSON and SVG with the
+4. Run `lltm influence measure`, `lltm influence fit`, then
+   `lltm eval budget-sweep`. Publish the resulting JSON and SVG with the
    selector (relevance or fitted utility), model path, dataset split, and commit
    SHA. Choose a Pareto point only after it completes.
 

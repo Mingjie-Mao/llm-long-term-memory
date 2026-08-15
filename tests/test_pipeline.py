@@ -10,16 +10,17 @@ from __future__ import annotations
 import numpy as np
 import pytest
 
-from chronomem.evaluation.datasets.longmemeval import HaystackSession, HaystackTurn
-from chronomem.ingest.pipeline import (
+from llm_long_term_memory.evaluation.datasets.longmemeval import HaystackSession, HaystackTurn
+from llm_long_term_memory.ingest.pipeline import (
     IngestionPipeline,
     IngestProgress,
     batched,
+    namespace_batch_count,
     namespaced_sessions,
 )
-from chronomem.llm.client import DailyQuotaExhausted
-from chronomem.llm.rate_limiter import Wait
-from chronomem.store import Memory, NumpyFlatIndex, SQLiteMemoryStore
+from llm_long_term_memory.llm.client import DailyQuotaExhausted
+from llm_long_term_memory.llm.rate_limiter import Wait
+from llm_long_term_memory.store import Memory, NumpyFlatIndex, SQLiteMemoryStore
 
 
 def session(sid: str) -> HaystackSession:
@@ -45,7 +46,7 @@ class FakeExtractor:
         if self.fail_on_batch and self.calls == self.fail_on_batch:
             raise self.exc
 
-        from chronomem.ingest.extract import ExtractionOutcome
+        from llm_long_term_memory.ingest.extract import ExtractionOutcome
 
         return ExtractionOutcome(
             [
@@ -67,7 +68,7 @@ class FakeExtractor:
 
 class PassthroughDedup:
     def process(self, candidates, vectors=None):
-        from chronomem.ingest.dedup import DedupOutcome
+        from llm_long_term_memory.ingest.dedup import DedupOutcome
 
         return DedupOutcome(kept=list(candidates))
 
@@ -210,7 +211,7 @@ def test_a_shared_session_is_ingested_once_per_question():
     session in two haystacks belongs to two different simulated users. Merging them
     produced a `lives_in` chain across seven cities and let retrieval for one
     question return another's evidence."""
-    from chronomem.evaluation.datasets.longmemeval import Instance
+    from llm_long_term_memory.evaluation.datasets.longmemeval import Instance
 
     shared = session("shared")
     a = Instance("q1", "t", "q", "a", "d", [shared, session("only_a")], [])
@@ -230,8 +231,8 @@ def test_namespaces_are_not_deduplicated_across_questions():
     users. Deduplicating it by session_id merges the personas — which is what
     produced a store where one 'user' had lived in Tokyo, Seattle, Shanghai and
     San Diego, with the temporal resolver chaining those into a move history."""
-    from chronomem.evaluation.datasets.longmemeval import Instance
-    from chronomem.ingest.pipeline import group_by_namespace, namespaced_sessions
+    from llm_long_term_memory.evaluation.datasets.longmemeval import Instance
+    from llm_long_term_memory.ingest.pipeline import group_by_namespace, namespaced_sessions
 
     shared = session("shared")
     a = Instance("q1", "t", "q", "a", "d", [shared, session("only_a")], [])
@@ -249,7 +250,7 @@ def test_namespaces_are_not_deduplicated_across_questions():
 
 def test_checkpoint_keys_are_namespaced():
     """Otherwise finishing a session under q1 would mark it done for q2 as well."""
-    from chronomem.ingest.pipeline import _key
+    from llm_long_term_memory.ingest.pipeline import _key
 
     assert _key("q1", session("s")) != _key("q2", session("s"))
 
@@ -257,7 +258,7 @@ def test_checkpoint_keys_are_namespaced():
 def test_a_batch_never_straddles_two_namespaces(build):
     """One extraction request must not mix two users' sessions — the model would
     attribute facts across personas, and `session_index` maps into one list."""
-    from chronomem.ingest.pipeline import group_by_namespace
+    from llm_long_term_memory.ingest.pipeline import group_by_namespace
 
     pairs = [("q1", session("a")), ("q2", session("b")), ("q1", session("c"))]
     groups = group_by_namespace(pairs)
@@ -280,3 +281,13 @@ def test_memories_are_written_under_their_own_namespace(build):
 def test_batched_splits_evenly_and_keeps_the_remainder():
     assert list(batched([1, 2, 3, 4, 5], 2)) == [[1, 2], [3, 4], [5]]
     assert list(batched([], 3)) == []
+
+
+def test_batch_estimate_respects_namespace_boundaries():
+    pairs = [
+        *(("q1", session(f"a{i}")) for i in range(4)),
+        *(("q2", session(f"b{i}")) for i in range(4)),
+    ]
+
+    assert namespace_batch_count(pairs, 3) == 4
+    assert -(-len(pairs) // 3) == 3, "the old global estimate undercounted partial batches"

@@ -1,0 +1,58 @@
+{
+  "note": "Recorded answer runs used by the inspector's default view. Each is a real run against a real model, replayed rather than re-executed, and labelled as such in the UI. `fingerprint` is checked against the live process so a recording made under a different store or prompt is reported stale instead of shown as current.",
+  "runs": [
+    {
+      "name": "mayo",
+      "namespace": "41275add",
+      "query": "what was the mayo clinic youtube video you recommended?",
+      "answer": "The Mayo Clinic video I previously recommended is titled \"How to Sit Properly at a Desk to Avoid Back Pain,\" and you can watch it here: https://www.youtube.com/watch?v=UfOvNlX9Hh0",
+      "answer_status": "no_evidence",
+      "fallback_level": "archive_wide",
+      "fallback_reason": "No structured memory covered the question; searched the raw conversation archive directly.",
+      "evidence": [
+        {
+          "session_id": "answer_sharegpt_81riySf_0",
+          "turn_index": 1,
+          "role": "assistant",
+          "text": "Certainly! There are plenty of helpful videos on YouTube that demonstrate proper workplace posture and provide tips for staying comfortable while working at a desk. Here are a few videos you could share with your staff:\n\n1. \"How to Sit Properly at a Desk to Avoid Back Pain\" by the Mayo Clinic: <https://www.youtube.com/watch?v=UfOvNlX9Hh0>\n2. \"5 Tips for Better Posture at Your Desk\" by Harvard Health Publishing: <https://www.youtube.com/watch?v=LT_dFRnmdGs>\n3. \"Office Ergonomics - Computer Workstation Ergonomics\" by Ohio State University Wexner Medical Center: <https://www.youtube.com/watch?v=0"
+        }
+      ],
+      "memories_selected": 10,
+      "candidates_considered": 85,
+      "judge_verdict": "PASS",
+      "judge_reason": "The candidate answer provides the exact title and URL as specified in the reference answer.",
+      "recorded_at": "2026-08-15T01:27:26+10:00",
+      "runs": 3,
+      "fingerprint": "41c67a1f3bebb0fe",
+      "versions": {
+        "answer_prompt": "memory-aware-v2",
+        "judge_prompt": "lme-type-aware-v2",
+        "extractor": null
+      },
+      "note": "Extraction dropped the URL; the archive still had it. The whole reason the raw layer exists."
+    },
+    {
+      "name": "battery",
+      "namespace": "09d032c9",
+      "query": "I've been having trouble with the battery life on my phone lately. Any tips?",
+      "answer": "Since you commute 30-40 minutes daily and have a new portable power bank and wireless charging pad, you could keep your portable power bank charged in your bag for your commute and set up the wireless charging pad at your desk or home workspace so your phone is easily topped up throughout the day.",
+      "answer_status": "answer",
+      "fallback_level": "none",
+      "fallback_reason": null,
+      "evidence": [],
+      "memories_selected": 10,
+      "candidates_considered": 85,
+      "judge_verdict": "PASS",
+      "judge_reason": "The candidate answer correctly incorporates the user's history regarding the portable power bank and wireless charging pad to provide personalized advice.",
+      "recorded_at": "2026-08-15T01:27:26+10:00",
+      "runs": 3,
+      "fingerprint": "70b4facf911730fb",
+      "versions": {
+        "answer_prompt": "memory-aware-v2",
+        "judge_prompt": "lme-type-aware-v2",
+        "extractor": null
+      },
+      "note": "Structured memory sufficed — the answerer applied the remembered power bank instead of declining. No fallback."
+    }
+  ]
+}

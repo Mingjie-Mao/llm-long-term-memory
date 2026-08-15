@@ -6,14 +6,14 @@ no gate: it authorises spending on a pipeline that has not earned it.
 
 from __future__ import annotations
 
-from chronomem.ingest.keying import Keying, UpdateOp
-from chronomem.ingest.temporal_gate import (
+from llm_long_term_memory.ingest.keying import Keying, UpdateOp
+from llm_long_term_memory.ingest.temporal_gate import (
     THRESHOLDS,
     score,
     stability_between,
     unusable,
 )
-from chronomem.ingest.temporal_pairs import ALL_PAIRS, COEXISTENCE, REPLACEMENT
+from llm_long_term_memory.ingest.temporal_pairs import ALL_PAIRS, COEXISTENCE, REPLACEMENT
 
 
 def k(key: str, op: UpdateOp = UpdateOp.COEXISTS) -> Keying:

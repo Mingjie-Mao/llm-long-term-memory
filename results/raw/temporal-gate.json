@@ -1,0 +1,416 @@
+{
+  "thresholds": {
+    "key_consistency": 0.97,
+    "replacement_recall": 0.92,
+    "false_supersede": 0.015,
+    "cross_run_stability": 0.95
+  },
+  "key_consistency": 1.0,
+  "replacement_recall": 1.0,
+  "false_supersede": 0.0,
+  "removal_recall": 1.0,
+  "cross_run_stability": 1.0,
+  "gate_open": true,
+  "outcomes": [
+    {
+      "attribute": "home city",
+      "expected": "replaces",
+      "before": {
+        "temporal_key": "home_city",
+        "update_op": "coexists",
+        "object": "Canberra"
+      },
+      "after": {
+        "temporal_key": "home_city",
+        "update_op": "replaces",
+        "object": "Sydney"
+      },
+      "same_key": true,
+      "correct": true
+    },
+    {
+      "attribute": "ML framework",
+      "expected": "replaces",
+      "before": {
+        "temporal_key": "ml_framework",
+        "update_op": "coexists",
+        "object": "TensorFlow"
+      },
+      "after": {
+        "temporal_key": "ml_framework",
+        "update_op": "replaces",
+        "object": "PyTorch"
+      },
+      "same_key": true,
+      "correct": true
+    },
+    {
+      "attribute": "job title",
+      "expected": "replaces",
+      "before": {
+        "temporal_key": "occupation",
+        "update_op": "coexists",
+        "object": "software engineer"
+      },
+      "after": {
+        "temporal_key": "occupation",
+        "update_op": "replaces",
+        "object": "solicitor"
+      },
+      "same_key": true,
+      "correct": true
+    },
+    {
+      "attribute": "bedtime",
+      "expected": "replaces",
+      "before": {
+        "temporal_key": "bedtime",
+        "update_op": "coexists",
+        "object": "11:30 pm"
+      },
+      "after": {
+        "temporal_key": "bedtime",
+        "update_op": "replaces",
+        "object": "10:30 pm"
+      },
+      "same_key": true,
+      "correct": true
+    },
+    {
+      "attribute": "phone",
+      "expected": "replaces",
+      "before": {
+        "temporal_key": "phone_model",
+        "update_op": "coexists",
+        "object": "iPhone 12"
+      },
+      "after": {
+        "temporal_key": "phone_model",
+        "update_op": "replaces",
+        "object": "iPhone 15"
+      },
+      "same_key": true,
+      "correct": true
+    },
+    {
+      "attribute": "weight",
+      "expected": "replaces",
+      "before": {
+        "temporal_key": "weight",
+        "update_op": "coexists",
+        "object": "82 kg"
+      },
+      "after": {
+        "temporal_key": "weight",
+        "update_op": "replaces",
+        "object": "76 kg"
+      },
+      "same_key": true,
+      "correct": true
+    },
+    {
+      "attribute": "running goal",
+      "expected": "replaces",
+      "before": {
+        "temporal_key": "fitness_goal",
+        "update_op": "coexists",
+        "object": "10k"
+      },
+      "after": {
+        "temporal_key": "fitness_goal",
+        "update_op": "replaces",
+        "object": "half marathon"
+      },
+      "same_key": true,
+      "correct": true
+    },
+    {
+      "attribute": "houseplants",
+      "expected": "coexists",
+      "before": {
+        "temporal_key": "houseplants",
+        "update_op": "coexists",
+        "object": "peace lily"
+      },
+      "after": {
+        "temporal_key": "houseplants",
+        "update_op": "coexists",
+        "object": "snake plant"
+      },
+      "same_key": true,
+      "correct": true
+    },
+    {
+      "attribute": "books read",
+      "expected": "coexists",
+      "before": {
+        "temporal_key": "books_read",
+        "update_op": "coexists",
+        "object": "Dune"
+      },
+      "after": {
+        "temporal_key": "books_read",
+        "update_op": "coexists",
+        "object": "Project Hail Mary"
+      },
+      "same_key": true,
+      "correct": true
+    },
+    {
+      "attribute": "trips",
+      "expected": "coexists",
+      "before": {
+        "temporal_key": "travel_destinations",
+        "update_op": "coexists",
+        "object": "Kyoto"
+      },
+      "after": {
+        "temporal_key": "travel_destinations",
+        "update_op": "coexists",
+        "object": "Osaka"
+      },
+      "same_key": true,
+      "correct": true
+    },
+    {
+      "attribute": "siblings",
+      "expected": "coexists",
+      "before": {
+        "temporal_key": "siblings",
+        "update_op": "coexists",
+        "object": "Mei"
+      },
+      "after": {
+        "temporal_key": "siblings",
+        "update_op": "coexists",
+        "object": "Ken"
+      },
+      "same_key": true,
+      "correct": true
+    },
+    {
+      "attribute": "purchases",
+      "expected": "coexists",
+      "before": {
+        "temporal_key": "purchases",
+        "update_op": "coexists",
+        "object": "running shoes"
+      },
+      "after": {
+        "temporal_key": "purchases",
+        "update_op": "coexists",
+        "object": "jacket"
+      },
+      "same_key": true,
+      "correct": true
+    },
+    {
+      "attribute": "allergies",
+      "expected": "coexists",
+      "before": {
+        "temporal_key": "allergies",
+        "update_op": "coexists",
+        "object": "peanuts"
+      },
+      "after": {
+        "temporal_key": "allergies",
+        "update_op": "coexists",
+        "object": "shellfish"
+      },
+      "same_key": true,
+      "correct": true
+    },
+    {
+      "attribute": "goals",
+      "expected": "coexists",
+      "before": {
+        "temporal_key": "learning_goals",
+        "update_op": "coexists",
+        "object": "Japanese"
+      },
+      "after": {
+        "temporal_key": "learning_goals",
+        "update_op": "coexists",
+        "object": "sailing"
+      },
+      "same_key": true,
+      "correct": true
+    },
+    {
+      "attribute": "classes attended",
+      "expected": "coexists",
+      "before": {
+        "temporal_key": "classes_attended",
+        "update_op": "coexists",
+        "object": "pottery class"
+      },
+      "after": {
+        "temporal_key": "classes_attended",
+        "update_op": "coexists",
+        "object": "cooking class"
+      },
+      "same_key": true,
+      "correct": true
+    },
+    {
+      "attribute": "recurring commitments",
+      "expected": "coexists",
+      "before": {
+        "temporal_key": "recurring_activities",
+        "update_op": "coexists",
+        "object": "cooking class"
+      },
+      "after": {
+        "temporal_key": "recurring_activities",
+        "update_op": "coexists",
+        "object": "game nights"
+      },
+      "same_key": true,
+      "correct": true
+    },
+    {
+      "attribute": "fitness equipment",
+      "expected": "coexists",
+      "before": {
+        "temporal_key": "fitness_tracker",
+        "update_op": "coexists",
+        "object": "Fitbit Charge 3"
+      },
+      "after": {
+        "temporal_key": "fitness_equipment",
+        "update_op": "coexists",
+        "object": "resistance bands"
+      },
+      "same_key": false,
+      "correct": true
+    },
+    {
+      "attribute": "coffee habit",
+      "expected": "removes",
+      "before": {
+        "temporal_key": "coffee_habit",
+        "update_op": "coexists",
+        "object": "two cups daily"
+      },
+      "after": {
+        "temporal_key": "coffee_habit",
+        "update_op": "removes",
+        "object": ""
+      },
+      "same_key": true,
+      "correct": true
+    },
+    {
+      "attribute": "car",
+      "expected": "removes",
+      "before": {
+        "temporal_key": "car",
+        "update_op": "coexists",
+        "object": "Honda Civic"
+      },
+      "after": {
+        "temporal_key": "car",
+        "update_op": "removes",
+        "object": "Honda Civic"
+      },
+      "same_key": true,
+      "correct": true
+    },
+    {
+      "attribute": "streaming subscription",
+      "expected": "removes",
+      "before": {
+        "temporal_key": "subscriptions",
+        "update_op": "coexists",
+        "object": "Netflix"
+      },
+      "after": {
+        "temporal_key": "subscriptions",
+        "update_op": "removes",
+        "object": "Netflix"
+      },
+      "same_key": true,
+      "correct": true
+    },
+    {
+      "attribute": "Spanish course",
+      "expected": "removes",
+      "before": {
+        "temporal_key": "courses",
+        "update_op": "coexists",
+        "object": "Spanish"
+      },
+      "after": {
+        "temporal_key": "courses",
+        "update_op": "removes",
+        "object": "Spanish"
+      },
+      "same_key": true,
+      "correct": true
+    },
+    {
+      "attribute": "speaker being considered",
+      "expected": "coexists",
+      "before": {
+        "temporal_key": "wishlist",
+        "update_op": "coexists",
+        "object": "Sonos One"
+      },
+      "after": {
+        "temporal_key": "wishlist",
+        "update_op": "coexists",
+        "object": "Google Home"
+      },
+      "same_key": true,
+      "correct": true
+    },
+    {
+      "attribute": "hobbies",
+      "expected": "coexists",
+      "before": {
+        "temporal_key": "hobbies",
+        "update_op": "coexists",
+        "object": "hiking"
+      },
+      "after": {
+        "temporal_key": "hobbies",
+        "update_op": "coexists",
+        "object": "rock climbing"
+      },
+      "same_key": true,
+      "correct": true
+    },
+    {
+      "attribute": "tiredness",
+      "expected": "coexists",
+      "before": {
+        "temporal_key": "none",
+        "update_op": "none",
+        "object": ""
+      },
+      "after": {
+        "temporal_key": "none",
+        "update_op": "none",
+        "object": ""
+      },
+      "same_key": true,
+      "correct": false
+    },
+    {
+      "attribute": "restaurants",
+      "expected": "coexists",
+      "before": {
+        "temporal_key": "favourite_restaurants",
+        "update_op": "coexists",
+        "object": "Nobu"
+      },
+      "after": {
+        "temporal_key": "favourite_restaurants",
+        "update_op": "coexists",
+        "object": "Sokyo"
+      },
+      "same_key": true,
+      "correct": true
+    }
+  ]
+}

@@ -3,7 +3,7 @@ from __future__ import annotations
 import numpy as np
 import pytest
 
-from chronomem.store import NumpyFlatIndex
+from llm_long_term_memory.store import NumpyFlatIndex
 
 
 def test_search_returns_nearest_first(tmp_path):

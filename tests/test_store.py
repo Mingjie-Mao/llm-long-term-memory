@@ -5,7 +5,7 @@ from datetime import UTC, datetime, timedelta
 
 import pytest
 
-from chronomem.store import Memory, Session, SQLiteMemoryStore, Turn
+from llm_long_term_memory.store import Memory, Session, SQLiteMemoryStore, Turn
 
 NOW = datetime(2026, 1, 1, tzinfo=UTC)
 

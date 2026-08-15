@@ -6,9 +6,9 @@ import json
 
 import numpy as np
 
-from chronomem.evaluation.datasets.longmemeval import Instance
-from chronomem.influence import FEATURE_NAMES, InfluenceDataset, measure_influence
-from chronomem.store import Memory
+from llm_long_term_memory.evaluation.datasets.longmemeval import Instance
+from llm_long_term_memory.influence import FEATURE_NAMES, InfluenceDataset, measure_influence
+from llm_long_term_memory.store import Memory
 
 
 class AlwaysCorrectJudge:
@@ -63,7 +63,7 @@ def test_interrupted_question_is_not_checkpointed_partially(tmp_path):
     assert outcome.dataset.rows == []
     assert InfluenceDataset.load(path).rows == []
     assert np.load(path.with_suffix(".features.npy")).shape == (0, len(FEATURE_NAMES))
-    assert json.loads(path.with_suffix(".features.json").read_text()) == {
+    assert json.loads(path.with_suffix(".features.json").read_text(encoding="utf-8")) == {
         "features": list(FEATURE_NAMES),
         "completed_questions": [],
     }

@@ -1,4 +1,4 @@
-from chronomem.evaluation.budget import (
+from llm_long_term_memory.evaluation.budget import (
     BudgetPoint,
     pareto_frontier,
     render_pareto_svg,

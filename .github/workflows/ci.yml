@@ -6,8 +6,43 @@ on:
   pull_request:
 
 jobs:
-  test:
+  # Lint once. Style is platform-independent, so running ruff three times would
+  # only buy three copies of the same answer.
+  lint:
     runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+      - run: uv python install 3.13
+      - name: Install
+        run: uv sync --group dev --extra llm
+      - name: Lint
+        run: uv run ruff check .
+      - name: Format check
+        run: uv run ruff format --check .
+
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    env:
+      # Force the legacy locale codec on Windows (cp1252 on the runner) instead of
+      # letting Python's UTF-8 mode paper over the defect this matrix exists to
+      # catch. Without this the Windows job would pass even if a file I/O site
+      # dropped its `encoding=`, because the runner's UTF-8 mode would supply the
+      # right codec by accident. Harmless on POSIX, where UTF-8 is already the
+      # locale default.
+      PYTHONUTF8: "0"
+      # Emit EncodingWarning wherever text-mode I/O relies on the locale codec.
+      # pyproject turns that warning into an error, so this catches a missing
+      # `encoding=` on *every* platform rather than only where the locale differs
+      # — the Windows job proves the behaviour, this makes all three jobs enforce
+      # it.
+      PYTHONWARNDEFAULTENCODING: "1"
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v5
@@ -24,9 +59,5 @@ jobs:
       - name: Install
         run: uv sync --group dev --extra llm
 
-      - name: Lint
-        run: uv run ruff check .
-      - name: Format check
-        run: uv run ruff format --check .
       - name: Test
-        run: uv run pytest --cov=chronomem --cov-report=term-missing
+        run: uv run pytest --cov=llm_long_term_memory --cov-report=term-missing

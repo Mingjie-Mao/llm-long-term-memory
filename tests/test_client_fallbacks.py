@@ -11,8 +11,8 @@ import httpx
 import pytest
 from google.genai import errors, types
 
-from chronomem.llm import Limits, QuotaManager
-from chronomem.llm.client import DailyQuotaExhausted, GeminiClient
+from llm_long_term_memory.llm import Limits, QuotaManager
+from llm_long_term_memory.llm.client import DailyQuotaExhausted, GeminiClient
 
 
 class FakeAPIError(errors.APIError):
@@ -55,7 +55,7 @@ def client(monkeypatch, tmp_path):
         c = GeminiClient.__new__(GeminiClient)
         c._client = type("C", (), {"models": FakeModels(script)})()
         c.quota = QuotaManager(state_dir=tmp_path, default=Limits(rpm=1000, tpm=10**9, rpd=1000))
-        from chronomem.llm import UsageTracker
+        from llm_long_term_memory.llm import UsageTracker
 
         c.usage = UsageTracker()
         c.max_retries = 4

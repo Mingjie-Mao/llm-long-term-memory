@@ -6,8 +6,8 @@ from datetime import datetime, timedelta
 
 import pytest
 
-from chronomem.lifecycle import apply_decay, decayed_strength, evict_to_limit
-from chronomem.store import Memory, SQLiteMemoryStore
+from llm_long_term_memory.lifecycle import apply_decay, decayed_strength, evict_to_limit
+from llm_long_term_memory.store import Memory, SQLiteMemoryStore
 
 NOW = datetime(2026, 1, 1)
 

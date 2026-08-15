@@ -8,7 +8,14 @@ abstention — the categories the whole project is about.
 
 from __future__ import annotations
 
-from chronomem.evaluation.datasets.longmemeval import Instance, stratify
+from llm_long_term_memory.evaluation.datasets.longmemeval import (
+    CHARS_PER_TOKEN,
+    HaystackSession,
+    HaystackTurn,
+    Instance,
+    compute_stats,
+    stratify,
+)
 
 
 def make(qid: str, qtype: str) -> Instance:
@@ -89,3 +96,21 @@ def test_limit_at_or_above_corpus_returns_everything():
 def test_order_is_stable_across_runs():
     picked = stratify(CORPUS, 30)
     assert [i.question_id for i in picked] == sorted(i.question_id for i in picked)
+
+
+def test_stats_token_estimate_uses_the_documented_corpus_ratio():
+    instance = make("q1", "single-session-user")
+    instance.sessions = [
+        HaystackSession(
+            session_id="s1",
+            date="2026-01-01",
+            turns=[HaystackTurn(role="user", content="x" * 460)],
+        )
+    ]
+
+    stats = compute_stats([instance])
+
+    assert CHARS_PER_TOKEN == 4.6
+    assert stats.total_chars == 460
+    assert stats.est_total_tokens == 100
+    assert stats.median_tokens_per_q == 100

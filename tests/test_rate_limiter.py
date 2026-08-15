@@ -10,8 +10,8 @@ from datetime import datetime, timedelta
 
 import pytest
 
-from chronomem.llm import Limits, RateLimiter
-from chronomem.llm.rate_limiter import QUOTA_TZ
+from llm_long_term_memory.llm import Limits, RateLimiter
+from llm_long_term_memory.llm.rate_limiter import QUOTA_TZ
 
 
 class FakeClock:
@@ -144,7 +144,7 @@ def test_a_request_larger_than_the_whole_tpm_budget_is_rejected_not_waited_on():
     `IndexError: deque index out of range`, which says nothing about the real
     problem or its fix.
     """
-    from chronomem.llm.rate_limiter import RequestTooLarge
+    from llm_long_term_memory.llm.rate_limiter import RequestTooLarge
 
     rl, _, _ = make(Limits(rpm=10, tpm=16_000, rpd=1_500))
     with pytest.raises(RequestTooLarge, match="reduce the batch size"):

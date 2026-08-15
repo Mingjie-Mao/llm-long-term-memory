@@ -7,7 +7,7 @@ subset. They are diagnostic results, not a final benchmark claim. Category-level
 percentages can be based on small denominators and are reported for failure
 localization, not as evidence of a general improvement.
 
-The result is deliberately negative: v1 ChronoMem scores 26.0% against naive RAG's
+The result is deliberately negative: v1 LLTM scores 26.0% against naive RAG's
 54.0%. The exact paired comparison for temporal filtering is 3 wins and 3 losses
 (`p = 1.000`), so the only supported statement is **no detectable difference at
 n=50**. It does not establish equivalence; that would require a pre-specified
@@ -22,11 +22,11 @@ equivalence or non-inferiority design on a larger held-out set.
 | Source literal coverage | The gold appears in the immutable source turns. | That an answer is derivable when its final wording is absent. |
 | End-to-end accuracy | The answerer was judged correct. | Which pipeline stage caused a wrong answer. |
 
-For each wrong answer, `chronomem eval failure-audit <variant>` writes a worksheet
+For each wrong answer, `lltm eval failure-audit <variant>` writes a worksheet
 that assigns exactly one primary cause: extraction loss (E1), retrieval miss (E2),
 temporal resolution error (E3), context assembly loss (E4), answer reasoning failure
 (E5), or judge error (E6). E1 is further labelled as number, date, duration, entity,
-event, relation, or negation. `chronomem eval failure-report <worksheet>` is the
+event, relation, or negation. `lltm eval failure-report <worksheet>` is the
 roadmap input; it must precede additional ranking or temporal tuning.
 
 ## Fidelity-preserving representation experiment
@@ -45,10 +45,10 @@ records missing anchors, skipped evidence, and hydrated tokens in each JSONL res
 
 ## Repeats, pairing, and latency
 
-Use `chronomem eval repeat <variant> --runs 3` (up to five) before interpreting a
-headline difference. `chronomem eval variability <variant>` reports individual
+Use `lltm eval repeat <variant> --runs 3` (up to five) before interpreting a
+headline difference. `lltm eval variability <variant>` reports individual
 accuracies, mean, sample standard deviation, observed spread, and a deterministic
-bootstrap interval for the mean. Compare matched variants with `chronomem eval
+bootstrap interval for the mean. Compare matched variants with `lltm eval
 compare`; report wins/losses and exact McNemar p-values, not only percentage deltas.
 
 The results table's p95 is observed answer-provider API latency, excluding quota

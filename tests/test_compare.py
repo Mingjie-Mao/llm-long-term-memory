@@ -9,8 +9,8 @@ from __future__ import annotations
 
 import pytest
 
-from chronomem.evaluation.compare import Variability, compare
-from chronomem.evaluation.harness import QuestionResult, RunReport
+from llm_long_term_memory.evaluation.compare import Variability, compare
+from llm_long_term_memory.evaluation.harness import QuestionResult, RunReport
 
 
 def report(variant: str, outcomes: dict[str, bool]) -> RunReport:

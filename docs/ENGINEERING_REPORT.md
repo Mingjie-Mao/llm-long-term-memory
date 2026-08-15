@@ -1,0 +1,663 @@
+# Engineering Report — Building a Persistent Long-Term Memory Layer for LLM Applications
+
+**Project:** `llm-long-term-memory` (internal name ChronoMem)
+**Report date:** 2026-08-15
+**Status:** productised prototype; dev-50 evaluation in progress, no held-out result yet
+
+Every number below was recomputed from committed artifacts in `results/raw/` at the
+time of writing, and each is labelled with the file it comes from. Where a figure
+appeared in an earlier draft and did not survive re-checking, the report says so
+rather than quietly dropping it.
+
+---
+
+## 1. Executive summary
+
+A long-term memory layer for LLM agents: it turns conversations into typed, time-
+bounded facts, resolves those facts when they change, retrieves them under a token
+budget, and — when the compression turns out to have dropped what a question needs —
+recovers the original conversation turn instead of failing.
+
+Four findings shaped the product, all of them measured:
+
+1. **Structured memory is a viable compression.** On a 31-question pilot,
+   `two_stage` at k=10 answered 51.6% using a median of **242 context tokens**
+   against `naive_rag`'s 51.6% on **13,057** — ~54x less context, with no detectable
+   accuracy difference (6W-6L, p = 1.000). *(recomputed from `results/raw/*.jsonl`)*
+2. **The gain came from extraction, not from attaching raw evidence.** An initial
+   draft credited evidence hydration. A causal ablation reversed that: the
+   extraction rewrite is worth 11W-2L (p = 0.022), hydration 2W-1L (p = 1.000) at 3x
+   the context. *(`results/a2-pilot.md`)*
+3. **Two plausible upgrades were built, measured, and not shipped.** Cross-encoder
+   reranking changed *zero* answers at k=10 while lowering source recall
+   (`results/rerank-pareto.md`); a utility predictor for budget packing lost to
+   predicting the mean (`results/p6-pilot.md`).
+4. **The evidence for dense raw retrieval dissolved under audit.** A constructed
+   query set suggested BM25 collapses on paraphrases (6.9% R@1); manual inspection
+   showed the construction had deleted the questions, not just their vocabulary.
+   Hand-written paraphrases retrieve at rank 1. *(`results/raw-recall-diagnostic.md`)*
+
+A live regression on the 7 questions that motivated the most recent fixes moved them
+from **0/7 to 6/7, identical across three runs** — including the golden case, where
+the answerer declared structured memory insufficient, the archive returned the
+original assistant turn, and the answer carried the exact URL extraction had dropped
+(`results/live-regression-v2.md`). Those 7 questions were selected because they
+failed, so this is a regression signal, not a measurement of the system.
+
+Shipped: a REST API, Docker image, structured request logging, an MCP-ready service
+layer, and a Memory Inspector that shows why each memory was selected, passed over,
+or superseded — with shareable URLs. 352 tests, three-platform CI.
+
+**Not claimed:** any comparison against a third-party system, or any result on
+held-out data. The dev-50 set has been used for prompt iteration and gate tuning, so
+it measures the fit of those choices as much as the system.
+
+---
+
+## 2. Problem and product goals
+
+A vector store with top-k retrieval answers *"what did the user say?"* It does not
+answer *"what is currently true?"*. Given
+
+```
+Jan   I use TensorFlow.
+Mar   I'm learning PyTorch.
+Aug   I've switched completely to PyTorch.
+```
+
+naive RAG surfaces all three and lets the model guess. The product goals follow:
+
+| Goal | Why it is not free |
+|---|---|
+| Answer from a fraction of the history | Context is the dominant cost of long-term memory |
+| Track facts that change | Superseded facts must stop being retrieved without being deleted |
+| Explain every answer | "Which memory produced this?" is unanswerable in a plain vector store |
+| Never lose a detail permanently | LLM extraction is lossy compression |
+| Apply memory, not just recall it | Retrieving a preference and ignoring it is a product failure |
+
+The last two are the ones that took longest to understand, and section 8 covers how
+each was diagnosed.
+
+---
+
+## 3. System architecture
+
+```
+                     Conversation
+                          │
+              ┌───────────┴───────────┐
+              ↓                       ↓
+      Raw conversation            Extractor
+         archive                 (2 LLM calls
+      (turns + FTS5)              per batch)
+              │                       ↓
+              │              Structured memory
+              │             (typed, bi-temporal,
+              │              provenance-anchored)
+              │                       │
+  Query ──────┼───────────────────────┘
+              │            hybrid retrieval (5 signals)
+              │                       ↓
+              │               sufficient to answer?
+              │              ┌────────┴────────┐
+              │             yes                no
+              │              ↓                  ↓
+              └──────────> answer      raw-source recovery
+                                                ↓
+                                       source-cited answer
+```
+
+**The raw archive is a storage decision, not a retrieval algorithm.** This
+distinction matters and was initially blurred in our own notes: keeping original
+turns is what makes lossy extraction *recoverable*; how those turns are found —
+source-local lookup, BM25, dense, hybrid — is an independent choice that can change
+without touching the storage model. Section 6 covers what is stored; section 7
+covers how it is searched today and what would change that.
+
+| Layer | Choice | Rationale |
+|---|---|---|
+| Store | SQLite (WAL) + FTS5 | One file, no service dependency; BM25 for free |
+| Vectors | Exact flat inner-product over numpy | 4.8k memories; an ANN index would add a dependency to save microseconds |
+| Embeddings | `all-MiniLM-L6-v2`, local | Corpus-wide embedding is ~53M tokens; the API quota is the binding constraint |
+| LLM | Gemini, three independently configured roles | Extractor, answerer and judge have different requirements |
+| Service | FastAPI, one composition root | The MCP server and Inspector are clients of the same service object |
+
+---
+
+## 4. Memory ingestion and update pipeline
+
+### 4.1 Two-stage extraction
+
+Stage A reads sessions and emits fact lines; Stage B assigns each a temporal key and
+an update operation. Two requests per batch rather than one.
+
+The split is not stylistic. A rule-based Stage B was free and scored **43% predicate
+accuracy with zero supersessions** over 148 memories; the LLM version passes the
+temporal gate on all four metrics. That doubled ingestion from ~190 to ~380 requests
+and was worth it, because a wrong temporal key makes the whole timeline layer a
+no-op — two spellings of the same relation never collide, so nothing is ever
+detected as superseded.
+
+### 4.2 `source_role` is not `subject`
+
+The single most consequential schema fix in the project. The original code derived
+the subject from a string prefix:
+
+```python
+subject = "assistant" if fact.lower().startswith("the assistant") else "user"
+```
+
+That made `subject` a two-valued speaker flag. *"Andy wore a blue shirt"*, said by
+the user, was stored as a fact about the user — and **no amount of prompt tuning
+could have fixed it, because the schema had nowhere else to put it**.
+
+Who said something and who it is about are different questions:
+
+| | `source_role` | `subject` |
+|---|---|---|
+| "I stopped drinking coffee" | user | user |
+| "I recommend Mod Podge" | assistant | assistant |
+| "Andy wore a blue shirt" (user speaking) | user | andy |
+
+Both now exist, alongside `scope` (profile / preference / plan / recommendation /
+commitment / event / shared_context). Stage A emits all three, because Stage B never
+sees the conversation — speaker identity is unrecoverable after Stage A.
+
+**Migration recovers the past exactly.** The old extractor set `subject='assistant'`
+precisely when the fact began "The assistant", so backfilling `source_role` from it
+is a derivation, not a guess. Verified on the live store: 326 assistant memories
+recovered, 4,517 user, zero mismatches, 4,843 rows preserved. `scope` stays NULL on
+pre-P10 rows — it is genuinely unknown, and a made-up value would be
+indistinguishable from a real one at query time.
+
+*Status: code and tests complete; the store has not yet been re-ingested under the
+new extractor, so the current 4,843 memories still carry the old framing.*
+
+### 4.3 Temporal resolution
+
+Every fact carries a validity window. For each `(subject, predicate)` key the
+resolver sorts by event time and rewrites the whole chain.
+
+Rebuilding rather than pairwise comparison is load-bearing. Sessions arrive in
+arbitrary order, so "the newest memory supersedes the current head" lets a
+late-arriving January fact become current, and a fact landing between two existing
+ones could never rewire a link that already points past it. Rebuilding is idempotent,
+order-independent, and costs no LLM calls.
+
+Two refinements came out of writing the tests:
+
+- **Restatements are not moves.** "I live in Canberra" in March and again in June is
+  one interval owned by March, so "when did you move?" answers correctly.
+- **Arity is the default rule, not the whole rule.** `uses_tool` is multi-valued —
+  using PyTorch does not stop you using NumPy — so extraction also emits
+  `replaces_previous` when the user's own wording signals a replacement.
+
+The first real ingest disproved part of the arity list immediately: `lives_in`
+produced `Tokyo → South Bay → Las Vegas`, which is right, while `scheduled` produced
+`layover in London → cooking class → the 9:15 train`, which is not a sequence of
+competing values at all. `scheduled` and `has_goal` were removed. That mistake cost
+seconds because resolution reads stored data and calls no model.
+
+---
+
+## 5. Retrieval architecture
+
+Five signals, each normalized to [0,1] before weighting: semantic, BM25, recency,
+importance, entity overlap. Setting a weight to zero disables that signal, which is
+how ablation rows are produced.
+
+Normalization is not cosmetic. FTS5's `bm25()` is negative and unbounded while
+cosine similarity is bounded; adding the raw values would let the lexical term
+dominate or vanish according to an implementation detail rather than a configured
+weight.
+
+Retrieval is **namespace-isolated**. In the benchmark the namespace is the question
+id; in the product it is the user. Ingesting fifty simulated users under one id
+produced a `lives_in` chain running Toronto → Greenville → Seattle → Tokyo →
+Shanghai → Hyderabad → Las Vegas and let one question retrieve another's evidence.
+The API enforces the same boundary, and cross-namespace reads return **404 rather
+than 403** — 403 would confirm that an id exists.
+
+**Staged recall instrumentation.** Each answer records whether the evidence session
+survived at each stage: candidates → ranked → selected → hydrated. One
+end-of-pipeline recall number cannot distinguish "never found it" from "found it and
+then dropped it", and those call for opposite fixes. Section 7.3 is a direct
+consequence of having this.
+
+---
+
+## 6. The raw conversation archive
+
+### 6.1 Why it exists
+
+LLM extraction is lossy compression, and the losses are not random: the gist
+survives and the artifact disappears. From `results/assistant-gap.md`, a real case —
+the source turn reads
+
+> *"…the Mayo Clinic: 'How to Sit Properly at a Desk to Avoid Back Pain',
+> https://www.youtube.com/watch?v=UfOvNlX9Hh0"*
+
+and structured memory holds nothing about Mayo Clinic at all. If the original turn
+were discarded, the URL would be unrecoverable. Because it is kept, it can be
+recovered.
+
+This is the same reasoning MemMachine gives for preserving raw conversational
+episodes rather than relying on LLM extraction as the sole representation
+([arXiv:2604.04853](https://arxiv.org/abs/2604.04853)). We reached it from a failure
+trace rather than from the paper, and the architectures agree on the principle while
+differing in emphasis: MemMachine minimises routine extraction, whereas this system
+extracts aggressively and treats the archive as the recovery path.
+
+**The archive is not an excuse for lossless extraction.** If extraction improves to
+the point of losing nothing, structured memory becomes the conversation again and the
+compression claim evaporates. The design accepts loss and requires that it be
+*recoverable*.
+
+### 6.2 Conditional, not always-on
+
+Attaching raw evidence to every answer was measured. `two_stage_hydrated` tripled
+median context (439 → 1,318 tokens) for no detectable accuracy gain — a slow slide
+back to naive RAG. So recovery is conditional and the answerer decides:
+
+```
+first call → AnswerVerdict{status: answer | need_source | no_evidence}
+  answer       → done, one LLM call
+  need_source  → source-local: the turns those memories came from
+  no_evidence  → archive-wide: BM25 over every turn in the namespace
+              → nothing found: decline, and stay declined
+```
+
+Level 1 is preferred when it applies: a memory that names the right session is
+stronger evidence than a keyword match over everything, and costs no search.
+
+The final branch is a guard rail with a test of its own. Abstention is a measured
+strength — 100% on the frozen v1 rows against `full_context`'s 50% (`results/table.md`)
+— and a fallback that answers from whatever BM25 returned would trade it away.
+
+---
+
+## 7. Experiments and engineering decisions
+
+Each below is stated as problem → experiment → result → decision. Paired comparisons
+use an exact McNemar test over disagreements only; comparing headline accuracies
+cannot separate a real improvement from re-running the same configuration, which on
+this setup moved a variant between **48.0% and 54.0%** unchanged (`results/table.md`).
+
+### 7.1 Does structured memory lose too much to be useful?
+
+**Problem.** The frozen v1 system scored 26.0% against naive RAG's 54.0% on the
+stratified 50 (`results/table.md`). Source-session retrieval usually succeeded, so
+the loss was in the representation.
+
+**Experiment.** Rewrite extraction (two-stage), and evaluate on the 31 fully
+ingested namespaces (`results/manifests/dev31-pilot.json`).
+
+**Result** *(recomputed from `results/raw/*.jsonl`, n=31)*:
+
+| Variant | Accuracy | Median ctx tokens | Source-session recall |
+|---|---:|---:|---:|
+| `full_context` | 64.5% | 109,605 | — |
+| `naive_rag` | 51.6% | 13,057 | — |
+| `two_stage` k=10 | 51.6% | **242** | 87.1% |
+| `two_stage` k=20 | 48.4% | 439 | 93.5% |
+| `chronomem` (v1) | 19.4% | 465 | — |
+
+**Decision.** Ship `two_stage`. The defensible claim is **equal accuracy at ~54x
+less context** (6W-6L vs `naive_rag`, p = 1.000) — not better accuracy.
+
+**Limits.** n=31, unstratified (an ingest-order prefix), one run each. The v1 row
+reads 19.4% here and 26.0% on the stratified 50; they are different question sets and
+must not be compared. p = 1.000 means *no difference was detected*, not that the
+systems are equivalent.
+
+### 7.2 Which change actually produced the gain?
+
+**Problem.** An earlier draft of `results/a2-pilot.md` attributed the improvement to
+evidence hydration. That was an assumption: two things changed at once.
+
+**Experiment.** Evaluate `two_stage` (no hydration) on the same 31 questions.
+
+**Result:**
+
+| Step | Δ | Paired |
+|---|---:|---|
+| `chronomem` → `two_stage` (extraction rewrite) | **+29.0pp** | 11W-2L, **p = 0.022** |
+| `two_stage` → `two_stage_hydrated` (hydration) | +3.2pp | 2W-1L, p = 1.000 |
+
+Source-session recall is **93.5% for both**, which confirms the attribution:
+hydration runs after retrieval and cannot change what is recalled, so the
+80.0% → 93.5% improvement belongs to extraction too.
+
+**Decision.** Ship `two_stage`; demote hydration from an always-on stage to the
+conditional fallback of section 6. Hydration is *not shown to be useless* — 3
+disagreements show nothing in either direction — but it is not entitled to 3x
+context by default.
+
+### 7.3 Does cross-encoder reranking help?
+
+**Problem.** The v1 failure was mis-ranking, and a cross-encoder is the standard fix:
+it scores query and memory jointly, which a bi-encoder cannot.
+
+**Experiment.** Sweep `top_k ∈ {20,10,5} × rerank ∈ {off,on}`, 31 questions
+(`results/rerank-pareto.md`).
+
+**Result:**
+
+| top_k | rerank | Accuracy | Median ctx | Source recall |
+|---:|---|---:|---:|---:|
+| 20 | off | 48.4% | 439 | **93.5%** |
+| 20 | on | 48.4% | 420 | 90.3% |
+| 10 | off | 51.6% | 242 | **87.1%** |
+| 10 | on | 51.6% | 240 | 83.9% |
+| 5 | off | 48.4% | 146 | **87.1%** |
+| 5 | on | 48.4% | 143 | 83.9% |
+
+**At k=10 the two arms answered all 31 questions identically** — zero disagreements,
+which is stronger than "no detectable difference". Reranking lowered source recall at
+every k.
+
+**Decision.** Not enabled. The implementation and `configs/rerank.yaml` stay in the
+repo so the result is reproducible rather than asserted, and the dependency moved to
+its own `rerank` extra so running the product does not download a reranker model
+nobody asked for.
+
+**Related work.** [arXiv:2606.04194](https://arxiv.org/abs/2606.04194) reports an
+off-the-shelf cross-encoder over a fused top-10 degrading LoCoMo Hit@1 by 6.9 pp.
+That is a different corpus, retriever and metric, and their own paper limits the
+conclusion to the reranker configuration tested — so this is **directionally
+consistent, not a replication**.
+
+### 7.4 Does the raw fallback need dense retrieval?
+
+**Problem.** The fallback searches with BM25. Dense retrieval would mean embedding
+every turn, a second index, more ingest cost and a model in the serving path.
+
+**Experiment.** Measure *evidence recall* rather than end-to-end accuracy — accuracy
+folds retrieval, answering and judging into one number and cannot say which moved.
+Gold turns come from LongMemEval's own `has_answer` flags. Three query types, 31
+questions (`results/raw-recall-diagnostic.md`).
+
+**First result:**
+
+| query type | n | R@1 | R@3 | R@5 | MRR |
+|---|---:|---:|---:|---:|---:|
+| keyword (upper bound) | 31 | 93.5% | 96.8% | 96.8% | 0.946 |
+| natural | 31 | 54.8% | 74.2% | 74.2% | 0.640 |
+| disjoint (constructed) | 29 | 6.9% | 6.9% | 6.9% | 0.069 |
+
+6.9% looks like decisive evidence that BM25 collapses on paraphrases.
+
+**The audit that reversed it.** The `disjoint` queries were built by deleting every
+content word the question shared with its gold turn. Spot-checking them — the step
+meant to validate the construction — showed the deletion removes the *question*:
+
+```
+"How long have I been collecting vintage cameras?"   →  "long"
+"What health issue did I initially think was a cold?" →  "health issue think"
+```
+
+No retriever answers `"long"`. That row measures degraded input, not lexical
+brittleness, and **cannot be cited as evidence for embeddings**.
+
+**Second result — hand-written paraphrases.** Five phrasings of the Mayo Clinic
+question, gold turn `answer_sharegpt_81riySf_0:1`: **all rank 1**, including
+phrasings containing no "Mayo", "Clinic" or "YouTube". Genuine paraphrases keep topic
+words (posture, ergonomics, sitting, back pain) and drop only the proper noun, which
+BM25 never needed.
+
+**Third result — what `natural` actually misses.** All 8 misses are
+`single-session-preference` (the gold is a rubric, not a fact), `temporal-reasoning`
+(the answer is computed from dates), or `multi-session` (the answer aggregates across
+turns). None has a single gold turn for any retriever to rank first.
+
+**Decision.** **Dense raw retrieval deferred** — not rejected. No demonstrated
+product-level lexical-recall gap currently justifies the complexity. Two conditions
+would reopen it: a model-generated paraphrase set over 30–50 cases, or a corpus of
+terser turns where topic words do not co-occur so reliably.
+
+**Related work.** [arXiv:2606.04194](https://arxiv.org/abs/2606.04194) finds
+lexical–dense fusion worth +11.2 pp Hit@1 over BM25 on LoCoMo. Our decision is about
+a different corpus and a different retrieval stage, and does not contradict it —
+their result is one reason the deferral is written as *deferred*.
+
+### 7.5 Does a learned utility predictor beat relevance for packing?
+
+**Problem.** Budget packing selects memories by relevance. A learned utility signal
+might select better.
+
+**Experiment.** Leave-one-out influence labels over 10 questions, ridge regression,
+5-fold cross-validation grouped by question (`results/p6-pilot.md`).
+
+**Result.** Held-out RMSE 0.310 against a mean-baseline 0.263 — the predictor does
+not beat predicting the mean. A budget sweep using it was deliberately *not* run:
+applying a failed predictor to its own calibration questions would produce an
+optimistic, uninformative comparison.
+
+**Decision.** Not shipped. Relevance packing stays the baseline.
+
+---
+
+## 8. Failure analysis
+
+Not every wrong answer is a retrieval failure. Eight classes, each with a real case
+and a different owner:
+
+| Code | Class | Real case | Owner |
+|---|---|---|---|
+| **S** | Storage / schema policy | Third-party facts ("Andy wore a blue shirt") had no representable subject | Schema |
+| **E** | Extraction / representation | "17 vintage cameras" kept, "three months" dropped | Extractor prompt |
+| **R** | Retrieval | Correct session never enters the candidate set | Ranking |
+| **H** | Hydration / evidence recovery | Memory anchors to the right turn but the span is missing | Fallback |
+| **A** | Answerer / application | Retrieved the user's power bank, replied "I do not know what phone you use" | Answerer prompt |
+| **T** | Temporal reasoning | "How many weeks ago did I receive the chandelier?" | Reasoning layer |
+| **M** | Multi-session aggregation | "How many museums in February?" | Query decomposition |
+| **J** | Judge / evaluation | A correct cookie recommendation marked wrong for not restating the rubric | Judge prompt |
+
+### 8.1 S — the assistant gap
+
+`single-session-assistant` scored **0/4 for every memory variant** while
+`full_context` and `naive_rag` scored 4/4 (`results/assistant-gap.md`). A gap that
+uniform is a policy defect, not a ranking problem.
+
+Tracing all four: the raw evidence was present in every case (`source_session_id`
+resolves to a turn for 4,843/4,843 memories), but three answers lived in **assistant**
+turns and the fourth described a third party. The extraction prompt already contained
+an instruction to record assistant facts — so this was not a missing rule but **a rule
+the model did not reliably follow**: 326 of 4,843 memories (6.7%) carry
+`subject='assistant'`, against 12 of 2,007 (0.6%) in v1. The two-stage rewrite
+improved compliance 12x and still fell short.
+
+Fixed in the schema (§4.2) and the prompt, which now carries worked examples for an
+assistant recommendation and a third-party subject — the one instruction that had no
+example was the one being ignored, in a project that had already measured worked
+examples moving source fidelity 33.6% → 36.6%.
+
+### 8.2 A and J — recall is not application
+
+All three `single-session-preference` questions scored 0/3 for *every* system,
+`full_context` included (`results/preference-audit.md`). That ruled out memory as the
+cause. Hand-auditing the three found two distinct defects:
+
+**J — the judge.** LongMemEval's preference "gold" is a rubric describing a
+well-personalized reply, not a reference answer. Grading it as one failed a reply
+that had done exactly what the rubric asked (it recommended turbinado sugar), with
+the reason *"the reference answer describes the user's preferences, whereas the
+candidate answer provides actual suggestions"*. LongMemEval's own evaluation uses a
+separate preference prompt; ours now routes by question type, with abstention
+outranking everything and unknown categories falling back to the reference judge.
+
+**A — the answerer.** On the battery question the system **retrieved the right
+memories** — the reply names the power bank and the charging pad — and then declined:
+*"I do not know what phone you use"*. The old prompt optimised for factual recall and
+abstention, which is why abstention is 100%, and that same disposition refuses on
+advice-shaped questions.
+
+The fix draws the distinction that matters: *missing fact* versus *available
+context*. It still declines when something was never discussed, and personalizes when
+the memories support a useful reply. Memories are now grouped by `scope` under
+headings ("User preferences", "Current plans", "Previously recommended by the
+assistant") so a constraint does not read like a candidate answer.
+
+*Status: **verified live 2026-08-14**. Both fixes confirmed on the questions that
+motivated them — the cookie answer now passes the rubric judge, and the battery
+answer applies the user's power bank instead of declining. See
+`results/live-regression-v2.md`.*
+
+### 8.3 T and M — not retrieval problems at all
+
+"How many weeks ago did I receive the chandelier?" needs date arithmetic over
+retrieved evidence. "How many museums did I visit in February?" needs aggregation
+across turns — no turn states the count. A better retriever returns the same
+evidence and the answer is still absent.
+
+These are recorded in the regression corpus as `reasoning_required: true` and
+**excluded from retriever comparisons**, because scoring a retriever on a question
+with no single gold turn measures the wrong thing.
+
+---
+
+## 9. Productization
+
+### 9.1 Service
+
+`src/llm_long_term_memory/api/`, three layers, no domain logic in handlers:
+
+```
+POST   /v1/messages            ingest a turn, return the memories it created
+POST   /v1/memories/search     retrieve, with signals, provenance and rejections
+POST   /v1/raw/search          the fallback layer, queryable directly
+GET    /v1/memories            browse a namespace; filter by status/type/scope/role
+GET    /v1/memories/{id}       one memory with its source turn
+GET    /v1/timeline            the supersession chain for a (subject, predicate)
+DELETE /v1/memories/{id}       forget (marks evicted; never a hard delete)
+GET    /healthz  GET /v1/config
+```
+
+`service.py` holds the domain and no HTTP, so the MCP server and the Inspector are
+clients of the same object rather than second implementations.
+
+**`rejected` is the differentiating field.** Search returns why a candidate did *not*
+come back — `superseded` (the fact was true and no longer is; returning it would be
+wrong) or `below_rank` (still true, lost on score; returning it would have been
+affordable). Absence without explanation is indistinguishable from a retrieval bug.
+
+### 9.2 Operations
+
+- **Docker**: non-root, no datasets/models/credentials baked in, store on a mounted
+  volume, healthcheck hitting the real `/healthz` so an unreadable volume reports
+  unhealthy instead of accepting traffic.
+- **Structured logging**: one JSON event per request with request id, route, status,
+  latency and a config fingerprint; `x-request-id` returned so a bug report can name
+  a log line. Asserted to contain no memory content and no credentials. Cost in
+  currency is deliberately absent — a USD figure invented from a list price would
+  look authoritative and be wrong.
+- **Encoder warm-up at startup**: the lazily-loaded embedder moved a 12.5s model load
+  onto whichever user arrived first. Warming it cut the first request from
+  **12,486ms to 181ms** and made logged p95 a property of the system rather than of
+  process age.
+- **Cross-platform**: 65 file I/O sites given explicit `encoding="utf-8"`, CI across
+  ubuntu/windows/macos, and `filterwarnings = ["error::EncodingWarning"]` so the
+  defect fails a test on any platform rather than only where the locale differs.
+- **Result versioning**: every evaluation row records `answer_prompt_version`,
+  `judge_prompt_version` and `extractor_version`. The extractor version is read from
+  the *store*, not the checkout, because it describes the data being evaluated.
+  Defaults are `None` — rows written before stamping genuinely do not know.
+
+### 9.3 Memory Inspector
+
+A single self-contained page at `GET /`, a client of the documented endpoints only.
+It groups a query's retrieval into **Selected memories** (by scope, with signal bars
+and an expandable source turn with the extracted span highlighted), **Not selected —
+no longer true**, **Not selected — ranked below the cut**, and the **raw archive
+preview**.
+
+State is split by who needs to see it: the URL carries `namespace` and `q` so a view
+survives a reload and pastes into another browser; localStorage carries the chat
+transcript; memories and raw turns are in neither, because a browser copy goes stale
+against the store. Fixed demo routes (`?demo=mayo`, `?demo=timeline`,
+`?demo=collectibles`) rewrite themselves into plain shareable links.
+
+**The Inspector became a debugging surface within minutes of existing.** It rendered
+a `collectibles` key as a supersession chain — G.I. Joe *replaced by* stamps
+*replaced by* a Mickey Mantle card — which looked convincingly like a data defect
+until the store showed all eight rows `active` with no `superseded_by`. The bug was
+in the renderer: it drew an arrow between every pair of entries in a key, and most
+predicates are multi-valued. Two further bugs surfaced the same way: copy claiming
+"structured memory answered it" when nothing had evaluated sufficiency, and a
+`const history = [...]` that shadowed `window.history` and blanked the panel with a
+TypeError while the chat pane kept rendering from localStorage — which made a
+frontend bug look like a backend failure.
+
+---
+
+## 10. Current limitations
+
+1. **No held-out result.** Every number comes from the dev-50 questions, used for
+   prompt iteration, gate tuning and predictor fitting. A pre-registered run on a
+   disjoint stratified sample is designed but unrun.
+2. **The pilot is 31 unstratified questions.** An ingest-order prefix, not a sample.
+   Category splits are descriptive only.
+3. **The store is 64% ingested** — 1,528 of 2,400 sessions, 32 of 50 namespaces —
+   and was built by the *pre*-P10 extractor, so `source_role`/`scope` are not yet
+   exercised on real data.
+4. **`source_local` fallback has no live confirmation.** The live regression
+   exercised `archive_wide` 18 times and `answer` 3 times; the answerer never
+   returned `need_source`, which is correct for those questions but leaves level 1
+   of the cascade unverified outside unit tests.
+5. **A prompt change broke comparability.** `ANSWER_SYSTEM` was rewritten on
+   2026-08-14; every number measured before it came from a different answerer. The
+   trade was deliberate — the old prompt was measurably wrong — and is recorded
+   rather than smoothed over.
+6. **Single-writer.** SQLite, no concurrency lock on ingestion; two simultaneous
+   ingests overwrite each other's quota accounting, observed live.
+7. **No cost accounting.** Free tier, no verified price schedule.
+
+---
+
+## 11. Future work
+
+**Immediate:** finish the ingest, run A2 on the frozen `dev50` manifest, re-ingest
+under the P10 extractor, and verify the answerer/judge fixes end to end.
+
+**Then, in order of evidence behind them:**
+
+- **A regression corpus, grown not generated.** `results/raw-retrieval-regressions.json`
+  holds 11 cases today. It exists to be run *before* adopting a retriever change —
+  the cross-encoder result is exactly what such a corpus is for. Retrieval-solvable
+  and reasoning-required cases are tagged separately, because only the former belong
+  in a BM25-vs-dense comparison. Revisit dense at ≥50 validated retrieval-solvable
+  cases with a clear Recall@3 gain.
+- **Conditional dense retrieval, if any.** If a gap appears, the shape suggested by
+  the evidence is a cascade — source-local, then BM25, then dense only when BM25
+  scores poorly — rather than paying dense on every query. Related work points the
+  same way: AgentIR and SelRoute route by query or by sparse-retrieval confidence
+  rather than running one retriever for everything. *(Not independently verified for
+  this report.)*
+- **Temporal and aggregation layers**, which sections 8.3 identifies as the largest
+  class of remaining failures that no retriever change can address.
+- **MCP server** over the existing service layer.
+- **Multimodal memory** as a demo capability, with the caveat that the caption-then-
+  index path leaves the downstream pipeline unchanged and the schema work is the
+  image anchor replacing character spans.
+
+---
+
+## Appendix — provenance of every headline number
+
+| Claim | Source | Recomputed |
+|---|---|---|
+| 51.6% / 242 tokens, 51.6% / 13,057 tokens | `results/raw/two_stage.k10_plain.jsonl`, `naive_rag.jsonl` | yes, 2026-08-15 |
+| 11W-2L p=0.022; 2W-1L p=1.000 | `results/a2-pilot.md`, `lltm eval compare` | yes |
+| Reranker: identical answers at k=10, recall 87.1→83.9 | `results/rerank-pareto.md`, `two_stage.k10_{plain,ce}.jsonl` | yes |
+| BM25 R@1 93.5/54.8/6.9 by query type | `results/raw-recall-diagnostic.md` | yes |
+| 5/5 Mayo paraphrases at rank 1 | `results/raw-retrieval-regressions.json` | yes |
+| 326 assistant / 4,517 user memories | `stores/two-stage-hydrated.db` | yes |
+| 4,843/4,843 provenance anchors | `stores/two-stage-hydrated.db` | yes |
+| Warm-up 12,486ms → 181ms | live measurement, 2026-08-14 | single run |
+| 26.0% vs 54.0%; abstention 100% vs 50%; repeat 48.0–54.0% | `results/table.md` (frozen v1, stratified 50) | not re-run |
+| Live regression 6/7, 3/3 consistent | `results/raw/two_stage_fallback.live_v2_run{1,2,3}.jsonl` | yes, 2026-08-14 |
+| Utility predictor RMSE 0.310 vs 0.263 | `results/p6-pilot.md` | not re-run |
+| Rule-based Stage B: 43% predicate accuracy | `docs/DECISIONS.md` | not re-run |
+
+External results (LoCoMo Hit@1 figures, MemMachine's architecture) are cited from the
+papers named inline and were **not** reproduced here.

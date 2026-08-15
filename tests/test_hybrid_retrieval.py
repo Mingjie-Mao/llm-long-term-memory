@@ -7,8 +7,8 @@ from datetime import datetime, timedelta
 import numpy as np
 import pytest
 
-from chronomem.retrieve import HybridRetriever
-from chronomem.store import Memory, NumpyFlatIndex, SQLiteMemoryStore
+from llm_long_term_memory.retrieve import HybridRetriever
+from llm_long_term_memory.store import Memory, NumpyFlatIndex, SQLiteMemoryStore
 
 NOW = datetime(2026, 1, 31)
 

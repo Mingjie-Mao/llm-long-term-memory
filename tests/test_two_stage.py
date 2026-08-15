@@ -11,10 +11,10 @@ from __future__ import annotations
 
 import json
 
-from chronomem.evaluation.datasets.longmemeval import HaystackSession, HaystackTurn
-from chronomem.ingest.extract_facts import FactExtractor
-from chronomem.ingest.keying import DEFAULT, FactKeyer, UpdateOp, _normalise
-from chronomem.ingest.two_stage import TwoStageExtractor
+from llm_long_term_memory.evaluation.datasets.longmemeval import HaystackSession, HaystackTurn
+from llm_long_term_memory.ingest.extract_facts import FactExtractor
+from llm_long_term_memory.ingest.keying import DEFAULT, FactKeyer, UpdateOp, _normalise
+from llm_long_term_memory.ingest.two_stage import TwoStageExtractor
 
 
 class ScriptedClient:
@@ -52,18 +52,26 @@ def test_facts_are_attributed_to_the_session_they_are_grouped_under():
     `session_index` field per fact and could mis-assign it; here the model cannot."""
     sessions = [session("s0", "2023/01/05", "a"), session("s1", "2023/03/12", "b")]
     client = ScriptedClient(
-        [{"sessions": [{"session_index": 1, "facts": ["The user moved to Sydney."]}]}]
+        [{"sessions": [{"session_index": 1, "facts": [{"content": "The user moved to Sydney."}]}]}]
     )
     outcome = FactExtractor(client, "m").extract(sessions)
 
-    assert outcome.by_session["s1"] == ["The user moved to Sydney."]
+    assert [f.content for f in outcome.by_session["s1"]] == ["The user moved to Sydney."]
     assert outcome.by_session["s0"] == []
     assert outcome.dropped_bad_index == 0
 
 
 def test_an_invented_session_index_is_counted_not_misfiled():
     sessions = [session("s0", "2023/01/05", "a")]
-    client = ScriptedClient([{"sessions": [{"session_index": 7, "facts": ["orphan", "orphan2"]}]}])
+    client = ScriptedClient(
+        [
+            {
+                "sessions": [
+                    {"session_index": 7, "facts": [{"content": "orphan"}, {"content": "orphan2"}]}
+                ]
+            }
+        ]
+    )
     outcome = FactExtractor(client, "m").extract(sessions)
 
     assert outcome.total == 0
@@ -72,8 +80,17 @@ def test_an_invented_session_index_is_counted_not_misfiled():
 
 def test_blank_facts_are_dropped():
     sessions = [session("s0", "2023/01/05", "a")]
-    client = ScriptedClient([{"sessions": [{"session_index": 0, "facts": ["  ", "real fact"]}]}])
-    assert FactExtractor(client, "m").extract(sessions).by_session["s0"] == ["real fact"]
+    client = ScriptedClient(
+        [
+            {
+                "sessions": [
+                    {"session_index": 0, "facts": [{"content": "  "}, {"content": "real fact"}]}
+                ]
+            }
+        ]
+    )
+    facts = FactExtractor(client, "m").extract(sessions).by_session["s0"]
+    assert [f.content for f in facts] == ["real fact"]
 
 
 def test_an_empty_batch_costs_no_request():
@@ -157,8 +174,8 @@ def test_a_fact_keeps_its_session_across_the_flatten_and_regroup():
     sessions = [session("s0", "2023/01/05", "a"), session("s1", "2023/08/02", "b")]
     client = _two_stage_client(
         [
-            {"session_index": 0, "facts": ["The user owns a fern."]},
-            {"session_index": 1, "facts": ["The user moved to Sydney."]},
+            {"session_index": 0, "facts": [{"content": "The user owns a fern."}]},
+            {"session_index": 1, "facts": [{"content": "The user moved to Sydney."}]},
         ],
         [
             {"index": 0, "temporal_key": "houseplants", "update_op": "coexists", "object": "fern"},
@@ -185,7 +202,7 @@ def test_removes_also_closes_the_earlier_fact():
     as ending ownership."""
     sessions = [session("s0", "2023/07/01", "a")]
     client = _two_stage_client(
-        [{"session_index": 0, "facts": ["The user sold their Honda Civic."]}],
+        [{"session_index": 0, "facts": [{"content": "The user sold their Honda Civic."}]}],
         [{"index": 0, "temporal_key": "car", "update_op": "removes", "object": "Honda Civic"}],
     )
     (memory,) = TwoStageExtractor(client, "m").extract(sessions).memories
@@ -197,7 +214,7 @@ def test_removes_also_closes_the_earlier_fact():
 def test_coexists_never_sets_the_closing_flag():
     sessions = [session("s0", "2023/07/01", "a")]
     client = _two_stage_client(
-        [{"session_index": 0, "facts": ["The user bought a snake plant."]}],
+        [{"session_index": 0, "facts": [{"content": "The user bought a snake plant."}]}],
         [
             {
                 "index": 0,
@@ -216,7 +233,7 @@ def test_the_reported_request_count_matches_what_was_spent():
     two-stage path spent two, so a full ingest was planned at half its true size."""
     sessions = [session("s0", "2023/07/01", "a")]
     client = _two_stage_client(
-        [{"session_index": 0, "facts": ["The user owns a fern."]}],
+        [{"session_index": 0, "facts": [{"content": "The user owns a fern."}]}],
         [{"index": 0, "temporal_key": "houseplants", "update_op": "coexists"}],
     )
     outcome = TwoStageExtractor(client, "m").extract(sessions)
@@ -239,11 +256,93 @@ def test_an_empty_stage_a_result_does_not_charge_a_stage_b_request():
 def test_an_assistant_fact_is_attributed_to_the_assistant():
     sessions = [session("s0", "2023/07/01", "a")]
     client = _two_stage_client(
-        [{"session_index": 0, "facts": ["The assistant recommended Mod Podge."]}],
+        [
+            {
+                "session_index": 0,
+                "facts": [
+                    {
+                        "content": "The assistant recommended Mod Podge.",
+                        "source_role": "assistant",
+                        "subject": "assistant",
+                        "scope": "recommendation",
+                    }
+                ],
+            }
+        ],
         [{"index": 0, "temporal_key": "assistant_recommendation", "update_op": "coexists"}],
     )
     (memory,) = TwoStageExtractor(client, "m").extract(sessions).memories
     assert memory.subject == "assistant"
+    assert memory.source_role == "assistant"
+    assert memory.scope == "recommendation"
+
+
+def test_the_speaker_and_the_subject_are_independent():
+    """The defect this separation exists to fix.
+
+    "Andy wore a blue shirt", said by the user, is a fact about Andy. The previous
+    implementation derived `subject` from whether the sentence started with "the
+    assistant", so every third-party fact was filed under `user` and questions about
+    Andy could not be answered from the store (results/assistant-gap.md).
+    """
+    sessions = [session("s0", "2023/09/20", "a")]
+    client = _two_stage_client(
+        [
+            {
+                "session_index": 0,
+                "facts": [
+                    {
+                        "content": "Andy wears an untidy, stained white shirt in the script.",
+                        "source_role": "user",
+                        "subject": "andy",
+                        "scope": "shared_context",
+                    }
+                ],
+            }
+        ],
+        [{"index": 0, "temporal_key": "clothing", "update_op": "coexists", "object": "shirt"}],
+    )
+
+    (memory,) = TwoStageExtractor(client, "m").extract(sessions).memories
+
+    assert memory.source_role == "user", "the user said it"
+    assert memory.subject == "andy", "but it is not about the user"
+    assert memory.scope == "shared_context"
+
+
+def test_an_unrecognised_scope_is_dropped_rather_than_stored():
+    """A made-up scope is indistinguishable from a real one once it is in the
+    column, and the field is meant to be filterable."""
+    sessions = [session("s0", "2023/07/01", "a")]
+    client = _two_stage_client(
+        [
+            {
+                "session_index": 0,
+                "facts": [{"content": "The user owns a fern.", "scope": "vibes"}],
+            }
+        ],
+        [{"index": 0, "temporal_key": "houseplants", "update_op": "coexists"}],
+    )
+
+    (memory,) = TwoStageExtractor(client, "m").extract(sessions).memories
+
+    assert memory.scope is None
+
+
+def test_stage_a_defaults_keep_a_bare_fact_usable():
+    """Stage A may omit the new fields; a fact with no attribution is a user fact,
+    which is what every pre-P10 memory in the store actually is."""
+    sessions = [session("s0", "2023/07/01", "a")]
+    client = _two_stage_client(
+        [{"session_index": 0, "facts": [{"content": "The user owns a fern."}]}],
+        [{"index": 0, "temporal_key": "houseplants", "update_op": "coexists"}],
+    )
+
+    (memory,) = TwoStageExtractor(client, "m").extract(sessions).memories
+
+    assert memory.source_role == "user"
+    assert memory.subject == "user"
+    assert memory.scope is None
 
 
 def test_a_fact_repeated_in_one_batch_is_stored_once():
@@ -251,7 +350,15 @@ def test_a_fact_repeated_in_one_batch_is_stored_once():
     reported count disagree with the store."""
     sessions = [session("s0", "2023/07/01", "a")]
     client = _two_stage_client(
-        [{"session_index": 0, "facts": ["The user owns a fern.", "The user owns a fern."]}],
+        [
+            {
+                "session_index": 0,
+                "facts": [
+                    {"content": "The user owns a fern."},
+                    {"content": "The user owns a fern."},
+                ],
+            }
+        ],
         [
             {"index": 0, "temporal_key": "houseplants", "update_op": "coexists"},
             {"index": 1, "temporal_key": "houseplants", "update_op": "coexists"},

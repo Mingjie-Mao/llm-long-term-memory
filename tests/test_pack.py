@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from chronomem.pack import pack
-from chronomem.store import Memory
+from llm_long_term_memory.pack import pack
+from llm_long_term_memory.store import Memory
 
 
 def mem(mid: str, content: str, tokens: int, mtype: str = "semantic") -> Memory:

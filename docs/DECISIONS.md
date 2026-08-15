@@ -28,7 +28,7 @@ forgetting/eviction work in P5, but both are new and small. Revisit in V6.
 
 ## D2 — No SOTA claims
 
-**Decision.** The results table compares ChronoMem's own ablation variants against
+**Decision.** The results table compares LLTM's own ablation variants against
 `full_context` and `naive_rag` baselines. It never claims to beat a third-party
 system.
 
@@ -80,7 +80,7 @@ tokens/minute, and requests/day independently; exceeding any one returns 429. At
 ~1,500 requests/day, the number of requests an ingestion costs decides the
 schedule.
 
-**Measurement** (`chronomem data stats --variant s`, 2026-08-10):
+**Measurement** (`lltm data stats --variant s`, 2026-08-10):
 
 | | |
 |---|---|
@@ -100,7 +100,7 @@ would have collapsed ingestion cost by an order of magnitude. They do not — th
 sharing factor is 1.24x, so deduplicating unique sessions saves about 20%, not 90%.
 This is exactly why P0 measures before P2 builds.
 
-**Budget** (`chronomem data plan`, 19,195 unique sessions @ 1,500 req/day):
+**Budget** (`lltm data plan`, 19,195 unique sessions @ 1,500 req/day):
 
 | sessions/request | requests | est. tokens/request | days |
 |---|---|---|---|
@@ -628,7 +628,7 @@ place.
 
 **The more useful consequence.** Because resolution rebuilds timelines from stored
 data (D21) and touches no LLM, correcting the list is a *re-resolution*, not a
-re-ingest: `chronomem resolve` repairs the store in seconds against ~2,880 requests
+re-ingest: `lltm resolve` repairs the store in seconds against ~2,880 requests
 and a day of quota. That required one addition — when a key is no longer resolvable,
 rows superseded under the old list are promoted back — without which the mistake
 would have been baked in permanently.
@@ -804,9 +804,9 @@ arithmetic alone.
 ## D30 — Worked examples beat rules, and the metric was wrong a third time (measured)
 
 **What other systems do.** Mem0's fact-extraction prompt was read directly rather
-than guessed at. Three differences from ChronoMem's mattered:
+than guessed at. Three differences from LLTM's mattered:
 
-| | Mem0 | ChronoMem v2 |
+| | Mem0 | LLTM v2 |
 |---|---|---|
 | teaching device | six input→output examples | prose rules |
 | granularity | one sentence split into several facts, shown | asserted in a rule |
@@ -851,7 +851,7 @@ practice that caught all three was reading the misses before acting on the numbe
 and it has now paid for itself three times over.
 
 **A real design question sits underneath it.** Mem0 explicitly tracks "Plans and
-Intentions"; ChronoMem's prompt says not to record things the user considered but
+Intentions"; LLTM's prompt says not to record things the user considered but
 did not do. "The user is considering a Sonos One" is a defensible memory, and
 LongMemEval asks preference questions where it would matter. Deferred rather than
 changed mid-comparison: it alters what a memory *means*, so it needs its own
@@ -864,7 +864,7 @@ strings — which is a structural change, not another prompt edit.
 
 ---
 
-## D26 — ChronoMem loses to both baselines, and the cause is upstream of P4 (measured)
+## D26 — LLTM loses to both baselines, and the cause is upstream of P4 (measured)
 
 **Result** (LongMemEval-S, stratified 50, same answerer and judge as every other row):
 
@@ -1088,7 +1088,7 @@ produce.
 
 **Decision.** Every comparison is paired. Both variants answer the same questions,
 so questions they both get right and both get wrong carry no information about
-which is better; only the disagreements do. `chronomem eval compare` runs an exact
+which is better; only the disagreements do. `lltm eval compare` runs an exact
 McNemar test over those:
 
     b01 = A wrong, B right      b10 = A right, B wrong

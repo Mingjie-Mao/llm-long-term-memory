@@ -11,8 +11,8 @@ from datetime import datetime
 
 import pytest
 
-from chronomem.store import Memory, SQLiteMemoryStore
-from chronomem.temporal import TemporalResolver, as_of
+from llm_long_term_memory.store import Memory, SQLiteMemoryStore
+from llm_long_term_memory.temporal import TemporalResolver, as_of
 
 
 @pytest.fixture
@@ -299,7 +299,7 @@ def test_a_wrong_arity_call_is_undone_on_re_resolution(store, monkeypatch):
     true facts. Fixing the list has to give them back — rebuilding a store costs
     hours of quota, so "you must re-ingest" is not an acceptable remedy.
     """
-    import chronomem.temporal.resolve as resolve_mod
+    import llm_long_term_memory.temporal.resolve as resolve_mod
 
     store.add_memories(
         [
@@ -328,7 +328,7 @@ def test_a_wrong_arity_call_is_undone_on_re_resolution(store, monkeypatch):
 
 
 def test_repair_is_idempotent(store, monkeypatch):
-    import chronomem.temporal.resolve as resolve_mod
+    import llm_long_term_memory.temporal.resolve as resolve_mod
 
     monkeypatch.setattr(resolve_mod, "is_single_valued", lambda p: False)
     store.add_memories(
@@ -345,7 +345,7 @@ def test_repair_is_idempotent(store, monkeypatch):
 def test_goals_and_schedules_are_multi_valued():
     """Both were on the list and both were wrong: a person holds many goals and
     many scheduled events at once."""
-    from chronomem.ingest import is_single_valued
+    from llm_long_term_memory.ingest import is_single_valued
 
     assert not is_single_valued("has_goal")
     assert not is_single_valued("scheduled")

@@ -8,9 +8,9 @@ taught the extractor to hoard.
 
 from __future__ import annotations
 
-from chronomem.evaluation.datasets.longmemeval import HaystackSession, HaystackTurn
-from chronomem.ingest.fidelity import _extract_facets, score_sessions, user_assertions
-from chronomem.store import Memory
+from llm_long_term_memory.evaluation.datasets.longmemeval import HaystackSession, HaystackTurn
+from llm_long_term_memory.ingest.fidelity import _extract_facets, score_sessions, user_assertions
+from llm_long_term_memory.store import Memory
 
 
 def session(*turns: tuple[str, str]) -> HaystackSession:

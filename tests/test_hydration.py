@@ -2,8 +2,8 @@
 
 from datetime import datetime
 
-from chronomem.retrieve import EvidenceHydrator
-from chronomem.store import Memory, Session, SQLiteMemoryStore, Turn
+from llm_long_term_memory.retrieve import EvidenceHydrator
+from llm_long_term_memory.store import Memory, Session, SQLiteMemoryStore, Turn
 
 
 def test_hydration_expands_the_anchored_sentence_by_local_context(tmp_path):

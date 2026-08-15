@@ -5,7 +5,7 @@ from __future__ import annotations
 import numpy as np
 import pytest
 
-from chronomem.influence import (
+from llm_long_term_memory.influence import (
     FEATURE_NAMES,
     Influence,
     InfluenceDataset,
@@ -14,8 +14,8 @@ from chronomem.influence import (
     fit_grouped,
     requests_needed,
 )
-from chronomem.influence.predictor import UtilityPredictor
-from chronomem.store import Memory
+from llm_long_term_memory.influence.predictor import UtilityPredictor
+from llm_long_term_memory.store import Memory
 
 
 def row(full: bool, without: bool, alone: bool | None = None) -> MemoryInfluence:
@@ -195,7 +195,7 @@ def test_a_memory_that_answers_alone_but_loses_in_context_is_not_called_helpful(
 
 def test_saving_an_unfitted_model_says_so():
     with pytest.raises(RuntimeError, match="fit"):
-        UtilityPredictor().save("/tmp/chronomem-never-fitted.json")
+        UtilityPredictor().save("/tmp/lltm-never-fitted.json")
 
 
 def test_loading_a_model_with_a_stale_feature_layout_is_refused(tmp_path):
@@ -211,9 +211,9 @@ def test_loading_a_model_with_a_stale_feature_layout_is_refused(tmp_path):
     path = tmp_path / "m.json"
     model.save(path)
 
-    d = json.loads(path.read_text())
+    d = json.loads(path.read_text(encoding="utf-8"))
     d["features"] = [*d["features"][:-1], "a_feature_that_no_longer_exists"]
-    path.write_text(json.dumps(d))
+    path.write_text(json.dumps(d), encoding="utf-8")
 
     with pytest.raises(ValueError, match="Refit"):
         UtilityPredictor.load(path)

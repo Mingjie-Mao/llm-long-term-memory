@@ -1,0 +1,53 @@
+# A3: cross-encoder reranking, on top of the two-stage hydrated pipeline.
+#
+# A copy of baselines.yaml with exactly one field changed —
+# `retrieval.rerank.enabled: true`. It is a separate file rather than a flag
+# because a variant is a config in this project, so the row that appears in the
+# results table is attributable to a diff you can read.
+#
+# Run it against the same store as the baseline row:
+#   chronomem eval run two_stage_hydrated_rerank \
+#     --config configs/rerank.yaml --store-name two-stage-hydrated
+#
+# The reranker runs locally and spends no API quota. Its cost is latency, which
+# the results table already reports as a p95 column — read that column alongside
+# the accuracy delta before adopting this.
+name: rerank
+description: two-stage hydrated + cross-encoder reranking (A3)
+
+models:
+  extractor: gemini-3.1-flash-lite
+  answerer: gemini-3.5-flash-lite
+  judge: gemma-4-31b-it
+  embedder: sentence-transformers/all-MiniLM-L6-v2
+  embedding_dim: 384
+
+quota:
+  rpm: 10
+  tpm: 250000
+  rpd: 500
+  max_wait_seconds: 300.0
+
+dataset_variant: s
+dataset_limit: 50
+
+temporal_resolution: true
+
+retrieval:
+  top_k: 20
+  candidate_limit: 50
+  rerank:
+    enabled: true
+    # Pinned, like every model id in this project: a floating reranker would
+    # silently invalidate comparisons between runs from different weeks (D3).
+    model: cross-encoder/ms-marco-MiniLM-L-6-v2
+    # 50 candidates in, 20 out. Reranking fewer than `candidate_limit` would
+    # leave part of the recall set unrescored and therefore unrankable.
+    candidates: 50
+    batch_size: 32
+
+ingest:
+  sessions_per_request: 15
+  two_stage: true
+  checkpoint_every: 5
+  dedupe_similarity_threshold: 0.92

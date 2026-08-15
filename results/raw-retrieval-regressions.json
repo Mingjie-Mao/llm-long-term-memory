@@ -1,0 +1,145 @@
+{
+  "schema_version": 1,
+  "purpose": "A growing regression corpus for the raw-conversation fallback. Not a benchmark: it is the set of cases a retriever change must not break. Run it before adopting any new retriever, exactly as the cross-encoder sweep should have been run before assuming reranking helps.",
+  "policy": {
+    "growth": "Add a case when a real fallback failure or a real fallback success is observed. Do not bulk-generate entries to reach a round number — a corpus padded with invented queries measures the imagination of whoever wrote them.",
+    "validation": "`validated: true` means a human confirmed the gold turn genuinely answers the query. Unvalidated entries are excluded from reported metrics.",
+    "retrieval_vs_reasoning": "Only `reasoning_required: false` cases belong in a BM25-vs-dense-vs-hybrid comparison. A question whose answer aggregates across turns, or is computed from dates, has no single gold turn to rank first, so scoring a retriever on it measures the wrong thing.",
+    "adoption_bar": "Revisit dense or hybrid retrieval when this corpus holds >= 50 validated, retrieval-solvable cases AND a candidate shows a clear Recall@3 gain over BM25 on them at acceptable latency and storage cost. A 1-point gain does not justify embedding every turn."
+  },
+  "query_types": {
+    "exact_wording": "Reuses the source turn's own words.",
+    "normal_paraphrase": "Same question, different phrasing, still shares topic words.",
+    "strong_paraphrase": "Shares no distinctive noun with the source; only the topic survives.",
+    "assistant_reference": "Asks about something the assistant said, not the user.",
+    "vague_reference": "Refers to the exchange without naming its content ('that thing you sent me')."
+  },
+  "cases": [
+    {
+      "id": "raw_mayo_001",
+      "namespace": "41275add",
+      "query": "mayo clinic youtube video",
+      "gold_turn_ids": ["answer_sharegpt_81riySf_0:1"],
+      "query_type": "exact_wording",
+      "reasoning_required": false,
+      "source": "real_failure",
+      "validated": true,
+      "bm25_rank": 1,
+      "note": "The golden case. Structured memory holds nothing about Mayo Clinic; the URL survives only in the raw turn."
+    },
+    {
+      "id": "raw_mayo_002",
+      "namespace": "41275add",
+      "query": "the posture video you recommended",
+      "gold_turn_ids": ["answer_sharegpt_81riySf_0:1"],
+      "query_type": "normal_paraphrase",
+      "reasoning_required": false,
+      "source": "manual_paraphrase",
+      "validated": true,
+      "bm25_rank": 1
+    },
+    {
+      "id": "raw_mayo_003",
+      "namespace": "41275add",
+      "query": "what was that desk ergonomics resource you gave me",
+      "gold_turn_ids": ["answer_sharegpt_81riySf_0:1"],
+      "query_type": "strong_paraphrase",
+      "reasoning_required": false,
+      "source": "manual_paraphrase",
+      "validated": true,
+      "bm25_rank": 1,
+      "note": "No 'Mayo', no 'YouTube', no 'video'. BM25 still ranks it first because 'ergonomics' and 'desk' appear in the source."
+    },
+    {
+      "id": "raw_mayo_004",
+      "namespace": "41275add",
+      "query": "the video I could share with my employees about sitting properly",
+      "gold_turn_ids": ["answer_sharegpt_81riySf_0:1"],
+      "query_type": "strong_paraphrase",
+      "reasoning_required": false,
+      "source": "manual_paraphrase",
+      "validated": true,
+      "bm25_rank": 1
+    },
+    {
+      "id": "raw_mayo_005",
+      "namespace": "41275add",
+      "query": "what did you suggest when we discussed workplace back pain",
+      "gold_turn_ids": ["answer_sharegpt_81riySf_0:1"],
+      "query_type": "assistant_reference",
+      "reasoning_required": false,
+      "source": "manual_paraphrase",
+      "validated": true,
+      "bm25_rank": 1
+    },
+    {
+      "id": "raw_mindful_001",
+      "namespace": "1b9b7252",
+      "query": "the website with free guided imagery exercises",
+      "gold_turn_ids": ["answer_ultrachat_115151:3"],
+      "query_type": "strong_paraphrase",
+      "reasoning_required": false,
+      "source": "real_failure",
+      "validated": false,
+      "note": "From results/assistant-gap.md: gold is 'Mindful.org', held in an assistant turn and absent from structured memory. Needs rank verification before use."
+    },
+    {
+      "id": "raw_modpodge_001",
+      "namespace": "8aef76bc",
+      "query": "what sealant did you recommend for the newspaper vase",
+      "gold_turn_ids": ["answer_ultrachat_563222:1"],
+      "query_type": "assistant_reference",
+      "reasoning_required": false,
+      "source": "real_failure",
+      "validated": false,
+      "note": "Gold is 'Mod Podge', buried in a numbered list the extractor classified as generic advice."
+    },
+    {
+      "id": "raw_andy_001",
+      "namespace": "4388e9dd",
+      "query": "what was the character wearing in the script you wrote",
+      "gold_turn_ids": ["answer_sharegpt_qTi81nS_0:0"],
+      "query_type": "vague_reference",
+      "reasoning_required": false,
+      "source": "real_failure",
+      "validated": false,
+      "note": "Third-party subject (Andy), not the user. Pre-P10 schema had nowhere to store it."
+    },
+    {
+      "id": "reasoning_chandelier_001",
+      "namespace": "80ec1f4f",
+      "query": "how many weeks ago did I meet up with my aunt and receive the crystal chandelier?",
+      "gold_turn_ids": [],
+      "query_type": "exact_wording",
+      "reasoning_required": true,
+      "reasoning_kind": "temporal",
+      "source": "real_failure",
+      "validated": false,
+      "note": "Excluded from retriever comparisons. The answer is a date arithmetic result, not a span in any turn — a better retriever returns the same evidence and still cannot answer."
+    },
+    {
+      "id": "reasoning_museums_001",
+      "namespace": "73d42213",
+      "query": "how many different museums or galleries did I visit in the month of February?",
+      "gold_turn_ids": [],
+      "query_type": "exact_wording",
+      "reasoning_required": true,
+      "reasoning_kind": "multi_session_aggregation",
+      "source": "real_failure",
+      "validated": false,
+      "note": "Excluded from retriever comparisons. No turn states the count; it exists only after aggregating several."
+    },
+    {
+      "id": "reasoning_battery_001",
+      "namespace": "09d032c9",
+      "query": "I've been having trouble with the battery life on my phone lately. Any tips?",
+      "gold_turn_ids": [],
+      "query_type": "exact_wording",
+      "reasoning_required": true,
+      "reasoning_kind": "preference_application",
+      "source": "real_failure",
+      "validated": false,
+      "note": "Excluded from retriever comparisons. Retrieval succeeded — the reply named the power bank and charging pad — and the failure was the answerer declining instead of advising (results/preference-audit.md)."
+    }
+  ]
+}

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pytest
 
-from chronomem.config import ExperimentConfig, RetrievalWeights, Settings
+from llm_long_term_memory.config import ExperimentConfig, RetrievalWeights, Settings
 
 
 def test_defaults_are_the_naive_rag_baseline():
@@ -51,7 +51,7 @@ def test_settings_reads_key_from_env(monkeypatch, tmp_path):
 
 def test_settings_reads_key_from_dotenv(monkeypatch, tmp_path):
     monkeypatch.delenv("GEMINI_API_KEY", raising=False)
-    (tmp_path / ".env").write_text("GEMINI_API_KEY=from-dotenv\n")
+    (tmp_path / ".env").write_text("GEMINI_API_KEY=from-dotenv\n", encoding="utf-8")
     monkeypatch.chdir(tmp_path)
     assert Settings().require_api_key() == "from-dotenv"
 
@@ -74,7 +74,7 @@ def test_whitespace_only_key_is_not_a_key(monkeypatch, tmp_path):
 
 def test_path_overrides_are_namespaced(monkeypatch, tmp_path):
     monkeypatch.chdir(tmp_path)
-    monkeypatch.setenv("CHRONOMEM_DATA_DIR", "/tmp/lme")
+    monkeypatch.setenv("LLTM_DATA_DIR", "/tmp/lme")
     monkeypatch.setenv("DATA_DIR", "/should/be/ignored")
     assert str(Settings().data_dir) == "/tmp/lme"
 

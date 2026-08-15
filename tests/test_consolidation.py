@@ -8,8 +8,8 @@ from datetime import datetime
 import numpy as np
 import pytest
 
-from chronomem.consolidate import Consolidator
-from chronomem.store import Memory, NumpyFlatIndex, SQLiteMemoryStore
+from llm_long_term_memory.consolidate import Consolidator
+from llm_long_term_memory.store import Memory, NumpyFlatIndex, SQLiteMemoryStore
 
 
 class StubEncoder:

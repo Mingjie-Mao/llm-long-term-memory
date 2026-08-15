@@ -13,10 +13,10 @@ from datetime import datetime
 import numpy as np
 import pytest
 
-from chronomem.evaluation.datasets.longmemeval import HaystackSession, HaystackTurn
-from chronomem.ingest import Deduplicator, Extractor, memory_id, normalize_predicate
-from chronomem.ingest.extract import _parse_date, render_batch
-from chronomem.store import Memory, SQLiteMemoryStore
+from llm_long_term_memory.evaluation.datasets.longmemeval import HaystackSession, HaystackTurn
+from llm_long_term_memory.ingest import Deduplicator, Extractor, memory_id, normalize_predicate
+from llm_long_term_memory.ingest.extract import _parse_date, render_batch
+from llm_long_term_memory.store import Memory, SQLiteMemoryStore
 
 # --------------------------------------------------------------------- helpers
 
@@ -293,7 +293,7 @@ def test_multi_valued_predicate_collisions_do_not_trigger_adjudication(tmp_path)
 
 
 def test_single_valued_predicates_are_the_ones_that_can_supersede():
-    from chronomem.ingest import is_single_valued
+    from llm_long_term_memory.ingest import is_single_valued
 
     assert is_single_valued("lives_in"), "you live in one place"
     assert is_single_valued("works_as")

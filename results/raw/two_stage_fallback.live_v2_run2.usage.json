@@ -1,0 +1,220 @@
+{
+  "summary": {
+    "total_requests": 21,
+    "total_tokens": 11307,
+    "failures": 1,
+    "by_role": {
+      "answerer": {
+        "role": "answerer",
+        "calls": 14,
+        "failures": 1,
+        "input_tokens": 8606,
+        "output_tokens": 550,
+        "p50_ms": 824.3503330741078,
+        "p95_ms": 1198.278500000015,
+        "max_ms": 1210.25020792149
+      },
+      "judge": {
+        "role": "judge",
+        "calls": 7,
+        "failures": 0,
+        "input_tokens": 1921,
+        "output_tokens": 230,
+        "p50_ms": 2018.910458078608,
+        "p95_ms": 5794.727124972269,
+        "max_ms": 5794.727124972269
+      }
+    }
+  },
+  "calls": [
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 535.8391250483692,
+      "ok": false,
+      "error": "ClientError: 400 INVALID_ARGUMENT. {'error': {'code': 400, 'message': 'Request contains an invalid argument.', 'status': 'INVALID_ARGUMENT'}}"
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 553,
+      "output_tokens": 72,
+      "latency_ms": 1037.603709148243,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 329,
+      "output_tokens": 44,
+      "latency_ms": 2571.2624578736722,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 562,
+      "output_tokens": 28,
+      "latency_ms": 887.6418340951204,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 686,
+      "output_tokens": 38,
+      "latency_ms": 1105.7414158713073,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 287,
+      "output_tokens": 32,
+      "latency_ms": 1723.2143338769674,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 557,
+      "output_tokens": 29,
+      "latency_ms": 792.0043750200421,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 794,
+      "output_tokens": 132,
+      "latency_ms": 1210.25020792149,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 384,
+      "output_tokens": 34,
+      "latency_ms": 1900.769541040063,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 585,
+      "output_tokens": 24,
+      "latency_ms": 799.8313750140369,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 737,
+      "output_tokens": 31,
+      "latency_ms": 719.1685838624835,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 233,
+      "output_tokens": 29,
+      "latency_ms": 1810.6289580464363,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 592,
+      "output_tokens": 32,
+      "latency_ms": 797.644916921854,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 884,
+      "output_tokens": 52,
+      "latency_ms": 814.9750409647822,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 273,
+      "output_tokens": 27,
+      "latency_ms": 4599.423791049048,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 561,
+      "output_tokens": 37,
+      "latency_ms": 824.3503330741078,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 882,
+      "output_tokens": 15,
+      "latency_ms": 1198.278500000015,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 203,
+      "output_tokens": 30,
+      "latency_ms": 5794.727124972269,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 592,
+      "output_tokens": 36,
+      "latency_ms": 892.0972500927746,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 621,
+      "output_tokens": 24,
+      "latency_ms": 828.1391658820212,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 212,
+      "output_tokens": 34,
+      "latency_ms": 2018.910458078608,
+      "ok": true,
+      "error": null
+    }
+  ]
+}

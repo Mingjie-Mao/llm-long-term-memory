@@ -13,9 +13,9 @@ from datetime import datetime
 import numpy as np
 import pytest
 
-from chronomem.evaluation.datasets.longmemeval import Instance
-from chronomem.evaluation.runners.memory import MemoryRunner, render_memory
-from chronomem.store import Memory, NumpyFlatIndex, Session, SQLiteMemoryStore, Turn
+from llm_long_term_memory.evaluation.datasets.longmemeval import Instance
+from llm_long_term_memory.evaluation.runners.memory import MemoryRunner, render_memory
+from llm_long_term_memory.store import Memory, NumpyFlatIndex, Session, SQLiteMemoryStore, Turn
 
 
 class ScriptedClient:

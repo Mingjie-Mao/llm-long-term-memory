@@ -1,7 +1,10 @@
 import csv
 
-from chronomem.evaluation.failures import summarize_failure_worksheet, write_failure_worksheet
-from chronomem.evaluation.harness import QuestionResult
+from llm_long_term_memory.evaluation.failures import (
+    summarize_failure_worksheet,
+    write_failure_worksheet,
+)
+from llm_long_term_memory.evaluation.harness import QuestionResult
 
 
 def result(correct: bool = False) -> QuestionResult:
@@ -26,7 +29,7 @@ def test_failure_worksheet_contains_only_judged_wrong_results(tmp_path):
     path = write_failure_worksheet(
         [result(False), result(True)], {"q1": "How long?"}, tmp_path / "audit.csv"
     )
-    rows = list(csv.DictReader(path.open()))
+    rows = list(csv.DictReader(path.open(newline="", encoding="utf-8")))
 
     assert len(rows) == 1
     assert rows[0]["source_session_recalled"] == "True"
@@ -35,10 +38,10 @@ def test_failure_worksheet_contains_only_judged_wrong_results(tmp_path):
 
 def test_failure_summary_counts_one_primary_cause_and_e1_detail(tmp_path):
     path = write_failure_worksheet([result()], {"q1": "How long?"}, tmp_path / "audit.csv")
-    rows = list(csv.DictReader(path.open()))
+    rows = list(csv.DictReader(path.open(newline="", encoding="utf-8")))
     rows[0]["primary_failure"] = "E1"
     rows[0]["extraction_detail"] = "duration"
-    with path.open("w", newline="") as handle:
+    with path.open("w", newline="", encoding="utf-8") as handle:
         writer = csv.DictWriter(handle, fieldnames=rows[0].keys())
         writer.writeheader()
         writer.writerows(rows)

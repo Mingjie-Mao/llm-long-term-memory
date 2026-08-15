@@ -1,4 +1,4 @@
-# ChronoMem v1 — frozen
+# llm-long-term-memory v1 — frozen
 
 Do not overwrite, regenerate, or "fix" anything in this directory. It is the record
 of the first end-to-end measurement of the memory system, including the extraction
