@@ -61,8 +61,14 @@
   .runmeta { font-family: var(--mono); font-size: 11.5px; color: var(--muted); margin-top: 8px;
              padding-top: 8px; border-top: 1px solid var(--line); }
   main { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1.15fr); gap: 0; height: calc(100vh - 53px); }
-  @media (max-width: 940px) { main { grid-template-columns: 1fr; height: auto; } }
-  .col { display: flex; flex-direction: column; min-height: 0; }
+  /* minmax(0,1fr), not 1fr: a bare `1fr` track is `minmax(auto, 1fr)`, and its auto
+     minimum is the content's min-content width. One long session id in the evidence
+     panel then holds the whole column open and the page scrolls sideways — which is
+     what happened here at 343px, where the document was 453px wide. */
+  @media (max-width: 940px) { main { grid-template-columns: minmax(0,1fr); height: auto; } }
+  /* Same rule one level down: a flex item's automatic minimum size is min-content,
+     so a column refuses to shrink below its widest unbreakable token unless told. */
+  .col { display: flex; flex-direction: column; min-height: 0; min-width: 0; }
   .col + .col { border-left: 1px solid var(--line); }
   @media (max-width: 940px) { .col + .col { border-left: 0; border-top: 1px solid var(--line); } }
   .col > h2 {
@@ -71,11 +77,19 @@
     border-bottom: 1px solid var(--line); background: var(--panel);
   }
   .scroll { overflow-y: auto; padding: 16px 20px; flex: 1; min-height: 0; }
-  form { display: flex; gap: 8px; padding: 12px 20px; border-top: 1px solid var(--line); background: var(--panel); }
+  form { display: flex; gap: 8px; padding: 12px 20px; border-top: 1px solid var(--line);
+         background: var(--panel); flex-wrap: wrap; }
   input[type=text] {
-    flex: 1; padding: 9px 12px; border: 1px solid var(--line); border-radius: 7px;
-    background: var(--bg); color: var(--ink); font: inherit;
+    /* `min-width: 0` because a flex item's automatic minimum is min-content, and a
+       text input's min-content is its placeholder — which is wider than a phone. */
+    flex: 1; min-width: 0; padding: 9px 12px; border: 1px solid var(--line);
+    border-radius: 7px; background: var(--bg); color: var(--ink); font: inherit;
   }
+  /* The query box is the one control that has to stay usable. Left to shrink it
+     ends up about ten characters wide next to the id field and the button; a floor
+     makes the wrapped row take it onto its own line instead, which is why `form`
+     wraps. Not a min-width on every input — the id field is fine narrow. */
+  #q { min-width: 14ch; }
   input:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
   button {
     padding: 9px 15px; border: 0; border-radius: 7px; background: var(--accent);
@@ -89,7 +103,7 @@
   button.ghost:hover { color: var(--ink); }
   .turn { margin-bottom: 14px; }
   .turn .who { font-size: 11.5px; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
-  .turn .what { white-space: pre-wrap; }
+  .turn .what { white-space: pre-wrap; overflow-wrap: anywhere; }
   .card {
     border: 1px solid var(--line); border-radius: 9px; padding: 11px 13px;
     margin-bottom: 9px; background: var(--panel);
@@ -115,8 +129,13 @@
   .evidence {
     margin-top: 8px; padding: 9px 11px; border-radius: 7px; background: var(--bg);
     border: 1px solid var(--line); font-size: 13.5px; white-space: pre-wrap;
+    /* `pre-wrap` keeps newlines but still refuses to break inside a word, and this
+       panel is mostly things with no break opportunity: session ids, URLs, memory
+       ids. Without this they set the min-content width of the whole column. */
+    overflow-wrap: anywhere;
   }
-  .evidence .src { font-family: var(--mono); font-size: 11px; color: var(--muted); margin-bottom: 5px; }
+  .evidence .src { font-family: var(--mono); font-size: 11px; color: var(--muted);
+                   margin-bottom: 5px; overflow-wrap: anywhere; }
   mark { background: color-mix(in srgb, var(--accent) 28%, transparent); color: inherit; border-radius: 2px; }
   .timeline { margin-top: 8px; border-left: 2px solid var(--line); padding-left: 13px; }
   .timeline .step { margin-bottom: 9px; font-size: 13.5px; }
