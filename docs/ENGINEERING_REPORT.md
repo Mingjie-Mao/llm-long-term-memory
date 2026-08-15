@@ -46,7 +46,7 @@ failed, so this is a regression signal, not a measurement of the system.
 
 Shipped: a REST API, Docker image (2.95GB), structured request logging, an MCP
 server over the same service layer, and a Memory Inspector that shows why each
-memory was selected, passed over, or superseded — with shareable URLs. 357 tests,
+memory was selected, passed over, or superseded — with shareable URLs. 363 tests,
 three-platform CI.
 
 **Not claimed:** any comparison against a third-party system, or any result on
@@ -769,7 +769,48 @@ automated evaluation pipelines: stale artifacts do not look like errors.
      noise figure for fidelity, only for end-to-end accuracy. The number still
      requires comparison against the baseline by a human.
 
-### 10.5 Placeholder — clean P10 result
+### 10.5 What the diagnostic run's failures pointed at
+
+Twenty failures, attributed by whether the source session was retrieved:
+
+| | |
+|---|---|
+| source session **was** retrieved, answer still wrong | 17 / 20 |
+| retrieval miss | 3 / 20 |
+
+**Retrieval is not the bottleneck.** That is the same conclusion the rerank and
+dense-retrieval work reached from the other direction, and it is why both sit at the
+bottom of the roadmap rather than the top.
+
+All three retrieval misses are `single-session-assistant`, and one of them is
+`41275add` — the Mayo question, which the demo answers correctly. A system cannot
+give two answers to one question, so the discrepancy was worth chasing, and it was
+not about the store:
+
+```python
+raw_fallback = cfg.fallback.enabled  # from the config, not from the variant name
+```
+
+`baselines.yaml` leaves `fallback.enabled` at its default of `False`. The variant
+named `two_stage_fallback` does not turn the fallback on by itself; only the config
+does, and the live regression used `configs/fallback.yaml`. So the diagnostic A2
+measured the system **without** the conditional raw-conversation fallback — the
+feature that exists precisely for those three cases.
+
+The formal run is therefore two arms over the same store, manifest, answerer and
+judge. The configs differ in `fallback.*` and nothing else — `top_k` 20, rerank off
+in both — so the delta between them is what the fallback is worth, measured rather
+than demonstrated:
+
+| arm | config | artifact |
+|---|---|---|
+| memory only | `baselines.yaml` | `two_stage_hydrated.a2-clean-p10.jsonl` |
+| memory + conditional fallback | `fallback.yaml` | `two_stage_hydrated.a2-clean-p10-fallback.jsonl` |
+
+The first stays comparable with every earlier number; the second describes what is
+actually shipped. Neither is the headline until both have run.
+
+### 10.6 Placeholder — clean P10 result
 
 *To be filled when the clean rebuild completes and the formal `dev50` A2 runs.*
 
@@ -793,8 +834,13 @@ fix.
 ## 11. Current limitations
 
 1. **No held-out result.** Every number comes from the dev-50 questions, used for
-   prompt iteration, gate tuning and predictor fitting. A pre-registered run on a
-   disjoint stratified sample is designed but unrun.
+   prompt iteration, gate tuning and predictor fitting. The test set is now frozen —
+   `results/manifests/heldout100.json`, 100 questions, stratified over what dev50 did
+   not take, zero overlap, written on 2026-08-15 before the clean-P10 run and before
+   any decision was made against it. Its questions and answers have not been read.
+   It is unrun, and running it is not cheap: `dataset_limit=50` means only the dev-50
+   namespaces are ingested, so a held-out result needs those 100 haystacks ingested
+   first — roughly twice the current store, or about two days of extractor quota.
 2. **The pilot is 31 unstratified questions.** An ingest-order prefix, not a sample.
    Category splits are descriptive only.
 3. **The completed store mixes two extractor generations** — 4,843 memory rows from

@@ -42,6 +42,21 @@ DEFAULT_VARIANT = "two_stage_hydrated"
 MANIFEST = REPO / "results" / "manifests" / "dev50.json"
 PILOT_OUT = REPO / "results" / "raw" / "two_stage_hydrated.jsonl"
 EXPECTED_NAMESPACES = 50
+
+# The formal A2 is two arms, because the shipped product includes the conditional
+# raw-conversation fallback and `baselines.yaml` does not enable it. The diagnostic
+# run made that visible: of its twenty failures, seventeen had retrieved the right
+# session and three had not — and all three of those were the single-session-
+# assistant cases the archive fallback exists to recover, including the Mayo
+# question the demo answers correctly. A headline measured with the fallback off
+# would not describe the thing being shipped.
+#
+# The two configs differ in `fallback.*` and nothing else (`name` and `description`
+# are metadata), so the pair is a clean ablation: the delta is the fallback.
+ARMS = [
+    ("configs/baselines.yaml", "", "memory only, comparable with every earlier run"),
+    ("configs/fallback.yaml", "-fallback", "memory first, archive when the answerer asks"),
+]
 VALID_SOURCE_ROLES = {"user", "assistant", "system"}
 QUOTA_TZ = ZoneInfo("America/Los_Angeles")
 
@@ -71,9 +86,8 @@ class Target:
     def store(self) -> Path:
         return REPO / "stores" / f"{self.store_name}.db"
 
-    @property
-    def out(self) -> Path:
-        return REPO / "results" / "raw" / f"{self.variant}.{self.label}.jsonl"
+    def out(self, suffix: str = "") -> Path:
+        return REPO / "results" / "raw" / f"{self.variant}.{self.label}{suffix}.jsonl"
 
 
 @dataclass
@@ -325,15 +339,17 @@ def check_store_is_homogeneous(target: Target, expected_sessions: int) -> None:
 
 
 def check_a2_output_is_clean(target: Target) -> None:
-    """The formal run writes its own file; the pilot artifact is never touched."""
-    out = target.out
-    if out.exists():
-        n = len([ln for ln in out.read_text(encoding="utf-8").splitlines() if ln.strip()])
-        stop("a2 output", f"{out.name} already holds {n} rows — move it aside first")
+    """Each arm writes its own file; the pilot artifact is never touched."""
+    for _, suffix, _ in ARMS:
+        out = target.out(suffix)
+        if out.exists():
+            n = len([ln for ln in out.read_text(encoding="utf-8").splitlines() if ln.strip()])
+            stop("a2 output", f"{out.name} already holds {n} rows — move it aside first")
     if not MANIFEST.exists():
         stop("a2 manifest", f"{MANIFEST} is missing")
     n_q = len(json.loads(MANIFEST.read_text(encoding="utf-8"))["question_ids"])
-    ok("a2 output", f"{out.name} is free; {PILOT_OUT.name} stays as the pilot record")
+    names = ", ".join(target.out(s).name for _, s, _ in ARMS)
+    ok("a2 output", f"free: {names}; {PILOT_OUT.name} stays as the pilot record")
     ok("a2 manifest", f"{MANIFEST.name}: {n_q} frozen question ids")
 
 
@@ -432,7 +448,7 @@ def main() -> int:
     args = parser.parse_args()
     target = Target(store_name=args.store_name, variant=args.variant, label=args.label)
 
-    print(f"\033[1mpreflight\033[0m  {target.store_name} -> {target.out.name}")
+    print(f"\033[1mpreflight\033[0m  {target.store_name} -> {len(ARMS)} A2 arms")
     try:
         expected = corpus_unique_sessions()
         ok("corpus", f"{expected:,} unique session ids — the completion target")
@@ -478,22 +494,30 @@ def main() -> int:
 
         # `variant` is positional and there is no --out: --label decides the
         # filename, leaving the pilot file alone. A labelled file is excluded from
-        # the default results table, so promoting this into the published table is a
-        # separate, deliberate step.
-        run_stage(
-            "formal A2",
-            [
-                "eval",
-                "run",
-                target.variant,
-                "--store-name",
-                target.store_name,
-                "--questions",
-                str(MANIFEST),
-                "--label",
-                target.label,
-            ],
-        )
+        # the default results table, so promoting either arm into the published
+        # table is a separate, deliberate step.
+        #
+        # Two arms, same store, same manifest, same answerer and judge. The only
+        # thing that differs is the config's `fallback.*`, so the delta between them
+        # is what the conditional raw-conversation fallback is worth — measured
+        # rather than demonstrated.
+        for config, suffix, why in ARMS:
+            run_stage(
+                f"formal A2 [{config.split('/')[-1]}] — {why}",
+                [
+                    "eval",
+                    "run",
+                    target.variant,
+                    "--config",
+                    config,
+                    "--store-name",
+                    target.store_name,
+                    "--questions",
+                    str(MANIFEST),
+                    "--label",
+                    target.label + suffix,
+                ],
+            )
     except Stop:
         print("\n\033[31mStopped. Later stages were not started.\033[0m")
         return 1
