@@ -44,6 +44,7 @@ class QuestionResult:
     answer_prompt_version: str | None = None
     judge_prompt_version: str | None = None
     extractor_version: str | None = None
+    store_fingerprint: str | None = None
     notes: dict[str, Any] = field(default_factory=dict)
 
 
@@ -148,8 +149,47 @@ def run_eval(
         return _run_eval_locked(runner, judge, instances, path, usage, resume, on_progress)
 
 
+class StoreChanged(RuntimeError):
+    """The artifact being resumed was produced from different data."""
+
+
+def _check_resumable(done: dict[str, QuestionResult], runner, path: Path) -> None:
+    """Refuse to append answers from one store onto answers from another.
+
+    Resume keys on question_id alone, which is right for the case it was built for
+    (a run that stopped on quota, continued the next day against the same store) and
+    silently wrong for the case that was about to happen here: a 31-question pilot
+    run against a 63%-ingested store, then the formal 50-question run after ingest
+    finished. Nineteen questions would be answered from the complete store and
+    thirty-one reused from the partial one, reported as a single number, with the
+    partial rows systematically *worse* because their evidence was missing.
+
+    That is the same defect the `--fresh` truncation already guards against for
+    prompts and judges. The store is the third input, and the largest.
+    """
+    current = getattr(runner, "store_fingerprint", None)
+    if current is None or not done:
+        return  # a runner that builds its own index per question has no store to pin
+    unstamped = sum(1 for r in done.values() if not r.store_fingerprint)
+    stale = {r.store_fingerprint for r in done.values() if r.store_fingerprint} - {current}
+    if not stale and not unstamped:
+        return
+    # Rows written before this field existed are refused too. Unknown provenance is
+    # not the same as matching provenance, and the artifact this was written for —
+    # the A2 pilot — is entirely unstamped, so treating None as "probably fine" would
+    # have let through the exact merge it exists to stop.
+    origin = ", ".join(sorted(stale)) if stale else f"{unstamped} rows of unknown store"
+    raise StoreChanged(
+        f"{path} holds {len(done)} answers from {origin}, but this run uses {current}. "
+        f"Resuming would merge answers from different stores into one number. "
+        f"Write this run to a different --out, or pass --fresh to replace the file."
+    )
+
+
 def _run_eval_locked(runner, judge, instances, path, usage, resume, on_progress) -> RunReport:
     done = _load_done(path) if resume else {}
+    if resume:
+        _check_resumable(done, runner, path)
     report = RunReport(variant=runner.name, results=list(done.values()))
 
     if not resume and path.exists():
@@ -199,6 +239,7 @@ def _run_eval_locked(runner, judge, instances, path, usage, resume, on_progress)
                 # From the store, not from the checked-out code: it describes the
                 # data being evaluated, which an older store will not share.
                 extractor_version=getattr(runner, "extractor_version", None),
+                store_fingerprint=getattr(runner, "store_fingerprint", None),
                 notes=answer.notes,
             )
             report.results.append(result)
@@ -219,6 +260,43 @@ class RunAlreadyInProgress(RuntimeError):
     """Another process is already writing this artifact."""
 
 
+def _process_alive(pid: int) -> bool:
+    """Does this pid belong to a running process?
+
+    `os.kill(pid, 0)` is the POSIX idiom and is *not* portable: on Windows signal 0
+    is CTRL_C_EVENT, so the "existence check" delivers a real interrupt to the
+    console group. Here that meant a lock check aimed at another evaluation would
+    have sent Ctrl+C to it — the opposite of the lock's purpose, which is to leave a
+    running evaluation alone. The Windows CI job surfaced it as a KeyboardInterrupt
+    landing in a different library on each run, after every test had passed.
+    """
+    if os.name == "nt":
+        import ctypes
+
+        PROCESS_QUERY_LIMITED_INFORMATION = 0x1000
+        STILL_ACTIVE = 259
+        kernel32 = ctypes.windll.kernel32  # type: ignore[attr-defined]
+        handle = kernel32.OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, False, pid)
+        if not handle:
+            return False  # no such pid, or it is gone
+        try:
+            code = ctypes.c_ulong()
+            if kernel32.GetExitCodeProcess(handle, ctypes.byref(code)):
+                # A handle outlives the process it names, so "openable" is not
+                # "running": an exited process still answers, with its exit code.
+                return code.value == STILL_ACTIVE
+            return True  # cannot tell; treat as live rather than steal the lock
+        finally:
+            kernel32.CloseHandle(handle)
+    try:
+        os.kill(pid, 0)
+    except ProcessLookupError:
+        return False
+    except PermissionError:
+        return True  # exists but is not ours
+    return True
+
+
 @contextmanager
 def _exclusive(path: Path):
     """Refuse to start when another run owns this output file.
@@ -237,15 +315,15 @@ def _exclusive(path: Path):
     if lock.exists():
         try:
             owner = int(lock.read_text(encoding="utf-8").strip())
-            os.kill(owner, 0)  # signal 0 only tests for existence
-        except (ValueError, ProcessLookupError):
-            lock.unlink(missing_ok=True)  # stale
-        except PermissionError:
-            pass  # exists but is not ours; treat as live
+        except ValueError:
+            lock.unlink(missing_ok=True)  # unreadable; not something to trust
         else:
-            raise RunAlreadyInProgress(
-                f"pid {owner} is already writing {path}. Wait for it, or kill it and delete {lock}."
-            )
+            if _process_alive(owner):
+                raise RunAlreadyInProgress(
+                    f"pid {owner} is already writing {path}. "
+                    f"Wait for it, or kill it and delete {lock}."
+                )
+            lock.unlink(missing_ok=True)  # stale
     lock.write_text(str(os.getpid()), encoding="utf-8")
     try:
         yield

@@ -1,209 +1,345 @@
 [![English](https://img.shields.io/badge/English-555555?style=for-the-badge)](README.md)
 [![中文](https://img.shields.io/badge/%E4%B8%AD%E6%96%87-2962FF?style=for-the-badge)](README.zh-CN.md)
 
-# ChronoMem
+# llm-long-term-memory
 
-面向 LLM Agent 的自适应长期记忆引擎——时序事实消解、记忆合并、带衰减的混合检索、
-以及 token 预算下的上下文组装，在
-[LongMemEval](https://github.com/xiaowu0162/LongMemEval) 上评测。
+**面向 LLM 应用的持久化长期记忆层。**
 
-> **状态：负结果已定位到表示层。** 在 50 题开发子集上，v1 ChronoMem 为 26%，朴素
-> RAG 为 54%。source session 常能被命中，但结构化表示会丢掉答案所需的细节。下一步是
-> 带 provenance 的 evidence hydration，不是继续调排序；见[评测协议](docs/EVALUATION.md)。
+它把对话压缩成紧凑的记忆、在事实发生变化时更新它们，并在压缩恰好丢掉了问题所需的
+细节时，回到原始对话把细节找回来。
 
-## 为什么做这个
+---
 
-向量库加 top-k 检索能回答「用户说过什么」，但回答不了「现在什么是真的」。比如：
+## 一次对话就能说清的问题
 
-```
-一月   我用 TensorFlow。
-三月   我在学 PyTorch。
-八月   我已经完全转用 PyTorch 了。
-```
+三个月前助手回答过一个问题。今天用户问起它：
 
-朴素 RAG 会把三条都捞出来，让模型自己猜。ChronoMem 把它们消解成一条带有效期的
-active 事实和两条已失效事实，再决定其中哪些值得花上下文窗口的 token。
+> **问：** 你之前推荐的那个 Mayo Clinic 视频是什么？
 
-## 结果
-
-LongMemEval-S · 50 题分层子集（seed 0）· answerer `gemini-3.5-flash-lite` ·
-judge `gemma-4-31b-it`，两者在所有行中锁定不变。这是用于开发与 failure localization 的
-子集，不是最终 benchmark 结论。p95 是观察到的 answer-provider API 延迟，不含免费层排队。
-每个数字都从 `results/raw/` 的 JSONL 产物重新生成。
-
-| 变体 | n | 准确率 | Temporal | Know-update | Abstention | Source-session recall | ctx tokens | p95 API |
-|---|---|---|---|---|---|---|---|---|
-| `full_context` | 50 | **56.0%** | 23.1% | 87.5% | 50.0% | — | 109,260 | 7.9s |
-| `naive_rag` | 50 | **54.0%** | 46.2% | 75.0% | 100% | 94.0% | 13,057 | 2.1s |
-| `chronomem_no_temporal` | 50 | **26.0%** | 7.7% | 37.5% | 100% | 80.0% | 331 | 7.0s |
-| `chronomem` | 50 | **26.0%** | 7.7% | 62.5% | 100% | 80.0% | 465 | 1.2s |
-
-**记忆系统输了，根因在时序消解之前。** 时序过滤为 3 胜 3 负（`p = 1.000`），只能说明
-在 n=50 时没有可检测差异，不能证明两个变体等价。
-
-**50 题中有 40 题的 source session 对应记忆被选中**，但其中只有 **12 题答对**。这是
-source-session recall，不是 answer-support recall：记忆可以指向正确 session，却已丢掉
-答案需要的时长、日期或数字。**50 题里有 28 题**回答「我不知道」。
-
-一个完整追踪的例子——*「我收集古董相机多久了?」*,gold 是 `three months`。证据
-session 产出的三条记忆,排名第一:
+记忆库里关于 Mayo Clinic 什么都没有——抽取保留了大意，丢掉了链接。向量库到这里就
+失败了，而且会一直失败下去。这个系统不会：
 
 ```
-- 用户拥有 17 台古董相机,包括 2023 年 5 月入手的 Brownie Hawkeye。
-- 用户有一张 1978 年版的 Fleetwood Mac《Rumours》。
-- 用户有一张霍格沃茨的 Mondo 海报。
+结构化记忆        不足
+原始对话回退      已触发 —— 全档案检索
+证据来源          session answer_sharegpt_81riySf_0 · turn 1 · assistant
+
+答案
+  "How to Sit Properly at a Desk to Avoid Back Pain"
+  https://www.youtube.com/watch?v=UfOvNlX9Hh0
 ```
 
-**时长从未被抽取出来。** 下一题(`25` 张明信片)以同样方式失败,模型答了 `17`——
-上下文里最近的那个数字。
+压缩必然有损。这个设计接受这一点，只要求损失是**可恢复的**。
 
-v1 的 literal-coverage gate 是回归探测器，不是准确率上限；但它暴露了同一个问题：当问题
-依赖局部措辞或时间细节时，有损的结构化记忆不够。新的 store 会保存 raw turn 与
-memory-to-span anchor，`two_stage_hydrated` ablation 在结构化检索后只恢复有上限的原文证据。
+### 自己看
 
+按下面的方式启动服务，然后打开：
 
-用 `chronomem eval report` 重新生成；含 single-session-assistant 和 preference
-细分的完整表格在 [results/table.md](results/table.md)。
+| Demo | 展示什么 |
+|---|---|
+| [`/?demo=mayo`](http://localhost:8000/?demo=mayo) | 压缩丢掉了 URL，档案把它找了回来 |
+| [`/?demo=battery`](http://localhost:8000/?demo=battery) | 记忆足够——回答**运用**了记住的偏好，没有回退 |
+| [`/?demo=timeline`](http://localhost:8000/?demo=timeline) | 同一个事实的五次变化，以及取代链 |
+| [`/?demo=collectibles`](http://localhost:8000/?demo=collectibles) | 多值键：这些事实并存，谁也没有取代谁 |
 
-### 该看配对检验，不是准确率那一列
+每个打开的都是**录制的运行结果**——真实模型的真实输出，并明确标注为录制，所以打开
+页面不消耗任何额度。**Run live answer** 按钮可以按需重新执行。录制结果带有产生它的
+库和 prompt 版本的指纹；任何一个变了，页面会显示 **stale**，而不是冒充当前行为。
 
-同一份配置原样重跑两次，分别得到 **48.0%** 和 **54.0%**。`temperature=0` 并不能让
-托管模型变得确定，judge 的边界判定也会移动；50 题里翻转 4 条就是 8 个百分点。
-**任何小于这个幅度的差距都不构成证据**，这就排除了在当前样本量下直接比较总准确率。
+---
 
-但两个变体回答的是同一批题，所以这是配对数据，共有的噪声可以被消掉。
-`chronomem eval compare` 只在分歧项上做精确 McNemar 检验：
+## 它做什么
+
+| | |
+|---|---|
+| **记住** | 把对话变成带类型、带时间窗的事实——谁说的、说的是谁、为什么值得留 |
+| **更新** | 追踪变化的事实。"我搬到悉尼了"会取代"我住在堪培拉"，但不删除它 |
+| **检索** | 五路加权信号——语义、BM25、时间新旧、重要性、实体重合 |
+| **恢复** | 结构化记忆不足时，去检索原始对话，而不是直接失败 |
+| **解释** | 每条记忆都能追到它来自的那句话；每一次**遗漏**都有明确原因 |
+
+最后一条是差异所在。检索不仅返回命中了什么，还返回**什么被排除了、为什么**——
+`superseded`（事实已不成立）或 `below_rank`（仍然成立，但分数不够）。没有解释的
+缺失，和 bug 无法区分。
+
+---
+
+## 30 秒看懂架构
 
 ```
-full_context vs naive_rag
-  都答对   19        naive_rag 胜   8
-  都答错   14        naive_rag 负   9
-  17 条分歧，p = 1.000  ->  检测不到差异
+                     对话
+                      │
+          ┌───────────┴───────────┐
+          ↓                       ↓
+    原始对话档案               抽取器
+      （turns）           （每批 2 次 LLM 调用）
+          │                       ↓
+          │                  结构化记忆
+          │              带类型 · 双时间轴
+          │                 带溯源锚点
+          │                       │
+  查询 ───┼───────────────────────┘
+          │        混合检索（5 路信号）
+          │                       ↓
+          │                 足够回答吗？
+          │              ┌────────┴────────┐
+          │             是                 否
+          │              ↓                  ↓
+          └──────────> 回答          回到原始证据
+                                            ↓
+                                    带出处的回答
 ```
 
-**支持的结论比「更多上下文没有价值」更窄：**在这个 50 题子集上，8.4 倍上下文相对朴素
-RAG 没有产生可检测的准确率提升。两个系统在 17 题上分歧，两个方向数量接近。
+**原始档案是一个存储决策，不是检索算法。** 保留原始对话是让有损抽取变得可恢复；
+至于*怎么*找到它们——按来源直查、BM25、稠密向量、混合——是另一个独立的选择。
 
-两者都在 54–56%。Temporal 分项 23.1% 对 46.2% 只是后续排查方向，不是能穿透采样噪声的
-结论：分母很小，仍需重复运行与独立 hold-out 评测。
+| 层 | 选择 | 理由 |
+|---|---|---|
+| 存储 | SQLite (WAL) + FTS5 | 单文件、无服务依赖；BM25 白送 |
+| 向量 | numpy 精确内积 | 几千条记忆；上 ANN 索引是为省微秒而加一个依赖 |
+| 嵌入 | `all-MiniLM-L6-v2`，本地 | 全语料嵌入约 5300 万 token，而 API 额度才是硬约束 |
+| LLM | Gemini，三个独立角色 | 抽取器、回答器、裁判的要求完全不同 |
+| 服务 | FastAPI，单一组合根 | API 和 Inspector 是同一个 service 对象的客户端 |
 
-另有两个分项差距大到值得追查：
+---
 
-- **Abstention，100% 对 50%。** 上下文稀疏时模型能可靠地说「不知道」；把整段历史
-  摆在面前，它有一半时间开始编。任何往上下文里塞进更多相关材料的变体都可能把这个
-  指标换掉，所以这一列一直单独显示，不并进平均值。
-- **Single-session-user，100% 对 71.4%。** 这是待追查方向，不是 retrieval 结论：94% 的
-  source-session recall 不衡量 answer-support recall。
-
-这些是 ChronoMem 自己的变体与两个基线的对比，**不构成**对任何第三方系统的断言：
-跨系统的记忆数字只在同一个 judge 和同一套 prompt 下才可比，而已发表的结果并不满足
-这个条件。
-
-**judge 的可靠性不做假设。** 免费层没有比 answerer 更强的模型可用来判分，因此判分
-结果与一份独立标注在全部 50 题上做了交叉核对：**94% 一致（n=50）**——1 条 judge 比
-标注更宽松，2 条更严格。在这三条分歧中未观察到方向性偏向，但这不证明 judge 没有偏向。
-
-两个前提如实写出而非埋掉。第一，标注是由 LLM 而非人完成的，所以它证明的是评分标准
-可复现，不是 judge 判得对。第二，第一遍得到的是 92%，而其中一条分歧是**标注方自己
-的错误**：它读的是被截断到 220 字符的答案，漏掉了最后一句里的结论。现在标注流程改为
-读全文。剩下三条是真正的边界判断——拼错的 app 名（`Memorse` 对 `Memrise`）、一个数字
-正确但把「计划购买」也算进去的计数、以及一个在 gold 只描述了「未点名的乐队」时给出
-具体艺人名的回答。
-
-**这里每个数字都从 JSONL 产物重新生成**，而不是取自控制台输出。当两者不一致时
-`run_eval` 会拒绝返回结果：此前有一次运行在只有 30 条记录的文件上打印了
-`50 questions, 56.0%`，而两个数字看上去都很合理（[D25](docs/DECISIONS.md)）。
-
-完整的指标定义、failure taxonomy、重复运行协议与延迟解释见
-[docs/EVALUATION.md](docs/EVALUATION.md)。
-
-## 抽取
-
-写入路径把 session 变成带类型、三元组形式、附有效期的记忆。两道关卡守着它，
-而且都已经抓到过真实缺陷：
-
-**答案覆盖率**（`chronomem ingest coverage`）在只含证据的子集上抽取，检查 gold 答案
-是否还留在记忆里。它发现第一版抽取 prompt 把 benchmark 真正要问的具体信息概括掉了
-——`The Glass Menagerie` 变成了「对表演感兴趣」——改写 prompt 后可测覆盖率从
-**26.3% 升到 50.0%**，`single-session-user` 从 1/3 升到 3/3。这个指标是严格的下界，
-文档里也这么写：LongMemEval 的答案大多是从已存事实**算出来的**，而不是直接陈述的。
-
-**去重的元数。** 嵌入相似度只是召回过滤器，真正判定 DUPLICATE / UPDATE / DISTINCT
-的是 LLM——因为「喜欢 Python」和「不喜欢 Python」的余弦相似度约 0.95，没有任何阈值
-能把它们分开。把 `(subject, predicate)` 碰撞限制在单值谓词上，使裁决调用从每 60 个
-session **72 次降到 3 次**，同时抓到的重复反而**增加**了。
-
-## 时序消解
-
-每条事实都带有效期。对每个 `(subject, predicate)` key，消解器按事件时间排序并重写
-整条链，于是 `TensorFlow` 在 `PyTorch` 开始的那天被关闭，只剩一个取值仍然生效。
-
-**重建时间线而不是两两比较**是这里最关键的选择。session 是按任意顺序摄入的，所以
-「刚到的记忆 supersede 已经在的那条」会让一条晚到的*一月*事实变成当前值；而且一条
-记忆一旦被 supersede 就不再是链头，因此后来落在两条之间的事实，永远改不了那条已经
-跨过它的链接。重建则是幂等的、与顺序无关、可自我修正，而且不消耗任何 LLM 调用。
-
-写测试时浮现出的两点细化：
-
-- **重述不是变更。** 「我住堪培拉」在三月和六月各说一次，合并成一个区间且归属*三月*，
-  这样「你什么时候搬的？」才答得对。计为 `restatements`，不计入 `superseded`。
-- **元数是默认规则，不是全部规则。** `uses_tool` 确实是多值的——用 PyTorch 不妨碍用
-  NumPy——所以纯静态谓词表会让开篇那个例子完全不被消解。因此抽取器在用户说
-  「我切换到 X 了」时额外输出 `replaces_previous`，不增加任何请求成本，两个信号任一
-  成立即可消解一个 key。
-
-第一次真实摄取立刻证明了那张表是错的。`lives_in` 产出
-`东京 → 南湾 → 拉斯维加斯`，这是对的；`scheduled` 产出
-`伦敦中转 → 烹饪课 → 9:15 的火车 → 周五游戏夜`，这根本不是一串互相竞争的取值。
-`scheduled` 和 `has_goal` 被移除。
-
-这个错误只花了几秒而不是一天，而且是刻意如此：消解读取已存数据、不调用模型，所以
-`chronomem resolve` 能原地重建每一条时间线。**元数是谓词的属性，不是数据的属性**，
-把它挡在摄入产物之外，才使得「搞错」变得便宜。
-
-## 快速开始
+## 2 分钟跑起来
 
 ```bash
-uv sync --group dev
-uv run chronomem data download --variant s
-uv run chronomem data stats --variant s
-uv run chronomem data plan --variant s
-
-uv run chronomem doctor
-uv run chronomem ingest coverage --n 20      # 抽取有没有把答案留住？
-uv run chronomem ingest run                  # 构建记忆库（可断点续传）
-uv run chronomem eval run naive_rag
-uv run chronomem eval report
+docker compose up --build
 ```
 
-`data plan` 会报告在你的 API 配额下，不同批大小各需要几天才能完成一次完整摄取——
-在按请求数限流的免费层上，这是排期而不是成本。
+```bash
+curl localhost:8000/healthz
+```
 
-## 设计
+然后打开 <http://localhost:8000> 就是 Inspector。
 
-详见 [docs/DECISIONS.md](docs/DECISIONS.md)——选了什么、否掉了什么、以及测量说明了什么。
+镜像里不打包任何数据集、模型、凭证或数据库——记忆库通过挂载卷进来。`GEMINI_API_KEY`
+是可选的：没有它服务以只读模式运行，并且会明说。
 
-| 层 | 选择 |
+首次构建要下载嵌入模型的依赖，需要几分钟；之后启动只要几秒。如果只要一个不带语义
+检索的只读小镜像，用 `--build-arg EXTRAS="api"` 构建——那时 `/healthz` 会报
+`degraded`，搜索返回 503 而不是莫名其妙地失败。
+
+**镜像大小 2.95GB。** 其中绝大部分是 PyTorch，嵌入模型需要它。默认安装拉的是 CUDA
+版轮子——给一个永远见不到 GPU 的容器装 24.4GB 的 GPU 运行时——所以 Dockerfile 换成
+CPU 版，并删掉换装后遗留的 CUDA 包。这仍然不算小；真要小就得把编码器移到进程外，那件事
+[在路线图里](docs/ROADMAP.md)，不适合在评测跑到一半时动。
+
+<details>
+<summary>不用 Docker</summary>
+
+```bash
+uv sync --group dev --extra api --extra embed
+uv run uvicorn llm_long_term_memory.api.app:app --port 8000
+```
+</details>
+
+---
+
+## 5 分钟接进你的应用
+
+```bash
+curl -X POST localhost:8000/v1/messages \
+  -H 'Content-Type: application/json' \
+  -d '{"user_id": "alice", "role": "user", "content": "I stopped drinking coffee last month."}'
+```
+
+```bash
+curl -X POST localhost:8000/v1/memories/search \
+  -H 'Content-Type: application/json' \
+  -d '{"user_id": "alice", "query": "what does she drink?", "explain": true}'
+```
+
+```json
+{
+  "memories": [
+    {
+      "content": "The user stopped drinking coffee.",
+      "scope": "profile",
+      "source_role": "user",
+      "score": 0.81,
+      "signals": {"semantic": 0.79, "bm25": 0.92, "recency": 0.4, ...},
+      "source": {"session_id": "s_4f2a", "turn_index": 0, "char_start": 0, "char_end": 41}
+    }
+  ],
+  "rejected": [
+    {"memory_id": "m_9c1", "reason": "superseded", "superseded_by": "m_a20",
+     "content": "The user drinks two coffees a day."}
+  ],
+  "candidates_considered": 37
+}
+```
+
+| 端点 | |
 |---|---|
-| 存储 | SQLite（WAL）+ FTS5 提供 BM25——单文件，无需额外服务 |
-| 向量 | numpy 上的精确内积暴力搜索 |
-| Embedding | `all-MiniLM-L6-v2`，本地运行，MPS 加速 |
-| LLM | 经 `google-genai` 调用 Gemini，三角色配置（extractor / answerer / judge） |
-| Benchmark | LongMemEval-S，配可断点续传、配额感知的摄取管线 |
+| `POST /v1/messages` | 写入一句对话，返回它产生的记忆 |
+| `POST /v1/memories/search` | 检索，附带信号、出处和排除原因 |
+| `POST /v1/answer` | 完整回答路径，必要时触发回退 |
+| `POST /v1/raw/search` | 回退层，可单独查询 |
+| `GET /v1/memories` | 浏览一个命名空间，可按状态/类型/scope/说话人过滤 |
+| `GET /v1/memories/{id}` | 单条记忆及其源对话 |
+| `GET /v1/timeline` | 某个 `(subject, predicate)` 的取代链 |
+| `DELETE /v1/memories/{id}` | 遗忘——标记为 evicted，绝不硬删 |
+| `GET /healthz` · `GET /v1/config` | 健康检查与运行清单 |
 
-## 目录结构
+每次读取都必须带 `user_id`，且严格按命名空间隔离。读别人命名空间的记忆返回
+**404 而不是 403**——403 会泄露那个 id 确实存在。
+
+---
+
+## 从 MCP 客户端接入
+
+[Model Context Protocol](https://modelcontextprotocol.io) 是 agent 接入它的方式，
+而 REST 是程序接入的方式。两者都是同一个 service 对象的薄封装，所以工具的行为不会
+和被测量过的行为产生偏离。
+
+```bash
+uv sync --extra mcp --extra embed
+uv run lltm mcp                    # stdio
+uv run lltm mcp --transport http   # streamable HTTP
+```
+
+在 Claude Desktop 或 Cursor 的 MCP 配置里加：
+
+```json
+{
+  "mcpServers": {
+    "long-term-memory": {
+      "command": "uv",
+      "args": ["run", "--directory", "/path/to/llm-long-term-memory", "lltm", "mcp"]
+    }
+  }
+}
+```
+
+| 工具 | |
+|---|---|
+| `search_memory` | 回忆已知的事情，附带每条被选中的原因——加上 `explain` 还会说明别的为什么没被选 |
+| `remember` | 存一句对话，返回它产生的记忆，让 agent 能确认系统理解到了什么 |
+| `search_conversations` | 当记忆切题但缺少精确细节时，回到原文把它找回来 |
+| `get_timeline` | 某个事实随时间如何变化 |
+| `forget` | 把记忆标记为 evicted，绝不硬删 |
+
+每个工具都要求显式的 `user_id`。这里没有隐含的会话身份：为多个人服务的 agent 必须
+说明它此刻代表谁，而边界由存储层强制，不依赖调用方自觉。
+
+---
+
+## 依据
+
+上面的设计不是偏好。每个选择都经过测量，而且有两个看起来合理的增强**测过之后没有上线**。
+
+### 结构化记忆作为一种压缩
+
+在 [LongMemEval-S](https://github.com/xiaowu0162/LongMemEval) 已完整摄入的 31 道题上，
+全程同一个回答器和裁判（[完整记录](results/a2-pilot.md)）：
+
+| 变体 | 准确率 | 中位上下文 tokens |
+|---|---:|---:|
+| `full_context` | 64.5% | 109,605 |
+| `naive_rag` | 51.6% | 13,057 |
+| **`two_stage` (k=10)** | **51.6%** | **242** |
+| v1 结构化记忆 | 19.4% | 465 |
+
+**上下文比 naive RAG 少约 54 倍，准确率无可检测差异**（6 胜 6 负，配对精确 McNemar，
+p = 1.000）。
+
+> **请当作 pilot 来读。** 31 道题、非分层抽样、各跑一次。`p = 1.000` 的意思是
+> *没有检测到差异*，不等于两个系统等价。分层 50 题的正式运行还没跑，也还没有任何
+> held-out 结果。
+
+### 提升来自哪里
+
+早期草稿把功劳归给了证据 hydration。因果消融推翻了这个归因：
+
+| 步骤 | Δ | 配对结果 |
+|---|---:|---|
+| 抽取管线重写 | **+29.0pp** | 11 胜 2 负，**p = 0.022** |
+| 证据 hydration | +3.2pp | 2 胜 1 负，p = 1.000 |
+
+两者的 source-session recall **都是 93.5%**，这一点印证了归因——hydration 在检索之后
+运行，本来就不可能改变召回了什么。于是 hydration 从"总是开启"降级为上面那个条件回退。
+
+### 测过但没有上线的
+
+**Cross-encoder 重排。** 在 k=10 时，开启与关闭重排在 31 道题上给出了**逐题完全相同**
+的答案——零个分歧——而重排在每个 k 上都**降低**了 source recall（k=20 时 93.5% → 90.3%）。
+它作为可选的 `rerank` extra 保留在仓库里，让这个结论可复现，但默认关闭。
+[详情](results/rerank-pareto.md)。
+
+**对原始档案做稠密检索。** 一组构造出来的查询显示 BM25 在改写下崩溃（R@1 只有 6.9%）。
+人工审计发现这种构造把**问题本身**也删掉了，而不只是删掉了词汇——*"How long have I been
+collecting vintage cameras?"* 变成了 `"long"`。这条证据因此被作废。手写的同义改写全部在
+**rank 1** 命中，包括完全不含原文专有名词的表述。结论是暂缓，不是否决，并写明了什么条件
+会重新开启这个议题。[详情](results/raw-recall-diagnostic.md)。
+
+**用于预算打包的学习式效用预测器。** held-out RMSE 0.310，而预测均值的基线是 0.263——
+它输给了预测均值。[详情](results/p6-pilot.md)。
+
+### Live 回归
+
+七道此前所有变体都答错的题，现在是 **6/7，三轮结果完全一致**——包括 Mayo 那道题的
+完整链路。[详情](results/live-regression-v2.md)。
+
+---
+
+## 工程
+
+- **352 个测试**，CI 覆盖 ubuntu / windows / macos
+- **结果版本化**——每一行评估结果都记录它的回答器 prompt、裁判 prompt 和抽取器版本；
+  抽取器版本读自**记忆库**而不是当前代码，因为它描述的是被评估的那批数据
+- **冻结的题目清单**——正式运行必须指定明确的题目集，因为"样本量"不是"实验身份"
+- **结构化日志**——每个请求一条 JSON，含请求 id、延迟和配置指纹；不含记忆内容和凭证
+- **启动时预热编码器**：首个请求从 12,486 ms 降到 181 ms
+
+完整记录：[工程报告](docs/ENGINEERING_REPORT.md) ·
+[设计决策](docs/DECISIONS.md) · [路线图](docs/ROADMAP.md)
+
+---
+
+## 开发
+
+```bash
+uv sync --group dev --extra api --extra llm --extra embed
+uv run pytest
+uv run lltm --help
+```
+
+<details>
+<summary>基准测试流程</summary>
+
+```bash
+uv run lltm data download --variant s
+uv run lltm doctor
+uv run lltm ingest run --store-name two-stage-hydrated
+uv run lltm eval freeze dev50 --n 50
+uv run lltm eval run two_stage --questions results/manifests/dev50.json
+uv run lltm eval compare naive_rag two_stage
+```
+
+`--questions` 接受一个冻结的清单。`--limit` 会重新抽样，只用于探索——分层子集散布在
+整个数据集里，并不是它的前缀。
+</details>
 
 ```
-src/chronomem/
+src/llm_long_term_memory/
+  api/         FastAPI 服务、Inspector、录制的 demo 运行
   store/       schema.sql、SQLiteMemoryStore、NumpyFlatIndex
-  llm/         配额感知限流器（RPM / TPM / RPD）、带重试的客户端
-  ingest/      抽取、去重、断点续传管线、覆盖率关卡
-  evaluation/  benchmark 加载器、runner、judge、报告
-  config.py    每个 ablation 变体一个 YAML
-  cli.py
-tests/
-docs/DECISIONS.md
+  ingest/      两阶段抽取、去重、断点续跑的流水线、质量闸门
+  retrieve/    混合检索、原始对话回退、重排器（可选）
+  evaluation/  数据集加载、运行器、裁判、清单、报表
+  llm/         配额感知的限流器（RPM / TPM / RPD）、带重试的客户端
 ```
+
+## 局限
+
+- 没有 held-out 结果。所有数字都来自同时用于调 prompt 和调闸门的开发题集。
+- 记忆库只摄入了 64%，且是用 P10 之前的抽取器建的，所以 `source_role` / `scope`
+  还没有在真实数据上生效。
+- 单写入者的 SQLite；摄入没有并发锁。
+- 时间推算和跨会话聚合仍未解决——见[工程报告](docs/ENGINEERING_REPORT.md)里的失败分类。
 
 ## 许可
 

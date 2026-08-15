@@ -38,9 +38,25 @@ CREATE TABLE IF NOT EXISTS memories (
 
     -- Triple form. Supersede detection in P4 matches on (user_id, subject, predicate),
     -- so these are indexed even though `content` is the human-readable payload.
+    --
+    -- `subject` is who or what the fact is ABOUT. It is emphatically not the
+    -- speaker: "Andy wore a blue shirt", said by the user, has subject 'andy'.
+    -- Conflating the two is what made every memory a user-profile entry and left
+    -- third-party facts with nowhere to live (results/assistant-gap.md).
     subject         TEXT,
     predicate       TEXT,
     object          TEXT,
+
+    -- Who said it. Orthogonal to `subject`, and the pair is what makes
+    -- "what did you recommend?" answerable at all: that question filters on
+    -- source_role='assistant', not on any property of the subject.
+    source_role     TEXT NOT NULL DEFAULT 'user',   -- user|assistant|system
+
+    -- Why it is worth keeping, which is what decides whether it is kept.
+    -- profile|preference|plan|recommendation|commitment|shared_context|event
+    -- Retrieval and packing can weight or filter on this, and the inspector groups
+    -- by it, so it earns its place independently of extraction.
+    scope           TEXT,
 
     importance      REAL NOT NULL DEFAULT 0.5,   -- [0,1], assigned at write time
     confidence      REAL NOT NULL DEFAULT 1.0,   -- [0,1], lowered by consolidation
@@ -111,6 +127,28 @@ END;
 CREATE TRIGGER IF NOT EXISTS memories_au AFTER UPDATE OF content ON memories BEGIN
     INSERT INTO memories_fts(memories_fts, rowid, content) VALUES ('delete', old.rowid, old.content);
     INSERT INTO memories_fts(rowid, content) VALUES (new.rowid, new.content);
+END;
+
+-- The raw conversation archive, searchable. Structured memory is a lossy
+-- compression of these turns; when a question needs a detail extraction dropped —
+-- an exact URL, a product name — the answer has to come from here instead. Without
+-- an index this table is write-only, and the fallback would have nowhere to look.
+CREATE VIRTUAL TABLE IF NOT EXISTS turns_fts USING fts5(
+    content,
+    content='turns',
+    content_rowid='rowid',
+    tokenize='porter unicode61'
+);
+
+CREATE TRIGGER IF NOT EXISTS turns_ai AFTER INSERT ON turns BEGIN
+    INSERT INTO turns_fts(rowid, content) VALUES (new.rowid, new.content);
+END;
+CREATE TRIGGER IF NOT EXISTS turns_ad AFTER DELETE ON turns BEGIN
+    INSERT INTO turns_fts(turns_fts, rowid, content) VALUES ('delete', old.rowid, old.content);
+END;
+CREATE TRIGGER IF NOT EXISTS turns_au AFTER UPDATE OF content ON turns BEGIN
+    INSERT INTO turns_fts(turns_fts, rowid, content) VALUES ('delete', old.rowid, old.content);
+    INSERT INTO turns_fts(rowid, content) VALUES (new.rowid, new.content);
 END;
 
 -- Entity overlap is the fifth retrieval signal. Entities are stored normalized so

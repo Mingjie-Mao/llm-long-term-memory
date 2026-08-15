@@ -179,6 +179,56 @@ retriever changes which wrong turn comes back.
 **Decision: no embeddings.** Full write-up, including the two conditions that would
 reopen it, in [results/raw-recall-diagnostic.md](../results/raw-recall-diagnostic.md).
 
+## Done — the Docker image, actually built ✅ 2026-08-15
+
+The README had promised a two-minute start for a Dockerfile that had never been
+built. Building and running it found three defects, all of them already public:
+
+1. **Search returned 500.** The image omitted the `embed` extra on the reasoning
+   that search "only needs an encoder for the query" — which is the entire read
+   path. Fixed by including it by default.
+2. **`/healthz` reported `ok` while search was broken.** Worse than no health check:
+   it tells an orchestrator to route traffic to a container that cannot answer.
+   Health now reports `degraded` with `search_available` and a remedy, still 200
+   because browse and timeline do work.
+3. **`ARG EXTRAS` was never used** — the `RUN` hard-coded its extras, so overriding
+   the build arg did nothing at all.
+
+A missing encoder now raises a typed `EncoderUnavailable`, mapped to **503 with the
+command that fixes it**, rather than a bare 500.
+
+**Then the image was 24.4GB.** The default torch wheel is the CUDA build, and
+`torch.cuda.is_available()` is False inside the container, so the whole GPU stack was
+dead weight.
+
+The first explanation for why swapping in the CPU wheel did not fix it was wrong.
+Layer ordering looked like the culprit — install then replace, with the old copy
+still underneath — but merging the swap into one `RUN` produced a *larger* image
+(15.2GB) than doing it in two (9.03GB), which the theory cannot explain. Looking
+inside the container gave the real answer:
+
+```
+nvidia/  2.9GB      CUDA libraries, orphaned
+triton/  649MB      orphaned
+torch/   577MB      correctly the CPU build
+```
+
+`uv pip install --reinstall torch` swaps torch and leaves its former dependencies
+behind, because nothing asks uv to drop packages that are merely no longer required.
+The fix is to delete them explicitly, in the same layer.
+
+**24.4GB → 2.95GB**, with `/healthz` ok, search returning ranked memories and the raw
+fallback recovering its turn from the built image. The venv is 1.02GB of that, most of
+it PyTorch, which the encoder genuinely needs. Getting materially below this means not
+shipping PyTorch at all — running the encoder out of process, or converting it — which
+changes the embeddings and so cannot be evaluated while a benchmark run is in flight.
+It is a deployment optimisation, deliberately queued behind the measurement it would
+otherwise invalidate.
+
+Two lessons: a Dockerfile that has not been built is a guess, and a plausible
+explanation for a measurement is not a diagnosis — this one survived until the
+numbers contradicted it.
+
 ## Done — shareable inspector state ✅ 2026-08-15
 
 State is split by who needs to see it:
@@ -441,7 +491,7 @@ below the budget, outside the namespace — is the thing no competitor surfaces,
 it is what the inspector renders.
 
 Build order: composition root → read endpoints → write endpoint → structured
-logging → Docker. Details in [P7_P8_PLAN.md](P7_P8_PLAN.md), still accurate.
+logging → Docker. The original contracts are in [P7_P8_PLAN.md](P7_P8_PLAN.md), now historical.
 
 **The service default is `two_stage`**, pinned by commit SHA in a release manifest.
 

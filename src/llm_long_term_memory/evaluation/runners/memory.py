@@ -192,6 +192,12 @@ class MemoryRunner:
         self.extractor_version = (
             store.get_meta("extractor_version") if hasattr(store, "get_meta") else None
         )
+        # What the answers were produced *from*. The extractor version alone does not
+        # separate a pilot run against a partly-ingested store from a formal run
+        # against the finished one — same code, different evidence — so the memory
+        # count is part of the identity. `run_eval` refuses to resume across a change
+        # in this string.
+        self.store_fingerprint = f"{self.extractor_version or 'unversioned'}@{store.count()}"
 
     def prepare(self, instance: Instance) -> None:
         """Nothing per-instance: the store is built once by `lltm ingest`.

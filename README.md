@@ -1,239 +1,367 @@
 [![English](https://img.shields.io/badge/English-2962FF?style=for-the-badge)](README.md)
 [![中文](https://img.shields.io/badge/%E4%B8%AD%E6%96%87-555555?style=for-the-badge)](README.zh-CN.md)
 
-# ChronoMem
+# llm-long-term-memory
 
-An adaptive long-term memory engine for LLM agents — temporal fact resolution,
-memory consolidation, decay-aware hybrid retrieval, and token-budgeted context
-assembly, evaluated on [LongMemEval](https://github.com/xiaowu0162/LongMemEval).
+**A persistent long-term memory layer for LLM applications.**
 
-> **Status: a negative result localized the representation failure.** On a
-> 50-question development subset, v1 ChronoMem scores 26% against naive RAG's 54%.
-> Source-session retrieval often succeeds, but the structured representation drops
-> answer-bearing details. The next experiment is provenance-backed evidence
-> hydration, not ranking tuning. See [the evaluation protocol](docs/EVALUATION.md).
+It remembers compactly, updates facts as they change, and falls back to the original
+conversation when compression turns out to have lost the exact detail a question
+needs.
 
-## Why
+---
 
-A vector store plus top-k retrieval answers "what did the user say?" but not
-"what is *currently* true?". Given
+## The problem, in one exchange
 
-```
-Jan   I use TensorFlow.
-Mar   I'm learning PyTorch.
-Aug   I've switched completely to PyTorch.
-```
+Three months ago the assistant answered a question. Today the user asks about it:
 
-naive RAG surfaces all three and lets the model guess. ChronoMem resolves them into
-one active fact with a validity window and one superseded fact, then decides which
-of them is worth spending context-window tokens on.
+> **Q:** What was the Mayo Clinic YouTube video you recommended?
 
-## Results
-
-LongMemEval-S · 50-question stratified subset (seed 0) · answerer
-`gemini-3.5-flash-lite` · judge `gemma-4-31b-it`, both pinned across every row.
-The subset is for development and failure localization, not a final benchmark
-claim. p95 is observed answer-provider API latency and excludes free-tier rate-limit
-queueing. Every number is regenerated from the JSONL artifacts in `results/raw/`.
-
-| Variant | n | Accuracy | Temporal | Know-update | Abstention | Source-session recall | Ctx tokens | p95 API |
-|---|---|---|---|---|---|---|---|---|
-| `full_context` | 50 | **56.0%** | 23.1% | 87.5% | 50.0% | — | 109,260 | 7.9s |
-| `naive_rag` | 50 | **54.0%** | 46.2% | 75.0% | 100% | 94.0% | 13,057 | 2.1s |
-| `chronomem_no_temporal` | 50 | **26.0%** | 7.7% | 37.5% | 100% | 80.0% | 331 | 7.0s |
-| `chronomem` | 50 | **26.0%** | 7.7% | 62.5% | 100% | 80.0% | 465 | 1.2s |
-
-**The memory system loses, and the root cause is upstream of temporal resolution.**
-Temporal filtering has 3 wins and 3 losses (`p = 1.000`): no detectable difference
-at n=50, not evidence that the variants are equivalent.
-
-**40 of 50 source sessions have a selected memory**, but only **12 of those 40**
-answers are correct. That is source-session recall, not answer-support recall: the
-selected memory can cite the right session while dropping the duration, date, or
-number the answer needs. **28 of 50** answers are "I do not know".
-
-One case, traced end to end — *"How long have I been collecting vintage cameras?"*,
-gold `three months`. The evidence session produced three memories, ranked first:
+The memory store holds nothing about Mayo Clinic — extraction kept the gist and
+dropped the link. A vector store would fail here and stay failed. This does not:
 
 ```
-- The user owns 17 vintage cameras, including a Brownie Hawkeye acquired in May 2023.
-- The user owns a rare 1978 pressing of Fleetwood Mac's Rumours.
-- The user owns a Mondo poster featuring Hogwarts castle.
+Structured memory          insufficient
+Raw conversation fallback  triggered — archive-wide
+Evidence                   session answer_sharegpt_81riySf_0 · turn 1 · assistant
+
+Answer
+  "How to Sit Properly at a Desk to Avoid Back Pain"
+  https://www.youtube.com/watch?v=UfOvNlX9Hh0
 ```
 
-The duration was never extracted. The next question (`25` postcards) failed the same
-way, and the model answered `17` — the nearest number in context.
+Compression is lossy. The design accepts that and requires only that the loss be
+**recoverable**.
 
-The v1 literal-coverage gate was a regression detector, not an accuracy ceiling.
-It nevertheless exposed the same failure: a lossy structured memory is not enough
-when the question depends on local wording or temporal detail. New stores retain raw
-turns and memory-to-span anchors; the `two_stage_hydrated` ablation restores only
-bounded source evidence after structured retrieval.
+### See it yourself
 
+Start the service (below) and open:
 
-Regenerate with `chronomem eval report`; the full table including
-single-session-assistant and preference splits is in
-[results/table.md](results/table.md).
+| Demo | What it shows |
+|---|---|
+| [`/?demo=mayo`](http://localhost:8000/?demo=mayo) | Compression dropped a URL; the archive got it back |
+| [`/?demo=battery`](http://localhost:8000/?demo=battery) | Memory sufficed — the reply *applies* a remembered preference, no fallback |
+| [`/?demo=timeline`](http://localhost:8000/?demo=timeline) | One fact, five values over time, with the supersession chain |
+| [`/?demo=collectibles`](http://localhost:8000/?demo=collectibles) | A multi-valued key whose facts coexist rather than replace |
 
-### Read the paired test, not the accuracy column
+Each opens a **recorded run** — real output from a real model, labelled as recorded,
+so the page costs nothing to open. A **Run live answer** button re-executes it on
+demand. Recordings carry a fingerprint of the store and prompt versions that
+produced them; if either changes, the page says **stale** instead of pretending to be
+current.
 
-The same configuration re-run unchanged scored **48.0%** and **54.0%**. `temperature=0`
-does not make a hosted model deterministic, and the judge's borderline calls move
-too; four flips out of fifty is eight points. **Any gap smaller than that is not
-evidence**, which rules out comparing headline accuracies at this sample size.
+---
 
-Both variants answer the same questions, so the runs are paired and the noise they
-share can be thrown away. `chronomem eval compare` runs an exact McNemar test over
-the disagreements only:
+## What it does
+
+| | |
+|---|---|
+| **Remember** | Turns conversations into typed, time-bounded facts — who said it, who it is about, and why it is worth keeping |
+| **Update** | Tracks facts that change. "I moved to Sydney" supersedes "I live in Canberra" without deleting it |
+| **Retrieve** | Five weighted signals — semantic, BM25, recency, importance, entity overlap |
+| **Recover** | When structured memory is insufficient, searches the original conversation instead of failing |
+| **Explain** | Every memory traces to the turn it came from; every *omission* has a stated reason |
+
+The last one is the differentiator. Search returns not just what matched but what was
+**rejected and why** — `superseded` (the fact is no longer true) or `below_rank`
+(still true, lost on score). An absence without an explanation is indistinguishable
+from a bug.
+
+---
+
+## Architecture in 30 seconds
 
 ```
-full_context vs naive_rag
-  both right   19        naive_rag wins    8
-  both wrong   14        naive_rag losses  9
-  17 disagreements, p = 1.000  ->  no detectable difference
+                     Conversation
+                          │
+              ┌───────────┴───────────┐
+              ↓                       ↓
+      Raw conversation            Extractor
+      archive (turns)        (2 LLM calls / batch)
+              │                       ↓
+              │              Structured memory
+              │             typed · bi-temporal
+              │              provenance-anchored
+              │                       │
+  Query ──────┼───────────────────────┘
+              │        hybrid retrieval (5 signals)
+              │                       ↓
+              │               enough to answer?
+              │              ┌────────┴────────┐
+              │             yes                no
+              │              ↓                  ↓
+              └──────────> answer      raw-source recovery
+                                                ↓
+                                       source-cited answer
 ```
 
-**The supported finding is narrower than "more context buys nothing"**: on this
-50-question subset, 8.4x more context produced no detectable accuracy improvement
-over naive RAG. The two systems disagree on 17 questions in both directions.
+**The raw archive is a storage decision, not a retrieval algorithm.** Keeping the
+original turns is what makes lossy extraction recoverable; *how* they are found —
+source-local lookup, BM25, dense, hybrid — is an independent choice.
 
-Both systems sit at 54–56%. The temporal split (23.1% vs 46.2%) is a directional
-lead for follow-up, not a claim that it survives sampling noise: its denominator is
-small and it needs repeated and held-out evaluation.
+| Layer | Choice | Why |
+|---|---|---|
+| Store | SQLite (WAL) + FTS5 | One file, no service dependency; BM25 for free |
+| Vectors | Exact flat inner-product (numpy) | Thousands of memories; an ANN index would add a dependency to save microseconds |
+| Embeddings | `all-MiniLM-L6-v2`, local | Corpus-wide embedding is ~53M tokens; API quota is the binding constraint |
+| LLM | Gemini, three independent roles | Extractor, answerer and judge have different requirements |
+| Service | FastAPI, one composition root | The API and inspector are clients of the same service object |
 
-Two category-level splits survive the noise floor as leads worth pulling on:
+---
 
-- **Abstention, 100% vs 50%.** With sparse retrieved context the model reliably says
-  it does not know; handed the whole history it confabulates half the time. Any
-  variant that packs in more relevant material risks trading this away, so the
-  column stays visible rather than folded into an average.
-- **Single-session-user, 100% vs 71.4%.** This is a follow-up lead, not a retrieval
-  conclusion: 94% source-session recall does not measure answer-support recall.
-
-These compare ChronoMem's own variants against two baselines. They are **not** a
-claim about any third-party system: cross-system memory numbers are only comparable
-under an identical judge and prompt, which is not the case across published results.
-
-**Judge reliability is not assumed.** The free tier offers no model stronger than
-the answerer to grade with, so the judge is cross-checked against an independent
-labelling of all 50 questions: **94% agreement (n=50)** — 1 case where the judge was
-more lenient than the label, 2 where it was stricter. No directional bias was
-observed in those three disagreements; this does not prove the judge is unbiased.
-
-Two caveats are stated rather than buried. First, the labelling was done by an LLM,
-not a person, so it establishes that the rubric is reproducible, not that the judge
-is right. Second, the first pass scored 92% and one of those disagreements was the
-*labeller's* error: it read a truncated 220-character view of the answer and missed
-a conclusion in the last sentence. Labelling now reads full text. The remaining
-three disagreements are genuine judgement calls — a misspelt app name (`Memorse`
-for `Memrise`), a count that is numerically right but includes a planned purchase,
-and an answer naming a specific artist where the gold describes an unnamed band.
-
-**Every number here is regenerated from the JSONL artifacts**, not from console
-output. `run_eval` refuses to return a result when the two disagree: an earlier run
-printed `50 questions, 56.0%` over a file holding 30, and both numbers looked
-reasonable ([D25](docs/DECISIONS.md)).
-
-Detailed metric definitions, failure taxonomy, repeat-run protocol, and latency
-interpretation are in [docs/EVALUATION.md](docs/EVALUATION.md).
-
-## Extraction
-
-The write path turns sessions into typed, triple-formed memories with validity
-windows. Two gates protect it, both of which have already caught real defects:
-
-**Answer coverage** (`chronomem ingest coverage`) extracts from the evidence-only
-split and checks whether the gold answer survives into memory. It found the first
-extraction prompt generalising away exactly the specifics the benchmark asks about
-— `The Glass Menagerie` becoming "interested in acting" — and rewriting the prompt
-took measurable coverage from **26.3% to 50.0%**, with `single-session-user` going
-1/3 → 3/3. The metric is a strict lower bound and is documented as one: most
-LongMemEval answers are *computed* from stored facts rather than stated in them.
-
-**Dedup arity.** Embedding similarity is only a recall filter; an LLM makes the
-DUPLICATE / UPDATE / DISTINCT call, because "likes Python" and "does not like
-Python" sit at ~0.95 cosine and no threshold separates them. Restricting
-`(subject, predicate)` collisions to single-valued predicates cut adjudication
-calls **72 → 3** per 60 sessions while *increasing* duplicates caught.
-
-## Temporal resolution
-
-Every fact carries a validity window. For each `(subject, predicate)` key the
-resolver sorts by event time and rewrites the whole chain, so `TensorFlow` ends up
-closed at the date `PyTorch` began and only one value is left in force.
-
-Rebuilding the timeline rather than comparing pairs is the load-bearing choice.
-Sessions are ingested in arbitrary order, so "the memory that just arrived
-supersedes the one already there" would let a late-arriving *January* fact become
-current — and once a memory is superseded it is no longer the head, so a fact
-landing between two existing ones could never rewire the link that now points past
-it. Rebuilding is idempotent, order-independent, and costs no LLM calls.
-
-Two refinements that came out of writing the tests:
-
-- **Restatements are not moves.** "I live in Canberra" in March and again in June
-  collapses to one interval owned by *March*, so "when did you move?" answers
-  correctly. Counted as `restatements`, not `superseded`.
-- **Arity is the default rule, not the whole rule.** `uses_tool` is multi-valued —
-  using PyTorch does not stop you using NumPy — so a static predicate list leaves
-  the headline example unresolved. Extraction therefore also emits
-  `replaces_previous` when the user says "I switched to X", at no extra request
-  cost, and either signal is enough to resolve a key.
-
-The first real ingest immediately proved the list wrong. `lives_in` produced
-`Tokyo → South Bay → Las Vegas`, which is right; `scheduled` produced
-`layover in London → cooking class → the 9:15 train → Friday game nights`, which is
-not a sequence of competing values at all. `scheduled` and `has_goal` were removed.
-
-That mistake cost seconds rather than a day, and deliberately so: resolution reads
-stored data and calls no model, so `chronomem resolve` rebuilds every timeline
-in-place. Arity is a property of the predicate, not of the data, so keeping it out
-of the ingested artifact is what makes it cheap to be wrong about.
-
-## Quickstart
+## Run it in 2 minutes
 
 ```bash
-uv sync --group dev
-uv run chronomem data download --variant s
-uv run chronomem data stats --variant s
-uv run chronomem data plan --variant s
-
-uv run chronomem doctor
-uv run chronomem ingest coverage --n 20      # is extraction keeping the answers?
-uv run chronomem ingest run                  # build the store (resumable)
-uv run chronomem eval run naive_rag
-uv run chronomem eval report
+docker compose up --build
 ```
 
-`data plan` reports how many days a full ingestion takes at each batch size given
-your API quota — on a request-capped free tier that is the schedule, not the cost.
+```bash
+curl localhost:8000/healthz
+```
 
-## Design
+Then open <http://localhost:8000> for the inspector.
 
-Written up in [docs/DECISIONS.md](docs/DECISIONS.md) — what was chosen, what was
-rejected, and what the measurements said.
+The image bakes in no datasets, models, credentials or database — the store arrives
+on a mounted volume. A `GEMINI_API_KEY` is optional: without one the service runs
+read-only and says so.
 
-| Layer | Choice |
+The first build downloads the embedding model's dependencies, so budget a few
+minutes for it; subsequent starts are seconds. For a smaller read-only image without
+semantic search, build with `--build-arg EXTRAS="api"` — `/healthz` will then report
+`degraded` and search will return 503 rather than failing obscurely.
+
+**Image size: 2.95GB.** Most of that is PyTorch, which the embedding model needs.
+The default build pulls the CUDA wheel — 24.4GB of GPU runtime for a container that
+will never see a GPU — so the Dockerfile installs the CPU wheel and deletes the CUDA
+packages orphaned by the swap. It is still not small; a deployment that wants small
+should run the encoder out of process, which is [on the roadmap](docs/ROADMAP.md) and
+is not something to change while an evaluation is mid-flight.
+
+<details>
+<summary>Without Docker</summary>
+
+```bash
+uv sync --group dev --extra api --extra embed
+uv run uvicorn llm_long_term_memory.api.app:app --port 8000
+```
+</details>
+
+---
+
+## Integrate in 5 minutes
+
+```bash
+curl -X POST localhost:8000/v1/messages \
+  -H 'Content-Type: application/json' \
+  -d '{"user_id": "alice", "role": "user", "content": "I stopped drinking coffee last month."}'
+```
+
+```bash
+curl -X POST localhost:8000/v1/memories/search \
+  -H 'Content-Type: application/json' \
+  -d '{"user_id": "alice", "query": "what does she drink?", "explain": true}'
+```
+
+```json
+{
+  "memories": [
+    {
+      "content": "The user stopped drinking coffee.",
+      "scope": "profile",
+      "source_role": "user",
+      "score": 0.81,
+      "signals": {"semantic": 0.79, "bm25": 0.92, "recency": 0.4, ...},
+      "source": {"session_id": "s_4f2a", "turn_index": 0, "char_start": 0, "char_end": 41}
+    }
+  ],
+  "rejected": [
+    {"memory_id": "m_9c1", "reason": "superseded", "superseded_by": "m_a20",
+     "content": "The user drinks two coffees a day."}
+  ],
+  "candidates_considered": 37
+}
+```
+
+| Endpoint | |
 |---|---|
-| Store | SQLite (WAL) + FTS5 for BM25 — one file, no service dependency |
-| Vectors | Exact flat inner-product search over numpy |
-| Embeddings | `all-MiniLM-L6-v2`, local, MPS-accelerated |
-| LLM | Gemini via `google-genai`, behind a three-role config (extractor / answerer / judge) |
-| Benchmark | LongMemEval-S via a checkpointed, quota-aware ingestion pipeline |
+| `POST /v1/messages` | Ingest a turn; returns the memories it created |
+| `POST /v1/memories/search` | Retrieve with signals, provenance and rejections |
+| `POST /v1/answer` | Full answer path, including fallback when needed |
+| `POST /v1/raw/search` | The fallback layer, queryable directly |
+| `GET /v1/memories` | Browse a namespace; filter by status / type / scope / speaker |
+| `GET /v1/memories/{id}` | One memory with its source turn |
+| `GET /v1/timeline` | The supersession chain for a `(subject, predicate)` |
+| `DELETE /v1/memories/{id}` | Forget — marks evicted, never a hard delete |
+| `GET /healthz` · `GET /v1/config` | Health and the running manifest |
 
-## Layout
+Every read requires a `user_id` and is namespace-isolated. Reading another
+namespace's memory returns **404, not 403** — 403 would confirm the id exists.
+
+---
+
+## Connect from an MCP-compatible client
+
+[Model Context Protocol](https://modelcontextprotocol.io) is how an agent connects
+to this, where REST is how a program does. Both are thin wrappers over the same
+service object, so the tools cannot drift from the behaviour that was measured.
+
+```bash
+uv sync --extra mcp --extra embed
+uv run lltm mcp                    # stdio
+uv run lltm mcp --transport http   # streamable HTTP
+```
+
+For Claude Desktop or Cursor, add to the MCP config:
+
+```json
+{
+  "mcpServers": {
+    "long-term-memory": {
+      "command": "uv",
+      "args": ["run", "--directory", "/path/to/llm-long-term-memory", "lltm", "mcp"]
+    }
+  }
+}
+```
+
+| Tool | |
+|---|---|
+| `search_memory` | Recall what is known, with the reason each memory was selected — and with `explain`, why others were not |
+| `remember` | Store a turn; returns the memories it produced, so the agent can confirm what was understood |
+| `search_conversations` | Recover the original wording when a memory is on topic but lacks the exact detail |
+| `get_timeline` | How one fact changed over time |
+| `forget` | Mark a memory evicted; never a hard delete |
+
+Every tool takes an explicit `user_id`. There is no ambient session identity: an
+agent serving several people must say which one it is acting for, and the store
+enforces the boundary rather than trusting the caller.
+
+---
+
+## Evidence
+
+The design above is not a preference. Each choice below was measured, and two
+plausible additions were measured and **not shipped**.
+
+### Structured memory as compression
+
+On 31 fully-ingested questions from [LongMemEval-S](https://github.com/xiaowu0162/LongMemEval),
+same answerer and judge throughout ([full write-up](results/a2-pilot.md)):
+
+| Variant | Accuracy | Median context tokens |
+|---|---:|---:|
+| `full_context` | 64.5% | 109,605 |
+| `naive_rag` | 51.6% | 13,057 |
+| **`two_stage` (k=10)** | **51.6%** | **242** |
+| v1 structured memory | 19.4% | 465 |
+
+**~54x less context than naive RAG, with no detectable accuracy difference**
+(6W-6L, paired exact McNemar, p = 1.000).
+
+> **Read this as a pilot.** 31 questions, unstratified, one run each. `p = 1.000`
+> means *no difference was detected*, not that the systems are equivalent. A
+> stratified 50-question run is pending, and no held-out result exists yet.
+
+### Where the gain came from
+
+An early draft credited evidence hydration. A causal ablation reversed that:
+
+| Step | Δ | Paired |
+|---|---:|---|
+| extraction rewrite | **+29.0pp** | 11W-2L, **p = 0.022** |
+| evidence hydration | +3.2pp | 2W-1L, p = 1.000 |
+
+Source-session recall is 93.5% for *both*, which confirms it — hydration runs after
+retrieval and cannot change what is recalled. So hydration was demoted from an
+always-on stage to the conditional fallback described above.
+
+### What was measured and not shipped
+
+**Cross-encoder reranking.** At k=10 the reranked and plain arms answered all 31
+questions **identically** — zero disagreements — while reranking *lowered* source
+recall at every k (93.5% → 90.3% at k=20). It stays in the repo behind an optional
+`rerank` extra so the result is reproducible, and off by default.
+[Details](results/rerank-pareto.md).
+
+**Dense retrieval over the raw archive.** A constructed query set suggested BM25
+collapses on paraphrases (6.9% R@1). Manual inspection showed the construction had
+deleted the *questions*, not just their vocabulary — *"How long have I been
+collecting vintage cameras?"* became `"long"`. That evidence was discarded.
+Hand-written paraphrases retrieve the gold turn at **rank 1**, including phrasings
+containing no distinctive noun from the source. Deferred, not rejected, with the
+conditions that would reopen it. [Details](results/raw-recall-diagnostic.md).
+
+**A learned utility predictor for budget packing.** Held-out RMSE 0.310 against a
+mean-baseline 0.263 — it lost to predicting the mean. [Details](results/p6-pilot.md).
+
+### Live regression
+
+Seven questions that every variant previously failed now score **6/7, identical
+across three runs** — including the Mayo case end to end.
+[Details](results/live-regression-v2.md).
+
+---
+
+## Engineering
+
+- **352 tests**, CI across ubuntu / windows / macos
+- **Result versioning** — every evaluation row records its answerer prompt, judge
+  prompt and extractor version; the extractor version comes from the *store*, not
+  the checkout, because it describes the data being evaluated
+- **Frozen manifests** — reported runs name an explicit question set, because a
+  sample size is not an experiment identity
+- **Structured logging** — one JSON event per request with request id, latency and a
+  config fingerprint; no memory content, no credentials
+- **Encoder warm-up** at startup: first request 12,486 ms → 181 ms
+
+Full write-up: [Engineering Report](docs/ENGINEERING_REPORT.md) ·
+[Design decisions](docs/DECISIONS.md) · [Roadmap](docs/ROADMAP.md)
+
+---
+
+## Development
+
+```bash
+uv sync --group dev --extra api --extra llm --extra embed
+uv run pytest
+uv run lltm --help
+```
+
+<details>
+<summary>Benchmark workflow</summary>
+
+```bash
+uv run lltm data download --variant s
+uv run lltm doctor
+uv run lltm ingest run --store-name two-stage-hydrated
+uv run lltm eval freeze dev50 --n 50
+uv run lltm eval run two_stage --questions results/manifests/dev50.json
+uv run lltm eval compare naive_rag two_stage
+```
+
+`--questions` takes a frozen manifest. `--limit` re-samples and is for exploration
+only — a stratified subset is scattered across the split, not a prefix of it.
+</details>
 
 ```
-src/chronomem/
+src/llm_long_term_memory/
+  api/         FastAPI service, inspector, recorded demo runs
   store/       schema.sql, SQLiteMemoryStore, NumpyFlatIndex
+  ingest/      two-stage extraction, dedup, checkpointed pipeline, quality gates
+  retrieve/    hybrid retrieval, raw-conversation fallback, reranker (optional)
+  evaluation/  benchmark loaders, runners, judge, manifests, reporting
   llm/         quota-aware rate limiter (RPM / TPM / RPD), retrying client
-  ingest/      extraction, dedup, checkpointed pipeline, coverage gate
-  evaluation/  benchmark loaders, runners, judge, reporting
-  config.py    one YAML per ablation variant
-  cli.py
-tests/
-docs/DECISIONS.md
 ```
+
+## Limitations
+
+- No held-out result. Every number comes from development questions also used for
+  prompt iteration and gate tuning.
+- The store is 64% ingested and was built by the pre-P10 extractor, so
+  `source_role` / `scope` are not yet exercised on real data.
+- Single-writer SQLite; no concurrency lock on ingestion.
+- Temporal arithmetic and cross-session aggregation are unsolved — see the failure
+  taxonomy in the [engineering report](docs/ENGINEERING_REPORT.md).
 
 ## License
 

@@ -30,7 +30,13 @@ from datetime import date, datetime
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
-# Google resets the daily quota at midnight Pacific.
+# Google resets the daily quota at midnight Pacific — verified against the live API,
+# not assumed: a run that stopped on quota reported "resets in 22.4h" at a moment
+# 22.4 hours before Pacific midnight.
+#
+# Evaluated at import, so a platform without a time zone database fails immediately
+# rather than at the first request. That is the right trade (loudly, at startup), and
+# `tzdata` is declared as a Windows dependency so it does not happen.
 QUOTA_TZ = ZoneInfo("America/Los_Angeles")
 
 

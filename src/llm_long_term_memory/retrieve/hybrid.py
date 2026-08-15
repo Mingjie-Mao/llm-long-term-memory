@@ -16,7 +16,7 @@ from datetime import datetime
 
 import numpy as np
 
-from chronomem.store import Memory, MemoryStore, VectorIndex
+from llm_long_term_memory.store import Memory, MemoryStore, VectorIndex
 
 _TOKEN = re.compile(r"[a-z0-9]+")
 
@@ -49,10 +49,31 @@ class RetrievalSignals:
 class RetrievedMemory:
     memory: Memory
     score: float
+    """The weighted hybrid score. Retained even when reranking replaced the
+    ordering, so that "ranked 7th by hybrid, 1st after reranking" stays visible."""
     signals: RetrievalSignals
     semantic_raw: float
     bm25_raw: float | None
     strength: float
+    rerank_score: float | None = None
+    """Cross-encoder score; None when reranking is disabled or the candidate was
+    outside the rerank pool. Not comparable to `score` — different scale."""
+
+
+@dataclass(frozen=True, slots=True)
+class RetrievalTrace:
+    """What recall looked like *before* truncation and reranking.
+
+    A single end-of-pipeline recall number cannot tell you whether a stage rescued
+    the evidence or discarded it. Comparing recall at each stage can: if candidate
+    recall is 100% and post-rerank recall is 90%, the reranker is deleting correct
+    evidence, and that is a different problem from failing to find it.
+    """
+
+    candidate_ids: tuple[str, ...]
+    """Every candidate that survived namespace and status filtering, in hybrid order."""
+    candidate_session_ids: frozenset[str]
+    reranked: bool
 
 
 def _clip(value: float) -> float:
@@ -88,6 +109,7 @@ class HybridRetriever:
         recency_halflife_days: float = 30.0,
         use_strength: bool = False,
         now: datetime | None = None,
+        reranker=None,
     ) -> None:
         self.store = store
         self.index = index
@@ -96,11 +118,22 @@ class HybridRetriever:
         self.recency_halflife_days = max(0.001, recency_halflife_days)
         self.use_strength = use_strength
         self.now = now
+        # Injected rather than constructed here, so this module stays free of a
+        # torch dependency and the reranker can be stubbed in tests.
+        self.reranker = reranker
 
     def retrieve(
         self, query: np.ndarray, query_text: str, namespace: str, *, temporal: bool, limit: int
     ) -> list[RetrievedMemory]:
         """Return ranked candidates without leaking namespaces or evicted records."""
+        return self.retrieve_with_trace(
+            query, query_text, namespace, temporal=temporal, limit=limit
+        )[0]
+
+    def retrieve_with_trace(
+        self, query: np.ndarray, query_text: str, namespace: str, *, temporal: bool, limit: int
+    ) -> tuple[list[RetrievedMemory], RetrievalTrace]:
+        """`retrieve`, plus the pre-truncation candidate set for recall attribution."""
         semantic_hits = self.index.search(query, limit=len(self.index))
         semantic_raw = dict(semantic_hits)
         semantic_memories = self.store.get_many([memory_id for memory_id, _ in semantic_hits])
@@ -130,7 +163,7 @@ class HybridRetriever:
             and (not temporal or memory.status == "active")
         ]
         if not memories:
-            return []
+            return [], RetrievalTrace((), frozenset(), self.reranker is not None)
 
         bm25 = _min_max(
             {memory.id: bm25_raw[memory.id] for memory in memories if memory.id in bm25_raw},
@@ -165,7 +198,19 @@ class HybridRetriever:
             )
 
         scored.sort(key=lambda hit: (-hit.score, -hit.semantic_raw, hit.memory.id))
-        return scored[:limit]
+        trace = RetrievalTrace(
+            candidate_ids=tuple(hit.memory.id for hit in scored),
+            candidate_session_ids=frozenset(
+                hit.memory.source_session_id for hit in scored if hit.memory.source_session_id
+            ),
+            reranked=self.reranker is not None,
+        )
+        # Reranking sits between recall and truncation on purpose: it can only
+        # rescue a memory the hybrid stage ranked below `limit` if it runs before
+        # the cut, and it can only be afforded at all because the cut happens after.
+        if self.reranker is not None:
+            return self.reranker.rerank(query_text, scored, limit), trace
+        return scored[:limit], trace
 
     @staticmethod
     def _entity_overlap(memory: Memory, query_terms: set[str]) -> float:

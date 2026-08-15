@@ -1,0 +1,26 @@
+# Development profile. One service, one mounted volume.
+#
+#   docker compose up --build
+#   curl localhost:8000/healthz
+#
+# The store is bind-mounted from the repo so that a container and a local `lltm`
+# run see the same data — which is the point during development, and exactly what
+# you would not do in production (SQLite is single-writer; see docs/ROADMAP.md).
+
+services:
+  api:
+    build:
+      context: .
+      args:
+        # Add embed to enable local query embedding, and llm for the write path.
+        EXTRAS: "api,llm"
+    ports:
+      - "8000:8000"
+    environment:
+      # Optional: without it the service runs read-only and /v1/messages returns 503.
+      GEMINI_API_KEY: "${GEMINI_API_KEY:-}"
+      LLTM_STORE_DIR: /data/stores
+    volumes:
+      - ./stores:/data/stores
+      - ./configs:/app/configs:ro
+    restart: unless-stopped

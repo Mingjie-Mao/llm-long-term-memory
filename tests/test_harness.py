@@ -10,7 +10,7 @@ from __future__ import annotations
 import pytest
 
 from llm_long_term_memory.evaluation.datasets.longmemeval import Instance
-from llm_long_term_memory.evaluation.harness import ArtifactMismatch, run_eval
+from llm_long_term_memory.evaluation.harness import ArtifactMismatch, StoreChanged, run_eval
 from llm_long_term_memory.evaluation.runners.base import Answer
 
 
@@ -86,6 +86,48 @@ def test_resume_skips_completed_questions(tmp_path):
 
     assert judge.calls == 2, "only the two unfinished questions"
     assert report.n == 5
+
+
+class StoreRunner(StubRunner):
+    """A runner that reads a prebuilt store, and so has a store to pin."""
+
+    def __init__(self, fingerprint: str):
+        super().__init__()
+        self.store_fingerprint = fingerprint
+
+
+def test_resume_refuses_answers_from_a_different_store(tmp_path):
+    """The pilot/formal merge. A 31-question pilot ran against a store at 63% ingest;
+    the formal 50-question run uses the finished store. Resuming would reuse the
+    thirty-one — answered from evidence that was not yet there — and report them
+    beside nineteen answered from the complete store as a single accuracy."""
+    out = tmp_path / "r.jsonl"
+    instances = [instance(f"q{i}") for i in range(5)]
+    run_eval(StoreRunner("v4@1521"), StubJudge(), instances[:3], out)
+
+    with pytest.raises(StoreChanged, match="different stores"):
+        run_eval(StoreRunner("v4@2400"), StubJudge(), instances, out)
+
+    # The same store still resumes: this must not break the case resume exists for,
+    # a run that stopped on quota and continues tomorrow.
+    report = run_eval(StoreRunner("v4@1521"), StubJudge(), instances, out)
+    assert report.n == 5
+
+
+def test_resume_refuses_rows_that_predate_store_stamping(tmp_path):
+    """Unstamped rows are of unknown provenance, not of matching provenance — and
+    every row of the real pilot artifact is unstamped, so treating None as "probably
+    the same" would let through the one merge this guard was written for."""
+    out = tmp_path / "r.jsonl"
+    instances = [instance(f"q{i}") for i in range(3)]
+    run_eval(StubRunner(), StubJudge(), instances[:2], out)  # no fingerprint written
+
+    with pytest.raises(StoreChanged, match="unknown store"):
+        run_eval(StoreRunner("v4@2400"), StubJudge(), instances, out)
+
+    # --fresh remains the escape hatch, and it truncates.
+    report = run_eval(StoreRunner("v4@2400"), StubJudge(), instances, out, resume=False)
+    assert report.n == 3
 
 
 def test_fresh_truncates_rather_than_appending(tmp_path):
@@ -187,6 +229,20 @@ def test_a_lock_left_by_a_dead_process_is_reclaimed(tmp_path):
     report = run_eval(StubRunner(), StubJudge(), [instance("q1")], out)
     assert report.n == 1
     assert not lock.exists(), "released on the way out"
+
+
+def test_liveness_check_does_not_signal_the_process_it_asks_about():
+    """`os.kill(pid, 0)` reads as an existence check and is not one on Windows, where
+    signal 0 is CTRL_C_EVENT: it delivers a real interrupt to the console group. The
+    lock check would then have sent Ctrl+C to the very evaluation it exists to leave
+    running. Asking about our own pid is the sharpest version of the question — if
+    the check signals anything, this test takes the hit."""
+    import os
+
+    from llm_long_term_memory.evaluation.harness import _process_alive
+
+    assert _process_alive(os.getpid()) is True
+    assert _process_alive(999999) is False
 
 
 def test_the_lock_is_released_even_when_the_run_raises(tmp_path):

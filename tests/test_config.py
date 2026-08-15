@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from pathlib import Path
+
 import pytest
 
 from llm_long_term_memory.config import ExperimentConfig, RetrievalWeights, Settings
@@ -76,7 +78,11 @@ def test_path_overrides_are_namespaced(monkeypatch, tmp_path):
     monkeypatch.chdir(tmp_path)
     monkeypatch.setenv("LLTM_DATA_DIR", "/tmp/lme")
     monkeypatch.setenv("DATA_DIR", "/should/be/ignored")
-    assert str(Settings().data_dir) == "/tmp/lme"
+    # Compared as paths, not as strings: `Path("/tmp/lme")` renders as "\tmp\lme" on
+    # Windows, so the string form asserts the separator convention of whoever wrote
+    # the test rather than the behaviour under test — which is that the namespaced
+    # variable wins over the bare one. Caught by the Windows CI job.
+    assert Settings().data_dir == Path("/tmp/lme")
 
 
 def test_model_ids_are_not_guessed():

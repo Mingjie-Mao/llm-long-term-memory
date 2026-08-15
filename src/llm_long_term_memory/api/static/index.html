@@ -1,0 +1,662 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>llm-long-term-memory — inspector</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ctext y='14' font-size='14'%3E%F0%9F%A7%A0%3C/text%3E%3C/svg%3E">
+<style>
+  :root {
+    --bg: #fbfbfa; --panel: #fff; --line: #e6e4e0; --ink: #1f1d1b; --muted: #6b6862;
+    --accent: #2f6f4e; --warn: #9a6b1f; --dead: #a8a49e;
+    --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #171614; --panel: #1e1d1b; --line: #33312e; --ink: #eceae6; --muted: #9b968f;
+      --accent: #7fc4a0; --warn: #d9a441; --dead: #6a655f;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font: 15px/1.55 ui-sans-serif, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  header {
+    padding: 14px 20px; border-bottom: 1px solid var(--line);
+    display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap;
+  }
+  header h1 { font-size: 15px; margin: 0; font-weight: 650; letter-spacing: -0.01em; }
+  header .meta { color: var(--muted); font-size: 12.5px; font-family: var(--mono); }
+  header .tagline { color: var(--muted); font-size: 13px; }
+  .sysdetails { margin: 0; }
+  .sysdetails summary { font-size: 12px; color: var(--muted); }
+
+  /* The default view: what the system concluded, and how. Everything a reader
+     needs to judge the product in thirty seconds sits above the fold; the
+     retrieval internals stay one click away rather than competing with them. */
+  .verdict { border: 1px solid var(--line); border-radius: 10px; background: var(--panel);
+             padding: 14px 16px; margin-bottom: 14px; }
+  .verdict h3 { margin: 0 0 8px; font-size: 11.5px; text-transform: uppercase;
+                letter-spacing: .07em; color: var(--muted); font-weight: 650; }
+  .sourceline { display: grid; grid-template-columns: 1fr auto; gap: 4px 12px;
+                align-items: baseline; font-size: 13.5px; padding: 5px 0; }
+  .sourceline + .sourceline { border-top: 1px dashed var(--line); }
+  .state { font-family: var(--mono); font-size: 12px; }
+  .state.yes { color: var(--accent); }
+  .state.no  { color: var(--muted); }
+  .state.warn { color: var(--warn); }
+  .verdict .why { margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--line); }
+  .more { background: transparent; color: var(--muted); border: 1px solid var(--line);
+          font-weight: 500; font-size: 12.5px; padding: 5px 11px; margin: 2px 0 12px; }
+  .more:hover { color: var(--ink); }
+  .hidden { display: none; }
+  .badge { font-family: var(--mono); font-size: 11px; padding: 2px 7px; border-radius: 4px;
+           border: 1px solid var(--line); color: var(--muted); }
+  .badge.recorded { color: var(--warn); border-color: currentColor; }
+  .badge.live { color: var(--accent); border-color: currentColor; }
+  .badge.stale { color: #b4453a; border-color: currentColor; }
+  .answer-text { font-size: 15px; line-height: 1.6; margin: 8px 0; }
+  .answer-text a, .answer-text code { word-break: break-all; }
+  .runmeta { font-family: var(--mono); font-size: 11.5px; color: var(--muted); margin-top: 8px;
+             padding-top: 8px; border-top: 1px solid var(--line); }
+  main { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1.15fr); gap: 0; height: calc(100vh - 53px); }
+  @media (max-width: 940px) { main { grid-template-columns: 1fr; height: auto; } }
+  .col { display: flex; flex-direction: column; min-height: 0; }
+  .col + .col { border-left: 1px solid var(--line); }
+  @media (max-width: 940px) { .col + .col { border-left: 0; border-top: 1px solid var(--line); } }
+  .col > h2 {
+    margin: 0; padding: 11px 20px; font-size: 11.5px; font-weight: 650;
+    text-transform: uppercase; letter-spacing: .07em; color: var(--muted);
+    border-bottom: 1px solid var(--line); background: var(--panel);
+  }
+  .scroll { overflow-y: auto; padding: 16px 20px; flex: 1; min-height: 0; }
+  form { display: flex; gap: 8px; padding: 12px 20px; border-top: 1px solid var(--line); background: var(--panel); }
+  input[type=text] {
+    flex: 1; padding: 9px 12px; border: 1px solid var(--line); border-radius: 7px;
+    background: var(--bg); color: var(--ink); font: inherit;
+  }
+  input:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
+  button {
+    padding: 9px 15px; border: 0; border-radius: 7px; background: var(--accent);
+    color: #fff; font: inherit; font-weight: 600; cursor: pointer;
+  }
+  button:disabled { opacity: .5; cursor: default; }
+  button.ghost {
+    margin-left: auto; background: transparent; color: var(--muted);
+    border: 1px solid var(--line); font-weight: 500; font-size: 12.5px; padding: 5px 10px;
+  }
+  button.ghost:hover { color: var(--ink); }
+  .turn { margin-bottom: 14px; }
+  .turn .who { font-size: 11.5px; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+  .turn .what { white-space: pre-wrap; }
+  .card {
+    border: 1px solid var(--line); border-radius: 9px; padding: 11px 13px;
+    margin-bottom: 9px; background: var(--panel);
+  }
+  .card.used { border-left: 3px solid var(--accent); }
+  .card.dropped { border-left: 3px solid var(--dead); opacity: .72; }
+  .card.superseded { border-left: 3px solid var(--warn); }
+  .card .content { margin-bottom: 7px; }
+  .tags { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+  .tag {
+    font-family: var(--mono); font-size: 11px; padding: 1.5px 6px; border-radius: 4px;
+    border: 1px solid var(--line); color: var(--muted);
+  }
+  .tag.scope { color: var(--accent); border-color: currentColor; }
+  .tag.role { color: var(--warn); border-color: currentColor; }
+  .why { font-size: 12.5px; color: var(--muted); margin-top: 6px; }
+  .bars { margin-top: 8px; display: grid; grid-template-columns: 68px 1fr 40px; gap: 3px 8px; align-items: center; }
+  .bars span { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+  .bar { height: 5px; background: var(--line); border-radius: 3px; overflow: hidden; }
+  .bar i { display: block; height: 100%; background: var(--accent); }
+  details { margin-top: 8px; }
+  summary { cursor: pointer; font-size: 12.5px; color: var(--muted); }
+  .evidence {
+    margin-top: 8px; padding: 9px 11px; border-radius: 7px; background: var(--bg);
+    border: 1px solid var(--line); font-size: 13.5px; white-space: pre-wrap;
+  }
+  .evidence .src { font-family: var(--mono); font-size: 11px; color: var(--muted); margin-bottom: 5px; }
+  mark { background: color-mix(in srgb, var(--accent) 28%, transparent); color: inherit; border-radius: 2px; }
+  .timeline { margin-top: 8px; border-left: 2px solid var(--line); padding-left: 13px; }
+  .timeline .step { margin-bottom: 9px; font-size: 13.5px; }
+  .timeline .step.old { color: var(--muted); text-decoration: line-through; text-decoration-color: var(--dead); }
+  .timeline .arrow { font-family: var(--mono); font-size: 11px; color: var(--warn); margin: 2px 0; }
+  .empty { color: var(--muted); font-size: 13.5px; }
+  .group-label {
+    font-size: 11.5px; text-transform: uppercase; letter-spacing: .06em;
+    color: var(--muted); margin: 14px 0 7px; font-weight: 650;
+  }
+  .group-label:first-child { margin-top: 0; }
+  .query-header {
+    font-size: 13px; color: var(--muted); padding-bottom: 10px; margin-bottom: 4px;
+    border-bottom: 1px solid var(--line); display: flex; gap: 8px; align-items: baseline;
+    flex-wrap: wrap;
+  }
+  .query-header q { color: var(--ink); font-style: normal; }
+</style>
+</head>
+<body>
+<header>
+  <h1>llm-long-term-memory</h1>
+  <span class="tagline">Long-term memory for LLM applications</span>
+  <details class="sysdetails"><summary>System details</summary>
+    <span class="meta" id="meta">connecting…</span>
+  </details>
+  <button id="copy" class="ghost" type="button">Copy view link</button>
+</header>
+
+<main>
+  <section class="col">
+    <h2>Ask</h2>
+    <div class="scroll" id="chat">
+      <p class="empty">
+        Ask something about this user's history. The right panel shows which memories
+        retrieval selected, which it passed over, and why.
+      </p>
+    </div>
+    <form id="ask">
+      <input type="text" id="user" value="01493427" style="max-width:130px" aria-label="user id">
+      <input type="text" id="q" placeholder="Ask about this user’s history…" aria-label="question">
+      <button type="submit" id="go">Search</button>
+    </form>
+  </section>
+
+  <section class="col">
+    <h2>Which memories, and why</h2>
+    <div class="scroll" id="panel">
+      <p class="empty">No query yet.</p>
+    </div>
+  </section>
+</main>
+
+<script>
+// Read from /v1/config at load. Hardcoding it here is what let the inspector show
+// 10 memories while the answerer worked from 20 — an explainability panel that did
+// not explain the thing beside it.
+let TOP_K = null;
+
+// Every panel section belongs to exactly one search. Two rapid submissions race —
+// `button.disabled` does not stop Enter from submitting the form — and without this
+// the slower response overwrites the faster one, leaving the panel explaining a
+// question the user did not ask last. For a tool whose entire value is "here is why",
+// showing the wrong query's reasoning is worse than showing none.
+let currentRequest = 0;
+
+const $ = (id) => document.getElementById(id);
+
+// State lives in two places, split by who needs to see it.
+//
+//   URL          namespace + query. Anything that identifies *what is being shown*
+//                goes here, so a view survives a reload and can be pasted to
+//                someone else. This is the property that makes a demo link work.
+//   localStorage the chat transcript and which panels are open — personal, not
+//                worth sharing, and meaningless in someone else's browser.
+//
+// Memories and raw turns are deliberately in neither. They are the live data; a
+// copy in the browser would go stale against the store and quietly show a state
+// the backend no longer holds.
+const STORE_KEY = "lltm.ui.v1";
+
+// Fixed cases for the README, so a reader never has to invent a question. Each is
+// a real behaviour of the system, not a scripted mock.
+const DEMOS = {
+  mayo: {
+    namespace: "41275add",
+    q: "what was the mayo clinic youtube video you recommended?",
+    note: "Structured memory dropped the URL; the raw archive still has it.",
+    golden: "mayo",
+  },
+  timeline: {
+    namespace: "9a707b81",
+    q: "what is the user's job?",
+    note: "One key, five values over time — expand a memory to see the chain.",
+  },
+  collectibles: {
+    namespace: "01493427",
+    q: "what does the user collect?",
+    note: "A multi-valued key: these facts coexist, none replaces another.",
+  },
+  battery: {
+    namespace: "09d032c9",
+    q: "I've been having trouble with the battery life on my phone lately. Any tips?",
+    note: "Structured memory sufficed — no fallback. The answerer applies what it remembers.",
+    golden: "battery",
+  },
+};
+
+function loadUiState() {
+  try { return JSON.parse(localStorage.getItem(STORE_KEY)) ?? {}; }
+  catch { return {}; }
+}
+
+function saveUiState(patch) {
+  try {
+    localStorage.setItem(STORE_KEY, JSON.stringify({...loadUiState(), ...patch}));
+  } catch { /* private browsing disables it; the URL still carries the view */ }
+}
+const esc = (s) => (s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+async function api(path, body) {
+  const opts = body
+    ? {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(body)}
+    : {};
+  const r = await fetch(path, opts);
+  if (!r.ok) throw new Error(`${r.status} ${await r.text()}`);
+  return r.json();
+}
+
+(async () => {
+  try {
+    const [h, c] = await Promise.all([api("/healthz"), api("/v1/config")]);
+    TOP_K = c.config.retrieval.top_k;
+    $("meta").textContent =
+      `${h.memories.toLocaleString()} memories · ${h.store}` +
+      ` · rerank=${c.config.retrieval.rerank.enabled ? "on" : "off"} · top_k=${TOP_K}` +
+      ` (service default; benchmark rows use ${c.config.retrieval.benchmark_top_k})`;
+  } catch (e) { $("meta").textContent = "offline"; }
+})();
+
+const SCOPE_ORDER = ["profile","preference","plan","event","recommendation","commitment","shared_context"];
+const SCOPE_LABEL = {
+  profile: "About the user", preference: "User preferences", plan: "Current plans",
+  event: "Past events", recommendation: "Previously recommended by the assistant",
+  commitment: "The assistant agreed to", shared_context: "Other people and things",
+  "": "Other things known"
+};
+
+const HIGHLIGHT_STOP = new Set(["the","a","an","and","or","of","to","for","in","on","at","was","were",
+  "is","are","what","which","that","this","you","your","i","my","me","we","did","do","does","how","when",
+  "give","gave","said","say","tell","told","recommend","recommended","about","with","from","it","its"]);
+
+function linkify(text) {
+  return esc(text).replace(/https?:\/\/[^\s<]+/g,
+    u => `<a href="${u}" target="_blank" rel="noopener noreferrer">${u}</a>`);
+}
+
+function highlight(text, query) {
+  const terms = [...new Set(query.toLowerCase().match(/[a-z0-9']+/g) ?? [])]
+    .filter(w => w.length > 2 && !HIGHLIGHT_STOP.has(w));
+  if (!terms.length) return esc(text);
+  // Escape first, then mark: building the regex over raw text and escaping after
+  // would let the markup be swallowed by the escaper.
+  const escaped = esc(text);
+  const pattern = new RegExp(`\\b(${terms.map(w => w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|")})`, "gi");
+  return escaped.replace(pattern, "<mark>$&</mark>");
+}
+
+function signals(m) {
+  const rows = Object.entries(m.signals)
+    .filter(([, v]) => v > 0)
+    .map(([k, v]) => `<span>${k}</span><div class="bar"><i style="width:${Math.round(v*100)}%"></i></div><span>${v.toFixed(2)}</span>`)
+    .join("");
+  return rows ? `<div class="bars">${rows}</div>` : "";
+}
+
+function card(m, kind, why) {
+  const tags = [
+    m.scope ? `<span class="tag scope">${esc(m.scope)}</span>` : "",
+    m.source_role && m.source_role !== "user" ? `<span class="tag role">said by ${esc(m.source_role)}</span>` : "",
+    m.subject && m.subject !== "user" ? `<span class="tag">about ${esc(m.subject)}</span>` : "",
+    m.status !== "active" ? `<span class="tag">${esc(m.status)}</span>` : "",
+    m.score != null ? `<span class="tag">score ${m.score.toFixed(3)}</span>` : "",
+  ].join("");
+  const detail = kind === "used"
+    ? `<details data-id="${esc(m.id)}" data-subject="${esc(m.subject||"")}" data-predicate="${esc(m.predicate||"")}">
+         <summary>Source and history</summary><div class="detail"></div>
+       </details>`
+    : "";
+  return `<div class="card ${kind}">
+     <div class="content">${esc(m.content)}</div>
+     <div class="tags">${tags}</div>
+     ${why ? `<div class="why">${esc(why)}</div>` : ""}
+     ${kind === "used" ? signals(m) : ""}
+     ${detail}
+   </div>`;
+}
+
+function grouped(memories) {
+  const by = {};
+  memories.forEach(m => (by[m.scope || ""] ??= []).push(m));
+  const keys = [...SCOPE_ORDER.filter(k => by[k]), ...Object.keys(by).filter(k => !SCOPE_ORDER.includes(k))];
+  return keys.map(k =>
+    `<div class="group-label">${esc(SCOPE_LABEL[k] ?? k)}</div>` +
+    by[k].map(m => card(m, "used")).join("")
+  ).join("");
+}
+
+async function loadDetail(el, req) {
+  if (req !== currentRequest) return;
+  const box = el.querySelector(".detail");
+  if (box.dataset.loaded) return;
+  box.dataset.loaded = "1";
+  box.innerHTML = `<p class="empty">Loading…</p>`;
+  const user = $("user").value.trim();
+  const id = el.dataset.id;
+  let html = "";
+  try {
+    const d = await api(`/v1/memories/${encodeURIComponent(id)}?user_id=${encodeURIComponent(user)}`);
+    if (d.evidence) {
+      const t = d.evidence.text, s = d.evidence.char_start, e = d.evidence.char_end;
+      const body = (s != null && e != null && e > s && e <= t.length)
+        ? esc(t.slice(0, s)) + "<mark>" + esc(t.slice(s, e)) + "</mark>" + esc(t.slice(e))
+        : esc(t);
+      html += `<div class="evidence">
+         <div class="src">session ${esc(d.evidence.session_id)} · turn ${d.evidence.turn_index} · ${esc(d.evidence.role)}</div>
+         ${body}</div>`;
+    } else {
+      html += `<p class="empty">No source turn recorded for this memory.</p>`;
+    }
+  } catch (err) { html += `<p class="empty">Could not load source.</p>`; }
+
+  const subject = el.dataset.subject, predicate = el.dataset.predicate;
+  if (subject && predicate) {
+    try {
+      const tl = await api(`/v1/timeline?user_id=${encodeURIComponent(user)}&subject=${encodeURIComponent(subject)}&predicate=${encodeURIComponent(predicate)}`);
+      // A key returns every memory under it, and most predicates are multi-valued:
+      // owning a G.I. Joe does not stop you owning stamps. Only draw the arrow where
+      // one entry actually names the next as its replacement, or the panel invents a
+      // history out of facts that simply coexist.
+      const supersedes = tl.entries.some(x => x.superseded_by);
+      if (tl.entries.length > 1 && supersedes) {
+        html += `<div class="timeline">` + tl.entries.map((x, i) => {
+          const replaced = x.valid_to != null && x.superseded_by;
+          const prev = i ? tl.entries[i - 1] : null;
+          const arrow = prev && prev.superseded_by === x.id
+            ? `<div class="arrow">↓ replaced by</div>` : "";
+          const when = x.valid_from ? new Date(x.valid_from).toISOString().slice(0, 10) : "date unknown";
+          return arrow +
+                 `<div class="step ${replaced ? "old" : ""}">${esc(x.object || x.content)} <span class="tag">${when}</span></div>`;
+        }).join("") + `</div>`;
+      } else if (tl.entries.length > 1) {
+        html += `<p class="why">${tl.entries.length} facts share this key and all still
+                 hold — <code>${esc(predicate)}</code> is multi-valued, so none replaces another.</p>`;
+      }
+    } catch (err) { /* a memory with no key chain simply has no timeline */ }
+  }
+  box.innerHTML = html;
+}
+
+function renderChat(messages) {
+  const box = $("chat");
+  box.innerHTML = messages.length
+    ? messages.map(m => `<div class="turn"><div class="who">${esc(m.role)}</div>
+        <div class="what">${esc(m.content)}</div></div>`).join("")
+    : `<p class="empty">Ask something about this user's history. The right panel shows which
+       memories retrieval selected, which it passed over, and why.</p>`;
+  box.scrollTop = box.scrollHeight;
+}
+
+async function search(user, q, {push = true, goldenName = null} = {}) {
+  if (!q) return;
+  const req = ++currentRequest;
+  $("go").disabled = true;
+  const transcript = [...(loadUiState().messages ?? []), {role: "you", content: q}].slice(-20);
+  saveUiState({messages: transcript, namespace: user});
+  renderChat(transcript);
+  // Clear wholesale rather than patching: a half-updated panel mixes two queries'
+  // evidence, which is the failure this binding exists to prevent.
+  $("panel").innerHTML = `<p class="empty">Searching…</p>`;
+  try {
+    const r = await api("/v1/memories/search", {user_id: user, query: q, limit: TOP_K ?? undefined, explain: true});
+    if (req !== currentRequest) return;  // a newer search superseded this one
+    const header = `<div class="query-header">Explaining: <q>${esc(q)}</q>
+      <span class="tag">${esc(user)}</span></div>`;
+    const superseded = r.rejected.filter(x => x.reason === "superseded");
+    const belowRank = r.rejected.filter(x => x.reason === "below_rank");
+    // Fetch the fallback layer before painting, so the summary can state what the
+    // system would rely on rather than appending it as an afterthought.
+    let raw = {turns: []};
+    try { raw = await api("/v1/raw/search", {user_id: user, query: q, limit: 2}); }
+    catch (e) { /* additive; a failure here must not blank the page */ }
+    if (req !== currentRequest) return;
+
+    // --- default view ---
+    // A recorded run is preferred when one exists for this exact demo, because the
+    // alternative — answering on every page load — spends quota on every refresh,
+    // and the other alternative — a hard-coded answer — is a mock dressed as a
+    // result. Recorded runs are labelled, carry their versions, and are checked
+    // against a fingerprint so a stale one cannot pose as current behaviour.
+    let golden = null;
+    if (goldenName) {
+      try { golden = await api(`/v1/golden/${encodeURIComponent(goldenName)}`); }
+      catch (e) { /* no recording for this demo; fall through to the live-capable view */ }
+    }
+    if (req !== currentRequest) return;
+
+    let html = header;
+
+    if (golden) {
+      const usedFallback = golden.fallback_level !== "none";
+      html += `<div class="verdict" id="recorded-card">
+        <h3>Answer <span class="badge ${golden.is_current ? "recorded" : "stale"}">
+          ${golden.is_current ? "recorded run — not executed on page load" : "recorded run — STALE"}
+        </span></h3>
+        <div class="answer-text">${linkify(golden.answer)}</div>
+        <div class="sourceline">
+          <span>Structured memory</span>
+          <span class="state ${golden.answer_status === "answer" ? "yes" : "no"}">${
+            golden.answer_status === "answer" ? "sufficient" : "insufficient"}</span>
+        </div>
+        <div class="sourceline">
+          <span>Raw conversation fallback</span>
+          <span class="state ${usedFallback ? "yes" : "no"}">${
+            usedFallback ? `triggered — ${esc(golden.fallback_level)}` : "not needed"}</span>
+        </div>
+        ${golden.fallback_reason ? `<div class="why">${esc(golden.fallback_reason)}</div>` : ""}
+        <div class="runmeta">
+          recorded ${esc((golden.recorded_at || "").slice(0, 10))} ·
+          ${golden.runs} run(s) agreed ·
+          judge ${esc(golden.judge_verdict || "n/a")} ·
+          answerer ${esc(golden.versions.answer_prompt || "?")} ·
+          judge ${esc(golden.versions.judge_prompt || "?")}
+          ${golden.is_current ? "" : "<br><strong>The store or prompts changed since this was recorded — re-run to see current behaviour.</strong>"}
+        </div>
+      </div>`;
+
+      if (golden.evidence.length) {
+        const ev = golden.evidence[0];
+        html += `<div class="verdict"><h3>Evidence the answer came from</h3>
+          <div class="evidence"><div class="src">session ${esc(ev.session_id)} ·
+            turn ${ev.turn_index} · ${esc(ev.role)}</div>${highlight(ev.text, q)}</div></div>`;
+      }
+      html += `<button class="more" id="run-live" type="button">Run live answer</button>
+               <div id="live-result"></div>`;
+    } else {
+      html += `<div class="verdict">
+        <h3>How this was answered</h3>
+        <div class="sourceline">
+          <span>Structured memory — ${r.memories.length} of ${r.candidates_considered} candidates selected</span>
+          <span class="state ${r.memories.length ? "yes" : "no"}">${r.memories.length ? "used" : "nothing relevant"}</span>
+        </div>
+        <div class="sourceline">
+          <span>Raw conversation archive — ${raw.turns.length} matching turn(s)</span>
+          <span class="state warn">available, not evaluated</span>
+        </div>
+        <div class="why">Nothing has judged whether the memories are sufficient — that
+          takes an answerer. Press below to run one.</div>
+      </div>
+      <button class="more" id="run-live" type="button">Run live answer</button>
+      <div id="live-result"></div>`;
+    }
+
+    html += `<button class="more" id="toggle-detail" type="button">Show retrieval details</button>
+             <div id="detail-view" class="hidden">`;
+
+    if (r.memories.length) {
+      html += `<div class="group-label">Selected memories — ${r.memories.length} of ${r.candidates_considered} candidates</div>`;
+      html += grouped(r.memories);
+    } else {
+      html += `<p class="empty">Nothing retrieved for this namespace.</p>`;
+    }
+    if (superseded.length) {
+      html += `<div class="group-label">Not selected — no longer true</div>`;
+      html += superseded.map(x => card(
+        {content: x.content || x.memory_id, status: "superseded"}, "superseded",
+        `Replaced by a later fact (${x.superseded_by ?? "unknown"}).`)).join("");
+    }
+    if (belowRank.length) {
+      html += `<div class="group-label">Not selected — ranked below the cut</div>`;
+      html += belowRank.slice(0, 8).map(x => card(
+        {content: x.content || x.memory_id, status: "active"}, "dropped",
+        "Still true, but scored outside the top-k for this query.")).join("");
+    }
+    // Two different things, previously conflated:
+    //
+    //   Fallback STATUS  — did the answer pipeline actually fall back? Only an
+    //                      answerer can decide that, by returning `need_source`.
+    //   Archive PREVIEW  — what the fallback *would* recover, queried directly so
+    //                      the layer is visible without spending an answerer call.
+    //
+    // The old copy claimed "structured memory answered it", which asserted a
+    // judgement nothing had made: with no answerer wired up, sufficiency was never
+    // evaluated. On the Mayo Clinic question it was also plainly false — no
+    // retrieved memory held the URL, and the archive below did.
+    if (raw.turns.length) {
+      html += `<div class="group-label">Raw archive preview</div>`;
+      html += raw.turns.map(t => `<div class="card dropped">
+          <div class="evidence"><div class="src">session ${esc(t.session_id)} · turn ${t.turn_index} · ${esc(t.role)}</div>${highlight(t.content.slice(0, 420), q)}${t.content.length > 420 ? "…" : ""}</div>
+        </div>`).join("");
+    }
+
+    html += `</div>`;
+
+    if (req !== currentRequest) return;
+    // Update the address bar only once the view actually rendered, and without a
+    // navigation — a reload here would restart the very search that just finished.
+    if (push) {
+      const url = `${location.pathname}?namespace=${encodeURIComponent(user)}&q=${encodeURIComponent(q)}`;
+      history.replaceState({user, q}, "", url);
+    }
+    $("panel").innerHTML = html;
+    $("panel").querySelectorAll("details").forEach(d =>
+      d.addEventListener("toggle", () => d.open && loadDetail(d, req)));
+
+    // Listeners are bound after the paint, because innerHTML replaces the nodes the
+    // previous render's listeners were attached to.
+    const toggle = $("toggle-detail"), view = $("detail-view");
+    if (toggle && view) {
+      // Remembered per browser: someone who wants the internals wants them every
+      // time, and someone showing the page to others does not.
+      if (loadUiState().showDetail) {
+        view.classList.remove("hidden");
+        toggle.textContent = "Hide retrieval details";
+      }
+      toggle.addEventListener("click", () => {
+        const open = !view.classList.toggle("hidden");
+        toggle.textContent = open ? "Hide retrieval details" : "Show retrieval details";
+        saveUiState({showDetail: open});
+      });
+    }
+
+    const live = $("run-live");
+    if (live) {
+      live.addEventListener("click", async () => {
+        live.disabled = true;
+        live.textContent = "Running…";
+        const box = $("live-result");
+        box.innerHTML = `<p class="empty">Calling the answerer…</p>`;
+        try {
+          const res = await api("/v1/answer", {user_id: user, query: q, limit: TOP_K ?? undefined});
+          const usedFallback = res.fallback_level !== "none";
+          box.innerHTML = `<div class="verdict">
+            <h3>Answer <span class="badge live">live run — just executed</span></h3>
+            <div class="answer-text">${linkify(res.answer)}</div>
+            <div class="sourceline"><span>Structured memory</span>
+              <span class="state ${res.answer_status === "answer" ? "yes" : "no"}">${
+                res.answer_status === "answer" ? "sufficient" : "insufficient"}</span></div>
+            <div class="sourceline"><span>Raw conversation fallback</span>
+              <span class="state ${usedFallback ? "yes" : "no"}">${
+                usedFallback ? `triggered — ${esc(res.fallback_level)}` : "not needed"}</span></div>
+            ${res.fallback_reason ? `<div class="why">${esc(res.fallback_reason)}</div>` : ""}
+            ${res.fallback_turns.length ? `
+              <div class="sourceline"><span>Top retrieved evidence</span>
+                <span class="state yes">${esc(res.fallback_turns[0])}</span></div>
+              <div class="why">Highest-ranked raw turn for this query. The answerer
+                does not yet declare which evidence it actually relied on, so this is
+                a retrieval fact, not a claim about the answer.</div>
+              ${res.fallback_turns.length > 1
+                ? `<details><summary>${res.fallback_turns.length - 1} supporting turn(s)</summary>
+                     <div class="why">${esc(res.fallback_turns.slice(1).join(", "))}</div></details>`
+                : ""}` : ""}
+            <div class="runmeta">${res.latency_ms} ms · ${res.answerer_calls} answerer call(s) ·
+              top_k ${res.top_k} · ${res.memories_selected} memories of
+              ${res.candidates_considered} candidates · ${res.context_tokens} context tokens
+            </div>
+            ${res.selected.length ? `<details><summary>The ${res.selected.length} memories the answerer received</summary>${
+              res.selected.map(m => `<div class="card used">
+                <div class="content">${esc(m.content || m.id)}</div>
+                <div class="tags">${m.scope ? `<span class="tag scope">${esc(m.scope)}</span>` : ""}${
+                  m.score != null ? `<span class="tag">score ${m.score.toFixed(3)}</span>` : ""}</div>
+              </div>`).join("")}</details>` : ""}
+            </div>`;
+          const recorded = $("recorded-card");
+          if (recorded) {
+            recorded.style.opacity = ".55";
+            const note = document.createElement("div");
+            note.className = "why";
+            note.textContent = "Superseded by the live run below — kept for comparison.";
+            recorded.appendChild(note);
+          }
+        } catch (e) {
+          box.innerHTML = `<p class="empty">${/503/.test(String(e))
+            ? "Live answering is unavailable: this server has no API key configured."
+            : esc(String(e))}</p>`;
+        } finally {
+          live.disabled = false;
+          live.textContent = "Run live answer again";
+        }
+      });
+    }
+  } catch (e) {
+    if (req === currentRequest) $("panel").innerHTML = `<p class="empty">${esc(String(e))}</p>`;
+  } finally {
+    if (req === currentRequest) $("go").disabled = false;
+    $("q").value = "";
+  }
+}
+
+$("ask").addEventListener("submit", (ev) => {
+  ev.preventDefault();
+  search($("user").value.trim(), $("q").value.trim());
+});
+
+$("copy").addEventListener("click", async () => {
+  const url = location.href;
+  try {
+    await navigator.clipboard.writeText(url);
+    $("copy").textContent = "Copied";
+  } catch {
+    // Clipboard access is origin- and permission-dependent; showing the URL is a
+    // worse experience than copying it but strictly better than a silent no-op.
+    prompt("Copy this view:", url);
+  }
+  setTimeout(() => ($("copy").textContent = "Copy view link"), 1400);
+});
+
+// Restore on load: URL first (shareable), then localStorage (personal).
+(function restore() {
+  const params = new URLSearchParams(location.search);
+  const demo = DEMOS[params.get("demo")];
+  const ui = loadUiState();
+  const user = demo?.namespace ?? params.get("namespace") ?? ui.namespace ?? "01493427";
+  const q = demo?.q ?? params.get("q") ?? "";
+
+  // A demo link is a fixed exhibit, not a continuation. Carrying the previous
+  // visitor's transcript into it buries the case being demonstrated under
+  // unrelated questions — which is exactly what happened the first time this page
+  // was opened for a screenshot.
+  if (demo) saveUiState({messages: []});
+
+  $("user").value = user;
+  renderChat(demo ? [] : (ui.messages ?? []));
+  if (!q) return;
+
+  $("q").value = q;
+  // A restored search goes through the same request binding as a typed one, so an
+  // in-flight restore cannot be overwritten by, or overwrite, a user's own search.
+  search(user, q, {goldenName: demo?.golden ?? null});
+})();
+</script>
+</body>
+</html>

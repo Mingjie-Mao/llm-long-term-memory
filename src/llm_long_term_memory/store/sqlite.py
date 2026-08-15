@@ -23,7 +23,8 @@ _SCHEMA = Path(__file__).with_name("schema.sql")
 _FTS_TOKEN = re.compile(r"[A-Za-z0-9_]+")
 
 _MEMORY_COLUMNS = (
-    "id, user_id, type, content, subject, predicate, object, importance, confidence, "
+    "id, user_id, type, content, subject, predicate, object, source_role, scope, "
+    "importance, confidence, "
     "event_time, valid_from, valid_to, ingested_at, update_op, replaces_previous, "
     "superseded_by, status, "
     "strength, "
@@ -40,6 +41,17 @@ def _parse(value: str | None) -> datetime | None:
     return datetime.fromisoformat(value) if value else None
 
 
+def _fts_match(query: str) -> str:
+    """Tokenize and quote a free-text query for FTS5.
+
+    FTS5 treats punctuation as syntax, so a raw user question containing one of its
+    operators raises OperationalError. Quoting each token escapes rather than strips,
+    which keeps recall on hyphenated terms.
+    """
+    tokens = _FTS_TOKEN.findall(query)
+    return " OR ".join(f'"{t}"' for t in tokens)
+
+
 class SQLiteMemoryStore:
     def __init__(self, path: str | Path) -> None:
         self.path = Path(path)
@@ -48,7 +60,7 @@ class SQLiteMemoryStore:
         self._conn.row_factory = sqlite3.Row
 
     def initialize(self) -> None:
-        self._conn.executescript(_SCHEMA.read_text())
+        self._conn.executescript(_SCHEMA.read_text(encoding="utf-8"))
         self._migrate()
         self._conn.commit()
 
@@ -76,6 +88,43 @@ class SQLiteMemoryStore:
             self._conn.execute("ALTER TABLE memories ADD COLUMN source_char_start INTEGER")
         if "source_char_end" not in columns:
             self._conn.execute("ALTER TABLE memories ADD COLUMN source_char_end INTEGER")
+        # P10. `scope` stays NULL on pre-P10 rows: it is genuinely unknown, and a
+        # made-up value would be indistinguishable from a real one at query time.
+        #
+        # `source_role` can be recovered exactly, though. The old extractor set
+        # subject='assistant' precisely when the fact string began "The assistant",
+        # so those rows *were* assistant-spoken; everything else was written under a
+        # user-profile framing. Backfilling from that is a derivation, not a guess,
+        # and without it every recovered assistant fact in an existing store would be
+        # mislabelled the moment source_role became queryable.
+        if "source_role" not in columns:
+            self._conn.execute(
+                "ALTER TABLE memories ADD COLUMN source_role TEXT NOT NULL DEFAULT 'user'"
+            )
+            self._conn.execute(
+                "UPDATE memories SET source_role = 'assistant' WHERE subject = 'assistant'"
+            )
+        if "scope" not in columns:
+            self._conn.execute("ALTER TABLE memories ADD COLUMN scope TEXT")
+
+        # The turns index is created empty by the schema and its triggers only fire
+        # on rows inserted afterwards, so a store ingested before the index existed
+        # would search an empty archive and silently find nothing — the worst failure
+        # mode for a fallback, since "no evidence" and "never indexed" are
+        # indistinguishable from outside.
+        #
+        # Detected with an explicit marker rather than by counting rows in the index:
+        # `turns_fts` is an external-content table, so `SELECT count(*)` reads the
+        # underlying `turns` table and reports full coverage even when nothing has
+        # been indexed at all.
+        built = self._conn.execute(
+            "SELECT value FROM meta WHERE key = 'turns_fts_built'"
+        ).fetchone()
+        if not built and self._conn.execute("SELECT count(*) FROM turns").fetchone()[0]:
+            self._conn.execute("INSERT INTO turns_fts(turns_fts) VALUES ('rebuild')")
+            self._conn.execute(
+                "INSERT OR REPLACE INTO meta(key, value) VALUES ('turns_fts_built', '1')"
+            )
 
     # ---------------------------------------------------------------- sessions
 
@@ -108,6 +157,8 @@ class SQLiteMemoryStore:
                 m.subject,
                 m.predicate,
                 m.object,
+                m.source_role,
+                m.scope,
                 m.importance,
                 m.confidence,
                 _dt(m.event_time),
@@ -130,7 +181,7 @@ class SQLiteMemoryStore:
             )
             for m in memories
         ]
-        placeholders = ",".join(["?"] * 26)
+        placeholders = ",".join(["?"] * len(_MEMORY_COLUMNS.split(",")))
         with self._conn:
             self._conn.executemany(
                 f"INSERT OR REPLACE INTO memories({_MEMORY_COLUMNS}) VALUES ({placeholders})",
@@ -173,6 +224,8 @@ class SQLiteMemoryStore:
             subject=row["subject"],
             predicate=row["predicate"],
             object=row["object"],
+            source_role=row["source_role"] or "user",
+            scope=row["scope"],
             importance=row["importance"],
             confidence=row["confidence"],
             event_time=_parse(row["event_time"]),
@@ -218,6 +271,48 @@ class SQLiteMemoryStore:
         ).fetchall()
         return [self._row_to_memory(r) for r in rows]
 
+    def set_meta(self, key: str, value: str) -> None:
+        """Record a property of the store itself.
+
+        The extractor version lives here rather than in a config file because it is a
+        property of *this data*, not of the code that happens to be checked out. A
+        store built by one extractor and evaluated a month later under another must
+        still report which one wrote it.
+        """
+        with self._conn:
+            self._conn.execute("INSERT OR REPLACE INTO meta(key, value) VALUES (?,?)", (key, value))
+
+    def get_meta(self, key: str) -> str | None:
+        row = self._conn.execute("SELECT value FROM meta WHERE key = ?", (key,)).fetchone()
+        return row["value"] if row else None
+
+    def iter_all(self, user_id: str) -> list[Memory]:
+        """Every memory in a namespace, whatever its status.
+
+        `iter_active` hides superseded rows, which is right for answering and wrong
+        for browsing: the API's memory list and the inspector's timeline exist
+        precisely to show that a fact was replaced rather than to pretend the old
+        value never held.
+        """
+        rows = self._conn.execute(
+            f"SELECT {_MEMORY_COLUMNS} FROM memories WHERE user_id = ?", (user_id,)
+        ).fetchall()
+        return [self._row_to_memory(r) for r in rows]
+
+    def get_session(self, session_id: str) -> Session | None:
+        row = self._conn.execute(
+            "SELECT id, user_id, started_at, source FROM sessions WHERE id = ?", (session_id,)
+        ).fetchone()
+        if row is None:
+            return None
+        return Session(
+            id=row["id"],
+            user_id=row["user_id"],
+            started_at=_parse(row["started_at"]),
+            source=row["source"],
+            turns=self.turns_for_session(session_id),
+        )
+
     def find_by_predicate(
         self, user_id: str, subject: str, predicate: str, include_superseded: bool = False
     ) -> list[Memory]:
@@ -260,15 +355,68 @@ class SQLiteMemoryStore:
         ).fetchall()
         return [(r["subject"], r["predicate"]) for r in rows]
 
+    def turns_for_memories(self, memories: list[Memory]) -> list[Turn]:
+        """Level 1 of the raw fallback: the source turns of memories already found.
+
+        Cheap and precise. When retrieval located the right memory but extraction
+        dropped the detail — "the assistant recommended a Mayo Clinic resource",
+        without the URL — the answer is in the turn that memory came from, and
+        nowhere else needs searching.
+        """
+        session_ids = {m.source_session_id for m in memories if m.source_session_id}
+        if not session_ids:
+            return []
+        wanted = {(m.source_session_id, m.source_turn_index) for m in memories}
+        out: list[Turn] = []
+        for session_id in sorted(session_ids):
+            for turn in self.turns_for_session(session_id):
+                # The anchored turn, or the whole session when no anchor was stored.
+                if (session_id, turn.turn_index) in wanted or (session_id, None) in wanted:
+                    out.append(turn)
+        return out
+
+    def search_turns(self, user_id: str, query: str, limit: int = 3) -> list[Turn]:
+        """Level 2 of the raw fallback: BM25 over the whole archive for one namespace.
+
+        Used only when structured memory found nothing at all, because extraction
+        can miss a fact entirely. Namespace-scoped like every other read — the join
+        onto `sessions` is what enforces that, since `turns` has no user_id of its
+        own.
+        """
+        match = _fts_match(query)
+        if not match:
+            return []
+        rows = self._conn.execute(
+            """
+            SELECT t.id, t.session_id, t.turn_index, t.role, t.content, t.ts
+            FROM turns_fts f
+            JOIN turns t ON t.rowid = f.rowid
+            JOIN sessions s ON s.id = t.session_id
+            WHERE turns_fts MATCH ? AND s.user_id = ?
+            ORDER BY bm25(turns_fts) LIMIT ?
+            """,
+            (match, user_id, limit),
+        ).fetchall()
+        return [
+            Turn(
+                id=r["id"],
+                session_id=r["session_id"],
+                turn_index=r["turn_index"],
+                role=r["role"],
+                content=r["content"],
+                ts=_parse(r["ts"]),
+            )
+            for r in rows
+        ]
+
     # --------------------------------------------------------------- retrieval
 
     def search_lexical(
         self, user_id: str, query: str, limit: int, include_superseded: bool = False
     ) -> list[LexicalHit]:
-        tokens = _FTS_TOKEN.findall(query)
-        if not tokens:
+        match = _fts_match(query)
+        if not match:
             return []
-        match = " OR ".join(f'"{t}"' for t in tokens)
         status_clause = "m.status != 'evicted'"
         if not include_superseded:
             status_clause += " AND m.status = 'active'"

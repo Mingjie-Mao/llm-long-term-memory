@@ -5,7 +5,7 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass, field
 
-from chronomem.store import Memory, MemoryStore
+from llm_long_term_memory.store import Memory, MemoryStore
 
 _SENTENCE = re.compile(r"[^.!?]+(?:[.!?]+|$)")
 

@@ -1,4 +1,4 @@
-"""ChronoMem command line.
+"""LLTM command line.
 
 P0 commands are the ones that need no API key: download the benchmark, measure it,
 and plan the ingestion budget against the free-tier quota.
@@ -12,10 +12,10 @@ import typer
 from rich.console import Console
 from rich.table import Table
 
-from chronomem.config import Settings
-from chronomem.evaluation.datasets import longmemeval as lme
+from llm_long_term_memory.config import Settings
+from llm_long_term_memory.evaluation.datasets import longmemeval as lme
 
-app = typer.Typer(add_completion=False, help="ChronoMem — long-term memory for LLM agents")
+app = typer.Typer(add_completion=False, help="LLTM — long-term memory for LLM agents")
 data_app = typer.Typer(help="Benchmark data: download, inspect, plan")
 app.add_typer(data_app, name="data")
 
@@ -116,8 +116,9 @@ def data_stats(
     console.print(qt)
 
     console.print(
-        "\n[dim]Token counts are a chars/4 estimate. Exact counts require the "
-        "provider tokenizer and are recomputed once an API key is configured.[/dim]"
+        f"\n[dim]Token counts use the corpus-measured estimate of "
+        f"{lme.CHARS_PER_TOKEN:g} chars/token. Exact counts depend on the model's "
+        "provider tokenizer.[/dim]"
     )
 
 
@@ -172,19 +173,34 @@ def _default_store_name(variant: str) -> str:
     return "two-stage" if variant.startswith("two_stage") else "memories"
 
 
-def _build(variant: str, cfg_path: str, store_name: str | None = None):
-    """Wire up client, judge, and runner for one variant."""
-    from chronomem.config import ExperimentConfig
-    from chronomem.embed import Encoder
-    from chronomem.evaluation.judge import Judge
-    from chronomem.evaluation.runners.full_context import FullContextRunner
-    from chronomem.evaluation.runners.memory import MemoryRunner
-    from chronomem.evaluation.runners.naive_rag import NaiveRAGRunner
-    from chronomem.llm import Limits, QuotaManager, UsageTracker
-    from chronomem.llm.client import GeminiClient
+def _build(
+    variant: str,
+    cfg_path: str,
+    store_name: str | None = None,
+    top_k: int | None = None,
+    rerank: bool | None = None,
+):
+    """Wire up client, judge, and runner for one variant.
+
+    `top_k` and `rerank` override the config so that an accuracy-vs-context sweep is
+    a loop over flags rather than six near-identical YAML files. Anything reported
+    as a table row should still come from a config, not from a flag.
+    """
+    from llm_long_term_memory.config import ExperimentConfig
+    from llm_long_term_memory.embed import Encoder
+    from llm_long_term_memory.evaluation.judge import Judge
+    from llm_long_term_memory.evaluation.runners.full_context import FullContextRunner
+    from llm_long_term_memory.evaluation.runners.memory import MemoryRunner
+    from llm_long_term_memory.evaluation.runners.naive_rag import NaiveRAGRunner
+    from llm_long_term_memory.llm import Limits, QuotaManager, UsageTracker
+    from llm_long_term_memory.llm.client import GeminiClient
 
     settings = Settings()
     cfg = ExperimentConfig.from_yaml(cfg_path)
+    if top_k is not None:
+        cfg.retrieval.top_k = top_k
+    if rerank is not None:
+        cfg.retrieval.rerank.enabled = rerank
 
     quota = QuotaManager(
         state_dir=settings.store_dir / "quota",
@@ -212,12 +228,17 @@ def _build(variant: str, cfg_path: str, store_name: str | None = None):
         "two_stage_no_temporal",
         "two_stage_hydrated",
         "two_stage_hydrated_no_temporal",
+        # A3. Same store and same pipeline; the only difference is
+        # `retrieval.rerank.enabled` in the config, so the row is attributable.
+        "two_stage_hydrated_rerank",
+        # Memory first, raw source only when the answerer says it needs it.
+        "two_stage_fallback",
     ):
-        from chronomem.store import NumpyFlatIndex, SQLiteMemoryStore
+        from llm_long_term_memory.store import NumpyFlatIndex, SQLiteMemoryStore
 
         utility_model = None
         if cfg.pack.enabled and cfg.pack.utility_model_path:
-            from chronomem.influence import UtilityPredictor
+            from llm_long_term_memory.influence import UtilityPredictor
 
             utility_model = UtilityPredictor.load(cfg.pack.utility_model_path)
 
@@ -227,8 +248,17 @@ def _build(variant: str, cfg_path: str, store_name: str | None = None):
         index = NumpyFlatIndex(settings.store_dir / f"{stem}-index", dim=cfg.models.embedding_dim)
         if not len(index):
             raise typer.BadParameter(
-                f"the {stem!r} memory store is empty — run `chronomem ingest run "
+                f"the {stem!r} memory store is empty — run `lltm ingest run "
                 f"--store-name {stem}` first"
+            )
+        reranker = None
+        if cfg.retrieval.rerank.enabled:
+            from llm_long_term_memory.retrieve import CrossEncoderReranker
+
+            reranker = CrossEncoderReranker(
+                model_name=cfg.retrieval.rerank.model,
+                candidates=cfg.retrieval.rerank.candidates,
+                batch_size=cfg.retrieval.rerank.batch_size,
             )
         runner = MemoryRunner(
             client,
@@ -250,6 +280,8 @@ def _build(variant: str, cfg_path: str, store_name: str | None = None):
             token_budget=cfg.pack.token_budget if cfg.pack.enabled else 0,
             utility_model=utility_model,
             type_floors=cfg.pack.type_floors if cfg.pack.enabled else None,
+            reranker=reranker,
+            raw_fallback=cfg.fallback.enabled,
         )
         runner.name = variant
     else:
@@ -270,25 +302,67 @@ def eval_run(
     ),
     config: str = typer.Option("configs/baselines.yaml", "--config", "-c"),
     limit: int | None = typer.Option(None, help="Override dataset_limit from config"),
+    questions: str | None = typer.Option(
+        None,
+        "--questions",
+        help=(
+            "Manifest of question ids (results/manifests/*.json, or a newline-delimited "
+            "list). Evaluates exactly these. Use this, not --limit, for anything whose "
+            "result gets reported: --limit draws a stratified sample scattered across "
+            "the split, so --limit 31 is NOT the first 31 questions in dataset order."
+        ),
+    ),
     store_name: str | None = typer.Option(
         None, help="Store filename stem; two_stage defaults to an isolated two-stage store"
     ),
     fresh: bool = typer.Option(False, help="Ignore existing results and start over"),
+    top_k: int | None = typer.Option(None, "--top-k", help="Override retrieval.top_k"),
+    rerank: bool | None = typer.Option(
+        None, "--rerank/--no-rerank", help="Override retrieval.rerank.enabled"
+    ),
+    label: str | None = typer.Option(
+        None,
+        help=(
+            "Write to <variant>.<label>.jsonl instead of <variant>.jsonl. Sweep arms "
+            "need this: they share a variant but are not the same run, and a labelled "
+            "file is excluded from the default results table."
+        ),
+    ),
 ) -> None:
     """Evaluate one variant on LongMemEval. Resumes automatically if interrupted."""
-    from chronomem.evaluation.harness import run_eval
-    from chronomem.evaluation.report import render_summary
+    from llm_long_term_memory.evaluation.harness import run_eval
+    from llm_long_term_memory.evaluation.report import render_summary
 
-    cfg, settings, runner, judge, usage = _build(variant, config, store_name)
+    cfg, settings, runner, judge, usage = _build(variant, config, store_name, top_k, rerank)
     n = limit if limit is not None else cfg.dataset_limit
 
     with console.status("Loading dataset…"):
-        instances = lme.load(cfg.dataset_variant, settings.data_dir, limit=n)
+        if questions:
+            from llm_long_term_memory.evaluation.manifest import load_manifest
 
-    out = settings.results_dir / "raw" / f"{variant}.jsonl"
+            # Load the full split and filter, rather than loading a stratified
+            # sample of size len(manifest): stratification would return a different
+            # set of questions entirely. See the --questions help text.
+            manifest = load_manifest(questions)
+            every = lme.load(manifest.variant, settings.data_dir)
+            by_id = {inst.question_id: inst for inst in every}
+            unknown = [qid for qid in manifest.question_ids if qid not in by_id]
+            if unknown:
+                raise typer.BadParameter(
+                    f"{len(unknown)} question id(s) not in the {manifest.variant!r} "
+                    f"split, first: {unknown[0]!r}"
+                )
+            instances = [by_id[qid] for qid in manifest.question_ids]
+        else:
+            instances = lme.load(cfg.dataset_variant, settings.data_dir, limit=n)
+
+    stem = f"{variant}.{label}" if label else variant
+    out = settings.results_dir / "raw" / f"{stem}.jsonl"
+    runner.name = stem
     console.print(
-        f"[bold]{variant}[/bold] · {len(instances)} questions · "
-        f"answerer={cfg.models.answerer} judge={cfg.models.judge}\n"
+        f"[bold]{stem}[/bold] · {len(instances)} questions · "
+        f"answerer={cfg.models.answerer} judge={cfg.models.judge} · "
+        f"top_k={cfg.retrieval.top_k} rerank={cfg.retrieval.rerank.enabled}\n"
         f"[dim]→ {out}[/dim]\n"
     )
 
@@ -330,16 +404,16 @@ def eval_budget_sweep(
     import json
     from dataclasses import asdict
 
-    from chronomem.evaluation.budget import (
+    from llm_long_term_memory.evaluation.budget import (
         BudgetPoint,
         pareto_frontier,
         render_pareto_svg,
         sweep_artifact_stem,
     )
-    from chronomem.evaluation.harness import run_eval
-    from chronomem.evaluation.report import render_summary
-    from chronomem.evaluation.runners.memory import MemoryRunner
-    from chronomem.influence import UtilityPredictor
+    from llm_long_term_memory.evaluation.harness import run_eval
+    from llm_long_term_memory.evaluation.report import render_summary
+    from llm_long_term_memory.evaluation.runners.memory import MemoryRunner
+    from llm_long_term_memory.influence import UtilityPredictor
 
     try:
         parsed_budgets = sorted(
@@ -396,8 +470,10 @@ def eval_budget_sweep(
     stem = sweep_artifact_stem(variant, selector)
     json_path = settings.results_dir / f"{stem}.json"
     svg_path = settings.results_dir / f"{stem}.svg"
-    json_path.write_text(json.dumps(payload, indent=2) + "\n")
-    svg_path.write_text(render_pareto_svg(points, f"{variant}: {selector} packing"))
+    json_path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+    svg_path.write_text(
+        render_pareto_svg(points, f"{variant}: {selector} packing"), encoding="utf-8"
+    )
 
     table = Table(title=f"P6 budget sweep — {selector} packing")
     table.add_column("budget", justify="right", style="cyan")
@@ -423,15 +499,19 @@ def eval_report(
     out: str = typer.Option("results/table.md", help="Where to write the markdown table"),
 ) -> None:
     """Regenerate the results table from run artifacts."""
-    from chronomem.evaluation.report import load_report, render_table
+    from llm_long_term_memory.evaluation.report import (
+        default_report_variants,
+        load_report,
+        render_table,
+    )
 
     settings = Settings()
     raw = settings.results_dir / "raw"
     if not raw.exists():
-        console.print("[yellow]No runs found.[/yellow] Try `chronomem eval run full_context`.")
+        console.print("[yellow]No runs found.[/yellow] Try `lltm eval run full_context`.")
         raise typer.Exit(1)
 
-    order = variants or [p.stem for p in sorted(raw.glob("*.jsonl"))]
+    order = variants or default_report_variants(raw)
     reports = [
         load_report(raw / f"{v}.jsonl", variant=v) for v in order if (raw / f"{v}.jsonl").exists()
     ]
@@ -443,7 +523,7 @@ def eval_report(
     console.print(table)
     dest = Path(out)
     dest.parent.mkdir(parents=True, exist_ok=True)
-    dest.write_text(table + "\n")
+    dest.write_text(table + "\n", encoding="utf-8")
     console.print(f"\n[green]✓[/green] {dest}")
 
 
@@ -458,9 +538,9 @@ def eval_label(
     The judge's verdict is withheld from the sheet so that labeling is not anchored
     to it.
     """
-    from chronomem.config import ExperimentConfig
-    from chronomem.evaluation.agreement import write_worksheet
-    from chronomem.evaluation.report import load_report
+    from llm_long_term_memory.config import ExperimentConfig
+    from llm_long_term_memory.evaluation.agreement import write_worksheet
+    from llm_long_term_memory.evaluation.report import load_report
 
     settings = Settings()
     cfg = ExperimentConfig.from_yaml(config)
@@ -480,7 +560,7 @@ def eval_label(
         f"[green]✓[/green] {dest}\n\n"
         f"Fill in the [cyan]human[/cyan] column with 1 (correct) or 0 (wrong) for each "
         f"row, judging the [cyan]hypothesis[/cyan] against the [cyan]gold[/cyan] answer.\n"
-        f"Then run: [cyan]chronomem eval agreement {variant}[/cyan]"
+        f"Then run: [cyan]lltm eval agreement {variant}[/cyan]"
     )
 
 
@@ -489,8 +569,8 @@ def eval_agreement(
     variant: str = typer.Argument(..., help="Which run to score"),
 ) -> None:
     """Compare the judge's verdicts against hand labels."""
-    from chronomem.evaluation.agreement import save_agreement, score_worksheet
-    from chronomem.evaluation.report import load_report
+    from llm_long_term_memory.evaluation.agreement import save_agreement, score_worksheet
+    from llm_long_term_memory.evaluation.report import load_report
 
     settings = Settings()
     sheet = settings.results_dir / f"labels-{variant}.csv"
@@ -524,9 +604,9 @@ def eval_failure_audit(
     out: str | None = typer.Option(None, help="CSV destination"),
 ) -> None:
     """Write one worksheet row for every judged-wrong answer."""
-    from chronomem.config import ExperimentConfig
-    from chronomem.evaluation.failures import FAILURE_CODES, write_failure_worksheet
-    from chronomem.evaluation.report import load_report
+    from llm_long_term_memory.config import ExperimentConfig
+    from llm_long_term_memory.evaluation.failures import FAILURE_CODES, write_failure_worksheet
+    from llm_long_term_memory.evaluation.report import load_report
 
     settings = Settings()
     source = settings.results_dir / "raw" / f"{variant}.jsonl"
@@ -551,7 +631,7 @@ def eval_failure_report(
     worksheet: str = typer.Argument(..., help="Completed failure-audit CSV"),
 ) -> None:
     """Summarize a completed single-cause failure taxonomy worksheet."""
-    from chronomem.evaluation.failures import FAILURE_CODES, summarize_failure_worksheet
+    from llm_long_term_memory.evaluation.failures import FAILURE_CODES, summarize_failure_worksheet
 
     report = summarize_failure_worksheet(worksheet)
     table = Table(title="failure decomposition")
@@ -583,19 +663,20 @@ def ingest_run(
     ),
 ) -> None:
     """Extract memories from the corpus. Resumes after a daily-quota stop."""
-    from chronomem.config import ExperimentConfig
-    from chronomem.embed import Encoder
-    from chronomem.ingest import (
+    from llm_long_term_memory.config import ExperimentConfig
+    from llm_long_term_memory.embed import Encoder
+    from llm_long_term_memory.ingest import (
         Deduplicator,
         Extractor,
         IngestionPipeline,
         TwoStageExtractor,
+        namespace_batch_count,
         namespaced_sessions,
     )
-    from chronomem.llm import Limits, QuotaManager, UsageTracker
-    from chronomem.llm.client import GeminiClient
-    from chronomem.store import NumpyFlatIndex, SQLiteMemoryStore
-    from chronomem.temporal import TemporalResolver
+    from llm_long_term_memory.llm import Limits, QuotaManager, UsageTracker
+    from llm_long_term_memory.llm.client import GeminiClient
+    from llm_long_term_memory.store import NumpyFlatIndex, SQLiteMemoryStore
+    from llm_long_term_memory.temporal import TemporalResolver
 
     settings = Settings()
     cfg = ExperimentConfig.from_yaml(config)
@@ -628,7 +709,7 @@ def ingest_run(
         threshold=cfg.ingest.dedupe_similarity_threshold,
     )
     resolver = TemporalResolver(store) if cfg.temporal_resolution else None
-    from chronomem.ingest.pipeline import fit_batch_size
+    from llm_long_term_memory.ingest.pipeline import fit_batch_size
 
     # ~2,560 tokens per session, measured in D5.
     per_request = fit_batch_size(
@@ -663,7 +744,7 @@ def ingest_run(
     if sessions:
         all_sessions = all_sessions[:sessions]
 
-    n_batches = -(-len(all_sessions) // per_request)
+    n_batches = namespace_batch_count(all_sessions, per_request)
     extraction_calls_per_batch = 2 if cfg.ingest.two_stage else 1
     console.print(
         f"[bold]ingest[/bold] · {len(all_sessions):,} unique sessions · "
@@ -730,11 +811,11 @@ def ingest_coverage(
     Uses the `oracle` variant (evidence sessions only), so it costs a few requests
     and isolates extraction quality from retrieval quality.
     """
-    from chronomem.config import ExperimentConfig
-    from chronomem.ingest import Extractor
-    from chronomem.ingest.coverage import UNMEASURABLE_TYPES, evaluate_coverage
-    from chronomem.llm import Limits, QuotaManager, UsageTracker
-    from chronomem.llm.client import GeminiClient
+    from llm_long_term_memory.config import ExperimentConfig
+    from llm_long_term_memory.ingest import Extractor
+    from llm_long_term_memory.ingest.coverage import UNMEASURABLE_TYPES, evaluate_coverage
+    from llm_long_term_memory.llm import Limits, QuotaManager, UsageTracker
+    from llm_long_term_memory.llm.client import GeminiClient
 
     settings = Settings()
     cfg = ExperimentConfig.from_yaml(config)
@@ -810,7 +891,8 @@ def ingest_coverage(
                 "cases": [_asdict(c) for c in report.cases],
             },
             indent=2,
-        )
+        ),
+        encoding="utf-8",
     )
     console.print(f"\n[green]✓[/green] {dest}")
 
@@ -826,8 +908,8 @@ def resolve(
     `SINGLE_VALUED_PREDICATES` cheap to correct: getting it wrong costs a
     re-resolution, not a 2,880-request re-ingest.
     """
-    from chronomem.store import SQLiteMemoryStore
-    from chronomem.temporal import TemporalResolver
+    from llm_long_term_memory.store import SQLiteMemoryStore
+    from llm_long_term_memory.temporal import TemporalResolver
 
     settings = Settings()
     store = SQLiteMemoryStore(settings.store_dir / f"{store_name}.db")
@@ -848,6 +930,86 @@ def resolve(
     store.close()
 
 
+@app.command("mcp")
+def mcp_serve(
+    transport: str = typer.Option("stdio", help="stdio | http"),
+    config: str = typer.Option("configs/baselines.yaml", "--config", "-c"),
+    store_name: str = typer.Option("two-stage-hydrated", help="Memory store filename stem"),
+) -> None:
+    """Serve the memory over MCP, for Claude Desktop, Cursor, or any MCP client.
+
+    The same `MemoryService` the REST API uses, so the tools cannot drift from the
+    behaviour that was measured.
+    """
+    from llm_long_term_memory.api.service import MemoryService
+    from llm_long_term_memory.mcp_server import run
+
+    # stdio is the protocol channel: anything written to stdout that is not a
+    # protocol message corrupts the stream, so no banner is printed there.
+    if transport != "stdio":
+        console.print(f"[bold]mcp[/bold] · {transport} · store={store_name}")
+    run(transport=transport, service=MemoryService(config_path=config, store_name=store_name))
+
+
+@eval_app.command("freeze")
+def eval_freeze(
+    name: str = typer.Argument(..., help="Manifest name, e.g. dev50 or test100"),
+    n: int = typer.Option(50, help="How many questions to draw"),
+    seed: int = typer.Option(0, help="Stratification seed"),
+    variant: str = typer.Option("s", help="LongMemEval split"),
+    exclude: str | None = typer.Option(
+        None, help="Manifest whose ids must not appear (for building a held-out set)"
+    ),
+    note: str = typer.Option("", help="Why this set exists; stored in the manifest"),
+    force: bool = typer.Option(False, help="Overwrite an existing manifest"),
+) -> None:
+    """Freeze a stratified question set into results/manifests/<name>.json.
+
+    Every reported run should name a manifest rather than a size. A size is not an
+    experiment identity: it says how many questions, not which ones, and the answer
+    to "which ones" has already changed once under a partial ingest.
+    """
+    from llm_long_term_memory.evaluation.datasets.longmemeval import stratify
+    from llm_long_term_memory.evaluation.manifest import Manifest, load_manifest
+
+    settings = Settings()
+    dest = settings.results_dir / "manifests" / f"{name}.json"
+    if dest.exists() and not force:
+        existing = load_manifest(dest)
+        raise typer.BadParameter(
+            f"{dest} already exists with {len(existing)} questions. Refusing to "
+            f"regenerate: a frozen set that moves is not frozen. Pass --force only "
+            f"if no published result depends on it."
+        )
+
+    every = lme.load(variant, settings.data_dir)
+    if exclude:
+        banned = set(load_manifest(exclude).question_ids)
+        every = [inst for inst in every if inst.question_id not in banned]
+        console.print(f"[dim]excluded {len(banned)} ids; {len(every)} remain[/dim]")
+
+    chosen = stratify(every, n, seed=seed)
+    manifest = Manifest(
+        name=name,
+        variant=variant,
+        seed=seed,
+        question_ids=tuple(inst.question_id for inst in chosen),
+        note=note,
+    )
+    manifest.save(dest)
+
+    by_type: dict[str, int] = {}
+    for inst in chosen:
+        by_type[inst.question_type] = by_type.get(inst.question_type, 0) + 1
+    t = Table(title=f"frozen: {dest}", show_header=False)
+    t.add_column(style="cyan")
+    t.add_column(justify="right")
+    for key in sorted(by_type):
+        t.add_row(key, str(by_type[key]))
+    t.add_row("[bold]total", f"[bold]{len(manifest)}")
+    console.print(t)
+
+
 @eval_app.command("compare")
 def eval_compare(
     variant_a: str = typer.Argument(..., help="Baseline variant"),
@@ -859,8 +1021,8 @@ def eval_compare(
     re-running the same configuration. This can: it ignores every question the two
     variants agree on and tests only the disagreements.
     """
-    from chronomem.evaluation.compare import compare as paired
-    from chronomem.evaluation.report import load_report
+    from llm_long_term_memory.evaluation.compare import compare as paired
+    from llm_long_term_memory.evaluation.report import load_report
 
     settings = Settings()
     raw = settings.results_dir / "raw"
@@ -898,8 +1060,8 @@ def eval_variability(
     Reads `<variant>.jsonl` plus any `<variant>.rep*.jsonl`. This is the yardstick
     every reported difference has to clear; create repeats with `eval repeat`.
     """
-    from chronomem.evaluation.compare import Variability
-    from chronomem.evaluation.report import load_report
+    from llm_long_term_memory.evaluation.compare import Variability
+    from llm_long_term_memory.evaluation.report import load_report
 
     settings = Settings()
     raw = settings.results_dir / "raw"
@@ -910,7 +1072,7 @@ def eval_variability(
     if len(paths) < 2:
         console.print(
             f"[yellow]Need at least two runs.[/yellow] Found {len(paths)}. "
-            f"Run `chronomem eval repeat {variant} --runs 3`."
+            f"Run `lltm eval repeat {variant} --runs 3`."
         )
         raise typer.Exit(1)
 
@@ -929,8 +1091,8 @@ def eval_repeat(
     fresh: bool = typer.Option(False, help="Discard each repeat checkpoint"),
 ) -> None:
     """Run 2-5 independently checkpointed repetitions of one configuration."""
-    from chronomem.evaluation.compare import Variability
-    from chronomem.evaluation.harness import run_eval
+    from llm_long_term_memory.evaluation.compare import Variability
+    from llm_long_term_memory.evaluation.harness import run_eval
 
     accuracies = []
     for number in range(1, runs + 1):
@@ -966,12 +1128,12 @@ def ingest_fidelity(
     reference is the source text. Run it before spending an ingest on a prompt
     change.
     """
-    from chronomem.config import ExperimentConfig
-    from chronomem.ingest import Extractor, TwoStageExtractor
-    from chronomem.ingest.fidelity import score_sessions
-    from chronomem.llm import Limits, QuotaManager, UsageTracker
-    from chronomem.llm.client import GeminiClient
-    from chronomem.store import Memory
+    from llm_long_term_memory.config import ExperimentConfig
+    from llm_long_term_memory.ingest import Extractor, TwoStageExtractor
+    from llm_long_term_memory.ingest.fidelity import score_sessions
+    from llm_long_term_memory.llm import Limits, QuotaManager, UsageTracker
+    from llm_long_term_memory.llm.client import GeminiClient
+    from llm_long_term_memory.store import Memory
 
     settings = Settings()
     cfg = ExperimentConfig.from_yaml(config)
@@ -1015,11 +1177,11 @@ def ingest_fidelity(
     import hashlib
     import json as _json
 
-    from chronomem.ingest.extract import _PROMPT, EXTRACT_SYSTEM
-    from chronomem.ingest.extract_facts import _PROMPT as FACTS_PROMPT
-    from chronomem.ingest.extract_facts import FACTS_SYSTEM
-    from chronomem.ingest.keying import _PROMPT as KEYING_PROMPT
-    from chronomem.ingest.keying import KEYING_SYSTEM
+    from llm_long_term_memory.ingest.extract import _PROMPT, EXTRACT_SYSTEM
+    from llm_long_term_memory.ingest.extract_facts import _PROMPT as FACTS_PROMPT
+    from llm_long_term_memory.ingest.extract_facts import FACTS_SYSTEM
+    from llm_long_term_memory.ingest.keying import _PROMPT as KEYING_PROMPT
+    from llm_long_term_memory.ingest.keying import KEYING_SYSTEM
 
     active_prompt = (
         FACTS_SYSTEM + FACTS_PROMPT + KEYING_SYSTEM + KEYING_PROMPT
@@ -1030,7 +1192,7 @@ def ingest_fidelity(
         (active_prompt + cfg.models.extractor + str(batch) + str(use_two_stage)).encode()
     ).hexdigest()[:12]
     cache_path = settings.store_dir / "fidelity-cache" / f"{fingerprint}.json"
-    cached = _json.loads(cache_path.read_text()) if cache_path.exists() else {}
+    cached = _json.loads(cache_path.read_text(encoding="utf-8")) if cache_path.exists() else {}
     if cached:
         console.print(
             f"[dim]reusing cached extraction {fingerprint} ({len(cached)} sessions)[/dim]"
@@ -1068,7 +1230,7 @@ def ingest_fidelity(
                 for m in by_session[s.session_id]
             ]
         cache_path.parent.mkdir(parents=True, exist_ok=True)
-        cache_path.write_text(_json.dumps(cached))
+        cache_path.write_text(_json.dumps(cached), encoding="utf-8")
         console.print(f"  batch {i // batch + 1}: +{len(outcome.memories)} memories")
 
     report = score_sessions(pairs)
@@ -1110,9 +1272,9 @@ def lifecycle_run(
     """Apply configured strength decay and optional capacity eviction."""
     from datetime import datetime
 
-    from chronomem.config import ExperimentConfig
-    from chronomem.lifecycle import apply_decay, evict_to_limit
-    from chronomem.store import SQLiteMemoryStore
+    from llm_long_term_memory.config import ExperimentConfig
+    from llm_long_term_memory.lifecycle import apply_decay, evict_to_limit
+    from llm_long_term_memory.store import SQLiteMemoryStore
 
     cfg = ExperimentConfig.from_yaml(config)
     settings = Settings()
@@ -1151,12 +1313,12 @@ def lifecycle_consolidate(
     user_id: str | None = typer.Option(None, help="Only process one namespace"),
 ) -> None:
     """Synthesize related active memories while retaining their source evidence."""
-    from chronomem.config import ExperimentConfig
-    from chronomem.consolidate import Consolidator
-    from chronomem.embed import Encoder
-    from chronomem.llm import Limits, QuotaManager, UsageTracker
-    from chronomem.llm.client import GeminiClient
-    from chronomem.store import NumpyFlatIndex, SQLiteMemoryStore
+    from llm_long_term_memory.config import ExperimentConfig
+    from llm_long_term_memory.consolidate import Consolidator
+    from llm_long_term_memory.embed import Encoder
+    from llm_long_term_memory.llm import Limits, QuotaManager, UsageTracker
+    from llm_long_term_memory.llm.client import GeminiClient
+    from llm_long_term_memory.store import NumpyFlatIndex, SQLiteMemoryStore
 
     cfg = ExperimentConfig.from_yaml(config)
     settings = Settings()
@@ -1204,7 +1366,7 @@ def influence_cost(
     leave_one_in: bool = typer.Option(True),
 ) -> None:
     """What a full influence measurement costs, before committing to it."""
-    from chronomem.influence import requests_needed
+    from llm_long_term_memory.influence import requests_needed
 
     answers = requests_needed(questions, top_k, leave_one_in)
     t = Table(show_header=False)
@@ -1233,8 +1395,8 @@ def influence_measure(
     fresh: bool = typer.Option(False, help="Discard the existing checkpoint"),
 ) -> None:
     """Measure retrieved memories' answer utility for a fixed evaluation variant."""
-    from chronomem.evaluation.runners.memory import MemoryRunner
-    from chronomem.influence import measure_influence
+    from llm_long_term_memory.evaluation.runners.memory import MemoryRunner
+    from llm_long_term_memory.influence import measure_influence
 
     cfg, settings, runner, judge, usage = _build(variant, config, store_name)
     if not isinstance(runner, MemoryRunner):
@@ -1292,7 +1454,7 @@ def influence_fit(
 
     import numpy as np
 
-    from chronomem.influence import FEATURE_NAMES, InfluenceDataset, fit_grouped
+    from llm_long_term_memory.influence import FEATURE_NAMES, InfluenceDataset, fit_grouped
 
     path = Path(labels)
     if not path.exists():
@@ -1308,7 +1470,7 @@ def influence_fit(
     if not header_path.exists():
         console.print(f"[yellow]No feature header at {header_path}.[/yellow] Rerun measurement.")
         raise typer.Exit(1)
-    feature_names = tuple(json.loads(header_path.read_text()).get("features", ()))
+    feature_names = tuple(json.loads(header_path.read_text(encoding="utf-8")).get("features", ()))
     if feature_names != FEATURE_NAMES:
         console.print(
             "[yellow]Feature header does not match this code. Rerun measurement.[/yellow]"
@@ -1362,12 +1524,17 @@ def ingest_temporal_gate(
     """
     import json
 
-    from chronomem.config import ExperimentConfig
-    from chronomem.ingest.keying import FactKeyer
-    from chronomem.ingest.temporal_gate import THRESHOLDS, score, stability_between, unusable
-    from chronomem.ingest.temporal_pairs import ALL_PAIRS
-    from chronomem.llm import Limits, QuotaManager, UsageTracker
-    from chronomem.llm.client import GeminiClient
+    from llm_long_term_memory.config import ExperimentConfig
+    from llm_long_term_memory.ingest.keying import FactKeyer
+    from llm_long_term_memory.ingest.temporal_gate import (
+        THRESHOLDS,
+        score,
+        stability_between,
+        unusable,
+    )
+    from llm_long_term_memory.ingest.temporal_pairs import ALL_PAIRS
+    from llm_long_term_memory.llm import Limits, QuotaManager, UsageTracker
+    from llm_long_term_memory.llm.client import DailyQuotaExhausted, GeminiClient
 
     settings = Settings()
     cfg = ExperimentConfig.from_yaml(config)
@@ -1386,10 +1553,21 @@ def ingest_temporal_gate(
     flat = [f for p in ALL_PAIRS for f in (p.before, p.after)]
     console.print(f"[bold]temporal gate[/bold] · {len(ALL_PAIRS)} pairs · {cfg.models.extractor}\n")
 
-    first = keyer.key(flat)
-    drift = None
-    if stability:
-        drift = stability_between(first, keyer.key(flat))
+    usage_artifact = settings.results_dir / "raw" / "temporal-gate.usage.json"
+    try:
+        first = keyer.key(flat)
+        drift = None
+        if stability:
+            drift = stability_between(first, keyer.key(flat))
+    except DailyQuotaExhausted as exc:
+        # Daily exhaustion is a normal pause in this project, not a crash. Preserve
+        # any completed first call from a stability run without replacing an older
+        # usage artifact when the local limiter stopped us before making a request.
+        if usage.records:
+            usage.save(usage_artifact, merge=True)
+        console.print(f"\n[yellow]Stopped on quota:[/yellow] {exc}")
+        console.print("[dim]Rerun after the reported reset; no gate report was written.[/dim]")
+        raise typer.Exit(2) from None
 
     report = score(
         ALL_PAIRS, [(first[2 * i], first[2 * i + 1]) for i in range(len(ALL_PAIRS))], drift
@@ -1432,9 +1610,9 @@ def ingest_temporal_gate(
 
     artifact = settings.results_dir / "raw" / "temporal-gate.json"
     artifact.parent.mkdir(parents=True, exist_ok=True)
-    artifact.write_text(json.dumps(report.to_dict(), indent=2) + "\n")
+    artifact.write_text(json.dumps(report.to_dict(), indent=2) + "\n", encoding="utf-8")
     console.print(f"[dim]→ {artifact}[/dim]")
-    usage.save(settings.results_dir / "raw" / "temporal-gate.usage.json")
+    usage.save(usage_artifact)
 
 
 if __name__ == "__main__":

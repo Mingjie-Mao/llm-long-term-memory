@@ -1,5 +1,12 @@
 # P7–P8 Delivery Plan
 
+> **Historical.** Written before P7/P8 were built; kept because it records what was
+> planned and therefore what changed. Most of it shipped — the service boundary, the
+> HTTP contract, structured logging, Docker, and the MCP server all exist now, though
+> the MCP surface ended up five tools rather than three. For current status and what
+> is next, read [ROADMAP.md](ROADMAP.md); for what was built and measured, read
+> [ENGINEERING_REPORT.md](ENGINEERING_REPORT.md).
+
 This plan follows the current repository rather than the original phase checklist.
 P1–P6 now have implementation and automated tests, but the new two-stage store has
 not yet produced a replacement benchmark table. P7 must package a *pinned,

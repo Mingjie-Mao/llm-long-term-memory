@@ -50,14 +50,17 @@ jobs:
           enable-cache: true
       - run: uv python install 3.13
 
-      # The `llm` extra is required: the tests exercise real provider quirks
-      # (a 429 quota body, a generic 400 on thinking_budget) and construct the
-      # SDK's own error and config types to do it. The `embed` extra is
-      # deliberately left out — it pulls ~2GB of torch, and `Encoder` loads
-      # sentence-transformers lazily inside a property, so nothing imported at
-      # collection time needs it.
+      # `llm` is required: the tests exercise real provider quirks (a 429 quota
+      # body, a generic 400 on thinking_budget) and construct the SDK's own error
+      # and config types to do it. `api` and `mcp` are here because without them
+      # the service and protocol tests skip, and a matrix that silently skips two
+      # thirds of the suite reports platform support it never checked — 101 tests
+      # ran where 354 exist. Neither extra pulls torch.
+      #
+      # `embed` stays out: ~2GB of torch, and `Encoder` loads sentence-transformers
+      # lazily inside a property, so nothing imported at collection time needs it.
       - name: Install
-        run: uv sync --group dev --extra llm
+        run: uv sync --group dev --extra llm --extra api --extra mcp
 
       - name: Test
         run: uv run pytest --cov=llm_long_term_memory --cov-report=term-missing

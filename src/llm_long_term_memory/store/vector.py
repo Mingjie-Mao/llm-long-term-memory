@@ -36,7 +36,7 @@ class NumpyFlatIndex:
     def _load(self) -> None:
         if self._vec_path.exists() and self._ids_path.exists():
             self._vectors = np.load(self._vec_path)
-            self._ids = json.loads(self._ids_path.read_text())
+            self._ids = json.loads(self._ids_path.read_text(encoding="utf-8"))
 
     def add(self, ids: list[str], vectors: np.ndarray) -> None:
         if not ids:
@@ -68,7 +68,7 @@ class NumpyFlatIndex:
     def save(self) -> None:
         self.path.parent.mkdir(parents=True, exist_ok=True)
         np.save(self._vec_path, self._vectors)
-        self._ids_path.write_text(json.dumps(self._ids))
+        self._ids_path.write_text(json.dumps(self._ids), encoding="utf-8")
 
     def __len__(self) -> int:
         return len(self._ids)

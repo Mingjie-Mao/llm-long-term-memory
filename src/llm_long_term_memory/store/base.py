@@ -30,8 +30,20 @@ class Memory:
     token_count: int
 
     subject: str | None = None
+    """Who or what the fact is ABOUT — not who said it. "Andy wore a blue shirt",
+    stated by the user, has subject 'andy'. See `source_role`."""
     predicate: str | None = None
     object: str | None = None
+
+    source_role: str = "user"
+    """Who said it: user | assistant | system. Orthogonal to `subject`. Keeping
+    these separate is what makes "what did you recommend?" expressible — it filters
+    on the speaker, while "what does Andy wear?" filters on the subject."""
+
+    scope: str | None = None
+    """Why this is worth retaining: profile | preference | plan | recommendation |
+    commitment | shared_context | event. Drives retrieval filters and the
+    inspector's grouping."""
 
     importance: float = 0.5
     confidence: float = 1.0
