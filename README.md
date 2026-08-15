@@ -304,7 +304,7 @@ across three runs** — including the Mayo case end to end.
 
 ## Engineering
 
-- **352 tests**, CI across ubuntu / windows / macos
+- **363 tests**, CI across ubuntu / windows / macos
 - **Result versioning** — every evaluation row records its answerer prompt, judge
   prompt and extractor version; the extractor version comes from the *store*, not
   the checkout, because it describes the data being evaluated
@@ -357,9 +357,13 @@ src/llm_long_term_memory/
 
 - No held-out result. Every number comes from development questions also used for
   prompt iteration and gate tuning.
-- The store is 64% ingested and was built by the pre-P10 extractor, so
-  `source_role` / `scope` are not yet exercised on real data.
-- Single-writer SQLite; no concurrency lock on ingestion.
+- The completed store mixes two extractor generations — 4,843 memory rows written
+  before the P10 fix and 2,265 after — so it is not one system version, and the
+  only result measured on it is labelled diagnostic. A clean rebuild is in
+  progress. See [section 10 of the engineering report](docs/ENGINEERING_REPORT.md)
+  for the incident and the guards added since.
+- Single-writer SQLite. Ingestion and evaluation now take a cross-process lock;
+  concurrency beyond that is not supported.
 - Temporal arithmetic and cross-session aggregation are unsolved — see the failure
   taxonomy in the [engineering report](docs/ENGINEERING_REPORT.md).
 
