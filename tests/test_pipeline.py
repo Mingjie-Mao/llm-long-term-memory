@@ -7,6 +7,8 @@ work, never the work already done.
 
 from __future__ import annotations
 
+import re
+
 import numpy as np
 import pytest
 
@@ -83,7 +85,7 @@ class FakeEncoder:
 
 @pytest.fixture
 def build(tmp_path):
-    def make(extractor, sessions_per_request=2, checkpoint_every=1):
+    def make(extractor, sessions_per_request=2, checkpoint_every=1, config_spec=None):
         store = SQLiteMemoryStore(tmp_path / "s.db")
         store.initialize()
         index = NumpyFlatIndex(tmp_path / "idx", dim=4)
@@ -96,6 +98,7 @@ def build(tmp_path):
             checkpoint_path=tmp_path / "ckpt.json",
             sessions_per_request=sessions_per_request,
             checkpoint_every=checkpoint_every,
+            config_spec=config_spec,
         )
         return pipeline, store, index
 
@@ -403,3 +406,75 @@ def test_a_schema_change_alone_is_enough_to_refuse(build, monkeypatch):
     pipeline2, _, _ = build(VersionedExtractor("v1"))
     with pytest.raises(ExtractorChanged, match="schema_version"):
         pipeline2.run([("u1", session(f"s{i}")) for i in range(8)])
+
+
+# ------------------------------ the second layer: runtime against configuration
+
+
+def spec_for(extractor, sessions_per_request=2, dedup=None):
+    """A config-derived spec, spelled out rather than read from a yaml file, so the
+    test states which value it is varying."""
+    from llm_long_term_memory.ingest import fingerprint
+
+    return fingerprint.from_runtime(
+        extractor, sessions_per_request=sessions_per_request, dedup=dedup
+    )
+
+
+def test_ingest_refuses_when_the_runtime_does_not_match_the_configuration(build):
+    """Preflight validates a store against a fingerprint derived from configuration.
+    That is only evidence about the run if the objects built from that
+    configuration match it — so the objects are checked against it here, before any
+    request is spent."""
+    from llm_long_term_memory.ingest.pipeline import ConfigurationMismatch
+
+    declared = spec_for(VersionedExtractor("v1", model="gemini-3.1-flash-lite"))
+    # The wiring mistake: an extractor constructed with a model the config does not
+    # name. Nothing downstream could tell, because the store would be stamped with
+    # whatever actually ran.
+    pipeline, store, _ = build(
+        VersionedExtractor("v1", model="gemma-3-27b-it"), config_spec=declared
+    )
+
+    with pytest.raises(
+        ConfigurationMismatch, match=re.escape("model: gemini-3.1-flash-lite -> gemma-3-27b-it")
+    ):
+        pipeline.run([("u1", session(f"s{i}")) for i in range(4)])
+
+    # Refused before writing: no rows, and no fingerprint claiming otherwise.
+    assert store.count() == 0
+    assert store.get_meta("ingest_fingerprint") is None
+
+
+def test_a_matching_runtime_passes_the_configuration_check(build):
+    """The case the check exists to allow, so a mismatch means something."""
+    extractor = VersionedExtractor("v1", model="gemini-3.1-flash-lite")
+    pipeline, store, _ = build(extractor, config_spec=spec_for(extractor))
+
+    outcome = pipeline.run([("u1", session(f"s{i}")) for i in range(4)])
+
+    assert outcome.completed
+    assert store.get_meta("extractor_version") == "v1"
+
+
+def test_the_batch_size_is_part_of_the_configuration_check(build):
+    """`sessions_per_request` is fingerprinted, and ingestion can lower it to fit the
+    model's token budget. A pipeline running a batch size the config-derived spec
+    does not describe would write a fingerprint nobody can reproduce."""
+    from llm_long_term_memory.ingest.pipeline import ConfigurationMismatch
+
+    extractor = VersionedExtractor("v1")
+    declared = spec_for(extractor, sessions_per_request=15)
+    pipeline, _, _ = build(extractor, sessions_per_request=2, config_spec=declared)
+
+    with pytest.raises(ConfigurationMismatch, match="sessions_per_request: 15 -> 2"):
+        pipeline.run([("u1", session(f"s{i}")) for i in range(4)])
+
+
+def test_without_a_config_spec_the_check_is_skipped(build):
+    """Callers that have no resolved configuration — the fidelity gate, the tests
+    above — keep working. The check is an addition, not a new requirement."""
+    pipeline, store, _ = build(VersionedExtractor("v1"))
+
+    assert pipeline.run([("u1", session("s0"))]).completed
+    assert store.count() == 1

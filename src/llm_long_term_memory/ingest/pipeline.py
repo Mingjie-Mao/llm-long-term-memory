@@ -134,6 +134,21 @@ def fit_batch_size(
     return max(1, min(configured, affordable))
 
 
+TOKENS_PER_SESSION = 2_560
+"""Measured in D5. Named because two callers need the same number."""
+
+
+def resolved_sessions_per_request(configured: int, tpm: int) -> int:
+    """The batch size ingestion will actually use.
+
+    Batch size is part of the ingest fingerprint, and the configured value is not
+    it — the model's token budget can lower it. Both the ingestion driver and the
+    preflight check resolve it through here, so a store whose fingerprint says 15
+    is not compared against a configuration that merely asked for 15.
+    """
+    return fit_batch_size(configured, tpm, tokens_per_session=TOKENS_PER_SESSION)
+
+
 def _key(namespace: str, session: HaystackSession) -> str:
     """Checkpoint key. Namespaced, because the same session in two questions is two
     separate units of work."""
@@ -171,6 +186,10 @@ class ExtractorChanged(RuntimeError):
     """A resume would append memories from a different extractor than the store holds."""
 
 
+class ConfigurationMismatch(RuntimeError):
+    """The objects about to run are not the ones the resolved configuration describes."""
+
+
 class IngestionPipeline:
     def __init__(
         self,
@@ -183,6 +202,7 @@ class IngestionPipeline:
         sessions_per_request: int = 10,
         checkpoint_every: int = 5,
         resolver=None,
+        config_spec: fingerprint.IngestSpec | None = None,
     ) -> None:
         self.extractor = extractor
         self.deduplicator = deduplicator
@@ -195,6 +215,10 @@ class IngestionPipeline:
         # Optional so the ablation can run ingestion with temporal
         # resolution switched off and compare against the same store.
         self.resolver = resolver
+        # The spec derived from resolved configuration, when the caller has one.
+        # Preflight validates a store against the *configuration*; this is what
+        # makes that validation mean something about the run — see `run()`.
+        self.config_spec = config_spec
 
     def run(
         self,
@@ -227,11 +251,33 @@ class IngestionPipeline:
         # alone, which produces exactly the same mixed store with nothing to notice
         # it by.
         if hasattr(self.store, "set_meta"):
-            current = fingerprint.build(
+            spec = fingerprint.from_runtime(
                 self.extractor,
                 sessions_per_request=self.sessions_per_request,
                 dedup=self.deduplicator,
             )
+            # The second layer. Preflight compares the store against a fingerprint
+            # derived from configuration, which is only evidence about this run if
+            # the objects built from that configuration match it. Checking it here
+            # is what closes the gap: preflight answers "is the config what wrote
+            # this store?", and this answers "is the runtime what the config says?".
+            #
+            # It is cheap and it runs before any request is spent, so a wiring
+            # mistake — an extractor constructed with a different model than the
+            # config names — stops here rather than at the end of a day of quota.
+            if self.config_spec is not None:
+                drifted = fingerprint.differences(self.config_spec.as_dict(), spec.as_dict())
+                if drifted:
+                    raise ConfigurationMismatch(
+                        "the ingestion objects do not match the resolved "
+                        "configuration:\n  "
+                        + "\n  ".join(drifted)
+                        + "\nThe fingerprint written to the store would describe "
+                        "something other than what ran, and every check that reads "
+                        "it downstream would inherit that."
+                    )
+
+            current = spec.as_dict()
             previous = fingerprint.loads(self.store.get_meta("ingest_fingerprint"))
             if resume and previous and self.store.count():
                 moved = fingerprint.differences(previous, current)

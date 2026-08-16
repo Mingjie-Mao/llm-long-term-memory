@@ -50,6 +50,12 @@ demand. Recordings carry a fingerprint of the store and prompt versions that
 produced them; if either changes, the page says **stale** instead of pretending to be
 current.
 
+> These run against the **mixed store**, not the clean one the measured results
+> come from. The Mayo case regresses on the clean store for a reason that is
+> understood and not yet fixed — see [Live regression](#live-regression). Rather
+> than re-record a demo that fails, the demos stay where they work and the gap is
+> stated here.
+
 ---
 
 ## What it does
@@ -245,22 +251,38 @@ plausible additions were measured and **not shipped**.
 
 ### Structured memory as compression
 
-On 31 fully-ingested questions from [LongMemEval-S](https://github.com/xiaowu0162/LongMemEval),
-same answerer and judge throughout ([full write-up](results/a2-pilot.md)):
+On the frozen 50-question `dev50` set from [LongMemEval-S](https://github.com/xiaowu0162/LongMemEval),
+against a store built end to end by one extractor generation, same answerer and
+judge throughout:
 
-| Variant | Accuracy | Median context tokens |
-|---|---:|---:|
-| `full_context` | 64.5% | 109,605 |
-| `naive_rag` | 51.6% | 13,057 |
-| **`two_stage` (k=10)** | **51.6%** | **242** |
-| v1 structured memory | 19.4% | 465 |
+| Variant | Raw fallback | Accuracy | Median context tokens |
+|---|---|---:|---:|
+| `full_context` | — | 56.0% | 109,260 |
+| `naive_rag` | — | 54.0% | 13,057 |
+| Clean P10, memory only | off | 56.0% | 1,415 |
+| **Clean P10, product** | **on** | **66.0%** | **1,455** |
+| v1 structured memory | — | 26.0% | 465 |
 
-**~54x less context than naive RAG, with no detectable accuracy difference**
-(6W-6L, paired exact McNemar, p = 1.000).
+**75x less context than the full transcript, and more accurate on this set.**
 
-> **Read this as a pilot.** 31 questions, unstratified, one run each. `p = 1.000`
-> means *no difference was detected*, not that the systems are equivalent. A
-> stratified 50-question run is pending, and no held-out result exists yet.
+The two P10 rows differ in `fallback.enabled`, `fallback.max_turns` and
+`fallback.max_chars` and in nothing else — checked before the run, not asserted
+afterwards — so the gap between them is attributable to the fallback.
+
+> **The +10pp is not statistically significant.** Paired over the same 50
+> questions, the fallback fixed 6 and broke 1 (exact McNemar, **p = 0.125**).
+> Seven discordant pairs cannot carry a claim this size. What the split *does*
+> show is where the wins came from: 3 of the 6 are `single-session-assistant`,
+> the case the archive exists for, which is consistent with the mechanism but is
+> not a substitute for the test.
+>
+> **`dev50` is a development set.** Prompts, gates and thresholds were all tuned
+> against it. The held-out set is frozen and has never been run.
+
+Where the fallback does nothing: `multi-session` (38.5%) and `temporal-reasoning`
+(46.2%) are **identical** in both arms. Half the question set, and the archive
+recovers none of it — these need aggregation and date arithmetic, not better
+lookup.
 
 ### Where the gain came from
 
@@ -296,15 +318,33 @@ mean-baseline 0.263 — it lost to predicting the mean. [Details](results/p6-pil
 
 ### Live regression
 
-Seven questions that every variant previously failed now score **6/7, identical
-across three runs** — including the Mayo case end to end.
-[Details](results/live-regression-v2.md).
+Seven questions that every variant previously failed score **6/7, identical across
+three runs**, including the Mayo case end to end.
+[Details](results/live-regression-v2.md). Measured on the mixed store, which is
+what the demos above still run against.
+
+**The Mayo case does not survive the move to the clean store**, and the reason is
+worth stating because it is not the one you would guess. The recovery itself is
+fine: archive-wide BM25 still ranks the gold turn **first**. What changed is which
+recovery runs. `RawFallback.recover` branches on whether retrieval returned
+anything at all — if it did, it searches only the source turns of the memories it
+found, and returns; archive-wide is reached only when retrieval came back empty.
+On the mixed store the Mayo question retrieved nothing and went archive-wide. On
+the clean store it retrieves ten on-topic memories whose source sessions are about
+concerts and screen recording, commits to those, and never tries the search that
+would have worked.
+
+So the better store took the narrower path. The question is in `dev50` and is
+wrong in **both** formal arms — it is the one failure behind
+`single-session-assistant` 5/6. Fixing the branch is the next piece of work, and
+the demos stay on the mixed store until it is fixed rather than being re-recorded
+onto a store where they fail.
 
 ---
 
 ## Engineering
 
-- **363 tests**, CI across ubuntu / windows / macos
+- **385 tests**, CI across ubuntu / windows / macos
 - **Result versioning** — every evaluation row records its answerer prompt, judge
   prompt and extractor version; the extractor version comes from the *store*, not
   the checkout, because it describes the data being evaluated
@@ -333,7 +373,7 @@ uv run lltm --help
 ```bash
 uv run lltm data download --variant s
 uv run lltm doctor
-uv run lltm ingest run --store-name two-stage-hydrated
+uv run lltm ingest run --store-name two-stage-p10
 uv run lltm eval freeze dev50 --n 50
 uv run lltm eval run two_stage --questions results/manifests/dev50.json
 uv run lltm eval compare naive_rag two_stage
@@ -356,16 +396,25 @@ src/llm_long_term_memory/
 ## Limitations
 
 - No held-out result. Every number comes from development questions also used for
-  prompt iteration and gate tuning.
-- The completed store mixes two extractor generations — 4,843 memory rows written
-  before the P10 fix and 2,265 after — so it is not one system version, and the
-  only result measured on it is labelled diagnostic. A clean rebuild is in
-  progress. See [section 10 of the engineering report](docs/ENGINEERING_REPORT.md)
+  prompt iteration and gate tuning. The held-out set is frozen and unopened.
+- The fallback picks its level by whether retrieval returned anything, not by
+  whether what it returned was relevant, so a confidently wrong retrieval blocks
+  the archive-wide search — the Mayo regression above.
+- The demos and the shipped service default still run on the mixed store, which
+  holds 4,843 rows from before the P10 fix and 2,265 from after. Results measured
+  on it stay labelled diagnostic. The clean rebuild is **done** — 2,348/2,348
+  sessions, 50 namespaces, 6,233 memories, zero pre-P10 rows — and is what the
+  formal results above were measured on; moving the demos onto it waits on the
+  fallback fix. See [section 10 of the engineering report](docs/ENGINEERING_REPORT.md)
   for the incident and the guards added since.
+- 14.5% of substantive sessions (304 of 2,096) yielded no memory at all. Recorded
+  as a baseline, not yet explained — whether it is stochastic dropout or a
+  systematic gap in the extraction policy has not been measured.
 - Single-writer SQLite. Ingestion and evaluation now take a cross-process lock;
   concurrency beyond that is not supported.
-- Temporal arithmetic and cross-session aggregation are unsolved — see the failure
-  taxonomy in the [engineering report](docs/ENGINEERING_REPORT.md).
+- Temporal arithmetic and cross-session aggregation are unsolved, and the fallback
+  does not touch them: both arms score identically on those two types. See the
+  failure taxonomy in the [engineering report](docs/ENGINEERING_REPORT.md).
 
 ## License
 

@@ -31,9 +31,10 @@ from zoneinfo import ZoneInfo
 REPO = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO / "src"))
 
-from llm_long_term_memory.config import ExperimentConfig  # noqa: E402
+from llm_long_term_memory.config import ExperimentConfig, Settings  # noqa: E402
 from llm_long_term_memory.ingest import fingerprint  # noqa: E402
-from llm_long_term_memory.ingest.two_stage import TwoStageExtractor  # noqa: E402
+from llm_long_term_memory.ingest.pipeline import resolved_sessions_per_request  # noqa: E402
+from llm_long_term_memory.llm import Limits, QuotaManager  # noqa: E402
 
 PY = str(REPO / ".venv" / "bin" / "python")
 DEFAULT_STORE_NAME = "two-stage-p10"
@@ -250,31 +251,74 @@ def store_meta(target: Target, key: str) -> str | None:
     return row[0] if row else None
 
 
-def check_target_store(target: Target, expected: int) -> tuple[int, int, int]:
+def check_target_store(target: Target, expected: int) -> bool:
     """Resume the existing store. Never create, never overwrite.
 
     A missing file here would mean the store moved or the name is wrong, and the
     recovery for both is a human looking — not this script quietly creating an empty
     database and ingesting the whole corpus into it.
+
+    Returns whether the ingest still has work to do. A complete store is not an
+    error: once the corpus is in, the remaining sequence is gates and A2, and this
+    script is the thing that runs them. It used to stop here, on the reasoning that
+    "nothing to resume" meant a mistake — which was true while ingestion was the
+    point and false the moment it finished, leaving the completed store with no way
+    to reach the checks that gate its own evaluation.
     """
     store = target.store
     if not store.exists():
         stop("target store", f"{store} does not exist — refusing to create one")
     sessions, namespaces, memories = store_counts(target)
-    if sessions >= expected:
-        stop("target store", f"already at {sessions}/{expected} — nothing to resume")
     if sessions == 0:
         stop("target store", f"{store.name} is empty — this is not a resume")
+    if sessions > expected:
+        stop("target store", f"{sessions} sessions against a corpus of {expected} — not this data")
+    complete = sessions == expected
     ok(
         "target store",
         f"{store.name}: {sessions}/{expected} sessions, "
-        f"{namespaces} namespaces, {memories:,} memories — resuming",
+        f"{namespaces} namespaces, {memories:,} memories — "
+        + ("complete, ingest will be skipped" if complete else "resuming"),
     )
     ok("store extractor", store_meta(target, "extractor_version") or "unstamped")
-    return sessions, namespaces, memories
+    return not complete
 
 
 # --------------------------------------------- homogeneity, before the formal A2
+
+
+def expected_fingerprint() -> fingerprint.IngestSpec:
+    """What a store written by the current configuration should carry.
+
+    Built from resolved configuration alone — no Gemini client, no encoder, no
+    request. A preflight that had to construct the runtime in order to describe it
+    would fail whenever the model dependencies were missing, for reasons having
+    nothing to do with the store it is checking, and it could reach the network on
+    a path whose entire job is to look without touching.
+
+    `sessions_per_request` is resolved through the same helper the ingestion driver
+    uses, because the configured batch size is not necessarily the effective one —
+    the model's token budget can lower it, and it is the effective value that goes
+    into the fingerprint. Reading `cfg.ingest.sessions_per_request` directly here
+    would compare a store against a number that never ran.
+
+    The remaining risk — configuration saying one thing while the objects built
+    from it do another — is not this function's to carry. `IngestionPipeline.run`
+    compares its live objects against this same config-derived spec before spending
+    a request, so the two layers together cover what one of them cannot.
+    """
+    cfg = ExperimentConfig.from_yaml(str(REPO / "configs" / "baselines.yaml"))
+    settings = Settings()
+    quota = QuotaManager(
+        state_dir=settings.store_dir / "quota",
+        default=Limits(rpm=cfg.quota.rpm, tpm=cfg.quota.tpm, rpd=cfg.quota.rpd),
+    )
+    quota.load_learned()
+    per_request = resolved_sessions_per_request(
+        cfg.ingest.sessions_per_request,
+        quota.for_model(cfg.models.extractor).limits.tpm,
+    )
+    return fingerprint.from_config(cfg, sessions_per_request=per_request)
 
 
 def check_store_is_homogeneous(target: Target, expected_sessions: int) -> None:
@@ -285,9 +329,10 @@ def check_store_is_homogeneous(target: Target, expected_sessions: int) -> None:
     came from the generation before. The fingerprint and the rows are both checked,
     and the division of labour between them is not symmetric:
 
-    * the fingerprint establishes that the *code* matches what is running now, and
-      for a store first written before the guard existed it is stamped on trust —
-      the resume that stamps it has no way to inspect rows already on disk;
+    * the fingerprint establishes that the store was written by the configuration
+      running now, and for a store first written before the guard existed it is
+      stamped on trust — the resume that stamps it has no way to inspect rows
+      already on disk;
     * the row checks are the evidence. `scope IS NULL` is a pre-P10 signature, and
       it separates the two real stores cleanly: 4,843 such rows in the mixed one,
       0 in the clean one. A store that lied in `meta` still fails here.
@@ -296,12 +341,7 @@ def check_store_is_homogeneous(target: Target, expected_sessions: int) -> None:
     is the normal case under this quota, so "all rows share a date" would fail a
     healthy store and pass an unhealthy one that happened to fit inside a day.
     """
-    expected_fp = fingerprint.build(
-        TwoStageExtractor,
-        sessions_per_request=ExperimentConfig.from_yaml(
-            str(REPO / "configs" / "baselines.yaml")
-        ).ingest.sessions_per_request,
-    )
+    expected_fp = expected_fingerprint().as_dict()
     stored_fp = fingerprint.loads(store_meta(target, "ingest_fingerprint"))
     if not stored_fp:
         stop("homogeneity", "store carries no ingest_fingerprint — it predates the guard")
@@ -527,25 +567,36 @@ def main() -> int:
         ok("corpus", f"{expected:,} unique session ids — the completion target")
         check_quota_really_reset(args.wait_for_quota)
         check_no_concurrent_ingest(target)
-        check_target_store(target, expected)
+        needs_ingest = check_target_store(target, expected)
         check_a2_output_is_clean(target)
+
+        # Homogeneity is a read-only check, so it runs here rather than only inside
+        # --run: a complete store can be inspected without committing to spending
+        # anything on it. An incomplete one cannot be — the check compares against
+        # the corpus total — so it is deferred to after the ingest, where it has
+        # always run.
+        if not needs_ingest:
+            print("\n\033[1m=== homogeneity ===\033[0m")
+            check_store_is_homogeneous(target, expected)
     except Stop:
         print("\n\033[31mPreflight failed. Nothing started.\033[0m")
         return 1
 
     if not args.run:
-        print("\n\033[33mChecks pass. Re-run with --run to start.\033[0m")
+        todo = "ingest, gates and A2" if needs_ingest else "gates and A2"
+        print(f"\n\033[33mChecks pass. Re-run with --run to start {todo}.\033[0m")
         return 0
 
     try:
-        run_stage("ingest (resume)", ["ingest", "run", "--store-name", target.store_name])
-        check_ingest_completed(target, expected)
+        if needs_ingest:
+            run_stage("ingest (resume)", ["ingest", "run", "--store-name", target.store_name])
+            check_ingest_completed(target, expected)
 
-        # Homogeneity before the gates, because a store that is not one system makes
-        # everything downstream unattributable — the incident this whole sequence
-        # exists to prevent recurring.
-        print("\n\033[1m=== homogeneity ===\033[0m")
-        check_store_is_homogeneous(target, expected)
+            # Homogeneity before the gates, because a store that is not one system
+            # makes everything downstream unattributable — the incident this whole
+            # sequence exists to prevent recurring.
+            print("\n\033[1m=== homogeneity ===\033[0m")
+            check_store_is_homogeneous(target, expected)
 
         # Both gates before A2, and a failure in either stops here. They cost a few
         # requests each against ~250 for the run they gate, which is the whole
