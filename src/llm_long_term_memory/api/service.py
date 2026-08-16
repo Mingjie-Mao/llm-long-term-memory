@@ -83,8 +83,16 @@ class MemoryService:
 
     def __init__(
         self,
-        config_path: str | Path = "configs/baselines.yaml",
-        store_name: str = "two-stage-hydrated",
+        # The product, not the baseline. `baselines.yaml` leaves the conditional
+        # raw-conversation fallback off, which is right for a comparison arm and
+        # wrong for the thing being served: the demo the README opens with recovers
+        # a dropped URL from the archive, and under the baseline config that path is
+        # unreachable. dev50: 56.0% without it, 72.0% with (results/table.md).
+        config_path: str | Path = "configs/fallback.yaml",
+        # The clean P10 store: one extractor generation, 2,348/2,348 sessions, and
+        # what every formal number is measured on. `two-stage-hydrated` mixes two
+        # generations and its results stay labelled diagnostic.
+        store_name: str = "two-stage-p10",
         settings: Settings | None = None,
         encoder=None,
         extractor=None,

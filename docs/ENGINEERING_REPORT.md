@@ -1,8 +1,8 @@
 # Engineering Report — Building a Persistent Long-Term Memory Layer for LLM Applications
 
 **Project:** `llm-long-term-memory` (internal name ChronoMem)
-**Report date:** 2026-08-15
-**Status:** productised prototype; dev-50 evaluation in progress, no held-out result yet
+**Report date:** 2026-08-17
+**Status:** productised prototype; formal dev-50 result measured on a clean store, no held-out result yet
 
 Every number below was recomputed from committed artifacts in `results/raw/` at the
 time of writing, and each is labelled with the file it comes from. Where a figure
@@ -53,10 +53,14 @@ three-platform CI.
 held-out data. The dev-50 set has been used for prompt iteration and gate tuning, so
 it measures the fit of those choices as much as the system.
 
-**No formal dev-50 result yet.** The run that was to produce it was made on a store
-that turned out to mix two extractor generations, so its 60.0% is recorded in
-section 10 as a diagnostic and is deliberately not carried into this summary, the
-README, or any comparison table. A clean rebuild is in progress.
+**The formal dev-50 result now exists** (section 10.6). The store it was measured
+on was rebuilt end to end under one extractor generation after the first attempt
+turned out to mix two; that earlier 60.0% stays in section 10 as a diagnostic and
+is carried into no comparison table. On the clean store, over the frozen dev50
+manifest: **56.0%** from structured memory alone and **72.0%** with the conditional
+raw-conversation fallback, the two arms differing in nothing else (9W-1L, exact
+McNemar p = 0.022). Section 10.6 explains why that p-value should be read as
+adaptive rather than as evidence of generalisation.
 
 ---
 
@@ -847,17 +851,25 @@ The formal A2 is two arms over the frozen `dev50` manifest, differing only in
 |---|---|---|---|
 | rows by extractor generation | 4,843 pre-P10 / 2,265 P10 | 100% P10 | 100% P10 |
 | raw fallback | on | off | on |
-| dev50 accuracy | 60.0% | 56.0% | **66.0%** |
+| dev50 accuracy | 60.0% | 56.0% | **72.0%** |
 | source-session recall | 94.0% | 94.0% | 94.0% |
-| `single-session-assistant` | 1/6 | 2/6 | 5/6 |
+| `single-session-assistant` | 1/6 | 2/6 | 6/6 |
+| `multi-session` | — | 5/13 | 7/13 |
 | median context | 1,346 tokens | 1,415 | 1,455 |
-| p95 answer latency | — | 7.2s | 2.8s |
+| p95 answer latency | — | 7.2s | 1.7s |
 
-**The +10pp between the two clean arms is not statistically significant.** Paired
-over the same 50 questions the fallback fixed 6 and broke 1 — exact McNemar
-**p = 0.125**. Three of the six wins are `single-session-assistant`, which is the
-case the archive exists for and is consistent with the mechanism, but seven
-discordant pairs cannot carry the claim on their own.
+Paired over the same 50 questions the fallback fixed 9 and broke 1 — exact McNemar
+**p = 0.022**.
+
+That number has a history, and reporting it without one would overstate it. The
+first product arm measured **66.0%**, at 6W-1L and **p = 0.125** — not significant.
+Reading one of its failures found the truncation defect in section 10.7; fixing it
+moved the arm to 72.0% and the pairing to significance, with the re-run beating the
+old arm 3W-0L. The defect was real and its fix is mechanical, but both the fix and
+its p-value come from the same 50 questions, which makes this an adaptive result.
+It means "this survived one honest look at its own failures", not "this
+generalises". The held-out set is what would answer the second question and it
+remains unopened.
 
 Two comparisons here are *not* clean experiments and should not be read as one.
 The mixed→clean columns differ in more than the extractor generation: the clean
@@ -871,14 +883,16 @@ What the P10 fix was for does show up where it was predicted:
 `single-session-assistant` moved 1/6 → 2/6 on memory alone, and to 5/6 once the
 archive is reachable.
 
-### 10.7 What the clean store broke: the fallback picks its level blind
+### 10.7 What the clean store broke, and the diagnosis that was wrong
 
-The one `single-session-assistant` still failing is the Mayo question — the case
-the README opens with, and the one the live regression demonstrated end to end on
-the mixed store. It fails on the clean store in **both** arms.
+After the rebuild, the Mayo question — the case the README opens with, and the one
+the live regression demonstrated end to end — failed on the clean store in **both**
+formal arms. A rebuild that improved retrieval broke the question that recovery
+exists for. Two explanations were available and the convincing one was wrong, which
+is the part worth recording.
 
-The recovery is not what broke. Archive-wide BM25 over the namespace still ranks
-the gold turn **first**. What changed is which recovery runs:
+**The explanation that was wrong.** `recover()` branched on whether retrieval had
+returned anything:
 
 ```python
 if memories:                                    # ← the entire condition
@@ -888,25 +902,48 @@ if memories:                                    # ← the entire condition
 turns = self.store.search_turns(user_id, query, limit=self.max_turns)  # archive_wide
 ```
 
-`recover()` branches on whether retrieval returned anything, never on whether what
-it returned is about the question, and `source_local` returns unconditionally once
-the retrieved memories have any source turns. On the mixed store the Mayo question
-retrieved nothing, fell through, and went archive-wide. On the clean store it
-retrieves ten plausible-looking memories whose source sessions are about concerts
-and screen-recording software, commits to those turns, and never reaches the
-search that would have worked.
+Nothing checked that the memories were *about* the question, so a confident wrong
+retrieval could suppress the archive search entirely. The docstring even stated the
+assumption — *"a memory that was found but lacks a detail points at the turn holding
+it, which is strictly better evidence than a keyword search over everything"* — true
+exactly when the retrieved memories are on topic, and unverified. This is a genuine
+defect and it is fixed. **It is not what broke Mayo.**
 
-The docstring states the reasoning: *"a memory that was found but lacks a detail
-points at the turn holding it, which is strictly better evidence than a keyword
-search over everything."* That holds exactly when the retrieved memories are about
-the right thing, and the clean store's better recall is what made the antecedent
-false — good retrieval put confident, wrong candidates in front of the router.
+**What actually broke it.** Retrieval had found the right conversation. At the
+product's `top_k=20`, the memories retrieved for the Mayo question included one
+anchored in `answer_sharegpt_81riySf_0` — the gold session — so the level chosen was
+`source_local`, and correctly. `turns_for_memories` returned **16** candidate turns
+ordered by session id, the gold turn sat at **index 9**, and `[:max_turns]` kept the
+first three: all from `33a39aa7_1`, a conversation about live music. The right level,
+the right conversation, and the answer discarded by an alphabetical slice.
 
-This is a level-selection bug, not a depth one. It is distinct from the `omelette`
-case (gold at BM25 rank 6 against `max_turns=3`), which is genuinely about depth,
-and the two should not be fixed with the same knob. Until it is fixed, the
-inspector demos stay on the mixed store, where they work, and the gap is stated in
-the README rather than papered over by re-recording a demo that fails.
+The two defects hid each other. On the mixed store this question retrieved nothing,
+fell through to the archive, and never met the slice — which is why a truncation bug
+in the most-demonstrated path in the project went unseen until recall improved
+enough to produce more than three candidates.
+
+Both are one omission: nothing ranked the candidates against the question. The fix
+ranks them, with a single FTS query serving twice — it supplies the archive-wide
+candidates, and its top hit decides whether the memories found the right
+conversation. The decision is per *session* rather than per turn, because inside one
+conversation BM25 routinely prefers the user's question to the assistant's answer
+(the question repeats the query's words); judged per turn that reads as "the archive
+beat the memories" and abandons a memory that had found exactly the right place.
+
+Neither defect is the `omelette` case (gold at BM25 rank 6 against `max_turns=3`),
+which is genuinely about depth. Depth remains untouched and unmeasured.
+
+**Effect.** `single-session-assistant` 5/6 → 6/6, `multi-session` 5/13 → 7/13, and
+the arm 66.0% → 72.0% (3W-0L against the pre-fix arm). The inspector demos now run
+on the clean store, and `scripts/record_golden.py` re-records them — a step that had
+been manual, which is why both recordings had gone stale unnoticed.
+
+**A note on what the demo recording revealed.** Requiring three runs to agree
+surfaced something a single run hides: the first-pass answerer is not deterministic
+between `need_source` and `no_evidence`, and the two route to different levels,
+because `need_source` passes the retrieved memories to `recover()` and `no_evidence`
+passes none. Both now recover the URL. The recording says so rather than presenting
+one run's route as the only one.
 
 ---
 
@@ -922,18 +959,16 @@ the README rather than papered over by re-recording a demo that fails.
    first — roughly twice the current store, or about two days of extractor quota.
 2. **The pilot is 31 unstratified questions.** An ingest-order prefix, not a sample.
    Category splits are descriptive only.
-3. **The mixed store is still what the demos and the service default run on** —
-   4,843 memory rows from the pre-P10 extractor and 2,265 from P10 (section 10),
-   so results measured on it stay labelled diagnostic. The clean rebuild is
-   **complete** (section 10.6) and carries the formal results; moving the demos
-   onto it is blocked on the fallback level-selection bug in section 10.7.
-4. **`source_local` now has live confirmation, and it was wrong.** This item
-   previously read "no live confirmation … leaves level 1 of the cascade
-   unverified outside unit tests." The clean store supplied the missing case and
-   it failed: `source_local` fired on the Mayo question, searched the wrong
-   sessions, and suppressed the archive-wide search that ranks the gold turn first
-   (section 10.7). The unit tests passed throughout — they exercise the level once
-   chosen, not the choosing.
+3. **The 72.0% is adaptive to dev50.** It was reached after fixing a defect found
+   by reading one of the set's own failures (section 10.7), so its `p = 0.022` says
+   the result survived one honest look, not that it generalises. The mixed store —
+   4,843 pre-P10 rows and 2,265 P10 (section 10) — is no longer the default for
+   anything, and results measured on it stay labelled diagnostic.
+4. **The fallback's candidate ranking is new and measured once.** Section 10.7
+   replaced a blind level choice and an alphabetical truncation with a single
+   ranking. It is covered by unit tests and by one dev50 arm; `fallback.max_turns`
+   itself has still never been swept, and the `omelette` case (gold at BM25 rank 6)
+   says depth is a separate open question.
 5. **14.5% of substantive sessions yield no memory** — 304 of 2,096 in the clean
    store, against 18.8% in the mixed one. Recorded as a baseline and deliberately
    not gated: this project has no evidence for where a healthy rate sits, and
@@ -959,24 +994,19 @@ the README rather than papered over by re-recording a demo that fails.
 `dev50` A2 in two arms, and the mixed-vs-clean comparison (section 10.6). The
 extractor-version guard on ingestion resume — the defect that made section 10
 necessary — is in `pipeline.py` and held throughout the resume that completed the
-rebuild.
+rebuild. The fallback's candidate ranking (section 10.7) replaced a blind level
+choice and an alphabetical truncation, taking the product arm to 72.0% and moving
+the demos onto the clean store.
 
 **Immediate, and in this order:**
 
-1. **Fix the fallback's level selection** (section 10.7). It is the one thing
-   currently known to be wrong rather than merely unmeasured, it costs the README's
-   headline demo, and it is a branch condition rather than a research question. The
-   fix is not to widen `max_turns`: the choice between `source_local` and
-   `archive_wide` needs to consider whether the retrieved memories are about the
-   question, or to try both and prefer the better evidence. Re-record the inspector
-   demos onto the clean store once it lands.
-2. **Explain the 14.5% zero-yield rate.** Re-run the 304 sessions that produced
+1. **Explain the 14.5% zero-yield rate.** Re-run the 304 sessions that produced
    nothing under an unchanged prompt, model and configuration, and measure how many
    yield on a second and third attempt. That separates stochastic dropout from a
    systematic gap in the extraction policy, and the answer decides whether the
    remedy is a retry or a prompt change. Doing it the other way round — editing the
    prompt first — would leave both explanations still open.
-3. **Exact-detail fidelity.** The recurring failure is a memory that keeps the gist
+2. **Exact-detail fidelity.** The recurring failure is a memory that keeps the gist
    and drops the identifier: the Mayo URL, `Garmin Forerunner`, `2-3 eggs`. Worth
    testing whether identity-bearing spans should survive extraction verbatim rather
    than being paraphrased into prose.
@@ -1018,11 +1048,13 @@ rebuild.
 | Diagnostic A2: 60.0% (30/50), recall 94.0%, 1,346 tokens, p95 42.2s | `results/raw/two_stage_hydrated.a2-mixed-store.jsonl` | yes, 2026-08-15 — **diagnostic, not a benchmark claim** |
 | Pilot→full-store pairing: 16/31 → 18/31, p=0.500 | `two_stage_hydrated.jsonl` vs `.a2-mixed-store.jsonl`, exact McNemar | yes, 2026-08-15 |
 | **Formal A2 base: 56.0% (28/50), recall 94.0%, 1,415 tokens, p95 7.2s** | `results/raw/two_stage_hydrated.a2-clean-p10.jsonl`, dev50 manifest, audited row-by-row | yes, 2026-08-17 |
-| **Formal A2 product: 66.0% (33/50), recall 94.0%, 1,455 tokens, p95 2.8s** | `results/raw/two_stage_hydrated.a2-clean-p10-fallback.jsonl` | yes, 2026-08-17 |
-| **Fallback 6W-1L, exact McNemar p=0.125** | the two files above, paired on question id | yes, 2026-08-17 — **not significant** |
+| Formal A2 product, pre-fix: 66.0% (33/50) | `results/raw/two_stage_hydrated.a2-clean-p10-fallback.jsonl` | yes, 2026-08-17 — **superseded by the row below** |
+| **Formal A2 product: 72.0% (36/50), recall 94.0%, 1,455 tokens, p95 1.7s** | `results/raw/two_stage_hydrated.a2-clean-p10-fallback-v2.jsonl`, audited row-by-row | yes, 2026-08-17 |
+| **Fallback 9W-1L, exact McNemar p=0.022** | base vs product-v2, paired on question id | yes, 2026-08-17 — **adaptive, see 10.6** |
+| Fix vs pre-fix arm: 3W-0L, p=0.250 | the two product files, paired | yes, 2026-08-17 |
 | Clean store: 2,348/2,348 sessions, 50 namespaces, 6,233 memories, 0 `scope NULL` | `stores/two-stage-p10.db` | yes, 2026-08-17 |
 | Zero-yield 304/2,096 (14.5%) substantive sessions | `SQLiteMemoryStore.zero_yield_sessions()` over `two-stage-p10.db` | yes, 2026-08-17 |
-| Mayo regresses on the clean store; archive-wide BM25 still ranks gold #1 | `raw_search('41275add', …)` over `two-stage-p10.db`; question wrong in both A2 arms | yes, 2026-08-17 |
+| Mayo: gold turn at index 9 of 16 source-local candidates, sliced off by `[:3]` | `turns_for_memories` over the 20 memories retrieved for the question | yes, 2026-08-17 |
 | Fidelity 44.0% (22/50 stated values) vs 36.6% baseline | `results/raw/fidelity.json` | yes, 2026-08-15 — **not distinguishable at n=50** |
 | Temporal gate 100/100/0/100, 4/4 pass | `results/raw/temporal-gate.json` | yes, 2026-08-15 |
 | Corpus: 2,400 session entries, 2,348 unique ids | LongMemEval-S via `lme.load`, `Counter` over session ids | yes, 2026-08-15 |

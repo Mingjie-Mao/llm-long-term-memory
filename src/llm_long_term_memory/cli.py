@@ -956,8 +956,9 @@ def resolve(
 @app.command("mcp")
 def mcp_serve(
     transport: str = typer.Option("stdio", help="stdio | http"),
-    config: str = typer.Option("configs/baselines.yaml", "--config", "-c"),
-    store_name: str = typer.Option("two-stage-hydrated", help="Memory store filename stem"),
+    # Matching MemoryService's defaults: the product config and the clean store.
+    config: str = typer.Option("configs/fallback.yaml", "--config", "-c"),
+    store_name: str = typer.Option("two-stage-p10", help="Memory store filename stem"),
 ) -> None:
     """Serve the memory over MCP, for Claude Desktop, Cursor, or any MCP client.
 

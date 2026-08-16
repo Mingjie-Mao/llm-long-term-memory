@@ -50,11 +50,10 @@ demand. Recordings carry a fingerprint of the store and prompt versions that
 produced them; if either changes, the page says **stale** instead of pretending to be
 current.
 
-> These run against the **mixed store**, not the clean one the measured results
-> come from. The Mayo case regresses on the clean store for a reason that is
-> understood and not yet fixed — see [Live regression](#live-regression). Rather
-> than re-record a demo that fails, the demos stay where they work and the gap is
-> stated here.
+> These run against the clean P10 store, the same one every measured result on
+> this page comes from. Re-recording them is `python scripts/record_golden.py
+> --write`, which refuses to record a demo whose runs disagree about whether the
+> archive was needed at all.
 
 ---
 
@@ -260,29 +259,30 @@ judge throughout:
 | `full_context` | — | 56.0% | 109,260 |
 | `naive_rag` | — | 54.0% | 13,057 |
 | Clean P10, memory only | off | 56.0% | 1,415 |
-| **Clean P10, product** | **on** | **66.0%** | **1,455** |
+| **Clean P10, product** | **on** | **72.0%** | **1,455** |
 | v1 structured memory | — | 26.0% | 465 |
 
 **75x less context than the full transcript, and more accurate on this set.**
 
 The two P10 rows differ in `fallback.enabled`, `fallback.max_turns` and
 `fallback.max_chars` and in nothing else — checked before the run, not asserted
-afterwards — so the gap between them is attributable to the fallback.
+afterwards — so the gap between them is attributable to the fallback. Paired over
+the same 50 questions it fixed 9 and broke 1: exact McNemar **p = 0.022**.
 
-> **The +10pp is not statistically significant.** Paired over the same 50
-> questions, the fallback fixed 6 and broke 1 (exact McNemar, **p = 0.125**).
-> Seven discordant pairs cannot carry a claim this size. What the split *does*
-> show is where the wins came from: 3 of the 6 are `single-session-assistant`,
-> the case the archive exists for, which is consistent with the mechanism but is
-> not a substitute for the test.
+> **Read the p-value with its history.** An earlier build of the fallback scored
+> 66.0% here, and the gap to the baseline was *not* significant (6W-1L, p = 0.125).
+> Fixing a truncation defect found by reading one of its failures moved it to
+> 72.0%. The defect was real and the fix is mechanical, but the significance is
+> measured on the same 50 questions that exposed it, which is the definition of an
+> adaptive choice. Treat `p = 0.022` as "this survived one honest look", not as a
+> held-out result.
 >
 > **`dev50` is a development set.** Prompts, gates and thresholds were all tuned
 > against it. The held-out set is frozen and has never been run.
 
-Where the fallback does nothing: `multi-session` (38.5%) and `temporal-reasoning`
-(46.2%) are **identical** in both arms. Half the question set, and the archive
-recovers none of it — these need aggregation and date arithmetic, not better
-lookup.
+Where the fallback does nothing: `temporal-reasoning` is **46.2% in both arms**.
+A quarter of the question set, and the archive recovers none of it — dates have to
+be computed, not looked up.
 
 ### Where the gain came from
 
@@ -320,25 +320,30 @@ mean-baseline 0.263 — it lost to predicting the mean. [Details](results/p6-pil
 
 Seven questions that every variant previously failed score **6/7, identical across
 three runs**, including the Mayo case end to end.
-[Details](results/live-regression-v2.md). Measured on the mixed store, which is
-what the demos above still run against.
+[Details](results/live-regression-v2.md).
 
-**The Mayo case does not survive the move to the clean store**, and the reason is
-worth stating because it is not the one you would guess. The recovery itself is
-fine: archive-wide BM25 still ranks the gold turn **first**. What changed is which
-recovery runs. `RawFallback.recover` branches on whether retrieval returned
-anything at all — if it did, it searches only the source turns of the memories it
-found, and returns; archive-wide is reached only when retrieval came back empty.
-On the mixed store the Mayo question retrieved nothing and went archive-wide. On
-the clean store it retrieves ten on-topic memories whose source sessions are about
-concerts and screen recording, commits to those, and never tries the search that
-would have worked.
+**The clean store briefly broke the Mayo case, and the obvious diagnosis was
+wrong.** Worth recording, because the wrong answer was convincing.
 
-So the better store took the narrower path. The question is in `dev50` and is
-wrong in **both** formal arms — it is the one failure behind
-`single-session-assistant` 5/6. Fixing the branch is the next piece of work, and
-the demos stay on the mixed store until it is fixed rather than being re-recorded
-onto a store where they fail.
+The symptom: after a rebuild that *improved* retrieval, the question this README
+opens with failed in both formal arms. The tempting explanation was the level
+branch — `RawFallback.recover` took the source turns whenever retrieval returned
+anything and reached the archive only when it came back empty, with nothing
+checking the memories were about the question. That is a genuine defect. It was
+not this one.
+
+What actually broke it was truncation. Retrieval *had* found the right
+conversation; the gold turn was among the candidates. But `turns_for_memories`
+returns turns ordered by session id, the code kept `[:max_turns]` of them, and the
+gold turn sat tenth of sixteen alphabetically — the three kept were all from a
+conversation about live music. Better recall meant more candidates, and more
+candidates meant the answer was sliced off. On the smaller mixed store the same
+question retrieved nothing, fell through to the archive, and never met the slice,
+which is why the defect survived unseen for as long as it did.
+
+Both are the same omission — nothing ranked the candidates against the question —
+so ranking them fixes both. `single-session-assistant` went 5/6 → **6/6**, and the
+arm 66.0% → 72.0%.
 
 ---
 
@@ -397,24 +402,22 @@ src/llm_long_term_memory/
 
 - No held-out result. Every number comes from development questions also used for
   prompt iteration and gate tuning. The held-out set is frozen and unopened.
-- The fallback picks its level by whether retrieval returned anything, not by
-  whether what it returned was relevant, so a confidently wrong retrieval blocks
-  the archive-wide search — the Mayo regression above.
-- The demos and the shipped service default still run on the mixed store, which
-  holds 4,843 rows from before the P10 fix and 2,265 from after. Results measured
-  on it stay labelled diagnostic. The clean rebuild is **done** — 2,348/2,348
-  sessions, 50 namespaces, 6,233 memories, zero pre-P10 rows — and is what the
-  formal results above were measured on; moving the demos onto it waits on the
-  fallback fix. See [section 10 of the engineering report](docs/ENGINEERING_REPORT.md)
-  for the incident and the guards added since.
+- The `72.0%` and its `p = 0.022` were reached after fixing a defect found by
+  reading a `dev50` failure. The fix is mechanical and the defect was real, but
+  the number is adaptive to the set it was measured on.
+- `stores/two-stage-hydrated.db` mixes 4,843 rows from before the P10 fix with
+  2,265 from after; results measured on it stay labelled diagnostic and it is no
+  longer what anything defaults to. See
+  [section 10 of the engineering report](docs/ENGINEERING_REPORT.md) for the
+  incident and the guards added since.
 - 14.5% of substantive sessions (304 of 2,096) yielded no memory at all. Recorded
   as a baseline, not yet explained — whether it is stochastic dropout or a
   systematic gap in the extraction policy has not been measured.
 - Single-writer SQLite. Ingestion and evaluation now take a cross-process lock;
   concurrency beyond that is not supported.
-- Temporal arithmetic and cross-session aggregation are unsolved, and the fallback
-  does not touch them: both arms score identically on those two types. See the
-  failure taxonomy in the [engineering report](docs/ENGINEERING_REPORT.md).
+- Temporal arithmetic is unsolved and the fallback does not touch it: both arms
+  score 46.2%, a quarter of the question set. See the failure taxonomy in the
+  [engineering report](docs/ENGINEERING_REPORT.md).
 
 ## License
 

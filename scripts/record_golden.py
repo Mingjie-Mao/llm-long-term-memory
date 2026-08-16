@@ -6,11 +6,11 @@ for anyone who wants it executed again. What keeps that honest is the fingerprin
 — of the store's contents and the prompt versions — which the service compares
 against the live process and reports as stale when it no longer matches.
 
-Which is what happened. The recordings on disk carried `extractor: None`, from a
-store written before ingestion stamped its version, so both demos read as stale
-against every store this repo now has. A stale demo is not a small thing here:
-the whole argument for showing a recording rather than a mock is that the reader
-can tell which one they are looking at.
+Which had happened without anyone noticing. The recordings on disk carried
+`extractor: None`, from a store written before ingestion stamped its version, so
+both demos read as stale against every store this repo now has. A stale demo is
+not a small thing here: the whole argument for showing a recording rather than a
+mock is that the reader can tell which one they are looking at.
 
 This script did not exist. The recordings were made by hand, which is why nothing
 noticed they had gone stale and why re-making them was not a command anyone could
@@ -20,11 +20,13 @@ a stale banner nobody can clear.
     python scripts/record_golden.py            # show what would change
     python scripts/record_golden.py --write    # spend the calls and save
 
-Each demo is run `--runs` times (3 by default). Runs that disagree on the
-answerer's verdict or the fallback level are not recorded: a demo that only
-sometimes reaches the archive is not a demonstration of the archive, and one run
-is an anecdote. The answer text itself is allowed to vary — it is generated prose
-— so the first run's is kept and the count of agreeing runs is recorded with it.
+Each demo is run `--runs` times (3 by default). Runs that disagree on whether the
+archive was needed at all are not recorded: a question that sometimes answers from
+memory alone is not a demonstration of recovery, and one run is an anecdote. The
+answer text is allowed to vary — it is generated prose — and so is the route, since
+the first-pass verdict is not deterministic and `need_source` and `no_evidence`
+reach the archive by different levels. When the route varies the recording says so
+in its `note` rather than presenting one run's path as the only one.
 """
 
 from __future__ import annotations
@@ -51,21 +53,13 @@ from llm_long_term_memory.api.service import (  # noqa: E402
     MemoryService,
 )
 
-# Named here rather than inherited from `MemoryService`'s defaults, because the two
-# are not currently the same thing and silently following the service default is how
-# a recording ends up describing a store nobody meant to demo.
+# Named here rather than inherited from `MemoryService`'s defaults. They agree
+# today, and stating them anyway means a change to the service default cannot
+# silently re-record the demos against a store nobody meant to demo.
 #
-# The demos run on the mixed store because that is where they work. On the clean
-# P10 store the Mayo case regresses — not in the archive search, which still ranks
-# the gold turn first, but in `RawFallback.recover`, which reaches archive-wide
-# only when retrieval came back empty. The clean store's better recall returns ten
-# plausible-but-wrong memories, so the fallback commits to their source turns and
-# never runs the search that would have worked. Section 10.7 of the engineering
-# report has the detail. Move both of these to `two-stage-p10` once that is fixed.
-#
-# The config is the product one: the baseline leaves the fallback off, and a Mayo
-# recording made under it could not reach the archive at all.
-DEMO_STORE = "two-stage-hydrated"
+# The config is the product one: the baseline config leaves the fallback off, and a
+# Mayo recording made under it could not reach the archive at all.
+DEMO_STORE = "two-stage-p10"
 DEMO_CONFIG = "configs/fallback.yaml"
 
 # The four demos the README links. `timeline` and `collectibles` are not here:
@@ -118,11 +112,35 @@ def record_one(service: MemoryService, name: str, namespace: str, query: str, ru
         except Exception as exc:  # reported, not swallowed
             return None, f"run {i + 1} failed: {type(exc).__name__}: {exc}"
 
-    verdicts = {(r["answer_status"], r["fallback_level"]) for r in results}
-    if len(verdicts) != 1:
-        return None, f"runs disagreed on the path taken: {sorted(verdicts)}"
+    # Agreement is required on *whether* raw evidence was needed, not on which
+    # level supplied it. The first-pass answerer decides between `need_source` and
+    # `no_evidence` and is not deterministic about it, and the two route to
+    # different levels because `need_source` passes the retrieved memories and
+    # `no_evidence` passes none. Demanding one level would refuse to record a demo
+    # whose every run recovers the same answer by a different route.
+    #
+    # Requiring agreement on "was the archive needed at all" is the property the
+    # demo actually claims. A question that sometimes answers from memory and
+    # sometimes does not is still not recordable.
+    used = {r["fallback_level"] != "none" for r in results}
+    if len(used) != 1:
+        return None, (
+            "runs disagreed on whether the archive was needed: "
+            f"{sorted((r['answer_status'], r['fallback_level']) for r in results)}"
+        )
 
     first = results[0]
+    levels = {r["fallback_level"] for r in results}
+    note = (
+        ""
+        if len(levels) == 1
+        else (
+            f"The first-pass verdict varies across runs, so this question reaches "
+            f"the archive by more than one route ({', '.join(sorted(levels))}). "
+            f"All {runs} runs recovered the same answer; the route shown is the "
+            f"one recorded."
+        )
+    )
     return (
         GoldenRun(
             name=name,
@@ -137,6 +155,7 @@ def record_one(service: MemoryService, name: str, namespace: str, query: str, ru
             candidates_considered=first["candidates_considered"],
             recorded_at=recorded_at_now(),
             runs=runs,
+            note=note,
             fingerprint=fingerprint(
                 namespace,
                 query,

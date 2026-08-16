@@ -237,6 +237,151 @@ def test_archive_search_never_crosses_a_namespace(wired):
     assert RawFallback(store).recover("someone_else", "Mayo Clinic", memories=[]).turns == []
 
 
+# ------------------------- choosing the level, after the clean-store regression
+
+
+@pytest.fixture
+def decoys(wired):
+    """A second conversation that shares the query's vocabulary and none of its
+    answer — the shape the clean P10 store produces at scale."""
+    store, index = wired
+    store.add_session(
+        Session(
+            id="s2",
+            user_id="u1",
+            started_at=NOW,
+            turns=[
+                Turn(
+                    id="s2:0",
+                    session_id="s2",
+                    turn_index=0,
+                    role="user",
+                    content="what youtube video software should i use for recording?",
+                    ts=NOW,
+                ),
+                Turn(
+                    id="s2:1",
+                    session_id="s2",
+                    turn_index=1,
+                    role="assistant",
+                    content="For a youtube video workflow, OBS Studio is a solid choice.",
+                    ts=NOW,
+                ),
+            ],
+        )
+    )
+    return store, index
+
+
+def test_confident_but_wrong_memories_do_not_suppress_the_archive(decoys):
+    """The level branch, which was a real defect but not the one that broke Mayo.
+
+    Retrieval returns a memory anchored in the *decoy* conversation and nothing
+    else. Under the old rule — branch on whether retrieval returned anything — that
+    was enough to commit to the decoy's turns and never run the archive search,
+    which ranks the real answer first.
+    """
+    store, _ = decoys
+    off_topic = Memory(
+        id="m_obs",
+        user_id="u1",
+        type="semantic",
+        content="The assistant recommended OBS Studio for recording video.",
+        token_count=9,
+        ingested_at=NOW,
+        valid_from=NOW,
+        subject="assistant",
+        source_session_id="s2",
+        source_turn_index=1,
+    )
+
+    evidence = RawFallback(store).recover("u1", "Mayo Clinic posture video", [off_topic])
+
+    assert evidence.level == "archive_wide", "the memory pointed at the wrong conversation"
+    assert any(MAYO_URL in t.content for t in evidence.turns), "the answer must survive"
+
+
+def test_the_right_conversation_still_wins_even_when_the_question_turn_ranks_higher(decoys):
+    """The counterweight, and the reason the decision is per session rather than
+    per turn: inside one conversation BM25 routinely prefers the user's question to
+    the assistant's answer, because the question repeats the query's own words.
+    Judged per turn, that reads as "the archive beat the memory" and throws away a
+    memory that had found exactly the right place.
+    """
+    store, _ = decoys
+    on_topic = Memory(
+        id="m_rec2",
+        user_id="u1",
+        type="semantic",
+        content="The assistant recommended a Mayo Clinic video about workplace posture.",
+        token_count=10,
+        ingested_at=NOW,
+        valid_from=NOW,
+        subject="assistant",
+        source_session_id="s1",
+        source_turn_index=1,
+    )
+
+    evidence = RawFallback(store).recover("u1", "youtube video workplace posture", [on_topic])
+
+    assert evidence.level == "source_local"
+    assert [t.id for t in evidence.turns] == ["s1:1"], "only the anchored turn, not its session"
+
+
+def test_source_local_turns_are_ordered_by_relevance_not_session_id(decoys):
+    """What actually broke Mayo on the clean store.
+
+    `turns_for_memories` returns turns sorted by session id, so `[:max_turns]` kept
+    an arbitrary slice of them. Retrieval had found the right conversation and the
+    level was chosen correctly; the gold turn sat tenth of sixteen alphabetically
+    and the three kept came from a conversation about live music. The larger the
+    store's recall, the more candidates, and the likelier the answer is sliced off.
+    """
+    store, _ = decoys
+    anchored = [
+        Memory(
+            id=f"m_{i}",
+            user_id="u1",
+            type="semantic",
+            content=f"memory {i}",
+            token_count=3,
+            ingested_at=NOW,
+            valid_from=NOW,
+            source_session_id="s1",
+            source_turn_index=i,
+        )
+        for i in (0, 1)
+    ]
+
+    evidence = RawFallback(store, max_turns=1).recover("u1", "Mayo Clinic back pain", anchored)
+
+    assert evidence.level == "source_local"
+    assert MAYO_URL in evidence.turns[0].content, "the one turn kept must be the relevant one"
+
+
+def test_a_query_with_no_searchable_terms_still_returns_the_anchored_turns(wired):
+    """FTS finds nothing to match on, so there is no ranking to consult. The
+    memories' own turns are then the only evidence there is, and returning them is
+    what the fallback did before ranking existed."""
+    store, _ = wired
+    anchored = Memory(
+        id="m_rec3",
+        user_id="u1",
+        type="semantic",
+        content="The assistant recommended a video.",
+        token_count=6,
+        ingested_at=NOW,
+        valid_from=NOW,
+        source_session_id="s1",
+        source_turn_index=1,
+    )
+
+    evidence = RawFallback(store).recover("u1", "???", [anchored])
+
+    assert evidence.level == "source_local"
+    assert [t.id for t in evidence.turns] == ["s1:1"]
+
+
 def test_a_store_indexed_before_turns_fts_existed_is_backfilled(tmp_path):
     """The index is created empty and its triggers only fire on later inserts, so a
     store ingested before it existed would search nothing and report 'no evidence' —
