@@ -334,6 +334,25 @@ def check_store_is_homogeneous(target: Target, expected_sessions: int) -> None:
         stop("homogeneity", f"{namespaces} namespaces, expected {EXPECTED_NAMESPACES}")
     ok("homogeneity: coverage", f"{sessions} sessions across {namespaces} namespaces")
 
+    # Recorded, never gated. It is a number to watch, not a threshold to pass: the
+    # rate was 18.8% of substantive sessions in the mixed store and 15.1% in the
+    # clean one, and this project has no evidence for where a healthy line sits.
+    # Gating on an invented threshold would stop a run for a number nobody can
+    # defend; printing it makes an invisible failure visible, which is the whole
+    # gap it was found in.
+    from llm_long_term_memory.store import SQLiteMemoryStore
+
+    s = SQLiteMemoryStore(target.store)
+    s.initialize()
+    try:
+        zero, subst = s.zero_yield_sessions()
+    finally:
+        s.close()
+    print(
+        f"  \033[36mNOTE\033[0m  zero-memory sessions: {zero:,} of {subst:,} "
+        f"({zero / subst:.1%}) — recorded, not gated"
+    )
+
 
 # ------------------------------------------------------- output-file safety
 
@@ -354,6 +373,60 @@ def check_a2_output_is_clean(target: Target) -> None:
 
 
 # --------------------------------------------------------------- the stages
+
+
+def check_arms_differ_only_in_fallback() -> None:
+    """The pair is only an ablation if one thing differs.
+
+    Run before the arms rather than asserted in a comment, because `Product - Base`
+    is attributable to the fallback exactly as far as this holds. `name` and
+    `description` are metadata and are ignored.
+    """
+    import yaml
+
+    def flat(d, prefix=""):
+        out = {}
+        for k, v in (d or {}).items():
+            key = f"{prefix}.{k}" if prefix else k
+            out.update(flat(v, key) if isinstance(v, dict) else {key: v})
+        return out
+
+    a = flat(yaml.safe_load((REPO / ARMS[0][0]).read_text(encoding="utf-8")))
+    b = flat(yaml.safe_load((REPO / ARMS[1][0]).read_text(encoding="utf-8")))
+    ignore = {"name", "description"}
+    moved = sorted(k for k in set(a) | set(b) if k not in ignore and a.get(k) != b.get(k))
+    unexpected = [k for k in moved if not k.startswith("fallback.")]
+    if unexpected:
+        stop("comparability", f"the arms differ in more than the fallback: {unexpected}")
+    ok("comparability", f"arms differ only in {', '.join(moved)}")
+
+
+def audit_result(path: Path, manifest_ids: set[str]) -> None:
+    """Check a finished arm before anyone reads its number.
+
+    Every one of these has been wrong at least once in this project: a run that
+    reported 50 questions over a file holding 30, a `--limit 31` that selected
+    different questions than intended, and a resume that would have merged two
+    stores into one accuracy.
+    """
+    rows = [json.loads(ln) for ln in path.read_text(encoding="utf-8").splitlines() if ln.strip()]
+    ids = [r["question_id"] for r in rows]
+    name = path.name
+    if len(ids) != len(set(ids)):
+        stop(f"audit:{name}", f"{len(ids)} rows but {len(set(ids))} unique question ids")
+    if set(ids) != manifest_ids:
+        missing, extra = manifest_ids - set(ids), set(ids) - manifest_ids
+        stop(f"audit:{name}", f"does not match dev50: {len(missing)} missing, {len(extra)} extra")
+    for field in ("store_fingerprint", "answer_prompt_version", "judge_prompt_version"):
+        values = {r.get(field) for r in rows}
+        if len(values) != 1:
+            stop(f"audit:{name}", f"{field} is not single-valued: {sorted(map(str, values))}")
+    correct = sum(r["correct"] for r in rows)
+    ok(
+        f"audit:{name}",
+        f"{len(rows)} rows, dev50 exact, one store and one prompt pair — "
+        f"{correct}/{len(rows)} = {correct / len(rows):.1%}",
+    )
 
 
 def run_stage(name: str, args: list[str]) -> None:
@@ -497,10 +570,13 @@ def main() -> int:
         # the default results table, so promoting either arm into the published
         # table is a separate, deliberate step.
         #
-        # Two arms, same store, same manifest, same answerer and judge. The only
-        # thing that differs is the config's `fallback.*`, so the delta between them
-        # is what the conditional raw-conversation fallback is worth — measured
-        # rather than demonstrated.
+        # Two arms, same store, same manifest, same answerer and judge. Checked
+        # rather than asserted, because Product - Base is attributable to the
+        # fallback exactly as far as that holds.
+        print("\n\033[1m=== comparability ===\033[0m")
+        check_arms_differ_only_in_fallback()
+
+        manifest_ids = set(json.loads(MANIFEST.read_text(encoding="utf-8"))["question_ids"])
         for config, suffix, why in ARMS:
             run_stage(
                 f"formal A2 [{config.split('/')[-1]}] — {why}",
@@ -518,6 +594,8 @@ def main() -> int:
                     target.label + suffix,
                 ],
             )
+            # Audited before the number is read, not after it is quoted.
+            audit_result(target.out(suffix), manifest_ids)
     except Stop:
         print("\n\033[31mStopped. Later stages were not started.\033[0m")
         return 1

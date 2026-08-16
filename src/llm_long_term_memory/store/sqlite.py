@@ -558,5 +558,37 @@ class SQLiteMemoryStore:
         ).fetchall()
         return {r["type"]: r["n"] for r in rows}
 
+    def zero_yield_sessions(self, min_turns: int = 6) -> tuple[int, int]:
+        """Sessions that were archived but produced no memory at all.
+
+        Returns `(zero_yield, total)` counting only sessions of at least `min_turns`,
+        so that a one-line stub does not flatter the number.
+
+        This is computed from the store rather than counted during ingestion,
+        because a counter only sees sessions processed after it was added and this
+        needs to describe a store that was built over several days.
+
+        It exists because the failure was invisible. Ingestion reported memories
+        written, duplicates dropped and bad session indices, and nothing at all
+        about sessions that yielded silence — so 16.7% of substantive sessions in
+        the first store, and 13.4% in the second, produced no memory while every
+        number on the report looked healthy. Measured 2026-08-15 across both stores;
+        the profile of a zero-yield session is indistinguishable from a normal one
+        (same median turn count, same assistant share), so this is extractor
+        variance rather than a property of the conversation.
+        """
+        total = self._conn.execute(
+            "SELECT COUNT(*) FROM sessions s WHERE "
+            "(SELECT COUNT(*) FROM turns t WHERE t.session_id = s.id) >= ?",
+            (min_turns,),
+        ).fetchone()[0]
+        zero = self._conn.execute(
+            "SELECT COUNT(*) FROM sessions s WHERE "
+            "(SELECT COUNT(*) FROM turns t WHERE t.session_id = s.id) >= ? "
+            "AND NOT EXISTS (SELECT 1 FROM memories m WHERE m.source_session_id = s.id)",
+            (min_turns,),
+        ).fetchone()[0]
+        return zero, total
+
     def close(self) -> None:
         self._conn.close()

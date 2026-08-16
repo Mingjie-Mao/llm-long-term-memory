@@ -771,16 +771,37 @@ automated evaluation pipelines: stale artifacts do not look like errors.
 
 ### 10.5 What the diagnostic run's failures pointed at
 
-Twenty failures, attributed by whether the source session was retrieved:
+A first pass counted `source_session_recalled` and reported 17 of 20 failures as
+"retrieved but still wrong". **That measure does not support the conclusion drawn
+from it.** A recall flag says a memory from the right session was touched. It does
+not say the answer-bearing turn was retrieved, that extraction preserved the exact
+fact, or that the fact reached the answerer — and those are three different defects
+with three different fixes.
 
-| | |
-|---|---|
-| source session **was** retrieved, answer still wrong | 17 / 20 |
-| retrieval miss | 3 / 20 |
+So all twenty were audited by hand to the evidence layer, one at a time, separating
+those four questions. `results/failure-analysis/a2-mixed-store-failures.json` records
+each case with its verdict and the reason.
 
-**Retrieval is not the bottleneck.** That is the same conclusion the rerank and
-dense-retrieval work reached from the other direction, and it is why both sit at the
-bottom of the roadmap rather than the top.
+| stage | n | what it means |
+|---|---:|---|
+| **E** | 10 | the fact was never stored, or stored in a form that loses it |
+| **M** | 3 | cross-session aggregation |
+| **R** | 3 | the exact evidence was in the store and was not retrieved |
+| **T** | 3 | temporal arithmetic |
+| **A** | 1 | the evidence reached the answerer and was not used |
+
+**Half of all failures are extraction losses.** Three gold sessions produced *zero*
+memories. Others stored a shape that cannot answer the question: the coffee-limit
+update was stored as "thinking of changing" rather than as a change, so supersession
+never fired and the answerer reported the direction backwards; the Hawaii trip was
+stored without its duration, and the answerer filled the gap by assuming a number.
+
+The refined conclusion is stronger than the one it replaces, and points the same
+way: **retrieval is where the least of the loss is**. Only 3 of 20 are retrieval
+misses, and of the thirteen cases whose answer survives in the raw archive, **nine
+are already returned by BM25 at rank 1** — the archive can answer them today, and
+nothing asked it to, because this run had the fallback off. A better retriever has almost nothing left to win here, while extraction
+fidelity has ten cases waiting.
 
 All three retrieval misses are `single-session-assistant`, and one of them is
 `41275add` — the Mayo question, which the demo answers correctly. A system cannot

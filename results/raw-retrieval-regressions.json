@@ -19,7 +19,9 @@
       "id": "raw_mayo_001",
       "namespace": "41275add",
       "query": "mayo clinic youtube video",
-      "gold_turn_ids": ["answer_sharegpt_81riySf_0:1"],
+      "gold_turn_ids": [
+        "answer_sharegpt_81riySf_0:1"
+      ],
       "query_type": "exact_wording",
       "reasoning_required": false,
       "source": "real_failure",
@@ -31,7 +33,9 @@
       "id": "raw_mayo_002",
       "namespace": "41275add",
       "query": "the posture video you recommended",
-      "gold_turn_ids": ["answer_sharegpt_81riySf_0:1"],
+      "gold_turn_ids": [
+        "answer_sharegpt_81riySf_0:1"
+      ],
       "query_type": "normal_paraphrase",
       "reasoning_required": false,
       "source": "manual_paraphrase",
@@ -42,7 +46,9 @@
       "id": "raw_mayo_003",
       "namespace": "41275add",
       "query": "what was that desk ergonomics resource you gave me",
-      "gold_turn_ids": ["answer_sharegpt_81riySf_0:1"],
+      "gold_turn_ids": [
+        "answer_sharegpt_81riySf_0:1"
+      ],
       "query_type": "strong_paraphrase",
       "reasoning_required": false,
       "source": "manual_paraphrase",
@@ -54,7 +60,9 @@
       "id": "raw_mayo_004",
       "namespace": "41275add",
       "query": "the video I could share with my employees about sitting properly",
-      "gold_turn_ids": ["answer_sharegpt_81riySf_0:1"],
+      "gold_turn_ids": [
+        "answer_sharegpt_81riySf_0:1"
+      ],
       "query_type": "strong_paraphrase",
       "reasoning_required": false,
       "source": "manual_paraphrase",
@@ -65,7 +73,9 @@
       "id": "raw_mayo_005",
       "namespace": "41275add",
       "query": "what did you suggest when we discussed workplace back pain",
-      "gold_turn_ids": ["answer_sharegpt_81riySf_0:1"],
+      "gold_turn_ids": [
+        "answer_sharegpt_81riySf_0:1"
+      ],
       "query_type": "assistant_reference",
       "reasoning_required": false,
       "source": "manual_paraphrase",
@@ -76,7 +86,9 @@
       "id": "raw_mindful_001",
       "namespace": "1b9b7252",
       "query": "the website with free guided imagery exercises",
-      "gold_turn_ids": ["answer_ultrachat_115151:3"],
+      "gold_turn_ids": [
+        "answer_ultrachat_115151:3"
+      ],
       "query_type": "strong_paraphrase",
       "reasoning_required": false,
       "source": "real_failure",
@@ -87,7 +99,9 @@
       "id": "raw_modpodge_001",
       "namespace": "8aef76bc",
       "query": "what sealant did you recommend for the newspaper vase",
-      "gold_turn_ids": ["answer_ultrachat_563222:1"],
+      "gold_turn_ids": [
+        "answer_ultrachat_563222:1"
+      ],
       "query_type": "assistant_reference",
       "reasoning_required": false,
       "source": "real_failure",
@@ -98,7 +112,9 @@
       "id": "raw_andy_001",
       "namespace": "4388e9dd",
       "query": "what was the character wearing in the script you wrote",
-      "gold_turn_ids": ["answer_sharegpt_qTi81nS_0:0"],
+      "gold_turn_ids": [
+        "answer_sharegpt_qTi81nS_0:0"
+      ],
       "query_type": "vague_reference",
       "reasoning_required": false,
       "source": "real_failure",
@@ -140,6 +156,20 @@
       "source": "real_failure",
       "validated": false,
       "note": "Excluded from retriever comparisons. Retrieval succeeded — the reply named the power bank and charging pad — and the failure was the answerer declining instead of advising (results/preference-audit.md)."
+    },
+    {
+      "id": "raw_omelette_012",
+      "namespace": "e8a79c70",
+      "query": "how many eggs did you say we need for the classic French omelette recipe",
+      "gold_turn_ids": [
+        "answer_ultrachat_13075:1"
+      ],
+      "query_type": "exact_wording",
+      "reasoning_required": false,
+      "source": "real_failure",
+      "validated": true,
+      "bm25_rank": 6,
+      "note": "From the A2 diagnostic run (results/failure-analysis/a2-mixed-store-failures.json). The only one of twenty failures that both layers miss. Extraction produced zero memories from this session, and BM25 ranks the ingredients turn 6th for the question as asked, while the fallback reads three turns — so the fallback would not rescue it either. The turns that outrank it are the same assistant's follow-ups about the same omelette (tips, fillings), which share the topic vocabulary without carrying the quantity. Admitted after checking all four criteria; the other nineteen failures were rejected, nine of them because raw BM25 already returns their answer at rank 1."
     }
   ]
 }

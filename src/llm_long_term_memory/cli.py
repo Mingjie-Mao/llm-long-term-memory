@@ -785,6 +785,17 @@ def ingest_run(
         t.add_row("duplicates dropped", f"{p.duplicates_dropped:,}")
         t.add_row("updates detected", f"{p.updates_detected:,}")
         t.add_row("bad session_index", f"{p.bad_session_index:,}")
+        # Sessions that were archived and produced nothing. Reported because it was
+        # invisible: every other number here looked healthy while 13-17% of
+        # substantive sessions yielded no memory at all, which is where a large part
+        # of the extraction-class failures come from.
+        zero, subst = store.zero_yield_sessions()
+        if subst:
+            t.add_row(
+                "zero-memory sessions",
+                f"[{'red' if zero / subst > 0.15 else 'yellow'}]{zero:,} of {subst:,} "
+                f"({zero / subst:.1%})[/]",
+            )
         t.add_row("superseded", f"{p.superseded:,}")
         t.add_row("extraction requests", f"{p.extraction_requests:,}")
         t.add_row("adjudication requests", f"{p.adjudication_requests:,}")
