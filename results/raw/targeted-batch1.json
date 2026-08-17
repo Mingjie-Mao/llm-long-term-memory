@@ -1,0 +1,294 @@
+{
+  "note": "Targeted batch=1 re-extraction of the gold sessions behind the seven dev50 failures that lose a named fact at extraction. Same model, prompt, schema and decoding as production; only the batch size differs. No store is written. `pattern_hits` is a search aid — read `batch1_memories`.",
+  "usage": 18,
+  "records": [
+    {
+      "question_id": "edced276",
+      "session_id": "answer_60e8941a_1",
+      "wanted": "the Hawaii trip lasted 10 days",
+      "production_memories": [
+        "The user recently returned from an island-hopping trip to Hawaii with their family."
+      ],
+      "batch1_memories": [
+        "The user recently returned from a family trip to Hawaii.",
+        "The user's previous family trip to Hawaii lasted 10 days.",
+        "The user prioritizes flexibility in their travel plans.",
+        "The assistant recommended New Zealand, Iceland, Thailand, Costa Rica, Japan, Portugal, and Croatia as solo-traveler-friendly destinations.",
+        "The assistant recommended visiting Japan in spring (March to May) or autumn (September to November).",
+        "The assistant recommended trying sushi, ramen, tonkatsu, udon, tempura, yakitori, bento, okonomiyaki, miso soup, and matcha sweets in Japan.",
+        "The assistant recommended Sushi Saito, Ichiran Ramen, Tofuya Ukai, Ginza Kyubey, Kani Doraku, and Yoshinoya as restaurants to try in Japan.",
+        "The assistant recommended visiting Tsukiji Outer Market, Dotonbori, Gion, and Ameya Yokocho for food in Japan."
+      ],
+      "pattern_hits": [
+        "The user's previous family trip to Hawaii lasted 10 days."
+      ]
+    },
+    {
+      "question_id": "4adc0475",
+      "session_id": "answer_6efce493_2",
+      "wanted": "the user had two assists",
+      "production_memories": [
+        "The user participated in a 5K charity run last month.",
+        "The user plays indoor soccer with colleagues.",
+        "The user decided to try Brooks Ghost running shoes."
+      ],
+      "batch1_memories": [
+        "The user participated in a 5K charity run last month (April 2023).",
+        "The user runs 3 times a week with increasing distances.",
+        "The user plays indoor soccer in a league with colleagues.",
+        "The user has scored several goals and two assists in their indoor soccer league.",
+        "The assistant recommended Brooks Ghost, Asics Gel-Kayano, Brooks Adrenaline GTS, New Balance Fresh Foam, Salomon Speedcross, and Hoka One One Challenger as running shoe models.",
+        "The assistant recommended replacing running shoes every 300-500 miles or every 3-6 months.",
+        "The user decided to try the Brooks Ghost running shoes.",
+        "The user has a history of shin splints when increasing running distance.",
+        "The assistant recommended increasing weekly running mileage by no more than 10 percent.",
+        "The assistant recommended plank, Russian twists, leg raises, bicycle crunches, and bird dog as core exercises for runners.",
+        "The assistant recommended hamstring, quad, hip flexor, calf, groin, IT band, and lower back stretches for post-soccer recovery.",
+        "The assistant recommended MyFitnessPal, Strava, and Nike Training Club as fitness tracking apps."
+      ],
+      "pattern_hits": [
+        "The user has scored several goals and two assists in their indoor soccer league.",
+        "The assistant recommended Brooks Ghost, Asics Gel-Kayano, Brooks Adrenaline GTS, New Balance Fresh Foam, Salomon Speedcross, and Hoka One One Challenger as running shoe models.",
+        "The assistant recommended replacing running shoes every 300-500 miles or every 3-6 months.",
+        "The assistant recommended increasing weekly running mileage by no more than 10 percent.",
+        "The assistant recommended plank, Russian twists, leg raises, bicycle crunches, and bird dog as core exercises for runners.",
+        "The assistant recommended hamstring, quad, hip flexor, calf, groin, IT band, and lower back stretches for post-soccer recovery.",
+        "The assistant recommended MyFitnessPal, Strava, and Nike Training Club as fitness tracking apps."
+      ]
+    },
+    {
+      "question_id": "37f165cf",
+      "session_id": "answer_6b9b2b1e_1",
+      "wanted": "the second novel was 416 pages",
+      "production_memories": [
+        "The user read Naomi Alderman's The Power in December 2022.",
+        "The Power by Naomi Alderman is 341 pages long.",
+        "The assistant recommended Margaret Atwood's The Handmaid's Tale.",
+        "The assistant recommended Erin Morgenstern's The Night Circus.",
+        "The assistant recommended Junot Díaz's The Brief Wondrous Life of Oscar Wao.",
+        "The assistant recommended Madeline Miller's The Song of Achilles.",
+        "The assistant recommended Claire North's The First Fifteen Lives of Harry August.",
+        "The assistant recommended China Miéville's The City & The City.",
+        "The assistant recommended Aliette de Bodard's The House of Shattered Wings.",
+        "The assistant recommended N.K. Jemisin's The Fifth Season.",
+        "The assistant recommended Nick Harkaway's The Gone-Away World.",
+        "The assistant recommended Carlos Ruiz Zafón's The Shadow of the Wind."
+      ],
+      "batch1_memories": [
+        "The user enjoys reading fiction novels that explore complex themes.",
+        "The user read \"The Power\" by Naomi Alderman in December 2022.",
+        "\"The Power\" by Naomi Alderman has 341 pages.",
+        "The user finished reading \"The Power\" in about 5 weeks.",
+        "The user recently finished a 416-page novel.",
+        "The assistant recommended \"The Handmaid's Tale\" by Margaret Atwood (311 pages).",
+        "The assistant recommended \"The Night Circus\" by Erin Morgenstern (512 pages).",
+        "The assistant recommended \"The Brief Wondrous Life of Oscar Wao\" by Junot Díaz (335 pages).",
+        "The assistant recommended \"The Song of Achilles\" by Madeline Miller (384 pages).",
+        "The assistant recommended \"The First Fifteen Lives of Harry August\" by Claire North (416 pages).",
+        "The assistant recommended \"The City & The City\" by China Miéville (312 pages).",
+        "The assistant recommended \"The House of Shattered Wings\" by Aliette de Bodard (384 pages).",
+        "The assistant recommended \"The Fifth Season\" by N.K. Jemisin (460 pages).",
+        "The assistant recommended \"The Gone-Away World\" by Nick Harkaway (416 pages).",
+        "The assistant recommended \"The Shadow of the Wind\" by Carlos Ruiz Zafón (416 pages).",
+        "The user reads about 20-30 pages a day before bed.",
+        "The user is currently listening to the audiobook \"Ready Player One\" by Ernest Cline."
+      ],
+      "pattern_hits": [
+        "The user recently finished a 416-page novel.",
+        "The assistant recommended \"The First Fifteen Lives of Harry August\" by Claire North (416 pages).",
+        "The assistant recommended \"The Gone-Away World\" by Nick Harkaway (416 pages).",
+        "The assistant recommended \"The Shadow of the Wind\" by Carlos Ruiz Zafón (416 pages)."
+      ]
+    },
+    {
+      "question_id": "73d42213",
+      "session_id": "answer_1881e7db_2",
+      "wanted": "the clinic took two hours to reach",
+      "production_memories": [
+        "The user is located in zip code 12345.",
+        "The user is looking for a primary care clinic within an hour's drive of zip code 12345."
+      ],
+      "batch1_memories": [
+        "The user is located in zip code 12345.",
+        "The user needs to see a primary care doctor.",
+        "The user prefers morning appointment slots on weekdays.",
+        "The user wants a clinic within a one-hour drive from their home.",
+        "The assistant recommended Family Care Medical Center at 123 Main St, Anytown, CA 12345, which is a 45-minute drive away.",
+        "Family Care Medical Center has morning slots available on Monday, Wednesday, and Friday from 8:00 am to 12:00 pm.",
+        "The assistant recommended Urgent Care and Primary Care at 456 Elm St, Othertown, CA 12345, which is a 30-minute drive away.",
+        "Urgent Care and Primary Care has morning slots available on Tuesday and Thursday from 8:30 am to 11:30 am.",
+        "The assistant recommended Community Health Clinic at 789 Oak St, Thistown, CA 12345, which is a 50-minute drive away.",
+        "Community Health Clinic has morning slots available on Monday and Wednesday from 9:00 am to 12:00 pm.",
+        "The user intends to contact Family Care Medical Center first."
+      ],
+      "pattern_hits": []
+    },
+    {
+      "question_id": "c9f37c46",
+      "session_id": "answer_cdba3d9f_2",
+      "wanted": "the user attended an open mic night",
+      "production_memories": [],
+      "batch1_memories": [
+        "The user recently started performing stand-up comedy.",
+        "The user attended an open mic night at a local comedy club in April 2023.",
+        "The user carries a small notebook to jot down joke ideas.",
+        "The assistant recommended writing jokes regularly as a habit.",
+        "The assistant recommended observing everyday life to find humor.",
+        "The assistant recommended developing a unique comedic voice rather than emulating others.",
+        "The assistant recommended starting jokes with a clear, concise, and relatable premise.",
+        "The assistant recommended keeping jokes concise with a 3-5 second delay between setup and punchline.",
+        "The assistant recommended testing material on friends and family before performing on stage.",
+        "The assistant recommended studying the structure, pacing, and delivery of experienced comedians.",
+        "The assistant recommended the setup-punchline formula for structuring jokes.",
+        "The assistant recommended the rule of three for structuring jokes.",
+        "The assistant recommended using strong connectors like but, however, meanwhile, or so to link setups to punchlines.",
+        "The assistant recommended reading jokes aloud to ensure they sound natural.",
+        "The assistant recommended drawing from personal experiences and universal emotions to make jokes relatable.",
+        "The assistant recommended using specific details and cultural references to improve joke relatability.",
+        "The assistant recommended exaggerating and embellishing everyday situations for comedic effect.",
+        "The assistant recommended looking for irony and absurdity in mundane situations.",
+        "The assistant recommended using self-deprecation to make jokes more relatable."
+      ],
+      "pattern_hits": [
+        "The user attended an open mic night at a local comedy club in April 2023."
+      ]
+    },
+    {
+      "question_id": "gpt4_7abb270c",
+      "session_id": "answer_7093d898_2",
+      "wanted": "the sixth museum visit",
+      "production_memories": [],
+      "batch1_memories": [
+        "The assistant recommended Artsy as an online platform for art news, exhibitions, and trends.",
+        "The assistant recommended Hyperallergic as an art blog covering contemporary art news and reviews.",
+        "The assistant recommended Artnet as a source for art market news and auction results.",
+        "The assistant recommended The Art Newspaper for international art news and market analysis.",
+        "The assistant recommended Contemporary Art Daily for discovering new artists and exhibitions.",
+        "The assistant recommended Art in America magazine for contemporary art features and reviews.",
+        "The assistant recommended Frieze magazine for international contemporary art and culture.",
+        "The assistant recommended Apollo Magazine for art, architecture, and collecting.",
+        "The assistant recommended Art21 for documentaries and content on contemporary art.",
+        "The assistant recommended Culture Trip for art, culture, and travel information.",
+        "The user is interested in learning about feminist art.",
+        "The assistant recommended the book The Feminist Art Movement by Norma Broude and Mary Garrard.",
+        "The assistant recommended the book Feminist Art and the Maternal by Andrea Liss.",
+        "The assistant recommended the book Women, Art, and Power by Linda Nochlin.",
+        "The assistant recommended the book The Power of Feminist Art: The American Movement of the 1970s, History and Impact by Norma Broude and Mary Garrard.",
+        "The assistant recommended the book Guerrilla Girls: The Art of Behaving Badly by Guerrilla Girls.",
+        "The assistant recommended the documentary !Women Art Revolution (2010) by Lynn Hershman Leeson.",
+        "The assistant recommended the documentary The Heretics (2009) about the Heresies Collective.",
+        "The assistant recommended the documentary series Womart: The Women's Art Movement (1991) by Kate Horsfield.",
+        "The assistant recommended the documentary Feminist Art in the 1970s: Conversations Across Generations (2010).",
+        "The assistant recommended the documentary Art:21 - Judy Chicago (2014).",
+        "Judy Chicago was born Judith Sylvia Cohen in 1939.",
+        "Judy Chicago earned her MFA in 1964.",
+        "Judy Chicago's installation The Dinner Party (1974-1979) is in the permanent collection at the Brooklyn Museum.",
+        "Judy Chicago created the Atmospheric Sculptures series in the 1960s and 1970s.",
+        "Judy Chicago created the Birth Project series between 1980 and 1985.",
+        "Judy Chicago created the PowerPlay series between 1982 and 1987.",
+        "Judy Chicago was awarded the National Medal of Arts in 2018.",
+        "The user attended a lecture series at the Museum of Contemporary Art where Dr. Maria Rodriguez spoke about feminist art in the 1970s.",
+        "The user is an artist interested in interactive and immersive installations.",
+        "The assistant recommended artist Carsten Höller for interactive and immersive installations.",
+        "The assistant recommended artist Anicka Yi for immersive, scent-based installations.",
+        "The assistant recommended artist Rafael Lozano-Hemmer for interactive installations using biometrics and robotics.",
+        "The assistant recommended the Meow Wolf collective for immersive exhibitions.",
+        "The assistant recommended The Color Factory in San Francisco for interactive art installations.",
+        "The assistant recommended the TeamLab collective for immersive exhibitions using light and technology.",
+        "The assistant recommended Artspace, The Creators Project, and Hyperallergic as online resources for immersive art.",
+        "The user plans to explore themes of identity, memory, and the human experience in their art.",
+        "The assistant recommended using 3D audio, projection mapping, scent diffusion, and haptic feedback for immersive installations.",
+        "The assistant recommended using data visualization, augmented reality, interactive storytelling, and collaborative platforms for exploring collective memory.",
+        "The assistant recommended Unity, Max/MSP, OpenFrameworks, and Arduino as technologies for creating interactive installations."
+      ],
+      "pattern_hits": [
+        "Judy Chicago's installation The Dinner Party (1974-1979) is in the permanent collection at the Brooklyn Museum.",
+        "The user attended a lecture series at the Museum of Contemporary Art where Dr. Maria Rodriguez spoke about feminist art in the 1970s."
+      ]
+    },
+    {
+      "question_id": "gpt4_7abb270c",
+      "session_id": "answer_7093d898_5",
+      "wanted": "the sixth museum visit",
+      "production_memories": [
+        "The user attended a guided tour of 'The Evolution of Abstract Expressionism' led by Dr. Patel on February 20, 2023."
+      ],
+      "batch1_memories": [
+        "The user attended a guided tour of The Evolution of Abstract Expressionism at the Modern Art Museum led by Dr. Patel.",
+        "The assistant recommended checking the Modern Art Museum website for exhibitions and events.",
+        "The assistant recommended signing up for the museum newsletter.",
+        "The assistant recommended following the museum on social media.",
+        "The assistant recommended checking the museum calendar to plan ahead.",
+        "The assistant recommended attending guided tours at the museum.",
+        "The user is interested in abstract expressionism, specifically artists Pollock and Rothko.",
+        "The assistant recommended exploring Willem de Kooning, Franz Kline, and Clyfford Still as artists associated with abstract expressionism.",
+        "The assistant recommended checking the museum's permanent collection for works by abstract expressionists.",
+        "The assistant recommended browsing the museum website for online catalogs and collection highlights.",
+        "The assistant recommended asking museum staff about notable pieces in the permanent collection.",
+        "The assistant recommended using interactive kiosks, mobile apps, or audio guides for collection information.",
+        "The assistant recommended taking a self-guided tour using museum maps or brochures.",
+        "The user saw ancient Egyptian artifacts including the golden mask of Pharaoh Tutankhamun at the Metropolitan Museum of Art.",
+        "The assistant recommended Impressionism featuring Claude Monet, Pierre-Auguste Renoir, and Mary Cassatt.",
+        "The assistant recommended Cubism featuring Pablo Picasso and Georges Braque.",
+        "The assistant recommended Surrealism featuring Salvador Dalí, René Magritte, and Max Ernst.",
+        "The assistant recommended Pop Art featuring Andy Warhol, Roy Lichtenstein, and Jasper Johns.",
+        "The assistant recommended Fauvism featuring Henri Matisse, André Derain, and Maurice de Vlaminck.",
+        "The assistant recommended Minimalism featuring Donald Judd, Dan Flavin, and Agnes Martin.",
+        "The assistant recommended Baroque featuring Caravaggio, Rembrandt, and Vermeer.",
+        "The assistant recommended Art Nouveau featuring Alphonse Mucha, Gustav Klimt, and Charles Rennie Mackintosh.",
+        "The user attended a lecture series on 1970s feminist art at the Museum of Contemporary Art led by Dr. Maria Rodriguez.",
+        "The assistant recommended Judy Chicago, Miriam Schapiro, Carolee Schneemann, The Guerrilla Girls, and The Feminist Art Program as key 1970s feminist art subjects.",
+        "The assistant recommended Barbara Kruger, Cindy Sherman, and Laurie Anderson as additional feminist artists.",
+        "The user was moved by a large-scale installation by Anselm Kiefer.",
+        "The assistant recommended Ad Reinhardt, Barnett Newman, and Robert Motherwell as contemporaries of Mark Rothko."
+      ],
+      "pattern_hits": [
+        "The user attended a guided tour of The Evolution of Abstract Expressionism at the Modern Art Museum led by Dr. Patel.",
+        "The assistant recommended checking the Modern Art Museum website for exhibitions and events.",
+        "The assistant recommended signing up for the museum newsletter.",
+        "The assistant recommended following the museum on social media.",
+        "The assistant recommended checking the museum calendar to plan ahead.",
+        "The assistant recommended attending guided tours at the museum.",
+        "The assistant recommended checking the museum's permanent collection for works by abstract expressionists.",
+        "The assistant recommended browsing the museum website for online catalogs and collection highlights.",
+        "The assistant recommended asking museum staff about notable pieces in the permanent collection.",
+        "The assistant recommended taking a self-guided tour using museum maps or brochures.",
+        "The user saw ancient Egyptian artifacts including the golden mask of Pharaoh Tutankhamun at the Metropolitan Museum of Art.",
+        "The user attended a lecture series on 1970s feminist art at the Museum of Contemporary Art led by Dr. Maria Rodriguez."
+      ]
+    },
+    {
+      "question_id": "80ec1f4f",
+      "session_id": "answer_990c8992_2",
+      "wanted": "the February gallery visit, with its date",
+      "production_memories": [],
+      "batch1_memories": [
+        "The user visited The Art Cube on February 15.",
+        "The user attended an exhibition opening night called Disrupting Reality on February 15.",
+        "The user met a curator named Rachel Lee at The Art Cube.",
+        "The user purchased a limited edition print from an artist at The Art Cube.",
+        "The assistant recommended Anicka Yi for immersive installation art.",
+        "The assistant recommended Carsten Höller for interactive installation art.",
+        "The assistant recommended Chiharu Shiota for large-scale installation art.",
+        "The assistant recommended Random International for interactive installation art.",
+        "The assistant recommended Rafael Lozano-Hemmer for interactive installation art.",
+        "The assistant recommended Artsy (artsy.net) as an art website.",
+        "The assistant recommended Hyperallergic (hyperallergic.com) as an art blog.",
+        "The assistant recommended Artnet (artnet.com) as an art platform.",
+        "The assistant recommended The Culture Trip (theculturetrip.com) as an art website.",
+        "The assistant recommended Contemporary Art Daily (contemporaryartdaily.com) as an art website.",
+        "The assistant recommended Colossal (thisiscolossal.com) as an art blog.",
+        "The assistant recommended The Jealous Curator (thejealouscurator.com) as an art blog.",
+        "The assistant recommended My Modern Met (mymodernmet.com) as an art blog.",
+        "The assistant recommended Art F City (artfcity.com) as an art blog.",
+        "The assistant recommended We Make Money Not Art (we-make-money-not-art.com) as an art blog."
+      ],
+      "pattern_hits": [
+        "The user visited The Art Cube on February 15.",
+        "The user attended an exhibition opening night called Disrupting Reality on February 15.",
+        "The user met a curator named Rachel Lee at The Art Cube.",
+        "The user purchased a limited edition print from an artist at The Art Cube."
+      ]
+    }
+  ]
+}
