@@ -106,7 +106,7 @@ each was diagnosed.
               │              provenance-anchored)
               │                       │
   Query ──────┼───────────────────────┘
-              │            hybrid retrieval (5 signals)
+              │       hybrid retrieval (5 built, 1 weighted)
               │                       ↓
               │               sufficient to answer?
               │              ┌────────┴────────┐
@@ -215,6 +215,21 @@ seconds because resolution reads stored data and calls no model.
 Five signals, each normalized to [0,1] before weighting: semantic, BM25, recency,
 importance, entity overlap. Setting a weight to zero disables that signal, which is
 how ablation rows are produced.
+
+**Four of them are set to zero in the shipped configuration**, and that was not a
+decision anyone recorded. `RetrievalWeights` defaults to `semantic: 1.0` with the
+rest at `0.0` — the ablation setting — and neither `baselines.yaml` nor
+`fallback.yaml` overrides it, so every result in this report was measured on
+semantic similarity alone. The other four are computed on every query and
+multiplied by zero: the top hit for the question that exposed this scored
+`bm25=0.58`, which contributed nothing to its rank.
+
+That makes "hybrid retrieval" a description of the machinery rather than of the
+product, and it is one reason a question like *"how many pages was the other
+novel?"* is hard here — cosine similarity does not distinguish four memories that
+each contain a different 416. Turning the weights on is a configuration change
+with an ablation attached, not a feature to build; it is deliberately not bundled
+with any other change.
 
 Normalization is not cosmetic. FTS5's `bm25()` is negative and unbounded while
 cosine similarity is bounded; adding the raw values would let the lexical term

@@ -39,6 +39,7 @@ reported and left alone rather than guessed at.
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass, field
 from datetime import datetime
 
@@ -85,6 +86,45 @@ class ResolutionStats:
 
 def _value(memory: Memory) -> str:
     return (memory.object or memory.content or "").strip().lower()
+
+
+_QUANTITY = re.compile(r"\b\d[\d,]*\b")
+
+
+def _quantities(memory: Memory) -> set[str]:
+    return {q.replace(",", "") for q in _QUANTITY.findall(memory.content or "")}
+
+
+def _is_restatement(memory: Memory, owner: Memory) -> bool:
+    """Is `memory` really just `owner` said again?
+
+    A restatement is folded away — marked superseded, pointing at the owner, and
+    invisible to retrieval. That is right for "I live in Sydney" said twice and
+    badly wrong for anything carrying information the owner does not have, because
+    the fold is silent and the memory never comes back.
+
+    `_value` compares `object`, which is the *predicate's* value and not the
+    sentence's. Two memories can share one and differ in everything the question
+    turns on. On dev50 this cost `92a0aa75`: both memories keyed to
+    `(user, job_title)` with object "Senior Marketing Specialist", one saying two
+    years and four months of marketing experience and the other three years and
+    nine months at the company. Same object, so the later one was folded as a
+    repeat — and the answer needed the difference between them.
+
+    It is rare. Across the clean P10 store exactly one fold is lossy in this way —
+    31 memories carry a `superseded_by`, but 30 of those had their value genuinely
+    change and were superseded rather than folded. `superseded_by` is set by both
+    paths, and counting it without comparing `_value` first overstates the problem
+    by thirty. Re-resolving the whole store under this change moves two rows.
+
+    So numbers gate the fold. It is a narrow test and deliberately so — it fires
+    on the case where silent loss is demonstrable and leaves genuine repetition
+    alone. It does not make `_value` right, and it does not fix `92a0aa75`, whose
+    root cause is upstream: two facts about different durations should never have
+    been keyed to `job_title` at all. This stops the loss; the keying is Stage B's
+    to fix.
+    """
+    return _value(owner) == _value(memory) and not (_quantities(memory) - _quantities(owner))
 
 
 def _is_removal(memory: Memory) -> bool:
@@ -195,7 +235,7 @@ class TemporalResolver:
                 runs
                 and not _is_removal(runs[-1][0])
                 and not _is_removal(m)
-                and _value(runs[-1][0]) == _value(m)
+                and _is_restatement(m, runs[-1][0])
             ):
                 runs[-1].append(m)
             else:

@@ -1,0 +1,72 @@
+{
+  "note": "First failing stage per dev50 failure, and the memory/rescue split of the headline accuracy. Stages are hand-assigned; see the STAGE table in scripts/stage_oracle.py and results/fact-lineage-dev50.md.",
+  "stages": {
+    "edced276": {
+      "stage": "S1",
+      "why": "the Hawaii trip's 10-day duration was never extracted"
+    },
+    "4adc0475": {
+      "stage": "S1",
+      "why": "the two assists were never extracted"
+    },
+    "37f165cf": {
+      "stage": "S1",
+      "why": "the 416-page figure was never extracted"
+    },
+    "73d42213": {
+      "stage": "S1",
+      "why": "the two-hour journey was never extracted, at any batch size"
+    },
+    "c9f37c46": {
+      "stage": "S1",
+      "why": "the open mic night's gold session yielded nothing"
+    },
+    "gpt4_7abb270c": {
+      "stage": "S1",
+      "why": "the sixth museum was never extracted"
+    },
+    "80ec1f4f": {
+      "stage": "S1",
+      "why": "the February gallery visit's gold session yielded nothing"
+    },
+    "gpt4_fa19884d": {
+      "stage": "S1",
+      "why": "the user's own statement was not extracted, only the replies to it"
+    },
+    "0edc2aef": {
+      "stage": "S1",
+      "why": "the user's transferable preference was not extracted"
+    },
+    "92a0aa75": {
+      "stage": "S2",
+      "why": "extracted, then folded away as a restatement"
+    },
+    "gpt4_e414231e": {
+      "stage": "S5",
+      "why": "both dates supplied and annotated; reported as the same day"
+    },
+    "gpt4_d6585ce8": {
+      "stage": "S5",
+      "why": "every event and date supplied; ordering still wrong"
+    },
+    "9a707b81": {
+      "stage": "S5",
+      "why": "the date supplied and correct; anchored on the wrong day"
+    },
+    "71017277": {
+      "stage": "S5",
+      "why": "the fact supplied and correct; not accepted as jewellery"
+    }
+  },
+  "counts": {
+    "S1": 9,
+    "S2": 1,
+    "S5": 4
+  },
+  "accuracy_split": {
+    "final": 36,
+    "memory_only": 27,
+    "rescued": 9,
+    "fired": 16
+  }
+}

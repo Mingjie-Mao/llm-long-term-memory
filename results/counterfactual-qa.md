@@ -73,13 +73,16 @@ applies that same undiscriminating policy more thoroughly. Spending twelve times
 the quota to execute an unexamined policy more completely is the wrong order of
 operations.
 
-> **A caution against the obvious fix.** "Downweight assistant recommendations"
-> is the reading these numbers invite, and it would break this project's
-> headline demo: the Mayo case is a question *about* an assistant recommendation
-> — the YouTube URL the assistant gave — and `single-session-assistant` scores
-> 6/6 in production. Whatever separates a recommendation worth keeping from a
-> list of seventeen restaurants, it is not the speaker. That distinction has to
-> be measured before it is encoded.
+> **A caution against the obvious fix**, since corrected. "Downweight assistant
+> recommendations" was rejected here on the grounds that it would break this
+> project's headline demo — the Mayo case is a question *about* an assistant
+> recommendation, and `single-session-assistant` scores 6/6. Measuring it
+> (`recommendation-utility.md`) inverted that: five of those six are answered
+> from the **raw archive**, not from a recommendation memory, and one of them
+> spent 85% of its context on recommendations before reporting `no_evidence`.
+> The demo was never resting on them. Removing them still is not an accuracy
+> fix — the freed slots fill with other irrelevant material — but the reason
+> given here was wrong.
 
 ## Limits
 

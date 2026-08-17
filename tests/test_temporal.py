@@ -114,6 +114,49 @@ def test_restating_the_same_value_is_not_a_change(store):
     assert store.get("b").superseded_by == "a"
 
 
+def test_a_repeat_carrying_a_new_number_is_not_folded_away(store):
+    """The fold is silent and permanent, so it must not swallow new information.
+
+    Both of these key to the same predicate with the same object, which is all
+    `_value` compares — and the second carries a figure the first does not. On
+    dev50 this is `92a0aa75`: two memories about the same job title, one saying
+    two years and four months and the other three years and nine months, and the
+    answer needed the difference. Folded, the second was marked superseded and
+    became invisible to retrieval, which only returns active rows.
+
+    Rare in practice — one case in the clean P10 store — but silent and permanent,
+    which is why it is gated rather than tolerated.
+    """
+    a = fact("a", "Senior Marketing Specialist", 3, predicate="job_title")
+    a.content = "The user has worked in marketing for two years and 4 months."
+    b = fact("b", "Senior Marketing Specialist", 6, predicate="job_title")
+    b.content = (
+        "The user is a Senior Marketing Specialist with 3 years and 9 months at the company."
+    )
+    store.add_memories([a, b])
+
+    stats = TemporalResolver(store).resolve_all("u1")
+
+    assert stats.restatements == 0, "different figures are not a restatement"
+    assert store.get("b").status != "superseded", "the later figure must stay retrievable"
+
+
+def test_a_genuine_repeat_with_the_same_numbers_is_still_folded(store):
+    """The counterweight. Gating on numbers must not stop the fold from doing its
+    job, or every re-mention becomes a separate fact and the timeline fills with
+    duplicates."""
+    a = fact("a", "Canberra", 3, predicate="lives_in")
+    a.content = "The user lives in Canberra, 2 hours from the coast."
+    b = fact("b", "Canberra", 6, predicate="lives_in")
+    b.content = "The user still lives in Canberra, about 2 hours from the coast."
+    store.add_memories([a, b])
+
+    stats = TemporalResolver(store).resolve_all("u1")
+
+    assert stats.restatements == 1
+    assert store.get("b").superseded_by == "a"
+
+
 # --------------------------------------------------------- ingestion order
 
 

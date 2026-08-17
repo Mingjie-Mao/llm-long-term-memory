@@ -63,7 +63,7 @@ current.
 |---|---|
 | **Remember** | Turns conversations into typed, time-bounded facts — who said it, who it is about, and why it is worth keeping |
 | **Update** | Tracks facts that change. "I moved to Sydney" supersedes "I live in Canberra" without deleting it |
-| **Retrieve** | Five weighted signals — semantic, BM25, recency, importance, entity overlap |
+| **Retrieve** | Five weighted signals — semantic, BM25, recency, importance, entity overlap. **The shipped configs weight only semantic**; see [Limitations](#limitations) |
 | **Recover** | When structured memory is insufficient, searches the original conversation instead of failing |
 | **Explain** | Every memory traces to the turn it came from; every *omission* has a stated reason |
 
@@ -89,7 +89,8 @@ from a bug.
               │              provenance-anchored
               │                       │
   Query ──────┼───────────────────────┘
-              │        hybrid retrieval (5 signals)
+              │      hybrid retrieval (5 signals built,
+              │       1 weighted in the shipped config)
               │                       ↓
               │               enough to answer?
               │              ┌────────┴────────┐
