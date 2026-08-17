@@ -1,4 +1,4 @@
-# Nine of fourteen failures are lost at extraction, and none at retrieval
+# Ten of fourteen failures are lost at extraction, and none at retrieval
 
 Four planned fixes in a row were aimed at the wrong layer: the renderer hypothesis
 was falsified on its own target questions, the typed-value work turned out to
@@ -22,11 +22,16 @@ attempted in this project has been confidently wrong.
 | stage | n | |
 |---|---:|---|
 | S0 source | 0 | the fact is not in the conversation |
-| **S1 extraction** | **9** | it never became a memory |
+| **S1 extraction** | **10** | it never became a memory |
 | S2 lifecycle | 1 | it became one, then was merged or superseded away |
 | S3 eligibility | 0 | filtered before ranking |
 | **S4 retrieval** | **0** | eligible, never reached the context |
-| S5 reasoning | 4 | everything supplied and correct, answer still wrong |
+| S4b composition | 1 | in context and top-ranked, still not used |
+| S5 reasoning | 2 | everything supplied and correct, answer still wrong |
+
+Two of the four originally filed S5 moved once the oracles read what was actually
+supplied — see below. First-stage classification by inspection was wrong twice out
+of fourteen, which is worth knowing about every other table in this project.
 
 | question | stage | what is lost |
 |---|---|---|
@@ -40,8 +45,8 @@ attempted in this project has been confidently wrong.
 | `gpt4_fa19884d` | S1 | the user's own statement — only the replies to it were kept |
 | `0edc2aef` | S1 | the user's transferable preference |
 | `92a0aa75` | S2 | extracted, then folded away as a restatement |
-| `gpt4_e414231e` | S5 | both dates supplied and annotated; reported as the same day |
-| `gpt4_d6585ce8` | S5 | every event and date supplied; ordering still wrong |
+| `gpt4_d6585ce8` | S1 | the free outdoor concert — only the replies to it were kept |
+| `gpt4_e414231e` | S4b | both dates ranked 1 and 2, and still read as the same day |
 | `9a707b81` | S5 | the date supplied and correct; anchored on the wrong day |
 | `71017277` | S5 | the fact supplied and correct; not accepted as jewellery |
 
@@ -49,11 +54,43 @@ attempted in this project has been confidently wrong.
 
 The most each module could be worth, if it were perfect:
 
-| module | ceiling | |
-|---|---:|---|
-| extraction | **9** | every S1, and only if the fact alone is enough |
-| **retrieval** | **0** | no failure is lost at S3 or S4 |
-| reasoning | 4 | every S5 |
+| module | ceiling | measured | |
+|---|---:|---:|---|
+| extraction | 10 | **4 fixed of 9 tried** | oracle A: inject the fact, run the real pipeline |
+| **retrieval** | **0** | not run | no failure is lost at S3 or S4 |
+| composition | 1 | 3 of 4 runs | oracle C on `gpt4_e414231e` |
+| reasoning | 2 | 0 | oracle C on the rest |
+
+**Oracle A fixed four of nine.** `4adc0475`, `80ec1f4f`, `c9f37c46` and `edced276`
+came back when their missing fact was injected, correctly worded, and the pipeline
+was left otherwise untouched. `73d42213`, `37f165cf`, `0edc2aef`,
+`gpt4_7abb270c` and `gpt4_fa19884d` did not — so five of the S1 questions have a
+second problem behind the missing fact, and perfect extraction alone would not
+reach them. A conversion of 4 in 9 against the counterfactual's 2 in 6, both on
+questions chosen for failing.
+
+**Oracle C produced one surprise and one correction.** `gpt4_e414231e` — the
+question the renderer change was built for and failed to move — answers correctly
+in 3 of 4 runs when given the two gold sessions' memories:
+
+> You fixed your mountain bike on March 15, 2023, and upgraded your road bike's
+> pedals on **March 19, 2023, which is 4 days later**.
+
+The answerer can do the arithmetic. It fails in production with the *same two
+memories ranked first and second*, which is why this is filed S4b rather than S5:
+not a reasoning failure, and not a retrieval failure either.
+
+The obvious explanation — too much context — was tested and is wrong. Re-answering
+at `top_k` of 20, 10, 5 and 3 gives the same wrong "same day, March 15" every
+time, and at k=3 the context is exactly the two needed memories plus one. Oracle
+C's six-memory set is a *superset* of that and does better. Fewer is not the
+variable. What differs is that oracle C supplies a coherent slice of two
+conversations while `top_k` supplies a scattered ranking across many — a
+hypothesis, not a finding, and untested.
+
+`gpt4_d6585ce8` was misfiled. Oracle C showed no memory for the "free outdoor
+concert series in the park" that the gold answer lists; the user states it in the
+raw turns and only the assistant's replies were extracted. It is S1.
 
 **Hybrid retrieval has a ceiling of zero on this set.** Not "small" — zero. Nothing
 is currently ranked out of reach; the facts these questions need are absent or
@@ -63,10 +100,10 @@ that four of five retrieval signals are weighted at zero
 (`docs/ENGINEERING_REPORT.md` §5): the weighting is a real inaccuracy in the
 documentation and not a cause of any failure here.
 
-The extraction ceiling of 9 is an upper bound and is known not to be reached. The
-[counterfactual](counterfactual-qa.md) recovered six real facts and fixed two
-answers — a conversion of 2 in 6 — because recovering a fact does not guarantee
-retrieval surfaces it or the answerer uses it.
+The extraction ceiling of 10 is an upper bound and is known not to be reached.
+Oracle A converts 4 of 9 and the [counterfactual](counterfactual-qa.md) converted
+2 of 6, because recovering a fact does not guarantee retrieval surfaces it or the
+answerer uses it.
 
 ## What the headline accuracy is made of
 
@@ -95,15 +132,17 @@ suggests, and the archive is absorbing the difference.
 reranking, a larger `top_k`, entity or date boosting. Their shared ceiling is zero
 questions. Anything spent there is spent on a stage that is not losing anything.
 
-**Not settled.** Whether the extraction ceiling of nine is reachable, and at what
-cost. The one measurement available says two in six, and it was taken on questions
-chosen for failing, which flatters it rather than the reverse.
+**Not settled.** Whether the extraction ceiling of ten is reachable, and at what
+cost. Two measurements now exist, 4 of 9 and 2 of 6, both on questions chosen for
+failing, which flatters them rather than the reverse. Five S1 questions survived
+having their missing fact handed to them, so they carry a second defect behind the
+first.
 
-**Open.** Two oracles remain unrun and would sharpen both numbers: injecting each
-missing fact as a memory and running the real pipeline (the true extraction
-ceiling), and handing the answerer the gold evidence alone (whether the four S5
-failures are really reasoning). Oracle B — a perfect retriever — is deliberately
-not run: a ceiling of zero needs no experiment, and spending quota to confirm it
+**Open.** What makes oracle C's context work where a top-ranked one does not.
+Fewer memories is ruled out; a coherent slice of two conversations against a
+scattered ranking is the remaining guess and has not been tested. Oracle B — a
+perfect retriever — is deliberately not run: a ceiling of zero needs no
+experiment, and spending quota to confirm it
 would measure the answerer's run-to-run noise rather than retrieval.
 
 ## Limits

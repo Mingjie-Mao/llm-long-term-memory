@@ -37,17 +37,17 @@
       "stage": "S1",
       "why": "the user's transferable preference was not extracted"
     },
+    "gpt4_d6585ce8": {
+      "stage": "S1",
+      "why": "the free outdoor concert was never extracted, only the replies to it"
+    },
     "92a0aa75": {
       "stage": "S2",
       "why": "extracted, then folded away as a restatement"
     },
     "gpt4_e414231e": {
-      "stage": "S5",
-      "why": "both dates supplied and annotated; reported as the same day"
-    },
-    "gpt4_d6585ce8": {
-      "stage": "S5",
-      "why": "every event and date supplied; ordering still wrong"
+      "stage": "S4b",
+      "why": "both dates ranked 1 and 2 and still read as the same day"
     },
     "9a707b81": {
       "stage": "S5",
@@ -59,9 +59,10 @@
     }
   },
   "counts": {
-    "S1": 9,
+    "S1": 10,
     "S2": 1,
-    "S5": 4
+    "S4b": 1,
+    "S5": 2
   },
   "accuracy_split": {
     "final": 36,

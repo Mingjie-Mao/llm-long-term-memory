@@ -75,11 +75,35 @@ STAGE = {
     "80ec1f4f": ("S1", "the February gallery visit's gold session yielded nothing"),
     "gpt4_fa19884d": ("S1", "the user's own statement was not extracted, only the replies to it"),
     "0edc2aef": ("S1", "the user's transferable preference was not extracted"),
+    # Filed S5 until oracle C read the gold sessions' memories and found no
+    # "free outdoor concert series in the park" among them. The user says it in
+    # the raw turns; only the assistant's replies to it were extracted.
+    "gpt4_d6585ce8": ("S1", "the free outdoor concert was never extracted, only the replies to it"),
     "92a0aa75": ("S2", "extracted, then folded away as a restatement"),
-    "gpt4_e414231e": ("S5", "both dates supplied and annotated; reported as the same day"),
-    "gpt4_d6585ce8": ("S5", "every event and date supplied; ordering still wrong"),
+    # Also filed S5, and also wrong. Both dates are in the store, correct, and
+    # ranked 1 and 2 — so they are in context at every top_k down to 3. Given the
+    # two gold sessions' memories instead, the same answerer gets it right in 3 of
+    # 4 runs. Same facts, same model, different surrounding material.
+    "gpt4_e414231e": ("S4b", "both dates ranked 1 and 2 and still read as the same day"),
     "9a707b81": ("S5", "the date supplied and correct; anchored on the wrong day"),
     "71017277": ("S5", "the fact supplied and correct; not accepted as jewellery"),
+}
+
+
+# The fact each S1 question needed, written by hand from the lineage audit and
+# worded as the extractor would have worded it. Oracle A injects these: a question
+# that still fails with its missing fact present and correctly phrased is a
+# question no amount of extraction work would have fixed.
+GOLD_FACT = {
+    "edced276": "The user's island-hopping trip to Hawaii lasted 10 days.",
+    "4adc0475": "The user has had two assists in their indoor soccer league.",
+    "37f165cf": "The user recently finished reading a 416-page novel.",
+    "73d42213": "It took the user two hours to travel to the clinic last time.",
+    "c9f37c46": "The user attended an open mic night at a local comedy club in April 2023.",
+    "gpt4_7abb270c": "The user visited the Modern Art Museum on February 20, 2023.",
+    "80ec1f4f": "The user visited The Art Cube gallery on February 15, 2023.",
+    "gpt4_fa19884d": "The user started listening to bluegrass music on March 31, 2023.",
+    "0edc2aef": "The user prefers hotels with great views and a rooftop pool or hot tub.",
 }
 
 
@@ -118,11 +142,12 @@ def audit(rows) -> dict:
         "S2": "lifecycle — merged or superseded away",
         "S3": "eligibility — filtered before ranking",
         "S4": "retrieval — eligible but never in context",
+        "S4b": "composition — in context and top-ranked, still not used",
         "S5": "reasoning — everything supplied and correct",
     }
     print(f"{'stage':6s} {'n':>3s}   first cause")
     print("-" * 66)
-    for s in ("S0", "S1", "S2", "S3", "S4", "S5"):
+    for s in ("S0", "S1", "S2", "S3", "S4", "S4b", "S5"):
         print(f"{s:6s} {counts.get(s, 0):3d}   {labels[s]}")
     return dict(counts)
 
@@ -153,12 +178,140 @@ def contribution(rows) -> dict:
     return {"final": len(correct), "memory_only": memory_only, "rescued": rescued, "fired": fired}
 
 
+def oracle_a(rows, inst, cfg, settings) -> dict:
+    """Inject the missing fact as a memory, then run the real pipeline over it.
+
+    A ceiling, not a proposal. Nothing here changes the extractor — it answers
+    "if extraction had been perfect for these nine, how many come back?" The
+    counterfactual already suggested the ceiling is not reached: six real facts
+    recovered, two answers fixed, because a fact still has to be retrieved and
+    then used.
+    """
+    import shutil
+    import subprocess
+    from datetime import datetime
+
+    from llm_long_term_memory.embed import Encoder
+    from llm_long_term_memory.store import Memory, NumpyFlatIndex, SQLiteMemoryStore
+
+    name = "oracle-extraction"
+    dst = settings.store_dir / f"{name}.db"
+    if dst.exists():
+        dst.unlink()
+    shutil.copy2(STORE, dst)
+    store = SQLiteMemoryStore(dst)
+    store.initialize()
+    now = datetime.now()
+    try:
+        for qid, text in GOLD_FACT.items():
+            when = datetime.strptime(inst[qid].question_date[:10], "%Y/%m/%d")
+            store.add_memories(
+                [
+                    Memory(
+                        id=f"oracle_{qid}",
+                        user_id=qid,
+                        type="semantic",
+                        content=text,
+                        token_count=max(1, len(text) // 5),
+                        subject="user",
+                        predicate="oracle_fact",
+                        source_role="user",
+                        scope="event",
+                        importance=1.0,
+                        event_time=when,
+                        valid_from=when,
+                        ingested_at=now,
+                        source_session_id=inst[qid].answer_session_ids[0],
+                        source_turn_index=0,
+                    )
+                ]
+            )
+        encoder = Encoder(cfg.models.embedder)
+        allrows = store._conn.execute("SELECT id, content FROM memories").fetchall()
+        path = settings.store_dir / f"{name}-index"
+        for suffix in (".npy", ".ids.json"):
+            f = Path(str(path) + suffix)
+            if f.exists():
+                f.unlink()
+        index = NumpyFlatIndex(path, dim=cfg.models.embedding_dim)
+        index.add(
+            [i for i, _ in allrows], encoder.encode([c for _, c in allrows], show_progress=True)
+        )
+        index.save()
+    finally:
+        store.close()
+
+    manifest = REPO / "results" / "manifests" / "oracle-s1.json"
+    manifest.write_text(
+        json.dumps({"name": "oracle-s1", "question_ids": sorted(GOLD_FACT)}, indent=2) + "\n",
+        encoding="utf-8",
+    )
+    subprocess.run(
+        [
+            str(REPO / ".venv" / "bin" / "python"),
+            "-m",
+            "llm_long_term_memory.cli",
+            "eval",
+            "run",
+            "two_stage_hydrated",
+            "--config",
+            "configs/fallback.yaml",
+            "--store-name",
+            name,
+            "--questions",
+            str(manifest),
+            "--label",
+            "oracle-s1",
+        ],
+        cwd=REPO,
+        check=False,
+    )
+    out = REPO / "results" / "raw" / "two_stage_hydrated.oracle-s1.jsonl"
+    after = {
+        json.loads(x)["question_id"]: json.loads(x)["correct"]
+        for x in out.read_text(encoding="utf-8").splitlines()
+        if x.strip()
+    }
+    fixed = sorted(q for q in after if after[q] and not rows[q]["correct"])
+    print(f"\n  oracle A: {len(fixed)} of {len(GOLD_FACT)} fixed by injecting the missing fact")
+    for q in sorted(after):
+        print(f"    {q:15s} {'FIXED' if q in fixed else 'still wrong'}")
+    return {"n": len(GOLD_FACT), "fixed": fixed}
+
+
+def oracle_c(rows, inst, settings) -> dict:
+    """Hand the answerer the gold sessions' memories and nothing else.
+
+    If a question fails with uncontaminated evidence in front of it, the failure is
+    reasoning, and no extraction or retrieval work can reach it.
+    """
+    from llm_long_term_memory.api.service import MemoryService
+
+    svc = MemoryService(store_name="two-stage-p10", config_path="configs/fallback.yaml")
+    if svc.answerer is None:
+        print("  no API key; oracle C skipped")
+        return {}
+    questions = sorted(q for q, (s, _) in STAGE.items() if s == "S5")
+    answers = {}
+    for qid in questions:
+        gold = set(inst[qid].answer_session_ids)
+        memories = [m for m in svc.store.iter_all(qid) if m.source_session_id in gold]
+        text = svc.answerer.answer_with_memories(inst[qid], memories)
+        answers[qid] = text
+        print(f"    {qid:15s} {len(memories):2d} memories from the gold sessions")
+        print(f"       gold: {str(inst[qid].answer)[:96]}")
+        print(f"       got : {text[:96]}")
+    print("\n  Judge these by reading them. A loose string match on a computed answer")
+    print("  is the mistake this project has already made three times.")
+    return {"n": len(questions), "answers": answers}
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--run", action="store_true", help="also run the oracles (costs quota)")
     args = parser.parse_args()
 
-    rows, _inst, _cfg = load()
+    rows, inst, cfg = load()
 
     print("\n" + "=" * 104)
     print("FIRST FAILING STAGE — one per question, the earliest that loses it")
@@ -178,6 +331,7 @@ def main() -> int:
         f"(every S1, if the fact alone is enough)"
     )
     print(f"  B  perfect retrieval  : up to {counts.get('S3', 0) + counts.get('S4', 0)} questions")
+    print(f"  D  perfect composition: up to {counts.get('S4b', 0)} questions")
     print(f"  C  perfect reasoning  : up to {counts.get('S5', 0)} questions")
     print(
         "\n  These are upper bounds from the audit, not measurements. The "
@@ -206,7 +360,27 @@ def main() -> int:
     print(f"\n→ {OUT}")
 
     if not args.run:
-        print("\nOracles A/B/C are not run. Re-run with --run to spend quota on them.")
+        print("\nOracles are not run. Re-run with --run to spend quota on them.")
+        return 0
+
+    settings = Settings()
+    print("\n" + "=" * 104)
+    print("ORACLE B — deliberately not run. The audit assigns zero questions to S3 or")
+    print("S4, so a perfect retriever has nothing to fix. Spending quota to confirm a")
+    print("ceiling of zero would measure the answerer's run-to-run noise instead.")
+    print("\n" + "=" * 104)
+    print("ORACLE A — inject the missing fact, then run the real pipeline")
+    print("=" * 104)
+    a = oracle_a(rows, inst, cfg, settings)
+    print("\n" + "=" * 104)
+    print("ORACLE C — the gold sessions' memories and nothing else")
+    print("=" * 104)
+    c = oracle_c(rows, inst, settings)
+
+    data = json.loads(OUT.read_text(encoding="utf-8"))
+    data["oracle_a"] = a
+    data["oracle_c"] = c
+    OUT.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
     return 0
 
 
