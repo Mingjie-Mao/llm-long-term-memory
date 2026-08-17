@@ -153,3 +153,36 @@ def test_unscoped_memories_are_grouped_honestly_not_guessed_at():
 def test_grouping_keeps_the_validity_window():
     rendered = render_grouped([memory("The user lives in Sydney.", scope="profile")], temporal=True)
     assert "since 2026-08-14" in rendered
+
+
+def test_every_scope_is_dated_the_same_way():
+    """`since` on a one-off event reads oddly, and changing it to `on` was tried and
+    reverted (`results/render-preposition.md`).
+
+    The hypothesis was that framing an occurrence as the start of an ongoing state
+    was why two dev50 questions failed: asked how many days passed between two
+    events, the answerer took a date out of the prose and reported zero. Rendering
+    `event` scopes as `(on <date>)` left both of those questions answered exactly
+    as before, word for word. The answerer is not misreading the annotation, it is
+    ignoring it in favour of the sentence — so the fix has to reach the prose,
+    where an unresolved "today" still sits next to a resolved date in the same row.
+    """
+    for scope in ("event", "profile", "preference"):
+        rendered = render_grouped([memory("The user did a thing.", scope=scope)], temporal=True)
+        assert "since 2026-08-14" in rendered, scope
+
+
+def test_a_store_written_before_scope_existed_renders_as_it_did():
+    rendered = render_grouped([memory("The user owns a fern.")], temporal=True)
+    assert "since 2026-08-14" in rendered
+
+
+def test_a_superseded_memory_shows_both_ends_of_its_window():
+    """A fact that stopped being true needs both dates, not just its start."""
+    from datetime import datetime
+
+    m = memory("The user lived in Canberra.", scope="event")
+    m.valid_to = datetime(2026, 8, 20)
+    rendered = render_grouped([m], temporal=True)
+
+    assert "2026-08-14 to 2026-08-20, no longer current" in rendered
