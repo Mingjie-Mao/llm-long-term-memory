@@ -108,15 +108,45 @@ def main() -> int:
             ).fetchone()
         finally:
             conn.close()
-        if have < want:
+        # Counted from the checkpoint rather than from `turns`, because a batch the
+        # provider refuses still has its turns written — the archive is populated
+        # before extraction runs. Counting turns would call the store complete while
+        # fifteen sessions silently hold no memories, which is precisely the gap
+        # this gate exists to catch.
+        ckpt = settings.store_dir / f"{STORE}-ingest.json"
+        if not ckpt.exists():
+            stop("ingestion", f"{ckpt.name} is missing — nothing has been ingested")
+        progress = json.loads(ckpt.read_text(encoding="utf-8"))
+        done = set(progress.get("done_sessions", []))
+        blocked = set(progress.get("blocked_sessions", []))
+        if len(done) + len(blocked) < want:
             stop(
                 "ingestion",
-                f"{have}/{want} sessions. A partial store is indistinguishable from an "
-                f"extraction failure, so the run would measure its own incompleteness. "
-                f"Resume: lltm ingest run --config {CONFIG} --store-name {STORE} "
-                f"--questions {MANIFEST.name}",
+                f"{len(done)} done + {len(blocked)} blocked = {len(done) + len(blocked)}/{want}. "
+                f"A partial store is indistinguishable from an extraction failure, so the "
+                f"run would measure its own incompleteness. Resume: lltm ingest run "
+                f"--config {CONFIG} --store-name {STORE} --questions {MANIFEST.name}",
             )
-        ok("ingestion", f"{have}/{want} sessions, {namespaces} namespaces, {memories:,} memories")
+        ok(
+            "ingestion",
+            f"{len(done)} sessions extracted, {namespaces} namespaces, {memories:,} memories "
+            f"(store holds turns for {have})",
+        )
+
+        # Refused batches are not a failure of this system and must not be counted
+        # as one. Named here so the result can report them rather than absorb them.
+        if blocked:
+            affected = sorted({k.split(":", 1)[0] for k in blocked})
+            print(
+                f"  \033[36mNOTE\033[0m  content policy refused {len(blocked)} sessions in "
+                f"{progress.get('blocked_batches', 0)} batch(es), affecting "
+                f"{len(affected)} question(s): {', '.join(affected)}"
+            )
+            print(
+                "        Their turns are archived and searchable, but they produced no "
+                "memories.\n        Report these questions separately: a failure there is "
+                "the provider's refusal,\n        not the memory system's."
+            )
 
         # 3 — homogeneous, and written by the frozen extractor
         frozen = json.loads(
