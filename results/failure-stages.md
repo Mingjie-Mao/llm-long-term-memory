@@ -154,3 +154,76 @@ preference was never extracted, but it is equally a failure to *apply* a
 preference the answerer could see. And "first failing stage" hides later ones: a
 question fixed at S1 may then fail at S5, which is exactly what the 2-in-6
 conversion suggests is happening.
+
+
+## The second defect behind the five oracle A did not fix
+
+All five had the injected fact in their context and failed anyway, so the audit's
+"first failing stage" was hiding a second one in each.
+
+| question | what stopped it the second time |
+|---|---|
+| `73d42213` | **a second missing fact** — the 9:00 arrival needs a 7:00 departure too, and the injection supplied only the two-hour journey. Still S1 |
+| `37f165cf` | **S5** — 341, 440 and the injected 416 were all in context and the answer was "I do not have a record of the specific books or page counts" |
+| `0edc2aef` | **S5** — the preference was supplied and the answerer declined to transfer it, replying that the trip was to Seattle |
+| `gpt4_7abb270c` | **S5** — six museums listed in order, with "Modern Art Gallery" substituted for the Museum of Contemporary Art |
+| `gpt4_fa19884d` | the gold is "a bluegrass band that features a banjo player", which names no artist. Likely a benchmark limit |
+
+**So the reasoning burden is larger than S5 = 2.** The audit records only the first
+stage that loses a question; behind four of these five there is an S5 waiting. A
+perfect extractor converts four of nine and then hands four more to a wall it
+cannot help with, which is the honest reading of the extraction ceiling: not ten
+questions, closer to five.
+
+## Coverage-aware extraction has nothing to select on
+
+The plan after this was adaptive extraction — ingest at batch 15, detect sessions
+at risk of having lost something, and re-extract only those at batch 1. The pilot's
+matched cohort already has the data to test whether such a detector could exist.
+
+It cannot. Every stratum loses at roughly the same rate:
+
+| stratum | batch 1 / batch 15 |
+|---|---:|
+| under 8 turns | 7.0x |
+| 8–11 turns | 5.5x |
+| 12–15 turns | 4.5x |
+| 16+ turns | 5.2x |
+| historically zero-yield | 6.0x |
+| historically normal | 4.6x |
+
+And the signal a detector would most obviously use runs the wrong way:
+
+| yield at batch 15 | yield at batch 1 |
+|---:|---:|
+| 0 memories | 11 |
+| 1–2 | 10 |
+| **5 or more** | **17** |
+
+**The sessions that did best at batch 15 gain the most at batch 1.** A detector
+that re-extracts the suspiciously quiet sessions would skip exactly the ones with
+the most to recover. The loss is not concentrated in an identifiable subset — it is
+roughly five-fold everywhere — so there is no risk signal to route on, and
+"selective retry" reduces to "re-extract everything", which is the 4,800-request
+option already rejected.
+
+
+## The reasoning module's oracle is smaller than it looks
+
+Handing the answerer only the operands, with nothing else in context:
+
+| question | result | |
+|---|---|---|
+| `gpt4_7abb270c` | **correct order** | Science Museum, Museum of Contemporary Art, Metropolitan, … |
+| `37f165cf` | "440 pages and 416 pages" | listed, not summed; gold is 856 |
+| `9a707b81` | "26 days ago, on March 20, 2022" | anchored on the question date, not the referenced event |
+
+The model can order six dated events and can subtract dates. It fails at choosing
+*which* operands and *which* anchor. So a router dispatching to deterministic
+sum/duration/ordering operators addresses the half that already works: ordering
+needs no operator, the date question needs the right anchor before any subtraction
+helps, and only the sum is a case where a deterministic operator would clearly fix
+the answer.
+
+That is one question of the six, and it arrives after the extraction work that
+would have to supply the operands in the first place.

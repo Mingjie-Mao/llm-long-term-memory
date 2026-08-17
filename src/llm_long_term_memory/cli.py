@@ -662,6 +662,16 @@ def ingest_run(
     store_name: str | None = typer.Option(
         None, help="Store filename stem; two-stage extraction defaults to two-stage"
     ),
+    questions: str | None = typer.Option(
+        None,
+        "--questions",
+        help=(
+            "Manifest of question ids. Ingests exactly these questions' haystacks. "
+            "`--limit` takes a prefix of the corpus, which is the wrong selection for "
+            "a frozen split: the held-out hundred are scattered through it, not at "
+            "the front."
+        ),
+    ),
 ) -> None:
     """Extract memories from the corpus. Resumes after a daily-quota stop."""
     from llm_long_term_memory.config import ExperimentConfig
@@ -746,9 +756,27 @@ def ingest_run(
         )
 
         with console.status("Loading corpus…"):
-            instances = lme.load(
-                cfg.dataset_variant, settings.data_dir, limit=limit or cfg.dataset_limit
-            )
+            if questions:
+                # Load the whole split and filter, exactly as `eval run --questions`
+                # does. A stratified sample of the manifest's size would return a
+                # different set of questions, and for a held-out split the haystacks
+                # ingested have to be the ones its questions are asked about.
+                from llm_long_term_memory.evaluation.manifest import load_manifest
+
+                manifest = load_manifest(questions)
+                by_id = {i.question_id: i for i in lme.load(manifest.variant, settings.data_dir)}
+                unknown = [q for q in manifest.question_ids if q not in by_id]
+                if unknown:
+                    raise typer.BadParameter(
+                        f"{len(unknown)} question id(s) not in the {manifest.variant!r} "
+                        f"split, first: {unknown[0]!r}"
+                    )
+                instances = [by_id[q] for q in manifest.question_ids]
+                console.print(f"[dim]manifest {manifest.name}: {len(instances)} questions[/dim]")
+            else:
+                instances = lme.load(
+                    cfg.dataset_variant, settings.data_dir, limit=limit or cfg.dataset_limit
+                )
             all_sessions = namespaced_sessions(instances)
         if sessions:
             all_sessions = all_sessions[:sessions]

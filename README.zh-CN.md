@@ -250,6 +250,12 @@ uv run lltm mcp --transport http   # streamable HTTP
 
 **上下文比完整原文少 75 倍，而且在这个题集上更准。**
 
+> **这个 72% 由什么构成。** 其中 54.0% 是纯结构化记忆答对的，18.0% 是回答器报告
+> 答不了之后由原始档案救回来的（[拆解](results/failure-stages.md)）。记忆单独的
+> 54.0% 正好和 `naive_rag` 打平；把产品推到前面的是档案。不拆开引用这个总数，读
+> 起来会像是记忆层答对了全部。
+
+
 两条 P10 臂只在 `fallback.enabled`、`fallback.max_turns`、`fallback.max_chars`
 上不同，其余完全一致 —— 这是运行前检查过的，不是事后声称的 —— 所以两者之差可以归因
 到回退机制。

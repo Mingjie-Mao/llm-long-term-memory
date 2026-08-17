@@ -1,0 +1,58 @@
+{
+  "answerer": {
+    "prompt_sha": "dcf2ef682d0aa5bc",
+    "version": "memory-aware-v2"
+  },
+  "config": "configs/fallback.yaml",
+  "extractor": {
+    "dedup_threshold": "0.9200",
+    "extractor_version": "two-stage-p10-v2",
+    "model": "gemini-3.1-flash-lite",
+    "prompts": "017e6620b1b9",
+    "schema_version": "530989df0aec",
+    "sessions_per_request": "15"
+  },
+  "fallback": {
+    "enabled": true,
+    "max_chars": 2400,
+    "max_turns": 3,
+    "recover_sha": "26276540759a8d0d"
+  },
+  "heldout_manifest_sha": "19f833d8d9457706",
+  "heldout_questions": 100,
+  "judge": {
+    "prompt_sha": "dab23d9ebefd22a6",
+    "version": "lme-type-aware-v2"
+  },
+  "note": "The system as frozen before the held-out run. Every hash here is re-derivable by scripts/freeze.py; a mismatch means the held-out result describes something other than what was frozen.",
+  "retrieval": {
+    "candidate_limit": 50,
+    "rerank_enabled": false,
+    "temporal_resolution": true,
+    "top_k": 20,
+    "weights": {
+      "bm25": 0.0,
+      "entity": 0.0,
+      "importance": 0.0,
+      "recency": 0.0,
+      "semantic": 1.0
+    }
+  },
+  "store": "two-stage-p10",
+  "store_counts": {
+    "active": 6202,
+    "memories": 6233,
+    "namespaces": 50,
+    "scope_null": 0,
+    "sessions": 2348,
+    "turns": 24590
+  },
+  "store_ingest_fingerprint": {
+    "dedup_threshold": "0.9200",
+    "extractor_version": "two-stage-p10-v2",
+    "model": "gemini-3.1-flash-lite",
+    "prompts": "017e6620b1b9",
+    "schema_version": "530989df0aec",
+    "sessions_per_request": "15"
+  }
+}

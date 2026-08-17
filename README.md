@@ -265,6 +265,13 @@ judge throughout:
 
 **75x less context than the full transcript, and more accurate on this set.**
 
+> **What the 72% is made of.** 54.0% is answered from structured memory alone and
+> 18.0% is rescued by the raw archive after the answerer reports it cannot answer
+> ([the breakdown](results/failure-stages.md)). Memory on its own ties `naive_rag`
+> at 54.0%; the archive is what puts the product ahead. Quoting the total
+> undivided reads as though the memory layer answered them all.
+
+
 The two P10 rows differ in `fallback.enabled`, `fallback.max_turns` and
 `fallback.max_chars` and in nothing else — checked before the run, not asserted
 afterwards — so the gap between them is attributable to the fallback. Paired over

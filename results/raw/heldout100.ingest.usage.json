@@ -1,0 +1,39 @@
+{
+  "summary": {
+    "total_requests": 2,
+    "total_tokens": 6801,
+    "failures": 0,
+    "by_role": {
+      "extractor": {
+        "role": "extractor",
+        "calls": 2,
+        "failures": 0,
+        "input_tokens": 6024,
+        "output_tokens": 777,
+        "p50_ms": 1889.3519169650972,
+        "p95_ms": 3111.106500029564,
+        "max_ms": 3111.106500029564
+      }
+    }
+  },
+  "calls": [
+    {
+      "role": "extractor",
+      "model": "gemini-3.1-flash-lite",
+      "input_tokens": 5158,
+      "output_tokens": 442,
+      "latency_ms": 3111.106500029564,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "extractor",
+      "model": "gemini-3.1-flash-lite",
+      "input_tokens": 866,
+      "output_tokens": 335,
+      "latency_ms": 1889.3519169650972,
+      "ok": true,
+      "error": null
+    }
+  ]
+}
