@@ -1,8 +1,12 @@
 # Batched extraction loses memories, and the loss is not mostly zero-yield
 
-**Status: experiment 1 complete, experiment 2 complete for batch 15 and 5, batch 1
-at 43/60 when the daily quota stopped it.** The `batchsize1` row below will move.
-Everything else is final.
+**Status: complete.** Both experiments finished; 420 records, no duplicate keys,
+all three batch-size arms over one shared cohort of 60 sessions.
+
+The follow-up that decides what to do about any of this is
+[the counterfactual](counterfactual-qa.md): recovering the lost facts fixed two
+answers out of six, and two of the four non-conversions were caused by material
+the smaller batch added. Read that before drawing a remedy from the numbers here.
 
 Run by `scripts/batch_position_pilot.py`, read by `scripts/batch_position_analyse.py`.
 Raw records in `results/raw/batch-position-pilot.json`.
@@ -93,10 +97,17 @@ attenuation, not a separate failure mode.
 |---|---:|---:|---:|
 | 15 (production) | 11.7% | 2.7 | 400 |
 | 5 | 8.3% | 4.8 | 1,000 |
-| 1 | 0.0% *(43/60)* | 12.0 *(43/60)* | 4,800 |
+| 1 | **0.0%** | **12.7** | 4,800 |
 
-Paired across sizes on all 60 sessions, batch 5 against batch 15: **39 sessions
-yielded more, 10 fewer, p = 3.8e-05**.
+Paired across sizes on all 60 sessions:
+
+| | more | fewer | exact McNemar |
+|---|---:|---:|---|
+| batch 5 vs batch 15 | 39 | 10 | p = 3.8e-05 |
+| batch 1 vs batch 15 | **60** | **0** | p = 1.7e-18 |
+| batch 1 vs batch 5 | **60** | **0** | p = 1.7e-18 |
+
+Not one session in sixty yielded more under a larger batch, twice over.
 
 Split by production history:
 
@@ -104,7 +115,7 @@ Split by production history:
 |---|---:|---:|
 | batch 15 | 23.3% zero, 2.1 mem/session | 0.0% zero, 3.3 mem/session |
 | batch 5 | 10.0% zero, 3.6 | 6.7% zero, 5.9 |
-| batch 1 *(partial)* | 0.0% zero, 10.8 | 0.0% zero, 13.2 |
+| batch 1 | 0.0% zero, 11.2 | 0.0% zero, 14.2 |
 
 This is the cleanest control in the pilot. At batch 15 the historical labels
 reproduce — the sessions that failed in production fail again at 23.3% while the
@@ -122,10 +133,13 @@ near-duplicate pairs within a session measured with the retrieval encoder.
 |---|---:|---:|---:|
 | 15 | 163 | 86.7% | 0.0% |
 | 5 | 285 | 87.0% | 0.2% |
-| 1 *(partial)* | 517 | 86.2% | 0.1% |
+| 1 | 762 | 86.1% | 0.1% |
 
-Groundedness is flat and duplication is nil at every size. So the 4.4x more
-memories at batch 1 are not fabrications and not restatements of each other.
+Groundedness is flat and duplication is nil at every size, so the extra memories
+at batch 1 are not fabrications and not restatements of each other. That is all it
+says. The counterfactual later found that 69.5% of them begin "The assistant
+recommended" — grounded, distinct, and mostly not asked about — which is exactly
+the failure mode these two numbers cannot see.
 
 **This is a floor, not a verdict.** Overlap catches a memory that invents a proper
 noun and misses one that recombines real words into a false claim, and neither
@@ -153,8 +167,10 @@ measured here, and this pilot separates none of them.
 
 ## Open
 
-* `batchsize1` needs its remaining 17 sessions.
-* LLM-judged fidelity and unsupported-fact rate on the extra memories.
+* LLM-judged fidelity and unsupported-fact rate on the extra memories. The free
+  floor cannot see the problem the counterfactual found: 69.5% of what batch 1
+  adds begins "The assistant recommended", which is grounded, non-duplicated, and
+  mostly not asked about.
 * Latency and token cost per strategy, alongside the request counts above.
 * Whether a smarter batching scheme — small batches, or a second pass over the tail
   of each batch — recovers the yield without paying 4,800 requests.
