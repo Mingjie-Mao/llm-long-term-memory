@@ -114,6 +114,23 @@ class DailyQuotaExhausted(RuntimeError):
         self.wait = wait
 
 
+class ContentBlocked(RuntimeError):
+    """The provider refused the prompt on content policy. Not retryable.
+
+    Distinct from every other failure here because the correct response is
+    different: a 429 waits, a transport error retries, and this one will refuse
+    identically forever at temperature 0. Carrying it as its own type lets the
+    ingestion driver record the batch and move on instead of halting a run of
+    hundreds on a refusal that no amount of waiting will clear.
+    """
+
+    def __init__(self, model: str, reason: str, prompt_tokens: int) -> None:
+        super().__init__(f"{model} refused the prompt: {reason} ({prompt_tokens:,} prompt tokens)")
+        self.model = model
+        self.reason = reason
+        self.prompt_tokens = prompt_tokens
+
+
 @dataclass(slots=True)
 class Completion:
     text: str
@@ -221,6 +238,18 @@ class GeminiClient:
                     box["output_tokens"] = (u.candidates_token_count or 0) + (
                         u.thoughts_token_count or 0
                     )
+                # Two levels of getattr: `prompt_feedback` is itself absent on a
+                # normal response, not merely None.
+                blocked = getattr(getattr(resp, "prompt_feedback", None), "block_reason", None)
+                if blocked is not None:
+                    # The provider refused the prompt outright: no candidates, no
+                    # output tokens, and `resp.text` is "". Left alone, that empty
+                    # string flows downstream and fails as a JSON parse error —
+                    # "EOF while parsing a value at line 1 column 0" — which names
+                    # the symptom and hides the cause. It cost an hour to find on
+                    # the held-out ingest, where retrying is useless because the
+                    # refusal is deterministic.
+                    raise ContentBlocked(model, str(blocked), u.prompt_token_count or 0)
                 raw = resp.text or ""
                 return Completion(
                     # Only when a schema was requested: leaving prose untouched

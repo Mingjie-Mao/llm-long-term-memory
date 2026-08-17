@@ -37,6 +37,22 @@ class FakeModels:
         outcome = self.script.pop(0)
         if isinstance(outcome, Exception):
             raise outcome
+        if outcome is REFUSED:
+            # What the provider actually returns on a content-policy refusal: no
+            # candidates, no output tokens, `text` an empty string, and the reason
+            # only present on `prompt_feedback`.
+            class Blocked:
+                text = ""
+
+                class prompt_feedback:
+                    block_reason = "PROHIBITED_CONTENT"
+
+                class usage_metadata:
+                    prompt_token_count = 36142
+                    candidates_token_count = None
+                    thoughts_token_count = None
+
+            return Blocked()
 
         class R:
             text = outcome
@@ -65,6 +81,9 @@ def client(monkeypatch, tmp_path):
 
     return build
 
+
+REFUSED = object()
+"""Script sentinel for a prompt the provider refuses outright."""
 
 GENERIC_400 = FakeAPIError(
     400, message="400 INVALID_ARGUMENT. Request contains an invalid argument."
@@ -252,3 +271,28 @@ def test_prose_answers_keep_their_fences(client):
     c = client(["Here is code:\n```python\nprint(1)\n```"])
     result = c.generate(role="answerer", model="m", prompt="x")
     assert "```python" in result.text
+
+
+def test_a_refused_prompt_raises_rather_than_returning_an_empty_string(client):
+    """The provider can refuse a prompt on content policy: no candidates, no output
+    tokens, and `text` is "".
+
+    Passed through, that empty string reaches whatever asked for structured output
+    and fails there as `EOF while parsing a value at line 1 column 0` — an error
+    naming the symptom and hiding the cause. On the held-out ingest it halted a run
+    of 367 batches at batch 76, and retrying is the obvious fix and the wrong one,
+    because a content refusal is deterministic.
+    """
+    from llm_long_term_memory.llm.client import ContentBlocked
+
+    c = client([REFUSED])
+    with pytest.raises(ContentBlocked, match="PROHIBITED_CONTENT"):
+        c.generate(role="extractor", model="m", prompt="p")
+
+
+def test_a_normal_response_has_no_prompt_feedback_at_all(client):
+    """The attribute is absent rather than None on a successful response, so the
+    check has to reach for it defensively or it turns every call into an
+    AttributeError."""
+    c = client(["ok"])
+    assert c.generate(role="extractor", model="m", prompt="p").text == "ok"

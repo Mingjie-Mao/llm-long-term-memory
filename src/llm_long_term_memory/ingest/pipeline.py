@@ -26,7 +26,7 @@ from pathlib import Path
 
 from llm_long_term_memory.embed import Encoder
 from llm_long_term_memory.evaluation.datasets.longmemeval import HaystackSession, Instance
-from llm_long_term_memory.llm.client import DailyQuotaExhausted
+from llm_long_term_memory.llm.client import ContentBlocked, DailyQuotaExhausted
 from llm_long_term_memory.store import MemoryStore, NumpyFlatIndex
 
 from . import fingerprint
@@ -45,10 +45,17 @@ class IngestProgress:
     adjudication_requests: int = 0
     superseded: int = 0
     undated: int = 0
+    blocked_sessions: set[str] = field(default_factory=set)
+    """Sessions in a batch the provider refused on content policy. They yielded no
+    memories and never will, so the gap is named rather than left to look like an
+    extraction failure."""
+    blocked_batches: int = 0
 
     def to_dict(self) -> dict:
         return {
             "done_sessions": sorted(self.done_sessions),
+            "blocked_sessions": sorted(self.blocked_sessions),
+            "blocked_batches": self.blocked_batches,
             "memories_written": self.memories_written,
             "duplicates_dropped": self.duplicates_dropped,
             "updates_detected": self.updates_detected,
@@ -64,8 +71,15 @@ class IngestProgress:
         if not path.exists():
             return cls()
         d = json.loads(path.read_text(encoding="utf-8"))
-        p = cls(done_sessions=set(d.get("done_sessions", [])))
+        p = cls(
+            done_sessions=set(d.get("done_sessions", [])),
+            # Restored, or a resumed run reports zero blocked batches while the
+            # store is missing their sessions — the gap would lose its name at the
+            # first quota stop.
+            blocked_sessions=set(d.get("blocked_sessions", [])),
+        )
         for key in (
+            "blocked_batches",
             "memories_written",
             "duplicates_dropped",
             "updates_detected",
@@ -308,6 +322,21 @@ class IngestionPipeline:
         for n, (namespace, batch) in enumerate(batches, start=1):
             try:
                 self._ingest_batch(namespace, batch, progress)
+            except ContentBlocked:
+                # The provider refused this prompt on content policy. Unlike every
+                # other failure here it will refuse identically on the next run, so
+                # halting turns one batch into a permanently stuck ingest — which is
+                # what it did on the held-out corpus at batch 76 of 367.
+                #
+                # Recorded rather than skipped silently. These sessions produce no
+                # memories, and downstream that is indistinguishable from the
+                # extractor having found nothing, which is exactly the confusion a
+                # held-out result cannot afford. The ids go in the checkpoint so the
+                # gap has a name and a size.
+                progress.blocked_sessions.update(_key(namespace, s) for s in batch)
+                progress.blocked_batches += 1
+                if on_batch:
+                    print(f"  blocked by content policy: {namespace}, {len(batch)} sessions")
             except DailyQuotaExhausted as exc:
                 self._commit(progress)
                 return IngestOutcome(progress, completed=False, stopped_reason=str(exc))
