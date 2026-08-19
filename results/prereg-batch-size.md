@@ -201,3 +201,76 @@ input-position effects and schema-length pressure are all consistent with the
 pilot and this separates none of them. The mechanism does not change which batch
 size to ship, and a hypothesis about it would not survive being tested on the same
 data that suggested it.
+
+---
+
+## Amendment 1 — memory-only accuracy is the QA endpoint, not final accuracy
+
+**Added 2026-08-19, while the held-out evaluation was running and before any of
+its rows had been read.** The result file held 1 of 100 questions at the time and
+its contents were not opened. The amendment comes from a mechanism argument, not
+from data.
+
+The original draft made final accuracy the confirmatory endpoint. That is the
+wrong quantity, and the reason is in this system's own design: **the archive
+fallback exists to compensate for exactly the failure batch size causes.** When
+extraction drops a fact, the answerer reports it cannot answer, the archive is
+searched, and the question is often recovered. On dev50 that path is 18.0 of the
+72.0 points.
+
+So an extraction fix does not primarily add correct answers. It **moves them from
+the expensive path to the cheap one**. Memory-only accuracy rises, the fallback
+fires less, and final accuracy sees only whatever is left over. An arm could
+improve extraction substantially and show a flat final accuracy, and under the
+original rule that would have been read as "batch size does not matter" — the
+second way this design was pre-committed to the wrong conclusion.
+
+It also worsens the power problem the draft already identified: the effect on
+final accuracy is the *residual* after the fallback absorbs part of it, so it is
+strictly smaller than the effect on memory-only accuracy. Measuring the residual
+and calling it the endpoint maximises the chance of a null.
+
+### Added endpoints — no extra cost
+
+All three are already recorded per question by the same run. Nothing new is spent.
+
+| endpoint | why |
+|---|---|
+| **memory-only accuracy** | what structured memory answers without the archive. The quantity extraction actually acts on, and the one the product wants to grow |
+| **fallback trigger rate** | the mechanism check. A real extraction improvement must show this falling. If coverage rises and the trigger rate does not fall, the recovered facts are not the ones being asked about |
+| fallback success rate | guards the opposite failure: an arm that fires less but converts worse |
+
+### Revised endpoint order
+
+1. **Coverage** — user facts per session, zero-yield rate. Paired per session over
+   4,796 sessions. Primary, and the only endpoint this n can resolve decisively.
+2. **Memory-only accuracy** — paired McNemar vs `batch15`. The QA endpoint.
+3. **Fallback trigger rate** — must fall if 1 and 2 both moved. A confirmation
+   that the three numbers describe one mechanism rather than three coincidences.
+4. **Final accuracy** — non-degradation guard only. Not the headline.
+5. Fidelity and dilution, unchanged.
+
+### Revised decision rule
+
+Replaces rule 1 of the original. Rules 2–5 stand.
+
+> Adopt the **cheapest** arm that improves user facts per session at p < 0.05 and
+> does not degrade final accuracy. Among arms that additionally improve
+> memory-only accuracy, prefer the one at the quality–cost knee rather than the
+> maximum: an arm costing twice as much for one point of memory-only accuracy is
+> not adopted. **If two arms are statistically indistinguishable on memory-only
+> accuracy, the cheaper one wins** — stated now so the operating point is not
+> chosen from noise after the fact.
+
+### Revised prediction
+
+Supersedes the accuracy line of the original prediction; the coverage and
+fidelity predictions stand.
+
+- Memory-only accuracy rises more than final accuracy in every arm, and the gap
+  between the two shrinks monotonically as batch size falls.
+- Fallback trigger rate falls at `batch1` relative to `batch15`.
+- Final accuracy moves by **less than the +8pp oracle ceiling** — oracle A
+  converted 4 of 9 dev50 questions with *perfect* injected facts, and `batch1` is
+  not perfect extraction, so its final-accuracy gain is bounded well below that.
+- `batch5` is still the adopted arm.
