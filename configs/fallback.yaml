@@ -75,3 +75,21 @@ fallback:
   enabled: true
   max_turns: 3
   max_chars: 2400
+
+# P6. Session-coherent context, used only by the `two_stage_coherent` variant;
+# every other variant ignores this block entirely. These values are the starting
+# point, NOT a result: the pre-registration
+# (results/prereg-context-shape.md) puts the budget on train150 and freezes it
+# before dev100 is touched, and they live here rather than behind a CLI flag so
+# that scripts/freeze.py can see them.
+#
+# The free gate has already reported that the default does not clear its own bar:
+# session recall @ top-3 is 64% where the pre-registration requires 80%. Session
+# selection is the thing train150 has to fix before this arm is worth running.
+context:
+  max_sessions: 3
+  window_radius: null
+  max_total_memories: 20
+  aggregate: sum_top3
+  session_order: chronological
+  include_superseded: false

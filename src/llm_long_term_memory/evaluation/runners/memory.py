@@ -29,6 +29,8 @@ from llm_long_term_memory.retrieve import (
     HybridRetriever,
     HydrationResult,
     RetrievedMemory,
+    SessionBudget,
+    build_coherent_context,
     render_evidence,
 )
 from llm_long_term_memory.store import Memory, MemoryStore, NumpyFlatIndex
@@ -142,6 +144,7 @@ class MemoryRunner:
         chars_per_token: float = 4.6,
         reranker=None,
         raw_fallback: bool = False,
+        session_budget: SessionBudget | None = None,
     ) -> None:
         self.client = client
         self.model = model
@@ -150,6 +153,16 @@ class MemoryRunner:
         self.index = index
         self.temporal = temporal
         self.top_k = top_k
+        # Budget packing reorders and drops memories by predicted utility, which is
+        # exactly what a coherent context is built to prevent. Combining them yields
+        # a context that is neither shape while reporting as both, so it is refused
+        # rather than silently resolved in favour of whichever runs last.
+        if session_budget is not None and token_budget:
+            raise ValueError(
+                "session_budget and token_budget both set: packing reorders the "
+                "memories a coherent context orders deliberately. Choose one."
+            )
+        self.session_budget = session_budget
         self.retriever = HybridRetriever(
             store,
             index,
@@ -275,6 +288,28 @@ class MemoryRunner:
         selected = [hit.memory for hit in retrieved]
         retrieved_by_id = {hit.memory.id: hit for hit in retrieved}
 
+        coherent = None
+        if self.session_budget is not None:
+            # One namespace read, grouped once. Retrieval found the memories; this
+            # decides which conversations they belong to and hands over each one
+            # whole, in the order it happened.
+            by_session: dict[str, list[Memory]] = {}
+            for memory in self.store.iter_all(instance.question_id):
+                if memory.source_session_id:
+                    by_session.setdefault(memory.source_session_id, []).append(memory)
+            coherent = build_coherent_context(
+                retrieved, lambda sid: by_session.get(sid, []), self.session_budget
+            )
+            selected = list(coherent.memories)
+            # Memories a coherent session contributes were not necessarily retrieved,
+            # so they have no hit to report signals from. Recorded as absent rather
+            # than fabricated at zero, which would read as "scored and lost".
+            retrieved_by_id = {
+                memory.id: retrieved_by_id[memory.id]
+                for memory in selected
+                if memory.id in retrieved_by_id
+            }
+
         assembly_started = perf_counter()
         packed = None
         if self.token_budget:
@@ -321,7 +356,29 @@ class MemoryRunner:
                         "signals": retrieved_by_id[memory.id].signals.to_dict(),
                     }
                     for memory in selected
+                    if memory.id in retrieved_by_id
                 ],
+                # Which context shape produced this row. A result that does not name
+                # its arm cannot be compared with one that does, and this project has
+                # already shipped a store whose meta claimed the wrong extractor.
+                "context_shape": "coherent" if coherent is not None else "flat",
+                "coherent": None
+                if coherent is None
+                else {
+                    "sessions": list(coherent.sessions),
+                    "dropped_sessions": list(coherent.dropped_sessions),
+                    "truncated": coherent.truncated,
+                    "memories": len(coherent.memories),
+                    "unretrieved": sum(1 for m in coherent.memories if m.id not in retrieved_by_id),
+                    "budget": {
+                        "max_sessions": self.session_budget.max_sessions,
+                        "window_radius": self.session_budget.window_radius,
+                        "max_total_memories": self.session_budget.max_total_memories,
+                        "aggregate": self.session_budget.aggregate,
+                        "session_order": self.session_budget.session_order,
+                        "include_superseded": self.session_budget.include_superseded,
+                    },
+                },
                 "decay_enabled": self.decay_enabled,
                 "superseded_shown": sum(1 for m in selected if m.status != "active"),
                 "token_budget": self.token_budget,

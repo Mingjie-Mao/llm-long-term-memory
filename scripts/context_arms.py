@@ -65,13 +65,15 @@ OUT = REPO / "results" / "raw" / "context-arms.json"
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--run", action="store_true")
-    parser.add_argument("--reps", type=int, default=1, help="repeats per arm; >1 measures run-to-run variance")
+    parser.add_argument(
+        "--reps", type=int, default=1, help="repeats per arm; >1 measures run-to-run variance"
+    )
     args = parser.parse_args()
 
     settings = Settings()
     inst = {i.question_id: i for i in lme.load("s", settings.data_dir)}
 
-    print(f"context arms · {len(FAILURES)} questions × 3 arms · store {STORE}")
+    print(f"context arms - {len(FAILURES)} questions x 3 arms - store {STORE}")
     print("  flat20    production: top_k 20, rank order")
     print("  flatN     same count as coherent, rank order, scattered")
     print("  coherent  gold-session memories, event order")
@@ -94,10 +96,10 @@ def main() -> int:
             question = inst[qid]
             gold_sessions = set(question.answer_session_ids)
 
-            coherent = [
-                m for m in svc.store.iter_all(qid) if m.source_session_id in gold_sessions
-            ]
-            coherent.sort(key=lambda m: (m.event_time or m.valid_from or "", m.source_turn_index or 0))
+            coherent = [m for m in svc.store.iter_all(qid) if m.source_session_id in gold_sessions]
+            coherent.sort(
+                key=lambda m: (m.event_time or m.valid_from or "", m.source_turn_index or 0)
+            )
             n = len(coherent)
 
             ranked20 = [h.memory for h in svc.search(qid, question.question, limit=20).memories]
@@ -109,8 +111,7 @@ def main() -> int:
             print(f"    gold     : {str(question.answer)[:100]}")
             for arm, memories in arms.items():
                 texts = [
-                    svc.answerer.answer_with_memories(question, memories)
-                    for _ in range(args.reps)
+                    svc.answerer.answer_with_memories(question, memories) for _ in range(args.reps)
                 ]
                 record[arm] = {"k": len(memories), "answers": texts}
                 print(f"    {arm:9s}(k={len(memories):2d}):")

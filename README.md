@@ -268,6 +268,19 @@ had to pass first, including one asserting the result file did not yet exist.
 
 **The headline generalises. Almost nothing underneath it does.**
 
+> **The single shot landed at the bottom of its own range.** Two further runs of
+> the identical configuration score **71** and **73**, so the held-out band is
+> **70-73, mean 71.3** ([the measurement](results/heldout-variance.md)). Against
+> the mean, the gap to dev50 is **-0.7pp**, not -2.0pp — the system generalises
+> better than the pre-registered number says. `70.0%` is still what is reported,
+> because the protocol committed to the single shot before the repeats existed and
+> a mean that flatters is exactly the case where that has to hold.
+>
+> Six of 100 questions disagree across the three runs, and **all six are
+> `temporal-reasoning` or `multi-session`** — the two types whose answers are
+> derived rather than looked up. The other four types are bit-identical across all
+> three runs.
+
 | question type | dev50 | heldout100 | Fisher p |
 |---|---:|---:|---:|
 | knowledge-update | 8/8 = 100% | **10/15 = 66.7%** | 0.122 |
@@ -347,6 +360,13 @@ the same 50 questions it fixed 9 and broke 1: exact McNemar **p = 0.022**.
 > measured on the same 50 questions that exposed it, which is the definition of an
 > adaptive choice. Treat `p = 0.022` as "this survived one honest look", not as a
 > held-out result.
+>
+> **And one honest look is literally one run.** Repeats on `heldout100` measured
+> 6 of 100 questions flipping verdict between identical runs. On 50 questions that
+> is about 3 expected flips, and a single flip turns 9W-1L into 8W-2L, `p = 0.109`.
+> So this p-value is **not established** — the effect size is large and probably
+> real, but the significance as published is beyond what one run per arm can
+> support. Re-testing it needs three runs per arm, which has not been done.
 >
 > **`dev50` is a development set.** Prompts, gates and thresholds were all tuned
 > against it. The held-out set is frozen and has never been run.
@@ -481,10 +501,14 @@ src/llm_long_term_memory/
   and its two worst both rose, none of it distinguishable from noise. Category-level
   claims made before the held-out run should be read as noise unless they reappear
   above.
-- The `72.0%` and its `p = 0.022` are `dev50` numbers reached after fixing a defect
-  found by reading a `dev50` failure — adaptive to the set they were measured on.
-  The unseen equivalent is `70.0%`, and the fallback's paired significance was
-  never re-tested on `heldout100`.
+- **Every paired p-value in this repository comes from one run per arm, and that
+  is now known to be too few.** Three runs of `heldout100` flip 6 of 100 verdicts;
+  on 50 questions one flip moves the fallback's 9W-1L from `p = 0.022` to
+  `p = 0.109`. The `72.0%` and its p-value are also `dev50` numbers reached after
+  fixing a defect found by reading a `dev50` failure, so they are adaptive on top
+  of being underpowered. Repeats are now protocol
+  ([data-protocol.md](results/data-protocol.md)); nothing published before
+  2026-08-20 follows it.
 - **`knowledge-update` is 66.7% on unseen data and was 100% on `dev50`.** Reading
   its five failures: all five recalled the gold session and the gold evidence, so
   none is a retrieval failure; one is extraction, one is a missing supersession

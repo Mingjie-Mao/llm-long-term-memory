@@ -677,6 +677,88 @@ Two scheduling facts worth stating plainly:
 
 ---
 
+## v2 — what is registered, and what state it is in
+
+**Direction set 2026-08-20, after the held-out run.** v1 is closed at
+**70.0%** (band 70-73 over three runs). Everything below develops against
+`train150`, decides on `dev100`, and reports once on `test100`, under
+[the data protocol](../results/data-protocol.md). The protocol is the deliverable
+here as much as any experiment: `dev50` lasted two weeks because prompt
+engineering *is* the fitting in this project and it was done by reading that set's
+failures in full.
+
+| set | n | role | may individual failures be read? |
+|---|---:|---|---|
+| `dev50` | 50 | v1 development — burned | historical only |
+| `heldout100` | 100 | v1 final test — spent, 70.0% | spent, so reading costs nothing more |
+| `train150` | 150 | v2 development | **yes, without limit** |
+| `dev100` | 100 | v2 validation | no — aggregate metrics only |
+| `test100` | 100 | v2 final test | no — not before the single run |
+
+### Registered before any of it runs
+
+| experiment | pre-registration | state |
+|---|---|---|
+| extraction batch size {15, 5, 1} | [prereg-batch-size.md](../results/prereg-batch-size.md) | waiting on `dev100` ingest |
+| context shape: flat vs session-coherent | [prereg-context-shape.md](../results/prereg-context-shape.md) | **gate failed, see below** |
+| repeats and reporting | [heldout-variance.md](../results/heldout-variance.md) | in force |
+
+Both pre-registrations had to be amended before running, and both amendments were
+the same mistake: an endpoint that the design could not resolve. The batch one
+originally made final accuracy confirmatory, which the archive fallback absorbs by
+construction; the context one would have demanded an accuracy win from a design
+whose registered hypothesis is equal accuracy at better consistency.
+
+### P6 is not the problem it was proposed as
+
+The free gate ran before any answerer quota was spent, and moved the target.
+
+| | |
+|---|---:|
+| gold session found at all (memory level) | 94% |
+| gold session ranked in the **top 3 sessions** | **64%** |
+| pre-registered threshold | 80% |
+| registered prediction | ">90%" |
+
+Fifty candidates spread over a median of 23 sessions, so the gold session usually
+contributes one or two memories and `sum_top3` rewards whichever conversations
+contributed more. Fifty-eight questions rank it first; thirty rank it sixth or
+worse.
+
+**So the work is session selection, not session layout.** `coherent-oracle` stays
+in the design as the ceiling, and the gap between it and `coherent-auto` is the
+size of the selection debt. None of this cost an API call to learn.
+
+### Debts this cannot repay itself
+
+- **The fallback's `p = 0.022` is unestablished and cannot be fixed on
+  `heldout100`.** On held-out the fallback is 20W-0L, which is degenerate: it only
+  fires when memory has already failed, so it cannot lose. The real contrast needs
+  a fallback-*disabled* arm, where the answerer has no option to defer — and
+  running a new arm on a spent test set is a new measurement, not the variance
+  estimation the protocol permits. It is repayable on `dev100` or `test100`, three
+  runs per arm, and nowhere else.
+- **`heldout100` has no baselines.** `full_context` and `naive_rag` were never run
+  on it, so "structured memory ties naive RAG" remains a `dev50` claim. Same
+  constraint: a v2 set or nothing.
+- **`knowledge-update` at 66.7%** was invisible on `dev50` (8/8) and its five
+  failures are one extraction, one missing supersession chain and three answerer
+  errors — with retrieval implicated in none. No work is scheduled against it yet,
+  because the diagnosis came from a spent set and needs reproducing on `train150`.
+
+### Order, and why it is not negotiable
+
+    train150 ingest  ->  session selection developed here, budget frozen
+                     ->  dev100 ingest at batch15
+                     ->  batch arms and context arms both read that store
+                     ->  v2 frozen  ->  test100, once
+
+`dev100`'s store is simultaneously the batch experiment's `batch15` arm and the
+context experiment's substrate. Building it at any other batch size confounds both
+pre-registrations at once, and neither would be interpretable.
+
+---
+
 ## Not doing
 
 Postgres/pgvector, multi-writer SQLite, auth and billing, hosted deployment, graph

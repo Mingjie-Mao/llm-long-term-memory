@@ -173,6 +173,23 @@ class FallbackConfig(BaseModel):
     max_chars: int = 2400
 
 
+class ContextConfig(BaseModel):
+    """Session-coherent context assembly, off unless a variant asks for it.
+
+    These live in the config rather than behind a CLI flag on purpose. The
+    pre-registration freezes the session budget on `train150` before `dev100` is
+    touched, and `scripts/freeze.py` hashes the config — a budget passed on the
+    command line would be a variable the freeze record cannot see.
+    """
+
+    max_sessions: int = 3
+    window_radius: int | None = None
+    max_total_memories: int | None = 20
+    aggregate: str = "sum_top3"
+    session_order: str = "chronological"
+    include_superseded: bool = False
+
+
 class ServiceConfig(BaseModel):
     """Defaults for the running service, deliberately separate from the benchmark's.
 
@@ -207,6 +224,7 @@ class ExperimentConfig(BaseModel):
     consolidation_config: ConsolidationConfig = Field(default_factory=ConsolidationConfig)
     hydration: HydrationConfig = Field(default_factory=HydrationConfig)
     fallback: FallbackConfig = Field(default_factory=FallbackConfig)
+    context: ContextConfig = Field(default_factory=ContextConfig)
     service: ServiceConfig = Field(default_factory=ServiceConfig)
 
     temporal_resolution: bool = False

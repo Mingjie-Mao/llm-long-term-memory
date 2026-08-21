@@ -234,7 +234,12 @@ def _build(
         "two_stage_hydrated_rerank",
         # Memory first, raw source only when the answerer says it needs it.
         "two_stage_fallback",
+        # P6. Same store, same retrieval, same fallback; the memories are grouped
+        # into whole sessions in event order rather than handed over as a ranking.
+        # The only difference from `two_stage_fallback` is the context's shape.
+        "two_stage_coherent",
     ):
+        from llm_long_term_memory.retrieve import SessionBudget
         from llm_long_term_memory.store import NumpyFlatIndex, SQLiteMemoryStore
 
         utility_model = None
@@ -283,6 +288,16 @@ def _build(
             type_floors=cfg.pack.type_floors if cfg.pack.enabled else None,
             reranker=reranker,
             raw_fallback=cfg.fallback.enabled,
+            session_budget=SessionBudget(
+                max_sessions=cfg.context.max_sessions,
+                window_radius=cfg.context.window_radius,
+                max_total_memories=cfg.context.max_total_memories,
+                aggregate=cfg.context.aggregate,
+                session_order=cfg.context.session_order,
+                include_superseded=cfg.context.include_superseded,
+            )
+            if variant == "two_stage_coherent"
+            else None,
         )
         runner.name = variant
     else:
@@ -296,7 +311,7 @@ def eval_run(
         ...,
         help=(
             "full_context | naive_rag | two_stage | two_stage_no_temporal | "
-            "two_stage_hydrated | two_stage_hydrated_no_temporal. "
+            "two_stage_hydrated | two_stage_hydrated_no_temporal | two_stage_coherent. "
             "The chronomem* names belong to the frozen v1 run and are kept so its "
             "rows are not overwritten by a re-measurement of a different pipeline."
         ),

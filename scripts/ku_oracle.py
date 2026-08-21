@@ -58,7 +58,10 @@ CONFIG = "configs/fallback.yaml"
 OUT = REPO / "results" / "raw" / "ku-oracle.json"
 
 FAILURES = {
-    "07741c45": ("A", "the shoe-rack memory is present and retrieved; the answer invents 'under the bed'"),
+    "07741c45": (
+        "A",
+        "the shoe-rack memory is present and retrieved; the answer invents 'under the bed'",
+    ),
     "71315a70": ("S2", "5-6 and 10-12 hours both active under `hobbies`; the answer adds them"),
     "69fee5aa": ("S5", "CONTROL — 37 + one added coin, both present and correctly keyed"),
     "0977f2af": ("S1", "the Instant Pot purchase was never extracted as a purchase"),
@@ -97,7 +100,9 @@ def main() -> int:
             gold_sessions = set(question.answer_session_ids)
             everything = list(svc.store.iter_all(qid))
             coherent = [m for m in everything if m.source_session_id in gold_sessions]
-            coherent.sort(key=lambda m: (m.event_time or m.valid_from or "", m.source_turn_index or 0))
+            coherent.sort(
+                key=lambda m: (m.event_time or m.valid_from or "", m.source_turn_index or 0)
+            )
 
             text = svc.answerer.answer_with_memories(question, coherent)
             out[qid] = {
