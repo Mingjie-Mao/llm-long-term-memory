@@ -2,7 +2,10 @@
 
 **Project:** `llm-long-term-memory` (internal name ChronoMem)
 **Report date:** 2026-08-17
-**Status:** productised prototype; formal dev-50 result measured on a clean store, no held-out result yet
+**Status:** productised prototype; **held-out result measured 2026-08-19 — 70.0% on 100
+unseen questions against dev50's 72.0%** (section 11). Run-to-run variance of the
+answerer is unquantified and is being measured; until it is, every single-run
+comparison here carries an unstated error bar.
 
 Every number below was recomputed from committed artifacts in `results/raw/` at the
 time of writing, and each is labelled with the file it comes from. Where a figure
@@ -49,9 +52,11 @@ server over the same service layer, and a Memory Inspector that shows why each
 memory was selected, passed over, or superseded — with shareable URLs. 385 tests,
 three-platform CI.
 
-**Not claimed:** any comparison against a third-party system, or any result on
-held-out data. The dev-50 set has been used for prompt iteration and gate tuning, so
-it measures the fit of those choices as much as the system.
+**Not claimed:** any comparison against a third-party system, and no *baseline* on
+held-out data — `heldout100` was run for this system only, so `full_context` and
+`naive_rag` have no unseen numbers. The dev-50 set was used for prompt iteration and
+gate tuning, so every dev-50 figure measures the fit of those choices as much as the
+system.
 
 **The formal dev-50 result now exists** (section 10.6). The store it was measured
 on was rebuilt end to end under one extractor generation after the first attempt
@@ -883,8 +888,10 @@ moved the arm to 72.0% and the pairing to significance, with the re-run beating 
 old arm 3W-0L. The defect was real and its fix is mechanical, but both the fix and
 its p-value come from the same 50 questions, which makes this an adaptive result.
 It means "this survived one honest look at its own failures", not "this
-generalises". The held-out set is what would answer the second question and it
-remains unopened.
+generalises". The held-out set has since answered the second question: **70.0%,
+a 2.0pp drop** (section 11). It has not answered it for this p-value, which was
+never re-tested on unseen questions — and 9W-1L becomes p = 0.109 at 8W-2L, which
+is one flipped question away.
 
 Two comparisons here are *not* clean experiments and should not be read as one.
 The mixed→clean columns differ in more than the extractor generation: the clean
@@ -964,17 +971,27 @@ one run's route as the only one.
 
 ## 11. Current limitations
 
-1. **No held-out result.** Every number comes from the dev-50 questions, used for
-   prompt iteration, gate tuning and predictor fitting. The test set is now frozen —
-   `results/manifests/heldout100.json`, 100 questions, stratified over what dev50 did
-   not take, zero overlap, written on 2026-08-15 before the clean-P10 run and before
-   any decision was made against it. Its questions and answers have not been read.
-   It is unrun, and running it is not cheap: `dataset_limit=50` means only the dev-50
-   namespaces are ingested, so a held-out result needs those 100 haystacks ingested
-   first — roughly twice the current store, or about two days of extractor quota.
-2. **The pilot is 31 unstratified questions.** An ingest-order prefix, not a sample.
+1. **The held-out result exists, and it has no baselines.** `heldout100` ran once
+   on 2026-08-19 behind five gates: **70.0% final, 50.0% from structured memory
+   alone, 20.0% rescued by the archive**, against dev50's 72.0 / 54.0 / 18.0. The
+   headline generalises at -2.0pp. `full_context` and `naive_rag` were not run on it,
+   so no unseen comparison against any baseline exists, and "structured memory ties
+   naive RAG" remains a dev-50 claim. The set is now spent and nothing may be tuned
+   against it; `dev100` was frozen beforehand for further work.
+2. **dev50's per-type numbers carried no information.** Each cell held 3 to 13
+   questions. On unseen data its three 100% categories all fell and its two worst both
+   rose, none of it distinguishable (Fisher p ≥ 0.12 everywhere). `temporal-reasoning`
+   is **59.3%**, not the 46.2% wall this report described; `knowledge-update` fell from
+   100% to **66.7%** and is now joint-weakest, a failure mode dev50 could not show.
+3. **The answerer disagrees with itself and this was never measured.** Re-running the
+   exact production configuration on five held-out questions did not reproduce three
+   of their answers, including a hallucination that never recurred in nine attempts
+   ([context-arms.md](../results/context-arms.md)). Every paired result in this report
+   is a single run. A repeat protocol is pre-committed in
+   [heldout-variance.md](../results/heldout-variance.md).
+4. **The pilot is 31 unstratified questions.** An ingest-order prefix, not a sample.
    Category splits are descriptive only.
-3. **The 72.0% is adaptive to dev50.** It was reached after fixing a defect found
+5. **The 72.0% is adaptive to dev50.** It was reached after fixing a defect found
    by reading one of the set's own failures (section 10.7), so its `p = 0.022` says
    the result survived one honest look, not that it generalises. The mixed store —
    4,843 pre-P10 rows and 2,265 P10 (section 10) — is no longer the default for

@@ -249,11 +249,74 @@ enforces the boundary rather than trusting the caller.
 The design above is not a preference. Each choice below was measured, and two
 plausible additions were measured and **not shipped**.
 
+### The held-out result
+
+100 questions from [LongMemEval-S](https://github.com/xiaowu0162/LongMemEval)
+that no decision was ever made against, run **once**, on a system frozen and
+hashed beforehand ([the freeze](results/frozen/p10-final/README.md)). Five gates
+had to pass first, including one asserting the result file did not yet exist.
+
+| | dev50 — every decision made here | **heldout100 — unseen** | |
+|---|---:|---:|---:|
+| **final accuracy** | 72.0% | **70.0%** | **-2.0pp** |
+| answered from structured memory alone | 54.0% | 50.0% | -4.0pp |
+| rescued by the raw archive | 18.0% | 20.0% | +2.0pp |
+| fallback fired | 32% | 36% | +4pp |
+| …and was right | 56.2% | 55.6% | -0.6pp |
+| source-session recall | 93.5% | 94.0% | +0.5pp |
+| median context tokens | 1,455 | 1,468 | +13 |
+
+**The headline generalises. Almost nothing underneath it does.**
+
+| question type | dev50 | heldout100 | Fisher p |
+|---|---:|---:|---:|
+| knowledge-update | 8/8 = 100% | **10/15 = 66.7%** | 0.122 |
+| single-session-user | 7/7 = 100% | 12/14 = 85.7% | 0.533 |
+| single-session-assistant | 6/6 = 100% | 9/11 = 81.8% | 0.515 |
+| multi-session | 7/13 = 53.8% | 19/27 = 70.4% | 0.480 |
+| single-session-preference | 2/3 = 66.7% | 4/6 = 66.7% | 1.000 |
+| **temporal-reasoning** | 6/13 = 46.2% | **16/27 = 59.3%** | 0.509 |
+
+Every `dev50` cell holds 3 to 13 questions. Its three 100% categories all fell and
+its two worst both rose, no movement is distinguishable from noise, and the honest
+reading is that **`dev50`'s per-type numbers never carried information** — which
+nobody had said out loud while they were being used to choose what to build.
+
+Two of those movements change what to work on next:
+
+- **`temporal-reasoning` is 59.3%, not 46.2%.** This README previously called
+  46.2% a wall across a quarter of the question set. On 27 unseen questions it is
+  still the worst category and no longer a wall. The old estimate rested on 13
+  questions and was consistent with this all along.
+- **`knowledge-update` fell from 100% to 66.7%**, the largest per-type drop and
+  now joint-worst. It is the supersession and validity-window machinery, the part
+  with a purpose-built bi-temporal resolver behind it — and it was invisible on
+  `dev50`, because 8 of 8 is not evidence. No decision was ever taken against it
+  because it never looked like a problem. Reading all five failures: all five
+  recalled the gold session *and* the gold evidence, so none is a retrieval
+  failure; four are downstream of retrieval, in how supplied facts are read and
+  combined.
+
+One question (`4c36ccef`) had its evidence refused by the provider's content
+filter. Its turns are archived and the fallback can reach them; it produced no
+memories. It is reported on its own line rather than charged to the system:
+excluding it, the numbers are 69.7% / 49.5% / 20.2% over 99.
+
+**What this result does not contain: baselines.** `full_context` and `naive_rag`
+were never run on `heldout100`. The comparison below is `dev50` only, so
+"structured memory ties naive RAG" is a development-set claim and has no unseen
+evidence behind it.
+
+`heldout100` is spent. It will not be run again, and nothing may be tuned against
+it; `dev100` was frozen before this result was read and is what further work
+develops against.
+
 ### Structured memory as compression
 
-On the frozen 50-question `dev50` set from [LongMemEval-S](https://github.com/xiaowu0162/LongMemEval),
-against a store built end to end by one extractor generation, same answerer and
-judge throughout:
+On the frozen 50-question `dev50` development set, against a store built end to
+end by one extractor generation, same answerer and judge throughout. **These are
+the numbers every design decision was made against, kept as the development
+record — the held-out result above is the one that was not fitted to:**
 
 | Variant | Raw fallback | Accuracy | Median context tokens |
 |---|---|---:|---:|
@@ -288,7 +351,8 @@ the same 50 questions it fixed 9 and broke 1: exact McNemar **p = 0.022**.
 > **`dev50` is a development set.** Prompts, gates and thresholds were all tuned
 > against it. The held-out set is frozen and has never been run.
 
-Where the fallback does nothing: `temporal-reasoning` is **46.2% in both arms**.
+Where the fallback does nothing: `temporal-reasoning` was **46.2% in both arms**
+here — an estimate off 13 questions that 27 unseen ones later put at 59.3%.
 A quarter of the question set, and the archive recovers none of it — dates have to
 be computed, not looked up.
 
@@ -408,11 +472,27 @@ src/llm_long_term_memory/
 
 ## Limitations
 
-- No held-out result. Every number comes from development questions also used for
-  prompt iteration and gate tuning. The held-out set is frozen and unopened.
-- The `72.0%` and its `p = 0.022` were reached after fixing a defect found by
-  reading a `dev50` failure. The fix is mechanical and the defect was real, but
-  the number is adaptive to the set it was measured on.
+- **No baselines on the held-out set.** `heldout100` was run for this system only,
+  so `70.0%` has no unseen point of comparison. Every baseline number here is
+  `dev50`, and "structured memory ties naive RAG" is therefore a development-set
+  claim.
+- **`dev50`'s per-type numbers carried no information**, and were used anyway. Each
+  cell held 3 to 13 questions; on unseen data its three 100% categories all fell
+  and its two worst both rose, none of it distinguishable from noise. Category-level
+  claims made before the held-out run should be read as noise unless they reappear
+  above.
+- The `72.0%` and its `p = 0.022` are `dev50` numbers reached after fixing a defect
+  found by reading a `dev50` failure — adaptive to the set they were measured on.
+  The unseen equivalent is `70.0%`, and the fallback's paired significance was
+  never re-tested on `heldout100`.
+- **`knowledge-update` is 66.7% on unseen data and was 100% on `dev50`.** Reading
+  its five failures: all five recalled the gold session and the gold evidence, so
+  none is a retrieval failure; one is extraction, one is a missing supersession
+  chain, and three are the answerer mis-reading facts it was given. The store
+  offers a matching symptom — extraction emits `replaces_previous` on 622 memories
+  (5.02%) while only 42 (0.34%) ever get superseded, and 2,275 carry the predicate
+  `none` — but that statistic is not yet shown to cause these failures, and on this
+  evidence its ceiling here is one question.
 - `stores/two-stage-hydrated.db` mixes 4,843 rows from before the P10 fix with
   2,265 from after; results measured on it stay labelled diagnostic and it is no
   longer what anything defaults to. See
@@ -423,9 +503,10 @@ src/llm_long_term_memory/
   systematic gap in the extraction policy has not been measured.
 - Single-writer SQLite. Ingestion and evaluation now take a cross-process lock;
   concurrency beyond that is not supported.
-- Temporal arithmetic is unsolved and the fallback does not touch it: both arms
-  score 46.2%, a quarter of the question set. See the failure taxonomy in the
-  [engineering report](docs/ENGINEERING_REPORT.md).
+- Temporal arithmetic is unsolved and the fallback does not touch it — but the
+  size of the gap was overstated. `dev50` said 46.2% off 13 questions; 27 unseen
+  questions say **59.3%**, still the worst category alongside `knowledge-update`.
+  See the failure taxonomy in the [engineering report](docs/ENGINEERING_REPORT.md).
 
 ## License
 

@@ -615,8 +615,23 @@ Real work, no longer milestones. Each needs a measured reason to be picked up:
 - **Full R/E/H/A/J/S failure attribution** on the 50, with `S` for storage/schema
   policy — the class the assistant gap belongs to, which is neither retrieval nor
   extraction.
-- **A4 held-out run.** Still the only clean number the project will ever have. Run
-  once, pre-registered, after the product default is frozen.
+- **A4 held-out run — done 2026-08-19.** **70.0%** on 100 unseen questions against
+  dev50's 72.0%, split 50.0% memory-only and 20.0% archive rescue, behind five gates
+  on a hash-frozen system. The headline generalises; dev50's per-type numbers did
+  not, and two of them were being used to choose what to build. `temporal-reasoning`
+  is 59.3% rather than the 46.2% this roadmap treats as settled, and
+  `knowledge-update` fell from 100% to 66.7% — a failure mode dev50 could not show,
+  because 8 of 8 is not evidence.
+
+  What it did not settle: `heldout100` carries no baselines, and re-running the
+  production configuration does not reliably reproduce its own answers
+  ([context-arms.md](../results/context-arms.md)), so the -2.0pp gap has an
+  unmeasured run component. Repeats are running under a pre-committed protocol
+  ([heldout-variance.md](../results/heldout-variance.md)).
+
+  The set is spent. `dev100` was frozen before the result was read and is what
+  everything below develops against; 250 questions remain untouched for a final
+  v2 measurement.
 
 ---
 

@@ -116,7 +116,7 @@ def main() -> int:
             ("rescued", "archive rescue"),
         ):
             a, b = d[k] / d["n"], h[k] / h["n"]
-            print(f"    {name:24s} dev {a:6.1%}   held-out {b:6.1%}   {b - a:+.1f}pp")
+            print(f"    {name:24s} dev {a:6.1%}   held-out {b:6.1%}   {(b - a) * 100:+.1f}pp")
 
     print("\n  Every design decision in this system was made against dev50, including")
     print("  six modules cancelled on its evidence. This is the first measurement that")
