@@ -155,6 +155,25 @@ def test_dropped_sessions_are_named_rather_than_vanishing(wired):
     assert coherent["dropped_sessions"], "the session left out has to be reported"
 
 
+def test_oracle_context_is_explicit_and_uses_only_gold_sessions(wired):
+    gold_is_second_session = instance()
+    gold_is_second_session.answer_session_ids = ["s2"]
+    runner = wired(
+        top_k=1,
+        session_budget=SessionBudget(max_sessions=1),
+        oracle_session_context=True,
+    )
+
+    answer = runner.answer(gold_is_second_session)
+
+    assert answer.notes["context_shape"] == "coherent-oracle"
+    assert answer.notes["coherent"]["oracle_sessions"] is True
+    assert answer.notes["coherent"]["sessions"] == ["s2"]
+    assert "repaired a bike" in runner.client.prompts[0]
+    assert "extra clay" not in runner.client.prompts[0]
+    assert "10-12 hours" not in runner.client.prompts[0]
+
+
 def test_packing_and_coherence_together_are_refused_rather_than_resolved(wired):
     with pytest.raises(ValueError, match="Choose one"):
         wired(session_budget=SessionBudget(), token_budget=500)

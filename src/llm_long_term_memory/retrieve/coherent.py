@@ -26,7 +26,7 @@ from collections.abc import Callable, Iterable, Sequence
 from dataclasses import dataclass, field
 from typing import Literal
 
-from ..store import Memory
+from ..store import Memory, external_session_id
 from .hybrid import RetrievedMemory
 
 Aggregate = Literal["max", "sum", "mean", "sum_top3"]
@@ -143,6 +143,8 @@ def build_coherent_context(
     hits: Sequence[RetrievedMemory],
     session_memories: Callable[[str], Iterable[Memory]],
     budget: SessionBudget | None = None,
+    *,
+    forced_session_ids: Iterable[str] | None = None,
 ) -> CoherentContext:
     """Group retrieved memories into whole sessions, in event order.
 
@@ -151,11 +153,27 @@ def build_coherent_context(
     """
     budget = budget or SessionBudget()
     ranked = rank_sessions(hits, budget.aggregate)
-    if not ranked:
+    forced_mode = forced_session_ids is not None
+    forced = list(dict.fromkeys(forced_session_ids or ()))
+    if not ranked and not forced_mode:
         return CoherentContext(memories=(), sessions=())
 
-    chosen = ranked[: budget.max_sessions]
-    dropped = [session_id for session_id, _ in ranked[budget.max_sessions :]]
+    if forced_mode:
+        # Evaluation ceiling only: the real system does not know these ids. Keep
+        # every other assembly rule identical. A forced session with no retrieved
+        # hit gets score 0 and, because it has no anchor, contributes its whole
+        # active timeline (still subject to the same hard context cap).
+        scores = dict(ranked)
+        forced_ranked = [(session_id, scores.get(session_id, 0.0)) for session_id in forced]
+        chosen = forced_ranked[: budget.max_sessions]
+        chosen_ids = {session_id for session_id, _ in chosen}
+        dropped = [session_id for session_id, _ in forced_ranked[budget.max_sessions :]]
+        dropped.extend(session_id for session_id, _ in ranked if session_id not in chosen_ids)
+        reported_scores = dict(forced_ranked)
+    else:
+        chosen = ranked[: budget.max_sessions]
+        dropped = [session_id for session_id, _ in ranked[budget.max_sessions :]]
+        reported_scores = dict(ranked)
 
     best_by_session: dict[str, set[str]] = {}
     for hit in hits:
@@ -198,7 +216,7 @@ def build_coherent_context(
     return CoherentContext(
         memories=tuple(selected),
         sessions=tuple(kept),
-        session_scores=dict(ranked),
+        session_scores=reported_scores,
         dropped_sessions=tuple(dropped),
         truncated=truncated,
     )
@@ -216,5 +234,5 @@ def session_recall(
     gold = set(gold_sessions)
     if not gold:
         return False
-    ranked = [session_id for session_id, _ in rank_sessions(hits)][:top_m]
+    ranked = [external_session_id(session_id) for session_id, _ in rank_sessions(hits)][:top_m]
     return any(session_id in gold for session_id in ranked)

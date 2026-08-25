@@ -8,6 +8,7 @@ work, never the work already done.
 from __future__ import annotations
 
 import re
+from datetime import datetime
 
 import numpy as np
 import pytest
@@ -20,9 +21,18 @@ from llm_long_term_memory.ingest.pipeline import (
     namespace_batch_count,
     namespaced_sessions,
 )
-from llm_long_term_memory.llm.client import DailyQuotaExhausted
+from llm_long_term_memory.llm.client import ContentBlocked, DailyQuotaExhausted
 from llm_long_term_memory.llm.rate_limiter import Wait
-from llm_long_term_memory.store import Memory, NumpyFlatIndex, SQLiteMemoryStore
+from llm_long_term_memory.store import (
+    Memory,
+    NumpyFlatIndex,
+    Session,
+    SQLiteMemoryStore,
+    Turn,
+    external_session_id,
+    scoped_session_id,
+    split_scoped_session_id,
+)
 
 
 def session(sid: str) -> HaystackSession:
@@ -85,13 +95,19 @@ class FakeEncoder:
 
 @pytest.fixture
 def build(tmp_path):
-    def make(extractor, sessions_per_request=2, checkpoint_every=1, config_spec=None):
+    def make(
+        extractor,
+        sessions_per_request=2,
+        checkpoint_every=1,
+        config_spec=None,
+        deduplicator=None,
+    ):
         store = SQLiteMemoryStore(tmp_path / "s.db")
         store.initialize()
         index = NumpyFlatIndex(tmp_path / "idx", dim=4)
         pipeline = IngestionPipeline(
             extractor,
-            PassthroughDedup(),
+            deduplicator or PassthroughDedup(),
             store,
             index,
             FakeEncoder(),
@@ -122,7 +138,7 @@ def test_pipeline_retains_raw_turns_for_later_evidence_hydration(build):
 
     pipeline.run([("u1", source)])
 
-    turns = store.turns_for_session("s0")
+    turns = store.turns_for_session(scoped_session_id("u1", "s0"))
     assert [(turn.role, turn.content) for turn in turns] == [("user", "content of s0")]
     store.close()
 
@@ -136,6 +152,8 @@ def test_quota_exhaustion_keeps_completed_batches(build):
     assert "daily quota" in outcome.stopped_reason
     assert store.count("u1") == 4, "the two batches that succeeded are on disk"
     assert len(outcome.progress.done_sessions) == 4
+    assert store.get_session(scoped_session_id("u1", "s4")) is None
+    assert store.get_session(scoped_session_id("u1", "s5")) is None
     store.close()
 
 
@@ -178,6 +196,76 @@ def test_resume_skips_done_sessions_and_finishes(build, tmp_path):
     assert second.calls == 2, "only the 4 remaining sessions, at 2 per request"
     assert len(outcome.progress.done_sessions) == 8
     assert store2.count("u1") == 8
+    store2.close()
+
+
+def test_resume_replays_a_batch_archived_before_dedup_quota_stop(build):
+    """A real quota stop can happen in dedup after extraction archived the source.
+
+    The archived raw turns are not a terminal zero: the checkpoint remains pending,
+    and replay must replace the same session rows and write each memory exactly once.
+    """
+
+    class QuotaOnceDedup(PassthroughDedup):
+        def __init__(self):
+            self.calls = 0
+
+        def process(self, candidates, vectors=None):
+            self.calls += 1
+            if self.calls == 1:
+                raise DailyQuotaExhausted("m", Wait(1.0, "rpd"))
+            return super().process(candidates, vectors)
+
+    pairs = [("u1", session("s0")), ("u1", session("s1"))]
+    pipeline, store, index = build(FakeExtractor(), deduplicator=QuotaOnceDedup())
+    first = pipeline.run(pairs)
+
+    assert not first.completed
+    assert first.progress.done_sessions == set()
+    assert store.get_session(scoped_session_id("u1", "s0")) is not None
+    assert store.get_session(scoped_session_id("u1", "s1")) is not None
+    assert store.count("u1") == 0
+    assert len(index) == 0
+    assert store.zero_yield_sessions(min_turns=1) == (2, 2)
+    assert store.zero_yield_sessions(min_turns=1, include_session_ids=set()) == (0, 0)
+    store.close()
+
+    resumed_pipeline, resumed_store, resumed_index = build(FakeExtractor())
+    resumed = resumed_pipeline.run(pairs)
+
+    assert resumed.completed
+    assert resumed.progress.done_sessions == {"u1:s0", "u1:s1"}
+    assert resumed_store.count("u1") == 2
+    assert len(resumed_index) == 2
+    assert resumed_store.zero_yield_sessions(
+        min_turns=1,
+        include_session_ids={scoped_session_id("u1", "s0"), scoped_session_id("u1", "s1")},
+    ) == (0, 2)
+    assert len(resumed_store.turns_for_session(scoped_session_id("u1", "s0"))) == 1
+    assert len(resumed_store.turns_for_session(scoped_session_id("u1", "s1"))) == 1
+    resumed_store.close()
+
+
+def test_resume_does_not_retry_content_blocked_sessions(build):
+    pairs = [("u1", session("s0")), ("u1", session("s1"))]
+    blocked = ContentBlocked("m", "PROHIBITED_CONTENT", 100)
+    first = FakeExtractor(fail_on_batch=1, exc=blocked)
+    pipeline, store, _ = build(first, sessions_per_request=2)
+
+    outcome = pipeline.run(pairs)
+    assert outcome.completed
+    assert outcome.progress.blocked_sessions == {"u1:s0", "u1:s1"}
+    assert store.get_session(scoped_session_id("u1", "s0")) is not None
+    assert store.get_session(scoped_session_id("u1", "s1")) is not None
+    store.close()
+
+    second = FakeExtractor()
+    pipeline2, store2, _ = build(second, sessions_per_request=2)
+    resumed = pipeline2.run(pairs)
+
+    assert resumed.completed
+    assert second.calls == 0, "a deterministic provider refusal must not be retried on resume"
+    assert resumed.progress.blocked_sessions == {"u1:s0", "u1:s1"}
     store2.close()
 
 
@@ -256,6 +344,87 @@ def test_checkpoint_keys_are_namespaced():
     from llm_long_term_memory.ingest.pipeline import _key
 
     assert _key("q1", session("s")) != _key("q2", session("s"))
+
+
+def test_session_storage_keys_roundtrip_without_delimiter_assumptions():
+    stored = scoped_session_id("user:with:colons", "session:also:with:colons")
+
+    assert split_scoped_session_id(stored) == (
+        "user:with:colons",
+        "session:also:with:colons",
+    )
+    assert external_session_id(stored) == "session:also:with:colons"
+    assert external_session_id("legacy") == "legacy"
+
+
+def test_shared_source_session_is_archived_once_per_namespace(build):
+    pipeline, store, _ = build(FakeExtractor(), sessions_per_request=1)
+    shared = session("shared")
+
+    pipeline.run([("q1", shared), ("q2", shared)])
+
+    q1_id = scoped_session_id("q1", "shared")
+    q2_id = scoped_session_id("q2", "shared")
+    assert q1_id != q2_id
+    assert store.get_session(q1_id).user_id == "q1"
+    assert store.get_session(q2_id).user_id == "q2"
+    assert store.get_session("shared") is None
+    assert store.iter_all("q1")[0].source_session_id == q1_id
+    assert store.iter_all("q2")[0].source_session_id == q2_id
+    assert [t.content for t in store.search_turns("q1", "content", limit=2)] == [
+        "content of shared"
+    ]
+    assert [t.content for t in store.search_turns("q2", "content", limit=2)] == [
+        "content of shared"
+    ]
+    store.close()
+
+
+def test_legacy_shared_session_can_be_migrated_without_reextracting(tmp_path):
+    from llm_long_term_memory.ingest.session_migration import migrate_scoped_sessions
+
+    store = SQLiteMemoryStore(tmp_path / "legacy.db")
+    store.initialize()
+    now = datetime(2026, 1, 5)
+    store.add_session(
+        Session(
+            id="shared",
+            user_id="q2",  # q2 overwrote q1 in the legacy single-column primary key
+            started_at=now,
+            turns=[Turn("shared:0", "shared", 0, "user", "content of shared", now)],
+        )
+    )
+    pending_id = scoped_session_id("q3", "pending")
+    store.add_session(
+        Session(
+            id=pending_id,
+            user_id="q3",
+            started_at=now,
+            source="longmemeval:pending",
+            turns=[Turn(f"{pending_id}:0", pending_id, 0, "user", "pending", now)],
+        )
+    )
+    store.add_memories(
+        [
+            Memory("m1", "q1", "semantic", "one", 1, source_session_id="shared"),
+            Memory("m2", "q2", "semantic", "two", 1, source_session_id="shared"),
+        ]
+    )
+
+    report = migrate_scoped_sessions(
+        store,
+        [("q1", session("shared")), ("q2", session("shared")), ("q0", session("zero"))],
+    )
+
+    assert report.memories_repointed == 2
+    assert report.uncheckpointed_sessions_removed == 1
+    assert store.get_session(scoped_session_id("q1", "shared")).user_id == "q1"
+    assert store.get_session(scoped_session_id("q2", "shared")).user_id == "q2"
+    assert store.get_session(scoped_session_id("q0", "zero")) is not None
+    assert store.get_session(pending_id) is None
+    assert store.get_session("shared") is None
+    assert store.iter_all("q1")[0].source_session_id == scoped_session_id("q1", "shared")
+    store.close()
 
 
 def test_a_batch_never_straddles_two_namespaces(build):

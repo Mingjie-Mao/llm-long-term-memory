@@ -83,9 +83,10 @@ fallback:
 # before dev100 is touched, and they live here rather than behind a CLI flag so
 # that scripts/freeze.py can see them.
 #
-# The free gate has already reported that the default does not clear its own bar:
-# session recall @ top-3 is 64% where the pre-registration requires 80%. Session
-# selection is the thing train150 has to fix before this arm is worth running.
+# The former ~64% Top-3 estimate is superseded: its script mixed incomplete
+# questions into the denominator and compared scoped database ids with public ids.
+# A partial corrected train150 pass is above the registered 80% bar, but only the
+# fixed full-150 grid may select this arm or write configs/v2.yaml.
 context:
   max_sessions: 3
   window_radius: null

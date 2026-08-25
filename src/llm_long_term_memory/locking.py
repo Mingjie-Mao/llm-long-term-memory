@@ -13,7 +13,8 @@ shell, which is the case that has actually happened here.
 from __future__ import annotations
 
 import os
-from contextlib import contextmanager
+import time
+from contextlib import contextmanager, suppress
 from pathlib import Path
 
 
@@ -79,15 +80,39 @@ def exclusive(path: Path, *, what: str = "job"):
     that outlives its owner would make the resume path unusable.
     """
     lock = path.with_suffix(path.suffix + ".lock")
-    owner = lock_holder(lock)
-    if owner is not None:
-        raise AlreadyRunning(
-            f"pid {owner} is already running this {what} on {path}. "
-            f"Wait for it, or kill it and delete {lock}."
-        )
-    lock.unlink(missing_ok=True)  # free or stale
     lock.parent.mkdir(parents=True, exist_ok=True)
-    lock.write_text(str(os.getpid()), encoding="utf-8")
+    while True:
+        try:
+            descriptor = os.open(lock, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+        except FileExistsError:
+            try:
+                raw = lock.read_text(encoding="utf-8").strip()
+                owner = int(raw)
+            except (OSError, ValueError):
+                # O_EXCL creates an empty file before its owner writes the pid. A
+                # second process must not mistake that tiny window for a stale lock.
+                try:
+                    age = time.time() - lock.stat().st_mtime
+                except FileNotFoundError:
+                    continue
+                if age < 5:
+                    raise AlreadyRunning(
+                        f"another process is acquiring this {what} lock on {path}"
+                    ) from None
+                owner = None
+            if owner is not None and process_alive(owner):
+                raise AlreadyRunning(
+                    f"pid {owner} is already running this {what} on {path}. "
+                    f"Wait for it, or kill it and delete {lock}."
+                ) from None
+            with suppress(FileNotFoundError):
+                lock.unlink()
+            continue
+        try:
+            os.write(descriptor, str(os.getpid()).encode("ascii"))
+        finally:
+            os.close(descriptor)
+        break
     try:
         yield
     finally:

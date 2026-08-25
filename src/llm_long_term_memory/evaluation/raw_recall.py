@@ -34,7 +34,7 @@ from dataclasses import dataclass, field
 from typing import Literal
 
 from llm_long_term_memory.evaluation.datasets.longmemeval import Instance
-from llm_long_term_memory.store import MemoryStore
+from llm_long_term_memory.store import MemoryStore, external_session_id
 
 QueryType = Literal["keyword", "natural", "disjoint"]
 
@@ -321,7 +321,8 @@ def run_probes(store: MemoryStore, probes: list[Probe], depth: int = 5) -> Recal
         hits = store.search_turns(probe.question_id, probe.query, limit=depth)
         probe.latency_ms = (time.perf_counter() - started) * 1000
         for position, turn in enumerate(hits, start=1):
-            if turn.id in probe.gold_turn_ids:
+            public_turn_id = f"{external_session_id(turn.session_id)}:{turn.turn_index}"
+            if public_turn_id in probe.gold_turn_ids:
                 probe.rank = position
                 break
     return RecallReport(probes=probes)

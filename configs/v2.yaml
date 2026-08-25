@@ -1,0 +1,70 @@
+name: v2
+description: train150-selected v2 candidate; frozen before dev100
+models:
+  extractor: gemini-3.1-flash-lite
+  answerer: gemini-3.5-flash-lite
+  judge: gemma-4-31b-it
+  embedder: sentence-transformers/all-MiniLM-L6-v2
+  embedding_dim: 384
+quota:
+  rpm: 10
+  tpm: 250000
+  rpd: 500
+  max_wait_seconds: 300.0
+ingest:
+  sessions_per_request: 15
+  dedupe_sessions: true
+  dedupe_similarity_threshold: 0.92
+  two_stage: true
+  checkpoint_every: 5
+retrieval:
+  weights:
+    semantic: 1.0
+    bm25: 0.0
+    recency: 0.0
+    importance: 0.0
+    entity: 0.0
+  candidate_limit: 50
+  top_k: 20
+  recency_halflife_days: 30.0
+  rerank:
+    enabled: false
+    model: cross-encoder/ms-marco-MiniLM-L-6-v2
+    candidates: 50
+    batch_size: 32
+pack:
+  enabled: false
+  token_budget: 2000
+  utility_model_path: null
+  type_floors:
+    profile: 0.1
+    semantic: 0.3
+decay:
+  enabled: false
+  halflife_days: 60.0
+  reinforcement: 0.3
+  max_memories_per_user: 0
+consolidation_config:
+  similarity_threshold: 0.84
+  min_cluster_size: 3
+  source_strength_multiplier: 0.5
+hydration:
+  neighbouring_sentences: 1
+  max_tokens: 800
+fallback:
+  enabled: true
+  max_turns: 3
+  max_chars: 2400
+context:
+  max_sessions: 3
+  window_radius: 1
+  max_total_memories: 30
+  aggregate: mean
+  session_order: chronological
+  include_superseded: false
+service:
+  top_k: 10
+temporal_resolution: true
+consolidation: false
+dataset_variant: s
+dataset_limit: 50

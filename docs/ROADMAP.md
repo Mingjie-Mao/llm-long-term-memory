@@ -700,7 +700,7 @@ failures in full.
 | experiment | pre-registration | state |
 |---|---|---|
 | extraction batch size {15, 5, 1} | [prereg-batch-size.md](../results/prereg-batch-size.md) | waiting on `dev100` ingest |
-| context shape: flat vs session-coherent | [prereg-context-shape.md](../results/prereg-context-shape.md) | **gate failed, see below** |
+| context shape: flat vs session-coherent | [prereg-context-shape.md](../results/prereg-context-shape.md) | corrected train gate in progress; final waits on complete `train150` |
 | repeats and reporting | [heldout-variance.md](../results/heldout-variance.md) | in force |
 
 Both pre-registrations had to be amended before running, and both amendments were
@@ -709,25 +709,29 @@ originally made final accuracy confirmatory, which the archive fallback absorbs 
 construction; the context one would have demanded an accuracy win from a design
 whose registered hypothesis is equal accuracy at better consistency.
 
-### P6 is not the problem it was proposed as
+### The original P6 gate was measured incorrectly
 
-The free gate ran before any answerer quota was spent, and moved the target.
+The first free gate reported 64% Top-3 recall, but that number is superseded. Its
+script mixed incomplete questions into the denominator and compared scoped database
+session ids with public dataset ids. The repaired code refuses a final result from
+an incomplete store and evaluates the same top-20 memory input the answer path uses.
+
+The corrected partial result covers 103 questions whose ingestion is complete. It is
+diagnostic only; the fixed 150-question grid decides the candidate.
 
 | | |
 |---|---:|
-| gold session found at all (memory level) | 94% |
-| gold session ranked in the **top 3 sessions** | **64%** |
+| gold session found in the top-20 memory input | 98.1% |
+| gold session ranked in the **top 3 sessions**, `max` | 95.1% |
+| gold session ranked in the **top 3 sessions**, `mean` | **96.1%** |
+| gold session retained after `mean` / radius 1 / cap 30 assembly | **96.1%** |
 | pre-registered threshold | 80% |
-| registered prediction | ">90%" |
 
-Fifty candidates spread over a median of 23 sessions, so the gold session usually
-contributes one or two memories and `sum_top3` rewards whichever conversations
-contributed more. Fifty-eight questions rank it first; thirty rank it sixth or
-worse.
-
-**So the work is session selection, not session layout.** `coherent-oracle` stays
-in the design as the ceiling, and the gap between it and `coherent-auto` is the
-size of the selection debt. None of this cost an API call to learn.
+The provisional improvement comes from fixing session aggregation and preventing
+the context hard cap from discarding an oversized top-ranked session. Seven nearby
+controls and the selection rule were fixed before the remaining train questions
+arrive. `coherent-oracle` remains a labelled diagnostic ceiling, never a product
+arm. None of this spends answerer or judge quota.
 
 ### Debts this cannot repay itself
 

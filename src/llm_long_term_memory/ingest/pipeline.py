@@ -309,7 +309,11 @@ class IngestionPipeline:
             self.store.set_meta("extractor_version", current["extractor_version"])
 
         progress = IngestProgress.load(self.checkpoint_path) if resume else IngestProgress()
-        pending = [p for p in pairs if _key(*p) not in progress.done_sessions]
+        # A content-policy refusal is deterministic for an unchanged prompt and
+        # temperature, so retrying it on every resume can never fill the gap. Keep
+        # it separately reported, but treat it as terminal work for scheduling.
+        terminal_sessions = progress.done_sessions | progress.blocked_sessions
+        pending = [p for p in pairs if _key(*p) not in terminal_sessions]
 
         # Batches never straddle a namespace, so every fact in a call belongs to the
         # user the call is attributed to.
@@ -333,6 +337,12 @@ class IngestionPipeline:
                 # extractor having found nothing, which is exactly the confusion a
                 # held-out result cannot afford. The ids go in the checkpoint so the
                 # gap has a name and a size.
+                #
+                # Keep the refused source text for lossless raw fallback. Other
+                # failed calls are deliberately not archived: they remain pending,
+                # so storing them would make an unfinished batch look like a
+                # completed zero-memory result.
+                self._record_sessions(namespace, batch)
                 progress.blocked_sessions.update(_key(namespace, s) for s in batch)
                 progress.blocked_batches += 1
                 if on_batch:
@@ -375,21 +385,22 @@ class IngestionPipeline:
         """
         from datetime import datetime
 
-        from llm_long_term_memory.store import Session, Turn
+        from llm_long_term_memory.store import Session, Turn, scoped_session_id
 
         from .extract import _parse_date
 
         for sess in batch:
+            stored_session_id = scoped_session_id(namespace, sess.session_id)
             self.store.add_session(
                 Session(
-                    id=sess.session_id,
+                    id=stored_session_id,
                     user_id=namespace,
                     started_at=_parse_date(sess.date) or datetime.now(),
                     source=f"longmemeval:{sess.session_id}",
                     turns=[
                         Turn(
-                            id=f"{sess.session_id}:{turn_index}",
-                            session_id=sess.session_id,
+                            id=f"{stored_session_id}:{turn_index}",
+                            session_id=stored_session_id,
                             turn_index=turn_index,
                             role=turn.role,
                             content=turn.content,
@@ -403,11 +414,18 @@ class IngestionPipeline:
     def _ingest_batch(
         self, namespace: str, batch: list[HaystackSession], progress: IngestProgress
     ) -> None:
-        self._record_sessions(namespace, batch)
         # The extractor stamps every memory it produces with this id, so it is set
         # per batch rather than per pipeline.
         self.extractor.user_id = namespace
         outcome = self.extractor.extract(batch)
+        # Archive only once extraction has succeeded. A quota/network failure is
+        # pending work, not a genuine zero-memory session.
+        self._record_sessions(namespace, batch)
+        from llm_long_term_memory.store import scoped_session_id
+
+        for memory in outcome.memories:
+            if memory.source_session_id:
+                memory.source_session_id = scoped_session_id(namespace, memory.source_session_id)
         progress.extraction_requests += outcome.requests
         progress.bad_session_index += outcome.dropped_bad_index
         if not outcome.memories:

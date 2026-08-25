@@ -29,7 +29,15 @@ from llm_long_term_memory.config import ExperimentConfig, Settings
 from llm_long_term_memory.evaluation.judge import JUDGE_PROMPT_VERSION
 from llm_long_term_memory.evaluation.runners.base import ANSWER_PROMPT_VERSION
 from llm_long_term_memory.retrieve import EvidenceHydrator, HybridRetriever
-from llm_long_term_memory.store import Memory, NumpyFlatIndex, Session, SQLiteMemoryStore, Turn
+from llm_long_term_memory.store import (
+    Memory,
+    NumpyFlatIndex,
+    Session,
+    SQLiteMemoryStore,
+    Turn,
+    external_session_id,
+    scoped_session_id,
+)
 
 
 class NamespaceRequired(ValueError):
@@ -217,7 +225,9 @@ class MemoryService:
                 retrieval_weights=self.config.retrieval.weights.model_dump(),
                 candidate_limit=self.config.retrieval.candidate_limit,
                 recency_halflife_days=self.config.retrieval.recency_halflife_days,
-                raw_fallback=True,
+                raw_fallback=self.config.fallback.enabled,
+                raw_fallback_max_turns=self.config.fallback.max_turns,
+                raw_fallback_max_chars=self.config.fallback.max_chars,
             )
         return self._answerer
 
@@ -451,7 +461,7 @@ class MemoryService:
             return None
         item = result.evidence[0]
         return {
-            "session_id": item.session_id,
+            "session_id": external_session_id(item.session_id),
             "turn_index": item.turn_index,
             "role": item.role,
             "text": item.text,
@@ -476,7 +486,8 @@ class MemoryService:
             )
 
         now = datetime.now()
-        session_id = session_id or f"s_{uuid.uuid4().hex[:12]}"
+        external_id = session_id or f"s_{uuid.uuid4().hex[:12]}"
+        session_id = scoped_session_id(user_id, external_id)
         existing = self.store.get_session(session_id)
         turn_index = len(existing.turns) if existing else 0
 
@@ -511,7 +522,7 @@ class MemoryService:
             )
             self.index.save()
         return {
-            "session_id": session_id,
+            "session_id": external_id,
             "turn_index": turn_index,
             "memories": outcome.memories,
             "usage": outcome.usage,
@@ -544,7 +555,7 @@ class MemoryService:
                 "temporal_resolution": self.config.temporal_resolution,
                 "retrieval": {
                     "weights": self.config.retrieval.weights.model_dump(),
-                    "top_k": self.top_k,
+                    "top_k": getattr(self, "top_k", self.config.service.top_k),
                     "benchmark_top_k": self.config.retrieval.top_k,
                     "candidate_limit": self.config.retrieval.candidate_limit,
                     "rerank": self.config.retrieval.rerank.model_dump(),
@@ -556,9 +567,12 @@ class MemoryService:
         """A short identity for the running configuration, stamped on every log
         line. Enough to tell two deployments apart when their logs are pooled."""
         r = self.config.retrieval
+        # Some read-only inspector tests intentionally construct the smallest
+        # possible service without running the expensive composition root.
+        live_top_k = getattr(self, "top_k", self.config.service.top_k)
         return (
             f"{self.config.name}/{self.store_name}"
-            f"/top_k={r.top_k}/rerank={'on' if r.rerank.enabled else 'off'}"
+            f"/top_k={live_top_k}/rerank={'on' if r.rerank.enabled else 'off'}"
             f"/temporal={'on' if self.config.temporal_resolution else 'off'}"
         )
 

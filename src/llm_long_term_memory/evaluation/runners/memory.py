@@ -33,7 +33,12 @@ from llm_long_term_memory.retrieve import (
     build_coherent_context,
     render_evidence,
 )
-from llm_long_term_memory.store import Memory, MemoryStore, NumpyFlatIndex
+from llm_long_term_memory.store import (
+    Memory,
+    MemoryStore,
+    NumpyFlatIndex,
+    external_session_id,
+)
 
 from .base import ANSWER_SYSTEM, Answer, AnswerVerdict
 
@@ -52,6 +57,10 @@ TEMPORAL_NOTE = (
     "is still true now; `(<date> to <date>)` means it was replaced and is no longer "
     "current. Answer with what is true now unless the question asks about the past."
 )
+
+
+def _external_session_ids(values) -> set[str]:
+    return {external_session_id(value) for value in values if value}
 
 
 # Scope -> heading, in the order they are shown. Ordering is semantic rather than
@@ -144,7 +153,10 @@ class MemoryRunner:
         chars_per_token: float = 4.6,
         reranker=None,
         raw_fallback: bool = False,
+        raw_fallback_max_turns: int = 3,
+        raw_fallback_max_chars: int = 2400,
         session_budget: SessionBudget | None = None,
+        oracle_session_context: bool = False,
     ) -> None:
         self.client = client
         self.model = model
@@ -163,6 +175,9 @@ class MemoryRunner:
                 "memories a coherent context orders deliberately. Choose one."
             )
         self.session_budget = session_budget
+        if oracle_session_context and session_budget is None:
+            raise ValueError("oracle_session_context requires a session_budget")
+        self.oracle_session_context = oracle_session_context
         self.retriever = HybridRetriever(
             store,
             index,
@@ -198,10 +213,11 @@ class MemoryRunner:
         # Off by default: it changes what a variant *is*, so it must be an ablation
         # row rather than a silent upgrade to every existing result.
         self.fallback = None
+        self.raw_fallback_max_chars = max(1, raw_fallback_max_chars)
         if raw_fallback:
             from llm_long_term_memory.retrieve.fallback import RawFallback
 
-            self.fallback = RawFallback(store)
+            self.fallback = RawFallback(store, max_turns=raw_fallback_max_turns)
         self.extractor_version = (
             store.get_meta("extractor_version") if hasattr(store, "get_meta") else None
         )
@@ -297,8 +313,21 @@ class MemoryRunner:
             for memory in self.store.iter_all(instance.question_id):
                 if memory.source_session_id:
                     by_session.setdefault(memory.source_session_id, []).append(memory)
+            forced_sessions = None
+            if self.oracle_session_context:
+                internal_by_external = {
+                    external_session_id(session_id): session_id for session_id in by_session
+                }
+                forced_sessions = [
+                    internal_by_external[session_id]
+                    for session_id in instance.answer_session_ids
+                    if session_id in internal_by_external
+                ]
             coherent = build_coherent_context(
-                retrieved, lambda sid: by_session.get(sid, []), self.session_budget
+                retrieved,
+                lambda sid: by_session.get(sid, []),
+                self.session_budget,
+                forced_session_ids=forced_sessions,
             )
             selected = list(coherent.memories)
             # Memories a coherent session contributes were not necessarily retrieved,
@@ -336,7 +365,11 @@ class MemoryRunner:
             context_tokens=int(
                 (
                     len(context)
-                    + (len(raw_evidence.render()) if raw_evidence and raw_evidence.used else 0)
+                    + (
+                        len(raw_evidence.render(max_chars=self.raw_fallback_max_chars))
+                        if raw_evidence and raw_evidence.used
+                        else 0
+                    )
                 )
                 / self.chars_per_token
             ),
@@ -361,7 +394,11 @@ class MemoryRunner:
                 # Which context shape produced this row. A result that does not name
                 # its arm cannot be compared with one that does, and this project has
                 # already shipped a store whose meta claimed the wrong extractor.
-                "context_shape": "coherent" if coherent is not None else "flat",
+                "context_shape": (
+                    "coherent-oracle"
+                    if coherent is not None and self.oracle_session_context
+                    else ("coherent" if coherent is not None else "flat")
+                ),
                 "coherent": None
                 if coherent is None
                 else {
@@ -378,6 +415,7 @@ class MemoryRunner:
                         "session_order": self.session_budget.session_order,
                         "include_superseded": self.session_budget.include_superseded,
                     },
+                    "oracle_sessions": self.oracle_session_context,
                 },
                 "decay_enabled": self.decay_enabled,
                 "superseded_shown": sum(1 for m in selected if m.status != "active"),
@@ -385,29 +423,31 @@ class MemoryRunner:
                 "packed_utilisation": packed.utilisation if packed else None,
                 "dropped_negative": packed.dropped_negative if packed else None,
                 "source_session_recalled": bool(
-                    evidence & {m.source_session_id for m in selected if m.source_session_id}
+                    evidence & _external_session_ids(m.source_session_id for m in selected)
                 ),
                 "evidence_recalled": bool(
-                    evidence & {m.source_session_id for m in selected if m.source_session_id}
+                    evidence & _external_session_ids(m.source_session_id for m in selected)
                 ),
                 # Staged recall. One end-of-pipeline number cannot distinguish "never
                 # found it" from "found it and then dropped it", and those call for
-                # opposite fixes. Each stage is a strict subset of the one above, so a
-                # drop between two adjacent stages names the stage that lost it.
+                # opposite fixes. Production stages are nested. In the explicitly
+                # labelled oracle arm, `selected` can recover a gold session that
+                # `ranked` missed; that non-production ceiling is intentionally not
+                # interpreted as a ranking fix.
                 "recall_stages": {
-                    "candidates": bool(evidence & trace.candidate_session_ids),
+                    "candidates": bool(
+                        evidence & _external_session_ids(trace.candidate_session_ids)
+                    ),
                     "ranked": bool(
                         evidence
-                        & {
-                            hit.memory.source_session_id
-                            for hit in retrieved
-                            if hit.memory.source_session_id
-                        }
+                        & _external_session_ids(hit.memory.source_session_id for hit in retrieved)
                     ),
                     "selected": bool(
-                        evidence & {m.source_session_id for m in selected if m.source_session_id}
+                        evidence & _external_session_ids(m.source_session_id for m in selected)
                     ),
-                    "hydrated": bool(evidence & {e.session_id for e in hydration.evidence})
+                    "hydrated": bool(
+                        evidence & _external_session_ids(e.session_id for e in hydration.evidence)
+                    )
                     if self.evidence_hydration
                     else None,
                 },
@@ -424,7 +464,7 @@ class MemoryRunner:
                     raw_evidence.reason if raw_evidence and raw_evidence.used else None
                 ),
                 "fallback_turns": [
-                    f"{t.session_id}:{t.turn_index}"
+                    f"{external_session_id(t.session_id)}:{t.turn_index}"
                     for t in (raw_evidence.turns if raw_evidence else [])
                 ],
                 "retrieval_latency_ms": retrieval_latency_ms,
@@ -496,7 +536,7 @@ Question: {question}
 
         prompt = self._FALLBACK_TEMPLATE.format(
             reason=verdict.reason or "the requested detail was missing",
-            evidence=evidence.render(),
+            evidence=evidence.render(max_chars=self.raw_fallback_max_chars),
             date=instance.question_date,
             question=instance.question,
         )

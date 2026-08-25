@@ -201,6 +201,31 @@ def test_source_local_fallback_recovers_a_detail_extraction_dropped(wired):
     assert MAYO_URL in client.calls[1]
 
 
+def test_runner_applies_configured_fallback_budgets(wired):
+    """The config is part of the frozen variant, so both limits must affect runtime."""
+    store, index = wired
+    client = ScriptedClient(
+        {
+            "status": "need_source",
+            "reason": "The exact title is missing.",
+            "source_query": "Mayo Clinic posture video",
+        },
+        "found it",
+    )
+
+    answer = runner(
+        store,
+        index,
+        client,
+        raw_fallback_max_turns=1,
+        raw_fallback_max_chars=24,
+    ).answer(instance("what was the exact video title?"))
+
+    assert answer.notes["fallback_turns"] == ["s1:1"]
+    evidence = client.calls[1].split("\n\nToday's date", 1)[0]
+    assert len(evidence.rsplit("\n", 1)[-1]) <= 24
+
+
 def test_a_question_never_discussed_is_declined_not_invented(wired):
     """Fallback must not become a licence to answer from whatever BM25 returns.
     Abstention is a measured strength; this is the test that protects it."""

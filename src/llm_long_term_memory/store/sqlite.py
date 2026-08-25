@@ -558,11 +558,21 @@ class SQLiteMemoryStore:
         ).fetchall()
         return {r["type"]: r["n"] for r in rows}
 
-    def zero_yield_sessions(self, min_turns: int = 6) -> tuple[int, int]:
+    def session_ids(self) -> set[str]:
+        return {row["id"] for row in self._conn.execute("SELECT id FROM sessions")}
+
+    def zero_yield_sessions(
+        self,
+        min_turns: int = 6,
+        *,
+        include_session_ids: set[str] | None = None,
+    ) -> tuple[int, int]:
         """Sessions that were archived but produced no memory at all.
 
         Returns `(zero_yield, total)` counting only sessions of at least `min_turns`,
-        so that a one-line stub does not flatter the number.
+        so that a one-line stub does not flatter the number. When
+        `include_session_ids` is supplied, raw-only batches that have not reached a
+        checkpoint terminal state can be excluded from an interim report.
 
         This is computed from the store rather than counted during ingestion,
         because a counter only sees sessions processed after it was added and this
@@ -577,17 +587,20 @@ class SQLiteMemoryStore:
         (same median turn count, same assistant share), so this is extractor
         variance rather than a property of the conversation.
         """
-        total = self._conn.execute(
-            "SELECT COUNT(*) FROM sessions s WHERE "
-            "(SELECT COUNT(*) FROM turns t WHERE t.session_id = s.id) >= ?",
-            (min_turns,),
-        ).fetchone()[0]
-        zero = self._conn.execute(
-            "SELECT COUNT(*) FROM sessions s WHERE "
-            "(SELECT COUNT(*) FROM turns t WHERE t.session_id = s.id) >= ? "
-            "AND NOT EXISTS (SELECT 1 FROM memories m WHERE m.source_session_id = s.id)",
-            (min_turns,),
-        ).fetchone()[0]
+        rows = self._conn.execute(
+            "SELECT s.id, "
+            "(SELECT COUNT(*) FROM turns t WHERE t.session_id = s.id) AS turn_count, "
+            "EXISTS(SELECT 1 FROM memories m WHERE m.source_session_id = s.id) AS has_memory "
+            "FROM sessions s"
+        )
+        eligible = [
+            row
+            for row in rows
+            if row["turn_count"] >= min_turns
+            and (include_session_ids is None or row["id"] in include_session_ids)
+        ]
+        total = len(eligible)
+        zero = sum(not row["has_memory"] for row in eligible)
         return zero, total
 
     def close(self) -> None:

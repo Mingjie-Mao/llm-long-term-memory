@@ -6,6 +6,7 @@ and plan the ingestion budget against the free-tier quota.
 
 from __future__ import annotations
 
+from contextlib import contextmanager
 from pathlib import Path
 
 import typer
@@ -14,13 +15,23 @@ from rich.table import Table
 
 from llm_long_term_memory.config import Settings
 from llm_long_term_memory.evaluation.datasets import longmemeval as lme
-from llm_long_term_memory.locking import exclusive
+from llm_long_term_memory.locking import AlreadyRunning, exclusive
 
 app = typer.Typer(add_completion=False, help="LLTM — long-term memory for LLM agents")
 data_app = typer.Typer(help="Benchmark data: download, inspect, plan")
 app.add_typer(data_app, name="data")
 
 console = Console()
+
+
+@contextmanager
+def _cli_lock(path: Path, *, what: str):
+    try:
+        with exclusive(path, what=what):
+            yield
+    except AlreadyRunning as exc:
+        console.print(f"[red]STOP[/red]: {exc}")
+        raise typer.Exit(code=2) from None
 
 
 def _mask(secret: str) -> str:
@@ -238,6 +249,9 @@ def _build(
         # into whole sessions in event order rather than handed over as a ranking.
         # The only difference from `two_stage_fallback` is the context's shape.
         "two_stage_coherent",
+        # Validation-only ceiling: session ids come from benchmark gold labels.
+        # It can explain a null but is never a product variant.
+        "two_stage_coherent_oracle",
     ):
         from llm_long_term_memory.retrieve import SessionBudget
         from llm_long_term_memory.store import NumpyFlatIndex, SQLiteMemoryStore
@@ -288,6 +302,8 @@ def _build(
             type_floors=cfg.pack.type_floors if cfg.pack.enabled else None,
             reranker=reranker,
             raw_fallback=cfg.fallback.enabled,
+            raw_fallback_max_turns=cfg.fallback.max_turns,
+            raw_fallback_max_chars=cfg.fallback.max_chars,
             session_budget=SessionBudget(
                 max_sessions=cfg.context.max_sessions,
                 window_radius=cfg.context.window_radius,
@@ -296,8 +312,9 @@ def _build(
                 session_order=cfg.context.session_order,
                 include_superseded=cfg.context.include_superseded,
             )
-            if variant == "two_stage_coherent"
+            if variant in {"two_stage_coherent", "two_stage_coherent_oracle"}
             else None,
+            oracle_session_context=variant == "two_stage_coherent_oracle",
         )
         runner.name = variant
     else:
@@ -311,7 +328,8 @@ def eval_run(
         ...,
         help=(
             "full_context | naive_rag | two_stage | two_stage_no_temporal | "
-            "two_stage_hydrated | two_stage_hydrated_no_temporal | two_stage_coherent. "
+            "two_stage_hydrated | two_stage_hydrated_no_temporal | two_stage_coherent | "
+            "two_stage_coherent_oracle. "
             "The chronomem* names belong to the frozen v1 run and are kept so its "
             "rows are not overwritten by a re-measurement of a different pipeline."
         ),
@@ -701,7 +719,7 @@ def ingest_run(
     )
     from llm_long_term_memory.llm import Limits, QuotaManager, UsageTracker
     from llm_long_term_memory.llm.client import GeminiClient
-    from llm_long_term_memory.store import NumpyFlatIndex, SQLiteMemoryStore
+    from llm_long_term_memory.store import NumpyFlatIndex, SQLiteMemoryStore, scoped_session_id
     from llm_long_term_memory.temporal import TemporalResolver
 
     settings = Settings()
@@ -713,7 +731,7 @@ def ingest_run(
     # totals under-reported the spend by roughly a third — 211 requests logged
     # against ~320 actually made. The store looked fine, so the only symptom was
     # the daily quota ending early.
-    with exclusive(settings.store_dir / f"{store_name}.db", what="ingest"):
+    with _cli_lock(settings.store_dir / f"{store_name}.db", what="ingest"):
         quota = QuotaManager(
             state_dir=settings.store_dir / "quota",
             default=Limits(rpm=cfg.quota.rpm, tpm=cfg.quota.tpm, rpd=cfg.quota.rpd),
@@ -813,17 +831,41 @@ def ingest_run(
                 highlight=False,
             )
 
-        outcome = pipeline.run(all_sessions, resume=not fresh, on_batch=on_batch)
-        p = outcome.progress
         usage_name = (
             "ingest.usage.json" if store_name == "memories" else f"{store_name}.ingest.usage.json"
         )
-        usage.save(settings.results_dir / "raw" / usage_name, merge=not fresh)
+        usage_path = settings.results_dir / "raw" / usage_name
+        try:
+            outcome = pipeline.run(all_sessions, resume=not fresh, on_batch=on_batch)
+        except BaseException:
+            # Normal quota/network stops return an outcome. This covers Ctrl-C or
+            # a truly unexpected crash after metered calls, so their cost is not
+            # silently lost before the user resumes.
+            usage.save(usage_path, merge=not fresh)
+            raise
+        p = outcome.progress
+        usage.save(usage_path, merge=not fresh)
 
         t = Table(title="ingestion", show_header=False)
         t.add_column(style="cyan")
         t.add_column(justify="right")
         t.add_row("sessions ingested", f"{len(p.done_sessions):,}")
+        t.add_row("content-blocked sessions", f"{len(p.blocked_sessions):,}")
+        t.add_row(
+            "sessions with terminal status",
+            f"{len(p.done_sessions | p.blocked_sessions):,}",
+        )
+        terminal_keys = p.done_sessions | p.blocked_sessions
+        expected_ids = {
+            scoped_session_id(namespace, session.session_id) for namespace, session in all_sessions
+        }
+        terminal_ids = {
+            scoped_session_id(namespace, session.session_id)
+            for namespace, session in all_sessions
+            if f"{namespace}:{session.session_id}" in terminal_keys
+        }
+        raw_only_pending = len((store.session_ids() & expected_ids) - terminal_ids)
+        t.add_row("raw-only pending sessions", f"{raw_only_pending:,}")
         t.add_row("memories written", f"{p.memories_written:,}")
         t.add_row("duplicates dropped", f"{p.duplicates_dropped:,}")
         t.add_row("updates detected", f"{p.updates_detected:,}")
@@ -832,7 +874,7 @@ def ingest_run(
         # invisible: every other number here looked healthy while 13-17% of
         # substantive sessions yielded no memory at all, which is where a large part
         # of the extraction-class failures come from.
-        zero, subst = store.zero_yield_sessions()
+        zero, subst = store.zero_yield_sessions(include_session_ids=terminal_ids)
         if subst:
             t.add_row(
                 "zero-memory sessions",
@@ -864,6 +906,12 @@ def ingest_run(
             console.print(f"\n[yellow]Stopped:[/yellow] {outcome.stopped_reason}")
             console.print("[dim]Rerun the same command tomorrow — it resumes.[/dim]")
         store.close()
+        if not outcome.completed:
+            # A quota stop is expected and resumable, but it is not success. Cron,
+            # CI and the Codex continuation must be able to distinguish "checkpoint
+            # safely written" from "all requested sessions reached a terminal
+            # state" without scraping prose from the terminal.
+            raise typer.Exit(code=2)
 
 
 @ingest_app.command("coverage")

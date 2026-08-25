@@ -169,6 +169,37 @@ def test_no_hits_yields_an_empty_context_rather_than_raising():
     assert ctx.memories == () and ctx.sessions == ()
 
 
+def test_forced_sessions_are_an_oracle_ceiling_with_the_same_context_budget():
+    retrieved = memory("a1", "sess_a", 10)
+    gold = [memory(f"g{i}", "sess_gold", 20 + i) for i in range(3)]
+
+    ctx = build_coherent_context(
+        [hit(retrieved, 0.9)],
+        library(retrieved, *gold),
+        SessionBudget(max_sessions=1, window_radius=1, max_total_memories=3),
+        forced_session_ids=["sess_gold"],
+    )
+
+    assert ctx.sessions == ("sess_gold",)
+    assert [item.id for item in ctx.memories] == ["g0", "g1", "g2"]
+    assert ctx.session_scores == {"sess_gold": 0.0}, "gold session was not retrieved"
+    assert "sess_a" in ctx.dropped_sessions
+
+
+def test_an_oracle_with_no_extracted_gold_session_does_not_fall_back_to_distractors():
+    distractor = memory("a1", "sess_a", 10)
+
+    ctx = build_coherent_context(
+        [hit(distractor, 0.9)],
+        library(distractor),
+        forced_session_ids=[],
+    )
+
+    assert ctx.memories == ()
+    assert ctx.sessions == ()
+    assert ctx.dropped_sessions == ("sess_a",)
+
+
 # --------------------------------------------------------------------- the gate
 
 
@@ -185,3 +216,11 @@ def test_session_recall_is_the_gate_the_experiment_runs_before_spending_quota(to
 
 def test_session_recall_with_no_gold_is_false_rather_than_vacuously_true():
     assert session_recall([hit(memory("a1", "sess_a", 10), 0.9)], [], 3) is False
+
+
+def test_session_recall_compares_public_ids_when_storage_ids_are_user_scoped():
+    from llm_long_term_memory.store import scoped_session_id
+
+    gold = memory("a1", scoped_session_id("q1", "sess_a"), 10)
+
+    assert session_recall([hit(gold, 0.9)], ["sess_a"], 1) is True

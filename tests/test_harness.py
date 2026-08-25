@@ -10,8 +10,14 @@ from __future__ import annotations
 import pytest
 
 from llm_long_term_memory.evaluation.datasets.longmemeval import Instance
-from llm_long_term_memory.evaluation.harness import ArtifactMismatch, StoreChanged, run_eval
+from llm_long_term_memory.evaluation.harness import (
+    ArtifactMismatch,
+    StoreChanged,
+    UsageArtifactMismatch,
+    run_eval,
+)
 from llm_long_term_memory.evaluation.runners.base import Answer
+from llm_long_term_memory.llm.usage import CallRecord, UsageTracker
 
 
 def instance(qid: str, qtype: str = "single-session-user") -> Instance:
@@ -86,6 +92,70 @@ def test_resume_skips_completed_questions(tmp_path):
 
     assert judge.calls == 2, "only the two unfinished questions"
     assert report.n == 5
+
+
+def test_usage_resume_loads_prior_calls_without_double_counting(tmp_path):
+    out = tmp_path / "r.jsonl"
+
+    class AccountingRunner(StubRunner):
+        def __init__(self, usage):
+            super().__init__()
+            self.usage = usage
+
+        def answer(self, inst):
+            self.usage.record(CallRecord("answerer", "m", 10, 2, 1.0))
+            return super().answer(inst)
+
+    class AccountingJudge(StubJudge):
+        def __init__(self, usage):
+            super().__init__()
+            self.usage = usage
+
+        def grade(self, *args, **kwargs):
+            self.usage.record(CallRecord("judge", "m", 10, 2, 1.0))
+            return super().grade(*args, **kwargs)
+
+    instances = [instance(f"q{i}") for i in range(3)]
+    first = UsageTracker()
+    run_eval(AccountingRunner(first), AccountingJudge(first), instances[:2], out, usage=first)
+    resumed = UsageTracker()
+    run_eval(AccountingRunner(resumed), AccountingJudge(resumed), instances, out, usage=resumed)
+
+    saved = UsageTracker._load_records(out.with_suffix(".usage.json"))
+    assert len(saved) == 6
+    assert [record.role for record in saved].count("answerer") == 3
+    assert [record.role for record in saved].count("judge") == 3
+
+
+def test_rows_without_usage_are_refused_when_cost_accounting_is_requested(tmp_path):
+    out = tmp_path / "r.jsonl"
+    run_eval(StubRunner(), StubJudge(), [instance("q1")], out)
+
+    with pytest.raises(UsageArtifactMismatch, match="undercount cost"):
+        run_eval(
+            StubRunner(),
+            StubJudge(),
+            [instance("q1"), instance("q2")],
+            out,
+            usage=UsageTracker(),
+        )
+
+
+def test_usage_is_checkpointed_when_a_metered_question_raises(tmp_path):
+    out = tmp_path / "r.jsonl"
+    usage = UsageTracker()
+
+    class MeteredFailure(StubRunner):
+        def answer(self, inst):
+            usage.record(CallRecord("answerer", "m", 10, 0, 1.0, ok=False, error="boom"))
+            raise RuntimeError("boom")
+
+    with pytest.raises(RuntimeError, match="boom"):
+        run_eval(MeteredFailure(), StubJudge(), [instance("q1")], out, usage=usage)
+
+    saved = UsageTracker._load_records(out.with_suffix(".usage.json"))
+    assert len(saved) == 1
+    assert not saved[0].ok
 
 
 class StoreRunner(StubRunner):

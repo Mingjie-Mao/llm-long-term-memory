@@ -16,6 +16,15 @@ class AlwaysCorrectJudge:
         return type("Verdict", (), {"correct": True})()
 
 
+class RecordingJudge(AlwaysCorrectJudge):
+    def __init__(self):
+        self.calls = []
+
+    def grade(self, **kwargs):
+        self.calls.append(kwargs)
+        return super().grade(**kwargs)
+
+
 def _instance() -> Instance:
     return Instance(
         question_id="q1",
@@ -67,3 +76,21 @@ def test_interrupted_question_is_not_checkpointed_partially(tmp_path):
         "features": list(FEATURE_NAMES),
         "completed_questions": [],
     }
+
+
+def test_influence_uses_the_question_type_specific_judge_prompt(tmp_path):
+    instance = _instance()
+    instance.question_type = "single-session-preference"
+    judge = RecordingJudge()
+
+    outcome = measure_influence(
+        [instance],
+        lambda _instance: [(_memory("m1"), 0.8)],
+        lambda _instance, _memories: "tea",
+        judge,
+        tmp_path / "influence.jsonl",
+    )
+
+    assert outcome.completed
+    assert judge.calls
+    assert all(call["question_type"] == "single-session-preference" for call in judge.calls)

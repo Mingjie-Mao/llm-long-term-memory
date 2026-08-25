@@ -8,6 +8,7 @@ from .base import (
     Turn,
     VectorIndex,
 )
+from .session_keys import external_session_id, scoped_session_id, split_scoped_session_id
 from .sqlite import SQLiteMemoryStore
 from .vector import NumpyFlatIndex
 
@@ -22,4 +23,7 @@ __all__ = [
     "Session",
     "Turn",
     "VectorIndex",
+    "external_session_id",
+    "scoped_session_id",
+    "split_scoped_session_id",
 ]

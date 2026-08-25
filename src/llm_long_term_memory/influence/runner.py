@@ -47,6 +47,7 @@ def _answer_and_judge(answer_fn, judge: Judge, instance: Instance, memories: lis
         gold=instance.answer,
         hypothesis=text,
         is_abstention=instance.is_abstention,
+        question_type=instance.question_type,
     )
     return verdict.correct
 

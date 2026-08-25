@@ -144,6 +144,18 @@ to it.
 5. The session budget is frozen from `train150` before `dev100` runs. If it has
    to move afterwards, that is a new experiment on a new set, not an adjustment.
 
+Implementation note (2026-08-22, still before any `dev100` access): the oracle arm
+forces the benchmark's gold session ids but keeps the frozen maximum-session,
+window, active/superseded, ordering and total-memory rules.  If extraction produced
+no memory for a gold session, the oracle context is empty rather than silently
+falling back to a retrieved distractor.  Every result row is labelled
+`coherent-oracle`, so this ceiling cannot be mistaken for a product run.
+
+The validation runner now enforces the three arm names above, their order, exactly
+three repeats, the canonical 100-question manifest and the registered freeze/store
+names. After all arms complete, it applies the decision rule in code and writes a
+hash-bound `dev100-decision.json`; there is no manual post-result reinterpretation.
+
 ## Registered prediction
 
 - Session recall @ top-3 on `train150` is **above 90%**, since memory-level

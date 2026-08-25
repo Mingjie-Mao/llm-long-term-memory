@@ -12,8 +12,9 @@ services:
     build:
       context: .
       args:
-        # Add embed to enable local query embedding, and llm for the write path.
-        EXTRAS: "api,llm"
+        # `embed` is the read path: without it health is degraded and memory search
+        # returns 503. `llm` keeps the optional live write/answer paths available.
+        EXTRAS: "api,llm,embed"
     ports:
       - "8000:8000"
     environment:

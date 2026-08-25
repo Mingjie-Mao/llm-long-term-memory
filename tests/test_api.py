@@ -167,6 +167,16 @@ def test_config_exposes_the_manifest_and_no_credentials(client):
     assert "api_key" not in serialised and "gemini_api_key" not in serialised
 
 
+def test_service_fingerprint_reports_the_live_top_k(client):
+    # Reach the running service through the same dependency the handlers use.
+    from llm_long_term_memory.api.app import get_service
+
+    running = get_service()
+    assert running.top_k == 10
+    assert "/top_k=10/" in running.fingerprint()
+    assert running.config.retrieval.top_k == 20, "the benchmark value is deliberately different"
+
+
 def test_search_returns_scored_memories_with_provenance(client):
     body = client.post(
         "/v1/memories/search", json={"user_id": "alice", "query": "where do I live?"}

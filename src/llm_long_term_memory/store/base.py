@@ -145,6 +145,10 @@ class MemoryStore(Protocol):
         """Every namespace present. Whole-store passes must walk all of them."""
         ...
 
+    def session_ids(self) -> set[str]:
+        """Every archived source session id, including resumable in-flight work."""
+        ...
+
     def predicate_keys(self, user_id: str) -> list[tuple[str, str]]:
         """Every (subject, predicate) present, for a full re-resolution pass."""
         ...

@@ -153,6 +153,10 @@ class StoreChanged(RuntimeError):
     """The artifact being resumed was produced from different data."""
 
 
+class UsageArtifactMismatch(RuntimeError):
+    """Result rows and request accounting cannot be safely resumed together."""
+
+
 def _check_resumable(done: dict[str, QuestionResult], runner, path: Path) -> None:
     """Refuse to append answers from one store onto answers from another.
 
@@ -190,6 +194,22 @@ def _run_eval_locked(runner, judge, instances, path, usage, resume, on_progress)
     done = _load_done(path) if resume else {}
     if resume:
         _check_resumable(done, runner, path)
+    usage_path = path.with_suffix(".usage.json")
+    if usage is not None and resume:
+        if done and not usage_path.exists():
+            raise UsageArtifactMismatch(
+                f"{path} has {len(done)} completed row(s) but no usage artifact; "
+                "resuming would undercount cost"
+            )
+        if usage_path.exists() and not path.exists():
+            raise UsageArtifactMismatch(
+                f"{usage_path} exists without its result artifact; provenance is unknown"
+            )
+        if usage_path.exists():
+            try:
+                usage.records[:] = UsageTracker._load_records(usage_path)
+            except (OSError, TypeError, ValueError, json.JSONDecodeError) as exc:
+                raise UsageArtifactMismatch(f"cannot resume invalid usage artifact: {exc}") from exc
     report = RunReport(variant=runner.name, results=list(done.values()))
 
     if not resume and path.exists():
@@ -216,9 +236,18 @@ def _run_eval_locked(runner, judge, instances, path, usage, resume, on_progress)
                     question_type=inst.question_type,
                 )
             except DailyQuotaExhausted as exc:
+                if usage:
+                    usage.save(usage_path)
                 report.completed = False
                 report.stopped_reason = str(exc)
                 break
+            except BaseException:
+                # Ctrl-C, a network error outside the quota wrapper, or a runner
+                # bug may arrive after one or more metered calls. Preserve those
+                # calls before propagating the original failure.
+                if usage:
+                    usage.save(usage_path)
+                raise
 
             result = QuestionResult(
                 question_id=inst.question_id,
@@ -243,6 +272,11 @@ def _run_eval_locked(runner, judge, instances, path, usage, resume, on_progress)
                 notes=answer.notes,
             )
             report.results.append(result)
+            # Cost first, then the row. A kill between them can cause a repeated
+            # question on resume, but its first attempt remains counted. The
+            # reverse order would silently lose already-spent requests.
+            if usage:
+                usage.save(usage_path)
             sink.write(json.dumps(asdict(result)) + "\n")
             sink.flush()  # a crash must not lose completed work
 
@@ -250,7 +284,7 @@ def _run_eval_locked(runner, judge, instances, path, usage, resume, on_progress)
                 on_progress(result, report)
 
     if usage:
-        usage.save(path.with_suffix(".usage.json"), merge=resume)
+        usage.save(usage_path)
 
     _verify_artifact_matches(path, report)
     return report

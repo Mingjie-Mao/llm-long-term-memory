@@ -14,7 +14,7 @@ from __future__ import annotations
 import json
 import time
 from collections import defaultdict
-from contextlib import contextmanager, suppress
+from contextlib import contextmanager
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 
@@ -139,6 +139,8 @@ class UsageTracker:
     @classmethod
     def _load_records(cls, path: Path) -> list[CallRecord]:
         payload = json.loads(path.read_text(encoding="utf-8"))
+        if not isinstance(payload, dict):
+            raise ValueError("usage artifact must be a JSON object")
         calls = payload.get("calls", [])
         if not isinstance(calls, list):
             raise ValueError("usage artifact has a non-list calls field")
@@ -149,13 +151,14 @@ class UsageTracker:
         p.parent.mkdir(parents=True, exist_ok=True)
         records = self.records
         if merge and p.exists():
-            with suppress(OSError, TypeError, ValueError, json.JSONDecodeError):
-                records = [*self._load_records(p), *records]
+            records = [*self._load_records(p), *records]
         combined = UsageTracker(records=records)
-        p.write_text(
+        temporary = p.with_suffix(p.suffix + ".tmp")
+        temporary.write_text(
             json.dumps(
                 {"summary": combined.summary(), "calls": [asdict(r) for r in combined.records]},
                 indent=2,
             ),
             encoding="utf-8",
         )
+        temporary.replace(p)
