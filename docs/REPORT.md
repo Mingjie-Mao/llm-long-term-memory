@@ -70,7 +70,7 @@ Document version: 2026-08-25.
 
 | | |
 |---|---|
-| Tests | pytest, **529 tests**, 80% line coverage |
+| Tests | pytest, **532 tests**, 80% line coverage |
 | Lint | ruff, `line-length = 100` |
 | CI | ubuntu / windows / macos matrix |
 | Warnings are errors | `filterwarnings = ["error::EncodingWarning"]` — an encoding defect cannot come back quietly |
@@ -79,7 +79,7 @@ Document version: 2026-08-25.
 
 **What is deliberately *not* in this stack** (see section 4): no separate database
 server, no vector database, no Elasticsearch, no message queue, no ORM. At the current
-scale — single machine, single writer, 18,017 memories at most — each of those adds
+scale — single machine, single writer, 18,519 memories at most — each of those adds
 operational surface without solving a problem the project has. The moment this becomes
 a multi-tenant service, SQLite is the first thing to replace.
 
@@ -965,7 +965,7 @@ ascending. This sign convention reappears in the downstream normalization (5.3).
 ### 4.4 Why SQLite + WAL + FTS5 and not something else
 
 Compared against this project's actual scale and deployment shape, not in the abstract.
-**The facts**: single machine, single writer, largest store 18,017 memories / 185MB,
+**The facts**: single machine, single writer, largest store 18,519 memories / 185MB,
 concurrency requirement zero (evaluation is serial).
 
 | Option | What it would bring | Why not here |
@@ -1052,7 +1052,7 @@ different levels:
 maintained by the pipeline, not by a transaction. Hence an explicit read-only checker
 (`scripts/check_ingest_state.py`) verifies checkpoint, raw archive, SQLite integrity,
 memory count, index ids, vector rows and extractor fingerprint together before every
-resume. On the current train150 all seven agree (18,017 memories = 18,017 ids = 18,017
+resume. On the current train150 all seven agree (18,519 memories = 18,519 ids = 18,519
 vector rows, dimension 384).
 
 ---
@@ -1335,11 +1335,19 @@ session_order=chronological, include_superseded=false`. **These are starting poi
 findings** — the config's own comment says "These values are the starting point, NOT a
 result".
 
-The candidate developed on train150 is `mean` aggregation, `window_radius=1`,
-`max_total_memories=30`, reaching 95.2% top-3 session recall and 95.2% assembled recall
-over 145/150 questions at a median of 140 context tokens. **It has not been written to
-any config file**, because the finalizer requires all 7,180 sessions to be terminal before
-`configs/v2.yaml` may be produced.
+The candidate selected on the complete train150 is `mean` aggregation,
+`window_radius=1`, `max_total_memories=30`: **95.3%** top-3 session recall, **95.3%**
+assembled recall, median **140.5** context tokens, 1 question truncated. It is now
+`configs/v2.yaml`, written by `finalize_train150.py` once all 7,180 sessions were
+terminal. The seven-arm grid and the selection record are in
+`results/analysis/train150-context-grid-final/` and
+`train150-context-selection.final.json`.
+
+Worth noting what the rule did: `mean-r1-cap40` ties on both recall figures and
+truncates **zero** questions rather than one, which is the row a human would have
+picked. The tie-break — written before the data — prefers the smaller memory cap, so
+cap30 won. That is the pre-registration doing its job on a decision small enough to be
+tempting.
 
 **v2's goal is currently consistency, not accuracy.** The registered decision rule says
 `coherent-auto` is adopted if it does **not degrade** accuracy and does not raise context
@@ -1857,8 +1865,8 @@ Full tables in 3.2. Summary:
 |---|---|
 | **Hypothesis** | Session-coherent context improves **consistency** (not necessarily accuracy) |
 | **Arms** | `flat20` (baseline) / `coherent-auto` (rebuilt from retrieval) / `coherent-oracle` (gold session ids, the ceiling) |
-| **Free gate** | Session recall@top-3 on train150 must be ≥80% before any validation quota is spent. Currently **95.2%** over 145/150 questions |
-| **Status** | **dev100 has not run. The accuracy effect is unknown.** |
+| **Free gate** | Session recall@top-3 on train150 must be ≥80% before any validation quota is spent. **95.3%** over the complete 150 — passed |
+| **Status** | **dev100 has not run. The accuracy effect is unknown.** A first ingest reached 37% and was discarded for a broken freeze lineage (12.2), not for anything it measured |
 | **Registered decision rule** | Adopt if accuracy does not degrade and context does not rise more than 50%; if auto degrades but oracle does not, the bottleneck is session selection; if both degrade, close the direction |
 
 ---
@@ -1903,7 +1911,7 @@ perfect extraction alone does not reach the ceiling.
   Fixed by splitting `subject` / `source_role` and adding worked examples.
 - **Batch-position attenuation.** (3.2 / 9.7) The same session moved to the back of a
   request yields a third as much. **Not fixed; quantified.**
-- **Zero-yield.** 14.5% of substantive sessions produced no memory on the clean store
+- **Zero-yield.** 15.6% of substantive sessions produced no memory on the complete train150 (986/6,309; 14.5% on the earlier clean store)
   (304/2,096). The planned remedy — re-running the zero-yield sessions — would have
   produced a **confident wrong answer**, because re-batching them moves them to the front.
 
@@ -1975,7 +1983,7 @@ to describe.**
 | **Cross-process lock** | Two ingests overwriting each other | `locking.py`, pid-based advisory lock |
 | **Quota-interruption safety** | An in-flight batch counted as "zero-yield" | Quota/network failures write no terminal state for the in-flight batch and it is excluded from analysis; content-policy refusals keep their raw text and get an explicit terminal state; an automated replay test proves resume produces no duplicates |
 | **Read-only state check** | Resuming a store of unknown consistency | `scripts/check_ingest_state.py` verifies checkpoint, raw archive, SQLite integrity, memory count, index ids, vector rows and extractor fingerprint together |
-| **Tests and CI** | — | **529 tests**, ubuntu / windows / macos, 80% line coverage (88–100% on critical experiment paths) |
+| **Tests and CI** | — | **532 tests**, ubuntu / windows / macos, 80% line coverage (88–100% on critical experiment paths) |
 | **Structured logging** | — | One JSON event per request: request id, latency, config fingerprint. **No memory content, no credentials** |
 
 **Three external interfaces share one service object**, so they cannot drift from the
@@ -2009,18 +2017,26 @@ datasets, models, credentials or database; the store arrives on a mounted volume
 | Batched extraction loses memories by position | Randomised control, p < 0.0001 |
 | Single-run noise is about 3 points | Three repeats, 6/100 flip |
 | The noise concentrates in two question types | Four of six types are bit-identical across three runs |
+| Weighting the other four retrieval signals hurts | Offline over 150 questions: -5.3pp to -17.3pp; `recency` is a no-op at a 30-day half-life |
+| The replacement signal is orphaned by predicate naming | 88% of `replaces_previous` sit alone on their key; 96% of those have sibling predicates on the same subject |
 
-### 12.2 The current candidate (not yet validated)
+### 12.2 The current candidate (frozen, not yet validated)
 
-**Session-coherent context.** On train150 (145/150 questions): top-3 session recall
-**95.2%**, assembled recall **95.2%**, median context **140 tokens**, 1 question
-truncated — well above the registered 80% gate.
+**Session-coherent context.** On the complete train150 (150/150 questions): top-3
+session recall **95.3%**, assembled recall **95.3%**, median context **140.5 tokens**,
+1 question truncated — well above the registered 80% gate. Selected by the fixed rule
+from a seven-arm grid and written to `configs/v2.yaml`.
 
 ⚠️ **These are proxy metrics. Finding the right source session is not the same as
-answering the question. Whether v2 improves accuracy is unknown until dev100 runs.** The
-candidate configuration (`mean` / `radius=1` / `cap=30`) **has not been written to any
-config file**; the finalizer requires all 7,180 sessions to be terminal before
-`configs/v2.yaml` may exist. Currently **6,983 / 7,180**.
+answering the question. Whether v2 improves accuracy is unknown until dev100 runs.**
+
+**dev100 status.** A first ingest reached 37% (1,789 / 4,791 sessions, 408 extractor
+calls) and was discarded. The data was sound; the lineage was not — its pre-ingest
+freeze had been captured against an uncommitted tree, and committing that work moved
+`git HEAD`, which the freeze compared. The store could no longer be shown to have been
+produced under the frozen system. The calls are written off rather than freezing after
+the fact, and the enforcement defect is fixed: fields named `*_for_reference_only` are
+recorded and no longer compared.
 
 ### 12.3 Open questions — supported by data, without conclusions
 
@@ -2051,8 +2067,8 @@ Marked explicitly so they cannot be read as current capability:
 
 | Step | Action | Completion evidence | Quota |
 |---:|---|---|---|
-| 1 | Finish train150's last 197 sessions | 7,180/7,180 in both checkpoint and store | ~70 calls |
-| 2 | `finalize_train150.py` | Final zero-yield audit, seven fixed grid artifacts, selection record, `configs/v2.yaml` | **None** |
+| ~~1~~ | ~~Finish train150~~ | **done** — 7,180/7,180, 18,519 memories | 92 calls |
+| ~~2~~ | ~~`finalize_train150.py`~~ | **done** — final zero-yield audit, seven grid artifacts, selection record, `configs/v2.yaml` | none |
 | 3 | Freeze and ingest dev100 | Pre- and post-ingest hashes, the latter a strict extension of the former | ~1,400 calls |
 | 4 | dev100, five arms x three repeats | Scores after all fifteen combinations finish; writes `dev100-decision.json` | ~2,050 calls |
 | 5 | Freeze and ingest test100 | Two hashes, also binding dev100's aggregate and decision | ~1,400 calls |

@@ -452,7 +452,7 @@ size 15. [Details](results/batch-position-pilot.md).
 
 ## Engineering
 
-- **529 tests**, CI across ubuntu / windows / macos, 80% line coverage
+- **532 tests**, CI across ubuntu / windows / macos, 80% line coverage
 - **Result versioning** — every evaluation row records its answerer prompt, judge
   prompt and extractor version; the extractor version comes from the *store*, not the
   checkout, because it describes the data being evaluated
@@ -531,8 +531,11 @@ only — a stratified subset is scattered across the split, not a prefix of it.
 - **The extractor is known-lossy and was not changed.** Batch size 15 yields 2.6
   memories per session against 12.7 at batch size 1. Every number here sits under that
   ceiling.
-- **14.5% of substantive sessions yield no memory at all** (304 of 2,096). Recorded as
-  a baseline, not yet explained.
+- **15.6% of substantive sessions yield no memory at all** — 986 of 6,309 on the
+  complete train150 (14.5% on the earlier clean store). The final audit attributes 13 to
+  annotated evidence misses and 5 to malformed sources, finds **zero** content-policy
+  refusals and **zero** identical-input-different-output cases, and leaves **862
+  undetermined** rather than calling them random failures.
 - **Four of five retrieval signals carry zero weight, and turning them on is worse.**
   Measured offline over 150 questions: every added signal degrades ranking, from -5.3pp
   (`importance`) to -17.3pp (`entity`). `recency` is a **no-op** — its 30-day half-life
