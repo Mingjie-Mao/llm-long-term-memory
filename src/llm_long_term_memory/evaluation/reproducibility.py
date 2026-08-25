@@ -496,11 +496,25 @@ def capture_system(request: FreezeRequest) -> dict[str, Any]:
     return system
 
 
+# A recorded field whose name ends in this is informational: it is captured so a
+# human can trace the freeze, and it is deliberately NOT part of the comparison.
+#
+# `git_head_for_reference_only` is the case that forced this. Every file the freeze
+# cares about is already hashed individually in `source.files`, so the commit sha
+# adds nothing to the guarantee — but comparing it made *any* commit, including one
+# touching only `docs/`, invalidate a pre-ingest freeze. That is worse than useless:
+# a freeze captured against an uncommitted tree could only be honoured by never
+# committing the work, which is the opposite of what a freeze is for.
+_REFERENCE_ONLY_SUFFIX = "_for_reference_only"
+
+
 def differences(frozen: Any, current: Any, path: str = "") -> list[str]:
     """Name every changed leaf while keeping secrets and dataset rows out."""
     if isinstance(frozen, dict) and isinstance(current, dict):
         changes: list[str] = []
         for key in sorted(set(frozen) | set(current)):
+            if key.endswith(_REFERENCE_ONLY_SUFFIX):
+                continue
             here = f"{path}.{key}" if path else key
             if key not in frozen:
                 changes.append(f"{here}: added")

@@ -523,17 +523,21 @@ only — a stratified subset is scattered across the split, not a prefix of it.
   cell held 3 to 13 questions.
 - **`knowledge-update` is 66.7% unseen and was 100% on `dev50`.** All five failures
   recalled the gold session and the gold evidence; four are downstream of retrieval.
-  The store offers a matching symptom — 622 memories carry `replaces_previous` while
-  only 42 are ever superseded, and 2,275 carry the predicate `none` — but that
-  statistic is not yet shown to cause these failures.
+  The store offers a mechanism: supersession keys on `(user_id, subject, predicate)`,
+  extraction invents a fresh predicate per fact, and **546 of 622 replacement signals
+  sit alone on their key — 96% of them beside sibling predicates on the same subject**.
+  55.6% of the store sits on multi-valued keys that can never supersede. Evidenced, but
+  not yet shown to cause these five failures.
 - **The extractor is known-lossy and was not changed.** Batch size 15 yields 2.6
   memories per session against 12.7 at batch size 1. Every number here sits under that
   ceiling.
 - **14.5% of substantive sessions yield no memory at all** (304 of 2,096). Recorded as
   a baseline, not yet explained.
-- **Four of five retrieval signals carry zero weight.** Hybrid retrieval is built and
-  tested; the shipped configs weight only `semantic`. The other four are unmeasured,
-  not rejected.
+- **Four of five retrieval signals carry zero weight, and turning them on is worse.**
+  Measured offline over 150 questions: every added signal degrades ranking, from -5.3pp
+  (`importance`) to -17.3pp (`entity`). `recency` is a **no-op** — its 30-day half-life
+  against a corpus whose freshest memory is 932 days old sends every score to ~1e-12.
+  Keep `semantic` alone. [Details](results/retrieval-weights.md).
 - **`stores/two-stage-hydrated.db` mixes two extractor generations** — 4,843 pre-fix
   rows and 2,265 after. Results on it stay labelled diagnostic.
 - **Single-writer SQLite**, with a cross-process lock added after two simultaneous

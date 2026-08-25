@@ -300,3 +300,20 @@ def test_freeze_cannot_be_pre_and_post_ingest_at_once(tmp_path):
 
     with pytest.raises(FreezeError, match="both pre-ingest and post-ingest"):
         capture_system(request)
+
+
+def test_reference_only_fields_are_recorded_but_not_enforced():
+    """`git_head_for_reference_only` must not invalidate a freeze.
+
+    Every file that affects a result is hashed individually in `source.files`, so the
+    commit sha adds nothing to the guarantee. Comparing it made *any* commit — even
+    one touching only `docs/` — break a pre-ingest freeze, which meant a freeze
+    captured against an uncommitted tree could only be honoured by never committing
+    the work it froze.
+    """
+    frozen = {"git_head_for_reference_only": "abc", "source": {"tree_sha256": "t"}}
+    current = {"git_head_for_reference_only": "def", "source": {"tree_sha256": "t"}}
+    assert differences(frozen, current) == []
+
+    moved = differences(frozen, {**current, "source": {"tree_sha256": "other"}})
+    assert moved == ["source.tree_sha256: changed"]

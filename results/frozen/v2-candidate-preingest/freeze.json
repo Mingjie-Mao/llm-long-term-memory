@@ -1,5 +1,5 @@
 {
-  "captured_at_utc": "2026-08-25T09:10:34.317303+00:00",
+  "captured_at_utc": "2026-08-25T10:31:52.464440+00:00",
   "note": "Content-addressed v2 experiment freeze. Run this command without --capture to verify the same system before resuming or reporting.",
   "system": {
     "config": {
@@ -106,7 +106,7 @@
         "variant": "s"
       }
     },
-    "git_head_for_reference_only": "3e5e3ae38c834f2cca53edb1af1f6a468eb97d41",
+    "git_head_for_reference_only": "0297f6c0a0c9c041c529ebe4e6e69ada18089e48",
     "ingest_runtime": {
       "fingerprint": {
         "dedup_threshold": "0.9200",
@@ -187,15 +187,15 @@
           "sha256": "f5f29c8f0407e7417ebdec1dca9fe065b2a5694fb5de7cd858c0185df68d06c9"
         },
         "results/prereg-context-shape.md": {
-          "bytes": 9289,
-          "sha256": "f6a02a23d7e422135b8a3c6859b257d8159fa20d7444e87d3839fc6d97e892d6"
+          "bytes": 12434,
+          "sha256": "3f03414d948ff7eea871d1f230fbc8473fe11331ba84cb74d28cb26df8dd5edf"
         },
         "results/prereg-v2-final.md": {
           "bytes": 2850,
           "sha256": "32d57a814fb504bf6591dd783fb1e038a55a947785fc409b91ad412422fea7a9"
         }
       },
-      "tree_sha256": "c5f4a01f578989e0401510f8d0f13f446ad0e7b3f6b8888354bf0c735ccedbe9"
+      "tree_sha256": "303c87f8aee82a7cd2efc5c225c098540f8c2f3ab50f8a9bb08bfb178249f23f"
     },
     "runtime": {
       "python": "3.12.13"
@@ -252,8 +252,8 @@
           "sha256": "cdb41e4110cf664b16fbbe85a989348ec88bb791ac72141c4f495eb1d82ca69d"
         },
         "scripts/freeze_v2.py": {
-          "bytes": 10269,
-          "sha256": "55be7e8a11fe22584753cc7dbc99b745941ac1a7511ac1eaaa01d1fdae691f95"
+          "bytes": 10461,
+          "sha256": "d0c82c5b95163b18bab44196385b88bf0f3c718b65bdb5ba1bf6ab1f3942cc48"
         },
         "scripts/heldout_report.py": {
           "bytes": 5399,
@@ -280,12 +280,12 @@
           "sha256": "6a5791bb6c11e82a8c2191b9177727e3fbb844c5b042e98836c91521a9b7bb22"
         },
         "scripts/run_frozen_ingest.py": {
-          "bytes": 8667,
-          "sha256": "0783f7c5b17f4d1588012ebe2ed0e3ca1c252e73d202c259be4fb0b3e76f0bd4"
+          "bytes": 8859,
+          "sha256": "27d16029b25065e09212eaae1bafbf6eda4e22c4ccacb6b1202f9e2e2f8fab84"
         },
         "scripts/run_validation.py": {
-          "bytes": 12651,
-          "sha256": "9e2d6f09f368e31ff6e8b41436a15659400634f9a7e1b0be8f3d748def4efc70"
+          "bytes": 13141,
+          "sha256": "209bfa878ac7ab0c8bec99210ba77425e3914e10172a19e3535f219498c8d1f8"
         },
         "scripts/session_recall.py": {
           "bytes": 15012,
@@ -328,8 +328,8 @@
           "sha256": "eadddae44912148898b118bc973dfdae3c3334a8626356cfd1b673d25e087aeb"
         },
         "src/llm_long_term_memory/cli.py": {
-          "bytes": 76503,
-          "sha256": "ac16a180bec55be2e5acdd364a9b755829fd42b570142b6b06b88dcc4853f5bf"
+          "bytes": 77240,
+          "sha256": "c0a6bdf93859d6e0ab5eb937a8ef53ff217e22601f52d29f654130a5fad1e267"
         },
         "src/llm_long_term_memory/config.py": {
           "bytes": 9004,
@@ -408,8 +408,8 @@
           "sha256": "3b283ff7dd2fec19e08d87d0a8bfe5e6dfe7c6783dc15fc99aef0fe2c53a9043"
         },
         "src/llm_long_term_memory/evaluation/reproducibility.py": {
-          "bytes": 20476,
-          "sha256": "9c047618127d304982b9b19f736a710126a767b44f56e34316cefb231ece50ec"
+          "bytes": 21529,
+          "sha256": "021f3fff22c8b92fa2916b17e3ca14eb5794a404f07e6baeacd6d8fde028d7df"
         },
         "src/llm_long_term_memory/evaluation/runners/base.py": {
           "bytes": 4750,
@@ -428,8 +428,8 @@
           "sha256": "45df4f8fab81552e7370e451a700198c8a0e8d0bd2fc030a5eb1214a8bbe0345"
         },
         "src/llm_long_term_memory/evaluation/validation.py": {
-          "bytes": 26935,
-          "sha256": "0f647a089c5bd750a42ab8892360967ec5679327d306763564900ce197e8d4f5"
+          "bytes": 27505,
+          "sha256": "01a0826e6757fe37f067986b8fb6f76cac1c6825914c1c691b844fbba2fd38a5"
         },
         "src/llm_long_term_memory/influence/__init__.py": {
           "bytes": 563,
@@ -624,13 +624,15 @@
           "sha256": "d631ac3d3e4de3c822e49bed3e5cbe570bf1188e51a8201e926a4a7b0771ce7a"
         }
       },
-      "tree_sha256": "dafb61b382f22d6b7acd985dbd67254771ca27703d2c33719ab86cd53c3203c8"
+      "tree_sha256": "d8435eb0510dd5603613c0fd3c8fa85d8084b0284baa29fe5b2815787983920c"
     },
     "store": null,
     "variants": [
       "two_stage_fallback",
       "two_stage_coherent",
-      "two_stage_coherent_oracle"
+      "two_stage_coherent_oracle",
+      "naive_rag",
+      "two_stage_memory_only"
     ]
   }
 }

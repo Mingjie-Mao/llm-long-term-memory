@@ -41,6 +41,10 @@ _DEV_VARIANTS = (
     "two_stage_fallback",
     "two_stage_coherent",
     "two_stage_coherent_oracle",
+    # Amendment 2026-08-25: reported baselines. They read the same store and cannot
+    # move the decision; see results/prereg-context-shape.md.
+    "naive_rag",
+    "two_stage_memory_only",
 )
 
 

@@ -185,3 +185,65 @@ batch arms and context arms both read it.
 
 Running this on a store built at a different batch size would confound the two
 pre-registrations, and neither would be interpretable.
+
+---
+
+## Amendment 2 — two reported baselines, added 2026-08-25
+
+**Written before `dev100` was ingested or evaluated.** The partial `dev100` store built
+on 2026-08-25 was discarded (see below), so no arm of this experiment has produced a
+score.
+
+### What changes
+
+Two arms are appended. The registered arm list becomes, in this order:
+
+| order | arm | runner | role |
+|---:|---|---|---|
+| 1 | `flat20` | `two_stage_fallback` | paired baseline — **decision arm** |
+| 2 | `coherent-auto` | `two_stage_coherent` | candidate — **decision arm** |
+| 3 | `coherent-oracle` | `two_stage_coherent_oracle` | ceiling — **decision arm** |
+| 4 | `naive_rag` | `naive_rag` | **reported baseline** |
+| 5 | `memory-only` | `two_stage_memory_only` | **reported baseline** |
+
+Cost: 5 arms x 3 repeats instead of 3 x 3, about 2,050 answerer calls instead of 1,233.
+No extra extractor quota — every arm reads the same store.
+
+### Why
+
+Every baseline number this project has is from `dev50`, a set that was read question by
+question for two weeks. The strongest sentence the final table can currently support is
+"the system scores X%", and the obvious question — *compared with what, on data nothing
+was fitted to?* — has no answer. `test100` already registers `full_context` and
+`naive_rag`; adding them one stage earlier means the comparison arrives with a measured
+run-to-run band rather than as a single shot.
+
+`memory-only` needs a new runner name. `two_stage` and `two_stage_fallback` both read
+`fallback.enabled`, so memory-only was previously reachable only by editing the config,
+which a single-config freeze forbids. `two_stage_memory_only` forces the archive off
+regardless of config. It is **not** the same measurement as the "answered from memory
+alone" split of the fallback arm: in that arm the answerer knows it may ask for source,
+which can change what it does.
+
+### What does not change
+
+**The decision rule is untouched.** `select_dev_candidate` computes the product choice
+from `flat20`, `coherent-auto` and `coherent-oracle` only; the two baselines are
+reported and cannot move it. This is enforced in code and covered by a test that gives a
+baseline a higher score than every decision arm and asserts the selection is unmoved.
+
+Everything else stands: three repeats, majority-of-three verdicts, aggregate-only
+reading, the pre-declared slices, and the four registered outcomes.
+
+### Why the partial store was discarded
+
+`dev100` was 37% ingested (1,789 / 4,791 sessions, 408 extractor calls) under a
+pre-ingest freeze captured while the source tree was uncommitted. Committing that work
+moved `git HEAD`, and the freeze compared it, so the store could no longer be shown to
+have been produced under the frozen system. The 408 calls are written off. Keeping them
+would have meant either an after-the-fact freeze or never committing the code the freeze
+describes; both are worse than one quota day.
+
+The enforcement defect itself is fixed: fields whose names end in `_for_reference_only`
+are now recorded and not compared, so a commit no longer invalidates a freeze while
+every file that affects a result stays hashed individually.

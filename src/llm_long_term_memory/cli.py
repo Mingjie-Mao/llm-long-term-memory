@@ -252,6 +252,13 @@ def _build(
         # Validation-only ceiling: session ids come from benchmark gold labels.
         # It can explain a null but is never a product variant.
         "two_stage_coherent_oracle",
+        # Structured memory with the raw archive switched off, whatever the config
+        # says. The existing names cannot express this: `two_stage` and
+        # `two_stage_fallback` both read `fallback.enabled`, so "memory only" was
+        # only ever reachable by editing the config — which a single-config freeze
+        # forbids. Reporting it as a split of the fallback arm is not the same
+        # measurement either: in that arm the answerer knows it may ask for source.
+        "two_stage_memory_only",
     ):
         from llm_long_term_memory.retrieve import SessionBudget
         from llm_long_term_memory.store import NumpyFlatIndex, SQLiteMemoryStore
@@ -301,7 +308,9 @@ def _build(
             utility_model=utility_model,
             type_floors=cfg.pack.type_floors if cfg.pack.enabled else None,
             reranker=reranker,
-            raw_fallback=cfg.fallback.enabled,
+            # The variant name wins over the config here, so a memory-only arm can
+            # sit in the same freeze as the arms it is compared against.
+            raw_fallback=cfg.fallback.enabled and variant != "two_stage_memory_only",
             raw_fallback_max_turns=cfg.fallback.max_turns,
             raw_fallback_max_chars=cfg.fallback.max_chars,
             session_budget=SessionBudget(
@@ -329,7 +338,7 @@ def eval_run(
         help=(
             "full_context | naive_rag | two_stage | two_stage_no_temporal | "
             "two_stage_hydrated | two_stage_hydrated_no_temporal | two_stage_coherent | "
-            "two_stage_coherent_oracle. "
+            "two_stage_coherent_oracle | two_stage_memory_only. "
             "The chronomem* names belong to the frozen v1 run and are kept so its "
             "rows are not overwritten by a re-measurement of a different pipeline."
         ),

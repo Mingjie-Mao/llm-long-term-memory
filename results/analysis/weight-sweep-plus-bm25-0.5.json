@@ -1,0 +1,2488 @@
+{
+  "store": "train150",
+  "questions": "train150.json",
+  "complete": true,
+  "ingest_complete": true,
+  "manifest_questions": 150,
+  "ingested_questions": 150,
+  "evaluated_questions": 150,
+  "skipped_without_gold": 0,
+  "n": 150,
+  "memory_limit": 20,
+  "candidate_limit": 50,
+  "context_budget": {
+    "max_sessions": 3,
+    "window_radius": 1,
+    "max_total_memories": 30,
+    "session_order": "chronological",
+    "include_superseded": false
+  },
+  "selected_aggregate": "mean",
+  "recall_at": {
+    "1": 0.8,
+    "2": 0.8733333333333333,
+    "3": 0.8933333333333333,
+    "5": 0.9133333333333333,
+    "10": 0.9466666666666667
+  },
+  "recall_by_aggregate": {
+    "max": {
+      "1": 0.8,
+      "2": 0.86,
+      "3": 0.9,
+      "5": 0.9133333333333333,
+      "10": 0.9533333333333334
+    },
+    "mean": {
+      "1": 0.8,
+      "2": 0.8733333333333333,
+      "3": 0.8933333333333333,
+      "5": 0.9133333333333333,
+      "10": 0.9466666666666667
+    },
+    "sum_top3": {
+      "1": 0.5733333333333334,
+      "2": 0.6866666666666666,
+      "3": 0.7866666666666666,
+      "5": 0.9,
+      "10": 0.9533333333333334
+    },
+    "sum": {
+      "1": 0.4866666666666667,
+      "2": 0.6733333333333333,
+      "3": 0.7866666666666666,
+      "5": 0.9,
+      "10": 0.9533333333333334
+    }
+  },
+  "assembled_by_aggregate": {
+    "max": {
+      "recall": 0.9,
+      "median_memories": 9.0,
+      "median_tokens": 159.0,
+      "truncated_questions": 1
+    },
+    "mean": {
+      "recall": 0.8933333333333333,
+      "median_memories": 8.0,
+      "median_tokens": 138.5,
+      "truncated_questions": 1
+    },
+    "sum_top3": {
+      "recall": 0.78,
+      "median_memories": 13.5,
+      "median_tokens": 243.5,
+      "truncated_questions": 5
+    },
+    "sum": {
+      "recall": 0.78,
+      "median_memories": 13.5,
+      "median_tokens": 243.5,
+      "truncated_questions": 5
+    }
+  },
+  "flat_median_tokens": 363.5,
+  "memory_level": 0.9533333333333334,
+  "rows": [
+    {
+      "question_id": "001be529",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 1,
+        "sum": 1
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 13
+    },
+    {
+      "question_id": "031748ae",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 4,
+        "sum": 4
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": false,
+        "sum": false
+      },
+      "sessions": 11
+    },
+    {
+      "question_id": "06db6396",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 1,
+        "sum": 1
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 10
+    },
+    {
+      "question_id": "09ba9854",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 5,
+        "sum": 5
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": false,
+        "sum": false
+      },
+      "sessions": 9
+    },
+    {
+      "question_id": "0bb5a684",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 2,
+        "sum": 2
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 14
+    },
+    {
+      "question_id": "0bc8ad92",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 1,
+        "sum": 2
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 13
+    },
+    {
+      "question_id": "0db4c65d",
+      "gold_session_rank": {
+        "max": 2,
+        "mean": 1,
+        "sum_top3": 1,
+        "sum": 1
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 15
+    },
+    {
+      "question_id": "0ddfec37_abs",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 1,
+        "sum": 1
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 18
+    },
+    {
+      "question_id": "0e4e4c46",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 1,
+        "sum": 1
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 12
+    },
+    {
+      "question_id": "0e5e2d1a",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 2,
+        "sum": 2
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 14
+    },
+    {
+      "question_id": "10e09553",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 1,
+        "sum": 2
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 13
+    },
+    {
+      "question_id": "1192316e",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 1,
+        "sum": 1
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 13
+    },
+    {
+      "question_id": "1568498a",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 2,
+        "sum": 2
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 16
+    },
+    {
+      "question_id": "15745da0_abs",
+      "gold_session_rank": {
+        "max": 3,
+        "mean": 2,
+        "sum_top3": 7,
+        "sum": 7
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": false,
+        "sum": false
+      },
+      "sessions": 11
+    },
+    {
+      "question_id": "157a136e",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 1,
+        "sum": 1
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 14
+    },
+    {
+      "question_id": "16c90bf4",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 4,
+        "sum": 4
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": false,
+        "sum": false
+      },
+      "sessions": 7
+    },
+    {
+      "question_id": "195a1a1b",
+      "gold_session_rank": {
+        "max": null,
+        "mean": null,
+        "sum_top3": null,
+        "sum": null
+      },
+      "assembled_gold_session": {
+        "max": false,
+        "mean": false,
+        "sum_top3": false,
+        "sum": false
+      },
+      "sessions": 14
+    },
+    {
+      "question_id": "1a1907b4",
+      "gold_session_rank": {
+        "max": 7,
+        "mean": 11,
+        "sum_top3": 5,
+        "sum": 5
+      },
+      "assembled_gold_session": {
+        "max": false,
+        "mean": false,
+        "sum_top3": false,
+        "sum": false
+      },
+      "sessions": 15
+    },
+    {
+      "question_id": "1a8a66a6",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 1,
+        "sum": 1
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 14
+    },
+    {
+      "question_id": "1c0ddc50",
+      "gold_session_rank": {
+        "max": 3,
+        "mean": 4,
+        "sum_top3": 1,
+        "sum": 1
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": false,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 13
+    },
+    {
+      "question_id": "1c549ce4",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 1,
+        "sum": 1
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 12
+    },
+    {
+      "question_id": "1cea1afa",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 1,
+        "sum": 1
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 16
+    },
+    {
+      "question_id": "1e043500",
+      "gold_session_rank": {
+        "max": null,
+        "mean": null,
+        "sum_top3": null,
+        "sum": null
+      },
+      "assembled_gold_session": {
+        "max": false,
+        "mean": false,
+        "sum_top3": false,
+        "sum": false
+      },
+      "sessions": 14
+    },
+    {
+      "question_id": "1f2b8d4f",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 3,
+        "sum": 3
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 16
+    },
+    {
+      "question_id": "22d2cb42",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 2,
+        "sum": 2
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 15
+    },
+    {
+      "question_id": "25e5aa4f",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 1,
+        "sum": 2
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 13
+    },
+    {
+      "question_id": "28dc39ac",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 2,
+        "sum": 2
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 16
+    },
+    {
+      "question_id": "29f2956b",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 3,
+        "sum": 3
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 16
+    },
+    {
+      "question_id": "2bf43736",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 3,
+        "sum": 3
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 10
+    },
+    {
+      "question_id": "2e6d26dc",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 2,
+        "sum_top3": 1,
+        "sum": 1
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 12
+    },
+    {
+      "question_id": "311778f1",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 1,
+        "sum": 1
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 14
+    },
+    {
+      "question_id": "35a27287",
+      "gold_session_rank": {
+        "max": 7,
+        "mean": 6,
+        "sum_top3": 7,
+        "sum": 7
+      },
+      "assembled_gold_session": {
+        "max": false,
+        "mean": false,
+        "sum_top3": false,
+        "sum": false
+      },
+      "sessions": 14
+    },
+    {
+      "question_id": "36b9f61e",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 3,
+        "sum": 3
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 12
+    },
+    {
+      "question_id": "3a704032",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 1,
+        "sum": 1
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 11
+    },
+    {
+      "question_id": "3b6f954b",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 3,
+        "sum": 3
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 12
+    },
+    {
+      "question_id": "3d86fd0a",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 1,
+        "sum": 1
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 6
+    },
+    {
+      "question_id": "3fdac837",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 1,
+        "sum": 1
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 11
+    },
+    {
+      "question_id": "45dc21b6",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 1,
+        "sum": 2
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 7
+    },
+    {
+      "question_id": "46a3abf7",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 1,
+        "sum": 1
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 14
+    },
+    {
+      "question_id": "50635ada",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 1,
+        "sum": 1
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 14
+    },
+    {
+      "question_id": "51a45a95",
+      "gold_session_rank": {
+        "max": 10,
+        "mean": 9,
+        "sum_top3": 10,
+        "sum": 10
+      },
+      "assembled_gold_session": {
+        "max": false,
+        "mean": false,
+        "sum_top3": false,
+        "sum": false
+      },
+      "sessions": 14
+    },
+    {
+      "question_id": "561fabcd",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 1,
+        "sum": 1
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 9
+    },
+    {
+      "question_id": "57f827a0",
+      "gold_session_rank": {
+        "max": null,
+        "mean": null,
+        "sum_top3": null,
+        "sum": null
+      },
+      "assembled_gold_session": {
+        "max": false,
+        "mean": false,
+        "sum_top3": false,
+        "sum": false
+      },
+      "sessions": 10
+    },
+    {
+      "question_id": "5809eb10",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 1,
+        "sum": 2
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 9
+    },
+    {
+      "question_id": "5831f84d",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 1,
+        "sum": 2
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 12
+    },
+    {
+      "question_id": "58470ed2",
+      "gold_session_rank": {
+        "max": null,
+        "mean": null,
+        "sum_top3": null,
+        "sum": null
+      },
+      "assembled_gold_session": {
+        "max": false,
+        "mean": false,
+        "sum_top3": false,
+        "sum": false
+      },
+      "sessions": 14
+    },
+    {
+      "question_id": "58ef2f1c",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 1,
+        "sum": 2
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 10
+    },
+    {
+      "question_id": "5a7937c8",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 1,
+        "sum": 1
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 10
+    },
+    {
+      "question_id": "603deb26",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 1,
+        "sum": 1
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 10
+    },
+    {
+      "question_id": "6071bd76",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 1,
+        "sum": 1
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 11
+    },
+    {
+      "question_id": "60bf93ed_abs",
+      "gold_session_rank": {
+        "max": 3,
+        "mean": 3,
+        "sum_top3": 1,
+        "sum": 1
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 15
+    },
+    {
+      "question_id": "6456829e",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 2,
+        "sum": 3
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 11
+    },
+    {
+      "question_id": "6613b389",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 1,
+        "sum": 1
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 13
+    },
+    {
+      "question_id": "6a1eabeb",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 1,
+        "sum": 1
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 13
+    },
+    {
+      "question_id": "6aeb4375",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 1,
+        "sum": 1
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 7
+    },
+    {
+      "question_id": "6aeb4375_abs",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 1,
+        "sum": 1
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 10
+    },
+    {
+      "question_id": "6b168ec8",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 1,
+        "sum": 1
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 14
+    },
+    {
+      "question_id": "6cb6f249",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 1,
+        "sum": 1
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 13
+    },
+    {
+      "question_id": "6e984301",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 2,
+        "sum": 2
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 17
+    },
+    {
+      "question_id": "726462e0",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 5,
+        "sum": 5
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": false,
+        "sum": false
+      },
+      "sessions": 9
+    },
+    {
+      "question_id": "7401057b",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 1,
+        "sum": 1
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 13
+    },
+    {
+      "question_id": "7527f7e2",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 1,
+        "sum": 1
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 9
+    },
+    {
+      "question_id": "778164c6",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 1,
+        "sum": 1
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 13
+    },
+    {
+      "question_id": "7a8d0b71",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 1,
+        "sum": 1
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 13
+    },
+    {
+      "question_id": "7e00a6cb",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 5,
+        "sum": 5
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": false,
+        "sum": false
+      },
+      "sessions": 13
+    },
+    {
+      "question_id": "8550ddae",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 3,
+        "sum_top3": 1,
+        "sum": 2
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 10
+    },
+    {
+      "question_id": "86b68151",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 1,
+        "sum": 1
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 13
+    },
+    {
+      "question_id": "8a2466db",
+      "gold_session_rank": {
+        "max": 9,
+        "mean": 9,
+        "sum_top3": 9,
+        "sum": 9
+      },
+      "assembled_gold_session": {
+        "max": false,
+        "mean": false,
+        "sum_top3": false,
+        "sum": false
+      },
+      "sessions": 10
+    },
+    {
+      "question_id": "8c18457d",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 1,
+        "sum": 1
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 11
+    },
+    {
+      "question_id": "8ebdbe50",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 2,
+        "sum": 2
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 15
+    },
+    {
+      "question_id": "95228167",
+      "gold_session_rank": {
+        "max": 3,
+        "mean": 1,
+        "sum_top3": 5,
+        "sum": 5
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": false,
+        "sum": false
+      },
+      "sessions": 12
+    },
+    {
+      "question_id": "982b5123",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 1,
+        "sum": 1
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 13
+    },
+    {
+      "question_id": "993da5e2",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 5,
+        "sum": 5
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": false,
+        "sum": false
+      },
+      "sessions": 9
+    },
+    {
+      "question_id": "9a707b82",
+      "gold_session_rank": {
+        "max": 2,
+        "mean": 2,
+        "sum_top3": 5,
+        "sum": 5
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": false,
+        "sum": false
+      },
+      "sessions": 14
+    },
+    {
+      "question_id": "9bbe84a2",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 4,
+        "sum": 4
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": false,
+        "sum": false
+      },
+      "sessions": 13
+    },
+    {
+      "question_id": "9d25d4e0",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 1,
+        "sum": 1
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 13
+    },
+    {
+      "question_id": "9ea5eabc",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 1,
+        "sum": 1
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": false,
+        "sum": false
+      },
+      "sessions": 11
+    },
+    {
+      "question_id": "a08a253f",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 1,
+        "sum": 1
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 11
+    },
+    {
+      "question_id": "a1cc6108",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 1,
+        "sum": 1
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 16
+    },
+    {
+      "question_id": "a3045048",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 1,
+        "sum": 1
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 14
+    },
+    {
+      "question_id": "a3838d2b",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 1,
+        "sum": 1
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 15
+    },
+    {
+      "question_id": "a4996e51",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 1,
+        "sum": 1
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 15
+    },
+    {
+      "question_id": "a82c026e",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 3,
+        "sum": 3
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 12
+    },
+    {
+      "question_id": "a89d7624",
+      "gold_session_rank": {
+        "max": 2,
+        "mean": 2,
+        "sum_top3": 2,
+        "sum": 2
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 11
+    },
+    {
+      "question_id": "a96c20ee",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 1,
+        "sum": 2
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 12
+    },
+    {
+      "question_id": "a9f6b44c",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 2,
+        "sum_top3": 1,
+        "sum": 1
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 9
+    },
+    {
+      "question_id": "af8d2e46",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 4,
+        "sum": 4
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": false,
+        "sum": false
+      },
+      "sessions": 12
+    },
+    {
+      "question_id": "afdc33df",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 1,
+        "sum": 1
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 9
+    },
+    {
+      "question_id": "affe2881",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 1,
+        "sum": 2
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 11
+    },
+    {
+      "question_id": "b46e15ed",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 1,
+        "sum": 1
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 16
+    },
+    {
+      "question_id": "b5ef892d",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 1,
+        "sum": 1
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 11
+    },
+    {
+      "question_id": "b759caee",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 1,
+        "sum": 1
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 16
+    },
+    {
+      "question_id": "bc149d6b",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 1,
+        "sum": 1
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 12
+    },
+    {
+      "question_id": "c18a7dc8",
+      "gold_session_rank": {
+        "max": 3,
+        "mean": 3,
+        "sum_top3": 4,
+        "sum": 4
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": false,
+        "sum": false
+      },
+      "sessions": 13
+    },
+    {
+      "question_id": "c7cf7dfd",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 1,
+        "sum": 1
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 8
+    },
+    {
+      "question_id": "c8090214",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 2,
+        "sum": 2
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 14
+    },
+    {
+      "question_id": "c8090214_abs",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 3,
+        "sum": 3
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 15
+    },
+    {
+      "question_id": "cc539528",
+      "gold_session_rank": {
+        "max": 5,
+        "mean": 4,
+        "sum_top3": 8,
+        "sum": 8
+      },
+      "assembled_gold_session": {
+        "max": false,
+        "mean": false,
+        "sum_top3": false,
+        "sum": false
+      },
+      "sessions": 16
+    },
+    {
+      "question_id": "cc5ded98",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 1,
+        "sum": 1
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 8
+    },
+    {
+      "question_id": "ccb36322",
+      "gold_session_rank": {
+        "max": 2,
+        "mean": 2,
+        "sum_top3": 4,
+        "sum": 4
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": false,
+        "sum": false
+      },
+      "sessions": 13
+    },
+    {
+      "question_id": "d23cf73b",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 1,
+        "sum": 1
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 13
+    },
+    {
+      "question_id": "d682f1a2",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 3,
+        "sum": 3
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 14
+    },
+    {
+      "question_id": "d905b33f",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 3,
+        "sum": 3
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 10
+    },
+    {
+      "question_id": "dd2973ad",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 3,
+        "sum": 3
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 13
+    },
+    {
+      "question_id": "e01b8e2f",
+      "gold_session_rank": {
+        "max": 8,
+        "mean": 8,
+        "sum_top3": 2,
+        "sum": 1
+      },
+      "assembled_gold_session": {
+        "max": false,
+        "mean": false,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 14
+    },
+    {
+      "question_id": "e3038f8c",
+      "gold_session_rank": {
+        "max": 2,
+        "mean": 1,
+        "sum_top3": 1,
+        "sum": 1
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 10
+    },
+    {
+      "question_id": "e3fc4d6e",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 1,
+        "sum": 2
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 10
+    },
+    {
+      "question_id": "e48988bc",
+      "gold_session_rank": {
+        "max": 4,
+        "mean": 4,
+        "sum_top3": 6,
+        "sum": 6
+      },
+      "assembled_gold_session": {
+        "max": false,
+        "mean": false,
+        "sum_top3": false,
+        "sum": false
+      },
+      "sessions": 10
+    },
+    {
+      "question_id": "eac54add",
+      "gold_session_rank": {
+        "max": 9,
+        "mean": 9,
+        "sum_top3": 10,
+        "sum": 10
+      },
+      "assembled_gold_session": {
+        "max": false,
+        "mean": false,
+        "sum_top3": false,
+        "sum": false
+      },
+      "sessions": 13
+    },
+    {
+      "question_id": "eaca4986",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 3,
+        "sum": 3
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 13
+    },
+    {
+      "question_id": "ed4ddc30",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 1,
+        "sum": 1
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 10
+    },
+    {
+      "question_id": "eeda8a6d",
+      "gold_session_rank": {
+        "max": 2,
+        "mean": 2,
+        "sum_top3": 3,
+        "sum": 3
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 11
+    },
+    {
+      "question_id": "ef66a6e5",
+      "gold_session_rank": {
+        "max": null,
+        "mean": null,
+        "sum_top3": null,
+        "sum": null
+      },
+      "assembled_gold_session": {
+        "max": false,
+        "mean": false,
+        "sum_top3": false,
+        "sum": false
+      },
+      "sessions": 15
+    },
+    {
+      "question_id": "ef9cf60a",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 1,
+        "sum": 1
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 12
+    },
+    {
+      "question_id": "f523d9fe",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 1,
+        "sum": 2
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 11
+    },
+    {
+      "question_id": "f685340e",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 1,
+        "sum": 1
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 8
+    },
+    {
+      "question_id": "f8c5f88b",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 1,
+        "sum": 1
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 15
+    },
+    {
+      "question_id": "f9e8c073",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 1,
+        "sum": 1
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 14
+    },
+    {
+      "question_id": "gpt4_0a05b494",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 1,
+        "sum": 2
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 12
+    },
+    {
+      "question_id": "gpt4_194be4b3",
+      "gold_session_rank": {
+        "max": 2,
+        "mean": 2,
+        "sum_top3": 1,
+        "sum": 1
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 13
+    },
+    {
+      "question_id": "gpt4_2487a7cb",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 1,
+        "sum": 1
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 13
+    },
+    {
+      "question_id": "gpt4_2d58bcd6",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 1,
+        "sum": 2
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 7
+    },
+    {
+      "question_id": "gpt4_2f8be40d",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 1,
+        "sum": 1
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 14
+    },
+    {
+      "question_id": "gpt4_2f91af09",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 1,
+        "sum": 1
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 14
+    },
+    {
+      "question_id": "gpt4_45189cb4",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 2,
+        "sum": 2
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 12
+    },
+    {
+      "question_id": "gpt4_4929293b",
+      "gold_session_rank": {
+        "max": null,
+        "mean": null,
+        "sum_top3": null,
+        "sum": null
+      },
+      "assembled_gold_session": {
+        "max": false,
+        "mean": false,
+        "sum_top3": false,
+        "sum": false
+      },
+      "sessions": 15
+    },
+    {
+      "question_id": "gpt4_4edbafa2",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 1,
+        "sum": 1
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 14
+    },
+    {
+      "question_id": "gpt4_59149c77",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 3,
+        "sum": 3
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 13
+    },
+    {
+      "question_id": "gpt4_6ed717ea",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 1,
+        "sum": 1
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 11
+    },
+    {
+      "question_id": "gpt4_70e84552_abs",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 1,
+        "sum": 1
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 15
+    },
+    {
+      "question_id": "gpt4_731e37d7",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 1,
+        "sum": 1
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 14
+    },
+    {
+      "question_id": "gpt4_74aed68e",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 1,
+        "sum": 2
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 12
+    },
+    {
+      "question_id": "gpt4_78cf46a3",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 2,
+        "sum": 2
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 14
+    },
+    {
+      "question_id": "gpt4_7a0daae1",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 4,
+        "sum": 4
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": false,
+        "sum": false
+      },
+      "sessions": 14
+    },
+    {
+      "question_id": "gpt4_7ddcf75f",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 4,
+        "sum": 4
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": false,
+        "sum": false
+      },
+      "sessions": 13
+    },
+    {
+      "question_id": "gpt4_7de946e7",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 1,
+        "sum": 1
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 11
+    },
+    {
+      "question_id": "gpt4_8279ba02",
+      "gold_session_rank": {
+        "max": null,
+        "mean": null,
+        "sum_top3": null,
+        "sum": null
+      },
+      "assembled_gold_session": {
+        "max": false,
+        "mean": false,
+        "sum_top3": false,
+        "sum": false
+      },
+      "sessions": 13
+    },
+    {
+      "question_id": "gpt4_8e165409",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 2,
+        "sum_top3": 1,
+        "sum": 1
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 9
+    },
+    {
+      "question_id": "gpt4_a1b77f9c",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 1,
+        "sum": 1
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 16
+    },
+    {
+      "question_id": "gpt4_a2d1d1f6",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 5,
+        "sum": 5
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": false,
+        "sum": false
+      },
+      "sessions": 12
+    },
+    {
+      "question_id": "gpt4_a56e767c",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 2,
+        "sum": 3
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 10
+    },
+    {
+      "question_id": "gpt4_ab202e7f",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 2,
+        "sum": 2
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 10
+    },
+    {
+      "question_id": "gpt4_b0863698",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 3,
+        "sum": 3
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 14
+    },
+    {
+      "question_id": "gpt4_b4a80587",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 3,
+        "sum": 3
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 14
+    },
+    {
+      "question_id": "gpt4_b5700ca0",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 6,
+        "sum": 6
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": false,
+        "sum": false
+      },
+      "sessions": 14
+    },
+    {
+      "question_id": "gpt4_c27434e8",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 1,
+        "sum_top3": 1,
+        "sum": 1
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 11
+    },
+    {
+      "question_id": "gpt4_d12ceb0e",
+      "gold_session_rank": {
+        "max": 2,
+        "mean": 1,
+        "sum_top3": 2,
+        "sum": 2
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 11
+    },
+    {
+      "question_id": "gpt4_d6585ce9",
+      "gold_session_rank": {
+        "max": 2,
+        "mean": 1,
+        "sum_top3": 2,
+        "sum": 1
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 9
+    },
+    {
+      "question_id": "gpt4_e061b84g",
+      "gold_session_rank": {
+        "max": 3,
+        "mean": 2,
+        "sum_top3": 4,
+        "sum": 4
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": false,
+        "sum": false
+      },
+      "sessions": 13
+    },
+    {
+      "question_id": "gpt4_fa19884c",
+      "gold_session_rank": {
+        "max": 1,
+        "mean": 2,
+        "sum_top3": 1,
+        "sum": 1
+      },
+      "assembled_gold_session": {
+        "max": true,
+        "mean": true,
+        "sum_top3": true,
+        "sum": true
+      },
+      "sessions": 15
+    }
+  ]
+}

@@ -358,3 +358,36 @@ def test_markdown_includes_shared_ingestion_and_total_usage():
     assert "shared ingestion" in rendered
     assert "**10**" in rendered
     assert "provider billing" in rendered
+
+
+def test_reported_baselines_do_not_enter_the_dev_decision():
+    """The 2026-08-25 amendment adds naive_rag and memory-only as reported arms.
+
+    They exist so the final table can answer "compared with what?". A baseline that
+    could move the product choice would be a decision rule rewritten after the arms
+    were chosen, so the selection must ignore them entirely — including when a
+    baseline scores higher than every decision arm.
+    """
+    decision = select_dev_candidate(
+        [
+            arm("flat20", 0.70, 300.0),
+            arm("coherent-auto", 0.70, 320.0),
+            arm("coherent-oracle", 0.74, 320.0),
+            arm("naive_rag", 0.99, 13000.0),
+            arm("memory-only", 0.98, 250.0),
+        ]
+    )
+    assert decision.selected_arm == "coherent-auto"
+    assert decision.baseline_majority_accuracy == 0.70
+
+
+def test_an_unregistered_dev_arm_is_refused():
+    with pytest.raises(ValidationArtifactError):
+        select_dev_candidate(
+            [
+                arm("flat20", 0.70, 300.0),
+                arm("coherent-auto", 0.70, 320.0),
+                arm("coherent-oracle", 0.74, 320.0),
+                arm("coherent-r2", 0.80, 320.0),
+            ]
+        )

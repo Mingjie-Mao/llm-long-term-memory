@@ -733,37 +733,50 @@ FROM memories WHERE subject<>'' AND predicate<>''
 GROUP BY subject, predicate HAVING c>1 AND rp>0 ORDER BY c DESC;
 ```
 
-| subject | predicate | memories | with `replaces` | actually superseded |
-|---|---|---:|---:|---:|
-| assistant | `assistant_recommendation` | **3,022** | 1 | 1 |
-| user | `travel_plans` | 177 | 3 | 2 |
-| user | `home_city` | 22 | 22 | **6** |
-| — | `none` | **2,275** | **0** | **0** |
+| store | keys | memories | |
+|---|---:|---:|---|
+| keys holding exactly 1 memory | 5,348 | 5,348 | nothing to replace |
+| keys holding more than 1 | 1,266 | 7,054 | |
+| …of which **resolvable** | 56 | 160 | single-valued predicate, or the key carries a replacement signal |
+| …of which **inert** | **1,210** | **6,894** | multiple values on one key that can *never* supersede — **55.6% of the store** |
 
-And across the store: **622** memories carry `replaces_previous`, of which **431 sit
-alone on their key** — there is nothing for them to replace. Total supersessions: **42**.
+And the replacement signal itself:
 
-Reading:
+| | heldout100 | train150 |
+|---|---:|---:|
+| memories carrying `replaces_previous` | 622 | 902 |
+| …of which **alone on their key** | **546 (88%)** | **777 (86%)** |
+| …of those, whose `(user, subject)` holds **other** predicates | **525 (96%)** | **757 (97%)** |
+| memories actually superseded | 42 | 76 |
+| signal-to-effect ratio | **14.8 : 1** | **11.9 : 1** |
 
-- **The predicate namespace is flat and unowned.** The extractor invents predicates
-  freely, so 5,297 of 12,402 memories (**43%**) land on just two keys.
-- A key holding 3,022 memories **is not a fact timeline, it is a category**.
-  Supersession cannot work correctly there.
-- The 2,275 rows with `predicate='none'`: zero carry `replaces_previous`, zero are
-  superseded. They are structurally unable to participate in supersession.
-- Where the key has the right shape the mechanism is fine: `home_city`, 22 memories,
-  22 replacement signals, **6 supersessions**.
+**The last row of the middle block is the mechanism.** Supersession matches on the exact
+`(user_id, subject, predicate)` triple. Extraction invents a fresh predicate string per
+fact, so the "this replaces an earlier fact" signal and the fact it should replace land
+on **different keys inside the same namespace** — 96–97% of orphaned signals sit beside
+sibling predicates on the same subject. The resolver then never fires.
 
-**This must be stated carefully: the above is correlation, not causation.** The
-statistic matches the shape of the failures, but no experiment shows it **causes** those
-five. Turning it into a causal claim needs an experiment that has not been run (see
-section 12).
+Direct corroboration: within a single namespace and subject, train150 holds **17
+singular/plural collisions** — `assistant_recommendation` vs `assistant_recommendations`,
+`recipe_recommendation` vs `recipe_recommendations`, `aquarium` vs `aquariums`. One
+concept, two keys, invisible to each other.
 
-One hazard that is armed but has not yet done damage: `resolve.py:208` makes an entire
-key take the single-valued path as soon as *any* memory on it carries
-`replaces_previous`. On the 3,022-row bucket this has already fired once (one
-supersession). That is precisely the failure mode for which two predicates were removed
-from the single-valued list in D23.
+Where the key does have the right shape the mechanism works: 37 keys on `heldout100` and
+71 on `train150` did produce a supersession.
+
+**Stated carefully: this is an evidenced mechanism hypothesis, not a proven cause.** It
+explains why supersession fires 42 times against 622 signals, and it matches the shape of
+the five failures. It does not yet show that these keys are what made *those* five
+questions wrong — that needs an experiment linking individual failures to key shape,
+which has not been run (see section 12).
+
+> **A correction.** An earlier revision of this section grouped memories by
+> `(subject, predicate)` and reported that 43% of the store sat on two keys. That was
+> wrong: every question is its own namespace here, and the resolver keys on
+> `(user_id, subject, predicate)`. Grouped correctly, concentration is mild — the largest
+> key holds 0.4% — and the real finding is the one above, which is both cleaner and
+> stronger. The numbers in this section come from
+> `scripts/` -equivalent read-only SQL over `stores/heldout100.db` and `stores/train150.db`.
 
 ---
 
@@ -2015,9 +2028,9 @@ config file**; the finalizer requires all 7,180 sessions to be terminal before
 |---|---|---|
 | **Batch-size attenuation** | Batch 1 yields 4.7x batch 15; causally established | The mechanism — output-budget exhaustion, enumeration drift, input-position effects, schema-length pressure; this experiment separates none of them |
 | **Wrong answers after correct retrieval** | S4=0, S4b=1, S5=2; all five knowledge-update failures recalled the gold | How the five causes in 5.7 divide up |
-| **The predicate namespace** | 43% of memories sit on two keys; 431 of 622 replacement signals are alone on their key; the 2,275 `predicate='none'` rows have zero supersessions | **This is correlation, not causation.** No experiment shows it causes the failures |
+| **The predicate namespace** | 55.6% of the store sits on multi-valued keys that can never supersede; 88% of replacement signals are alone on their key, and 96% of those have sibling predicates on the same subject | An evidenced mechanism, but **not yet shown to cause** the observed failures |
 | **Exact-detail fidelity** | The recurring failure shape is "keeps the gist, drops the identifier" (the Mayo URL, `Garmin Forerunner`, `2-3 eggs`) | Whether identity-bearing spans should survive extraction verbatim |
-| **Retrieval weights** | Four signals carry weight 0 and have never been measured | Whether non-zero weights help. **This is fully offline-testable and costs no quota** |
+| ~~Retrieval weights~~ **closed 2026-08-25** | Measured offline: every added signal degrades ranking (-5.3pp to -17.3pp); `recency` is a no-op because its 30-day half-life meets a corpus 932-1,727 days old | Whether a *tuned* hybrid could help. No weight grid or interaction search was run |
 | **Fallback depth** | `max_turns=3` has never been swept; one known case has its answer at BM25 rank 6 | How deep is right |
 | **No baselines on the held-out set** | `full_context` / `naive_rag` were never run on heldout100 | Whether "structured memory ties naive RAG" holds on unseen data |
 
@@ -2041,7 +2054,7 @@ Marked explicitly so they cannot be read as current capability:
 | 1 | Finish train150's last 197 sessions | 7,180/7,180 in both checkpoint and store | ~70 calls |
 | 2 | `finalize_train150.py` | Final zero-yield audit, seven fixed grid artifacts, selection record, `configs/v2.yaml` | **None** |
 | 3 | Freeze and ingest dev100 | Pre- and post-ingest hashes, the latter a strict extension of the former | ~1,400 calls |
-| 4 | dev100, three arms × three repeats | Scores after all nine combinations finish; writes `dev100-decision.json` | ~1,233 calls |
+| 4 | dev100, five arms x three repeats | Scores after all fifteen combinations finish; writes `dev100-decision.json` | ~2,050 calls |
 | 5 | Freeze and ingest test100 | Two hashes, also binding dev100's aggregate and decision | ~1,400 calls |
 | 6 | Spend test100 **once** | One ledger and one table containing every retained arm | ~550 calls |
 | 7 | Product hardening | See `docs/PRODUCTIZATION_V2_PLAN.md` | — |

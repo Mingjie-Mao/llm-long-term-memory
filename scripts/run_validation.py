@@ -44,10 +44,17 @@ from llm_long_term_memory.evaluation.validation import (  # noqa: E402
 )
 
 _SAFE_ARM = re.compile(r"^[A-Za-z0-9_-]+$")
+# Amendment 2026-08-25, written before any dev100 result existed: two baselines are
+# appended. They are *reported*, never decision-affecting — `select_dev_candidate`
+# still computes the product choice from flat20 / coherent-auto / coherent-oracle
+# alone, so the registered rule is unchanged. Without them the final table can say
+# "72%" and cannot answer "compared with what?" on data the system never saw.
 REGISTERED_DEV_ARMS = (
     ("flat20", "two_stage_fallback"),
     ("coherent-auto", "two_stage_coherent"),
     ("coherent-oracle", "two_stage_coherent_oracle"),
+    ("naive_rag", "naive_rag"),
+    ("memory-only", "two_stage_memory_only"),
 )
 
 

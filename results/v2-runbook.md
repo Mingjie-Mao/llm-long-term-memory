@@ -10,7 +10,7 @@ make no API calls.  Quota pauses always resume the same command.  Never add
 | 2–3 | final zero audit + fixed train grid + write v2 config | final audit, selection record and verified `configs/v2.yaml` |
 | 5a | freeze dev ingestion inputs | immutable pre-ingest hash, untouched `dev100` store name |
 | 5b | ingest dev100 | complete store, then post-ingest hash |
-| 5c | run aggregate-only dev experiment | three repeats/arm and `dev100-aggregate.md` |
+| 5c | run aggregate-only dev experiment | five arms x three repeats and `dev100-aggregate.md` |
 | 6a | choose v2 by registered dev rule | decision recorded without individual dev rows |
 | 6b | freeze and ingest test100 | pre- and post-ingest hashes |
 | 6c | spend test100 once | durable ledger + one aggregate report for v2 and baselines |
@@ -118,6 +118,8 @@ Preflight once without `--run`, then start/resume validation:
   --arm flat20=two_stage_fallback \
   --arm coherent-auto=two_stage_coherent \
   --arm coherent-oracle=two_stage_coherent_oracle \
+  --arm naive_rag=naive_rag \
+  --arm memory-only=two_stage_memory_only \
   --runs 3
 ```
 

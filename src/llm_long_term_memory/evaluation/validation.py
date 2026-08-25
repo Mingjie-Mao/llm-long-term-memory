@@ -105,10 +105,19 @@ class DevCandidateDecision:
 def select_dev_candidate(arms: list[ArmAggregate]) -> DevCandidateDecision:
     """Apply the dev100 rule recorded before any validation result was viewed."""
     by_name = {arm.arm: arm for arm in arms}
-    expected = {"flat20", "coherent-auto", "coherent-oracle"}
-    if set(by_name) != expected or len(arms) != len(expected):
+    # The decision arms are fixed by the pre-registration. Reported baselines
+    # (`naive_rag`, `memory-only`) may also be present; they answer "compared with
+    # what?" in the final table and must not be able to move the product choice, so
+    # they are required to be absent from this computation rather than tolerated.
+    decision_arms = {"flat20", "coherent-auto", "coherent-oracle"}
+    reportable = decision_arms | {"naive_rag", "memory-only"}
+    if not decision_arms <= set(by_name):
         raise ValidationArtifactError(
             "dev decision requires exactly flat20, coherent-auto and coherent-oracle"
+        )
+    if not set(by_name) <= reportable or len(arms) != len(by_name):
+        raise ValidationArtifactError(
+            "dev arms outside the pre-registered set cannot enter the decision"
         )
     if any(arm.questions != 100 or arm.runs != 3 for arm in arms):
         raise ValidationArtifactError(
