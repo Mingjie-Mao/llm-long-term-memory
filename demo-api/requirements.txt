@@ -16,3 +16,15 @@ pyyaml>=6.0
 structlog>=24.1
 onnxruntime>=1.20
 tokenizers>=0.20
+
+# Never called here — this service makes no provider request and needs no API key.
+# It is required by the *import graph*: `temporal.resolve` needs `ingest.schemas` for
+# the single-valued predicate list, importing that triggers `ingest/__init__.py`, and
+# that reaches the extractor and its provider client. 13MB to import a module whose own
+# dependencies are `re`, `typing` and `pydantic`.
+#
+# The first deploy failed exactly here. The smoke test had always run in a checkout
+# with every extra installed, so it never exercised the set of packages this file
+# actually declares — which is the environment that matters. `smoke.py` now checks the
+# import graph against this file so the gap cannot reopen silently.
+google-genai>=1.0
