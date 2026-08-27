@@ -34,17 +34,42 @@ def install_fake_model(monkeypatch):
     FakeSentenceTransformer.instances.clear()
 
 
-def test_device_selection_prefers_mps_then_cuda(monkeypatch):
-    import torch
+def install_fake_torch(monkeypatch, *, mps: bool, cuda: bool):
+    """Stand in for torch so the device branching can be tested without it.
 
-    monkeypatch.setattr(torch.backends.mps, "is_available", lambda: True)
-    monkeypatch.setattr(torch.cuda, "is_available", lambda: True)
+    `pytest.importorskip("torch")` would be the shorter fix and a worse one: CI never
+    installs the `embed` extra, so the test would skip on every runner and only ever
+    run on a developer machine that already has torch. A test that is green because it
+    did not execute is the failure this file was added to prevent — and it is the same
+    shape as the deploy that broke, where a check passed in an environment the target
+    did not have.
+
+    `_pick_device` imports torch inside the function, so putting a stub in
+    `sys.modules` is enough; nothing here needs the real library.
+    """
+    torch = ModuleType("torch")
+    torch.backends = ModuleType("torch.backends")
+    torch.backends.mps = ModuleType("torch.backends.mps")
+    torch.backends.mps.is_available = lambda: mps
+    torch.cuda = ModuleType("torch.cuda")
+    torch.cuda.is_available = lambda: cuda
+    for name, module in (
+        ("torch", torch),
+        ("torch.backends", torch.backends),
+        ("torch.backends.mps", torch.backends.mps),
+        ("torch.cuda", torch.cuda),
+    ):
+        monkeypatch.setitem(sys.modules, name, module)
+
+
+def test_device_selection_prefers_mps_then_cuda(monkeypatch):
+    install_fake_torch(monkeypatch, mps=True, cuda=True)
     assert encoder_module._pick_device() == "mps"
 
-    monkeypatch.setattr(torch.backends.mps, "is_available", lambda: False)
+    install_fake_torch(monkeypatch, mps=False, cuda=True)
     assert encoder_module._pick_device() == "cuda"
 
-    monkeypatch.setattr(torch.cuda, "is_available", lambda: False)
+    install_fake_torch(monkeypatch, mps=False, cuda=False)
     assert encoder_module._pick_device() == "cpu"
 
 
