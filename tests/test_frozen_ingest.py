@@ -3,6 +3,7 @@ from __future__ import annotations
 import copy
 import importlib.util
 import json
+import re
 import sys
 from pathlib import Path
 from types import SimpleNamespace
@@ -26,6 +27,15 @@ def _load_script(filename: str):
 
 run_frozen_ingest = _load_script("run_frozen_ingest.py")
 freeze_v2 = _load_script("freeze_v2.py")
+
+
+def _documented_dev100_commands(text: str) -> list[str]:
+    commands = re.findall(
+        r"python scripts/(?:freeze_v2|run_frozen_ingest)\.py.*?(?=\n\s*\n|\Z)",
+        text,
+        flags=re.DOTALL,
+    )
+    return [command for command in commands if "results/manifests/dev100.json" in command]
 
 
 def _formal_args(name: str, variants: list[str], freeze_name: str):
@@ -67,6 +77,22 @@ def test_formal_dev_ingest_requires_exact_registered_variants():
     valid.variant = ["two_stage_coherent"]
     with pytest.raises(FreezeError, match="pre-registration"):
         run_frozen_ingest._validate_formal_target(valid, manifest)
+
+
+def test_dev100_documentation_matches_registered_variants():
+    expected = list(freeze_v2._DEV_VARIANTS)
+    assert list(run_frozen_ingest._DEV_VARIANTS) == expected
+
+    repo = Path(__file__).resolve().parent.parent
+    documents = {
+        "results/v2-runbook.md": (repo / "results" / "v2-runbook.md").read_text(encoding="utf-8"),
+    }
+    expected_command_counts = {"results/v2-runbook.md": 3}
+    for name, text in documents.items():
+        commands = _documented_dev100_commands(text)
+        assert len(commands) == expected_command_counts[name], name
+        for command in commands:
+            assert re.findall(r"--variant\s+([\w-]+)", command) == expected, name
 
 
 @pytest.mark.parametrize(

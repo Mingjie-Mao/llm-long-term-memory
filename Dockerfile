@@ -14,7 +14,10 @@
 # state. The store arrives on a mounted volume, so the image stays reproducible and
 # an accidental `docker push` cannot leak a user's memories.
 
-FROM python:3.13-slim AS base
+# Multi-architecture index digest verified 2026-08-27. Keep the readable tag so
+# update tooling knows what to refresh, and the digest so a rebuild cannot silently
+# pick up a different base image.
+FROM python:3.13-slim@sha256:7e3a6aca9d74f93cca21a91d86a8dad8c34749afd5b4a98ee481c9c47b9f5ed4 AS base
 
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
@@ -28,7 +31,7 @@ WORKDIR /app
 
 # uv gives the same resolution the developer and CI use, rather than whatever pip
 # happens to pick at build time.
-COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
+COPY --from=ghcr.io/astral-sh/uv:latest@sha256:88bc6eb1ccd4b82efd0e1b530caffabddf50dc2bf612e66c14ea25b8ee8a4d3d /uv /usr/local/bin/uv
 
 ARG EXTRAS="api,llm,embed"
 

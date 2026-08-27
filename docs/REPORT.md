@@ -495,11 +495,10 @@ flat list. **Asymmetric costs justify an asymmetric default**, so the default is
 `coexists`. `update_op` was introduced to replace the hand-maintained list — ask the model
 what a fact *does* to history rather than inferring it from the predicate's name.
 
-#### Current limitation: the replacement signal is orphaned by predicate naming
+#### Current limitation: replacement signals fire with nothing to replace
 
-Supersession matches the exact `(user_id, subject, predicate)` triple, and extraction
-invents a fresh predicate string per fact. The signal and the fact it should replace land
-on **different keys inside the same namespace**:
+Supersession matches the exact `(user_id, subject, predicate)` triple. Most replacement
+signals never reach a target:
 
 | | heldout100 | train150 |
 |---|---:|---:|
@@ -510,15 +509,40 @@ on **different keys inside the same namespace**:
 | signal-to-effect ratio | **14.8 : 1** | **11.9 : 1** |
 
 **55.6%** (heldout100) / **55.1%** (train150) of the store sits on multi-valued keys that
-can never supersede. Direct corroboration: within one namespace and subject, train150
-holds **17 singular/plural collisions** — `assistant_recommendation` vs
-`assistant_recommendations`, `aquarium` vs `aquariums`. One concept, two keys, invisible
-to each other.
+can never supersede. What causes the 12–15x gap has been narrowed by elimination rather
+than established.
 
-**This is an evidenced mechanism hypothesis, not a proven cause.** It explains the 12–15x
-gap between signal and effect and matches the shape of the five `knowledge-update` failures
-(§6.7), but no experiment links individual failures to key shape. Predicate normalization
-is listed in §8.3.
+**Predicate naming is not the cause.** An earlier revision of this section inferred one:
+extraction invents a fresh predicate per fact, so signal and target land on different keys,
+and normalizing names would reunite them. Tested offline, canonicalizing every predicate
+merges 17 keys in train150 and **reunites 2 of 777 orphaned signals (0.3%)**, and 0 of 546
+on heldout100 ([diagnostics](../results/offline-diagnostics-2026-08-25.md)). **The
+hypothesis is withdrawn.**
+
+Sampling the orphans shows why. They sit on well-formed, specific predicates whose
+siblings are simply the user's other attributes:
+
+```
+signal predicate : age
+content          : "The user turned 32 years old on July 15th, 2023."
+siblings (48)    : art_studio, asylum_status, audiobook_app, books_read, …
+```
+
+`age`, `home_city`, `rent_budget` and `job_tenure` are not spelling variants of anything.
+No normalization merges them, because they are different attributes. The 17
+singular/plural collisions (`assistant_recommendation` vs `assistant_recommendations`,
+`aquarium` vs `aquariums`) are real but account for almost none of the gap.
+
+**The corrected reading is that `replaces_previous` is set on facts with no predecessor in
+the store.** Two explanations remain, and this evidence does not separate them: the earlier
+value was never extracted — in which case this is a second face of extraction loss rather
+than an independent defect in the temporal layer — or the extractor sets the flag on
+update-shaped wording ("turned", "renewed", "moved") regardless of whether anything earlier
+exists. Separating them requires reading the raw archive for an earlier statement of the
+same attribute, which needs semantic judgement rather than SQL and has not been run.
+
+The gap still matches the shape of the five `knowledge-update` failures (§6.7), but no
+experiment links individual failures to key shape.
 
 ---
 
@@ -891,9 +915,34 @@ reference answer), `multi-session`, `temporal-reasoning`, `knowledge-update`. Ch
 LoCoMo because it has real multi-session time spans and an explicit type split, while
 LoCoMo's conversations are synthetic (D1).
 
-**Baselines.** `full_context` is a reference point, **not a ceiling** (D16) — at 56.0% on
-dev50 it shows that pasting everything in does not itself solve the problem. `naive_rag`
-is the real opponent.
+**Baselines, and why they are all internal.** `full_context` is a reference point, **not
+a ceiling** (D16) — at 56.0% on dev50 it shows that pasting everything in does not itself
+solve the problem. `naive_rag` is the real opponent. Every arm shares the same store, the
+same answerer, the same judge and the same questions, so the only variable is the memory
+layer.
+
+Two other comparison targets were considered and rejected.
+
+**A third-party memory system** (running someone else's implementation on this corpus)
+would allow a relative claim, and it is deliberately not attempted. `DECISIONS.md` D2 puts
+the reason directly: *cross-system memory numbers are only comparable under an identical
+judge model and judge prompt, and published results do not share either — the public
+dispute over competing LoCoMo claims is precisely this failure. A claim that cannot be
+defended under questioning is worse than no claim.* Doing it properly means re-ingesting
+this corpus through their pipeline and forcing this project's answerer and judge onto
+their output. That is a separate project's worth of work, and the systems make different
+assumptions — some carry their own answering model, some keep no raw text — so the
+confounders would outnumber the finding.
+
+**Published LongMemEval numbers** are cheaper to cite and weaker still: a different
+answerer, a different judge, a different prompt. A comparison against them measures the
+model as much as the memory layer. They may be mentioned in a final report as context for
+what range this benchmark lives in; they cannot support a claim of being better.
+
+The consequence is worth stating plainly: **this project will never produce a leaderboard
+position.** What it produces instead is a paired internal comparison where one variable
+moves, which is the stronger experiment for a design question even though it is the weaker
+marketing claim.
 
 **Dataset roles — the most important methodology decision here.** dev50 lasted two weeks,
 and not because it was small:
@@ -1269,10 +1318,12 @@ credentials or database; the store arrives on a mounted volume.
 size 1 (§6.4, randomised control). Every number in this project sits under that lowered
 ceiling. It is a known quantity, not an unknown.
 
-**Predicate normalization and supersession.** 622 replacement signals produce 42
-supersessions; 88% of signals sit alone on their key, and 96% of those have sibling
-predicates on the same subject (§3.5). **An evidenced mechanism, not yet shown to cause the
-observed failures.**
+**Supersession fires 42 times on 622 signals.** 88% of replacement signals sit alone on
+their key. Predicate normalization was proposed as the cause and **tested offline: it
+reunites 0.3% of them**, so that hypothesis is withdrawn (§3.5). The remaining
+explanations are that the earlier value was never extracted — making this a second face of
+extraction loss — or that the flag is set on update-shaped wording regardless. Not yet
+separated.
 
 **Reasoning after successful retrieval.** S4 retrieval failures are zero, while S4b
 composition is 1 and S5 reasoning is 2; all five `knowledge-update` failures recalled the
@@ -1328,14 +1379,14 @@ read as current capability.
 
 | Direction | Basis | Why not now |
 |---|---|---|
-| **Batch size 1 / adaptive batching** | 4.7x the yield, causally established (§6.4) | Rebuilds every store, 10x the quota |
-| **Predicate normalization** | 96% of replacement signals orphaned by naming (§3.5) | Requires re-extraction; but **the next step is free** — simulate on the existing store how many orphaned signals a stemming merge would reunite with their target |
+| **Batch size 1 / adaptive batching** | 4.7x the yield, causally established (§6.4). A tail-only second pass was measured as an alternative: it costs 1.73x instead of 12x but recovers only **22%** of the loss, because position is the small half and batch crowding is 78% | Rebuilds every store, 10x the quota — and there is no cheap substitute |
+| ~~Predicate normalization~~ **closed 2026-08-25** | Simulated offline: a stemming merge reunites 2 of 777 orphaned signals | Withdrawn. The open question moved to whether the missing predecessors were ever extracted (§3.5) |
 | **Deterministic temporal calculator** | The S5 class needs date arithmetic | Needs its boundary located on train150 first |
 | **Routing by question type** | Noise concentrates in temporal and multi-session | As above |
 | **Explicit current/superseded resolver** | Settle which fact holds before the prompt is built | Depends on predicate normalization landing first |
 | **Structured evidence table** | Facts as a table rather than prose | Unvalidated |
 | **Stronger answerer** | Escalate unstable question types | Belongs after test100, as its own ablation |
-| **`recency` half-life** | 30 days against a 932–1,727-day corpus is identically zero (§6.5) | Free to retest; the half-life should be 300–600 days |
+| ~~`recency` half-life~~ **closed 2026-08-25** | Retested at 400 / 600 / 1200 days with non-zero weight: Top-3 and assembled recall do not move, @2 drops | Configured correctly it is still useless here — the gold session is not preferentially recent |
 | **Production storage** | SQLite is single-writer (§4.5) | Only **after** the experimental conclusion is fixed, or experiment and refactor get mixed |
 
 ### 8.4 What is not claimed
@@ -1673,6 +1724,7 @@ result stays hashed individually.
 | Failure staging and module ceilings | `results/failure-stages.md` |
 | Five-question context-shape probe | `results/context-arms.md` |
 | Retrieval weight sweep | `results/retrieval-weights.md` |
+| Three offline diagnostics, all negative | `results/offline-diagnostics-2026-08-25.md` |
 | Rerank Pareto | `results/rerank-pareto.md` |
 | Raw-retrieval diagnostic | `results/raw-recall-diagnostic.md` |
 | The three pre-registrations | `results/prereg-batch-size.md`, `prereg-context-shape.md`, `prereg-v2-final.md` |

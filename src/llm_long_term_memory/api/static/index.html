@@ -163,6 +163,11 @@
     <span class="meta" id="meta">connecting…</span>
   </details>
   <button id="copy" class="ghost" type="button">Copy view link</button>
+  <!-- The transcript and last namespace live in localStorage, so they outlive a
+       reload and a code change. Without a control here the only way to remove them
+       is the devtools console, which is not a reasonable thing to ask of someone
+       who wants their own traces gone. -->
+  <button id="wipe" class="ghost" type="button" style="margin-left:8px">Clear local data</button>
 </header>
 
 <main>
@@ -174,9 +179,21 @@
         retrieval selected, which it passed over, and why.
       </p>
     </div>
-    <form id="ask">
-      <input type="text" id="user" value="01493427" style="max-width:130px" aria-label="user id">
-      <input type="text" id="q" placeholder="Ask about this user’s history…" aria-label="question">
+    <!-- `autocomplete="off"` on both the form and each field, and `name` attributes
+         that cannot collide with anything else.
+
+         The query box was `<input type="text" id="q">` with no autocomplete and no
+         name. Browser form history is keyed on the field's name — falling back to
+         its id — and in Chrome that store is shared across sites, so a field called
+         `q` inherits suggestions from every search box on the web that also calls
+         itself `q`. A box whose whole purpose is asking about a person's history is
+         the last place that should re-offer whatever the visitor typed elsewhere.
+         Observed for real: unrelated phrases from another site appeared here. -->
+    <form id="ask" autocomplete="off">
+      <input type="text" id="user" name="lltm-namespace" autocomplete="off"
+             style="max-width:130px" aria-label="user id" placeholder="namespace">
+      <input type="text" id="q" name="lltm-question" autocomplete="off"
+             placeholder="Ask about this user’s history…" aria-label="question">
       <button type="submit" id="go">Search</button>
     </form>
   </section>
@@ -217,32 +234,20 @@ const $ = (id) => document.getElementById(id);
 // the backend no longer holds.
 const STORE_KEY = "lltm.ui.v1";
 
-// Fixed cases for the README, so a reader never has to invent a question. Each is
-// a real behaviour of the system, not a scripted mock.
-const DEMOS = {
-  mayo: {
-    namespace: "41275add",
-    q: "what was the mayo clinic youtube video you recommended?",
-    note: "Structured memory dropped the URL; the raw archive still has it.",
-    golden: "mayo",
-  },
-  timeline: {
-    namespace: "9a707b81",
-    q: "what is the user's job?",
-    note: "One key, five values over time — expand a memory to see the chain.",
-  },
-  collectibles: {
-    namespace: "01493427",
-    q: "what does the user collect?",
-    note: "A multi-valued key: these facts coexist, none replaces another.",
-  },
-  battery: {
-    namespace: "09d032c9",
-    q: "I've been having trouble with the battery life on my phone lately. Any tips?",
-    note: "Structured memory sufficed — no fallback. The answerer applies what it remembers.",
-    golden: "battery",
-  },
-};
+// There are deliberately no built-in exhibits here.
+//
+// This page used to ship four `?demo=` links, each hard-coding an evaluation
+// namespace, and the no-parameter case defaulted into one of them. That made the
+// inspector open onto a benchmark persona's private-looking life — commute length,
+// battery habits, what they collect — with nothing on screen saying these are
+// synthetic fixtures rather than a user of the product. Convenient for a
+// screenshot, wrong as a default.
+//
+// The inspector is now a tool, not an exhibit: it shows the namespace you ask for
+// and nothing before that. The demonstration lives in a separate self-contained
+// page with openly fictional data, so no evaluation fixture is ever presented as
+// if it were a person. The ids themselves are kept out of this file so that a test
+// can assert their absence.
 
 function loadUiState() {
   try { return JSON.parse(localStorage.getItem(STORE_KEY)) ?? {}; }
@@ -406,7 +411,7 @@ function renderChat(messages) {
   box.scrollTop = box.scrollHeight;
 }
 
-async function search(user, q, {push = true, goldenName = null} = {}) {
+async function search(user, q, {push = true} = {}) {
   if (!q) return;
   const req = ++currentRequest;
   $("go").disabled = true;
@@ -431,73 +436,28 @@ async function search(user, q, {push = true, goldenName = null} = {}) {
     if (req !== currentRequest) return;
 
     // --- default view ---
-    // A recorded run is preferred when one exists for this exact demo, because the
-    // alternative — answering on every page load — spends quota on every refresh,
-    // and the other alternative — a hard-coded answer — is a mock dressed as a
-    // result. Recorded runs are labelled, carry their versions, and are checked
-    // against a fingerprint so a stale one cannot pose as current behaviour.
-    let golden = null;
-    if (goldenName) {
-      try { golden = await api(`/v1/golden/${encodeURIComponent(goldenName)}`); }
-      catch (e) { /* no recording for this demo; fall through to the live-capable view */ }
-    }
-    if (req !== currentRequest) return;
-
+    // Recorded-run replay used to render here, keyed off the `?demo=` links. Both
+    // are gone: replaying a recording required shipping one, and the only two
+    // recordings that existed were answers about benchmark personas. The page now
+    // shows only what the store actually returns for the namespace you asked for,
+    // and any answer is one you explicitly ran.
     let html = header;
 
-    if (golden) {
-      const usedFallback = golden.fallback_level !== "none";
-      html += `<div class="verdict" id="recorded-card">
-        <h3>Answer <span class="badge ${golden.is_current ? "recorded" : "stale"}">
-          ${golden.is_current ? "recorded run — not executed on page load" : "recorded run — STALE"}
-        </span></h3>
-        <div class="answer-text">${linkify(golden.answer)}</div>
-        <div class="sourceline">
-          <span>Structured memory</span>
-          <span class="state ${golden.answer_status === "answer" ? "yes" : "no"}">${
-            golden.answer_status === "answer" ? "sufficient" : "insufficient"}</span>
-        </div>
-        <div class="sourceline">
-          <span>Raw conversation fallback</span>
-          <span class="state ${usedFallback ? "yes" : "no"}">${
-            usedFallback ? `triggered — ${esc(golden.fallback_level)}` : "not needed"}</span>
-        </div>
-        ${golden.fallback_reason ? `<div class="why">${esc(golden.fallback_reason)}</div>` : ""}
-        <div class="runmeta">
-          recorded ${esc((golden.recorded_at || "").slice(0, 10))} ·
-          ${golden.runs} run(s) agreed ·
-          judge ${esc(golden.judge_verdict || "n/a")} ·
-          answerer ${esc(golden.versions.answer_prompt || "?")} ·
-          judge ${esc(golden.versions.judge_prompt || "?")}
-          ${golden.is_current ? "" : "<br><strong>The store or prompts changed since this was recorded — re-run to see current behaviour.</strong>"}
-        </div>
-      </div>`;
-
-      if (golden.evidence.length) {
-        const ev = golden.evidence[0];
-        html += `<div class="verdict"><h3>Evidence the answer came from</h3>
-          <div class="evidence"><div class="src">session ${esc(ev.session_id)} ·
-            turn ${ev.turn_index} · ${esc(ev.role)}</div>${highlight(ev.text, q)}</div></div>`;
-      }
-      html += `<button class="more" id="run-live" type="button">Run live answer</button>
-               <div id="live-result"></div>`;
-    } else {
-      html += `<div class="verdict">
-        <h3>How this was answered</h3>
-        <div class="sourceline">
-          <span>Structured memory — ${r.memories.length} of ${r.candidates_considered} candidates selected</span>
-          <span class="state ${r.memories.length ? "yes" : "no"}">${r.memories.length ? "used" : "nothing relevant"}</span>
-        </div>
-        <div class="sourceline">
-          <span>Raw conversation archive — ${raw.turns.length} matching turn(s)</span>
-          <span class="state warn">available, not evaluated</span>
-        </div>
-        <div class="why">Nothing has judged whether the memories are sufficient — that
-          takes an answerer. Press below to run one.</div>
+    html += `<div class="verdict">
+      <h3>How this was answered</h3>
+      <div class="sourceline">
+        <span>Structured memory — ${r.memories.length} of ${r.candidates_considered} candidates selected</span>
+        <span class="state ${r.memories.length ? "yes" : "no"}">${r.memories.length ? "used" : "nothing relevant"}</span>
       </div>
-      <button class="more" id="run-live" type="button">Run live answer</button>
-      <div id="live-result"></div>`;
-    }
+      <div class="sourceline">
+        <span>Raw conversation archive — ${raw.turns.length} matching turn(s)</span>
+        <span class="state warn">available, not evaluated</span>
+      </div>
+      <div class="why">Nothing has judged whether the memories are sufficient — that
+        takes an answerer. Press below to run one.</div>
+    </div>
+    <button class="more" id="run-live" type="button">Run live answer</button>
+    <div id="live-result"></div>`;
 
     html += `<button class="more" id="toggle-detail" type="button">Show retrieval details</button>
              <div id="detail-view" class="hidden">`;
@@ -653,28 +613,38 @@ $("copy").addEventListener("click", async () => {
   setTimeout(() => ($("copy").textContent = "Copy view link"), 1400);
 });
 
+$("wipe").addEventListener("click", () => {
+  // Clear the stored state, the visible transcript, both fields, and the query
+  // string — the URL carries the namespace and question, so leaving it would put
+  // everything straight back on the next reload.
+  try { localStorage.removeItem(STORE_KEY); } catch { /* private mode; nothing stored */ }
+  $("user").value = "";
+  $("q").value = "";
+  renderChat([]);
+  $("panel").innerHTML = `<p class="empty">Local data cleared. Enter a namespace to start.</p>`;
+  history.replaceState({}, "", location.pathname);
+  $("wipe").textContent = "Cleared";
+  setTimeout(() => ($("wipe").textContent = "Clear local data"), 1400);
+});
+
 // Restore on load: URL first (shareable), then localStorage (personal).
 (function restore() {
   const params = new URLSearchParams(location.search);
-  const demo = DEMOS[params.get("demo")];
   const ui = loadUiState();
-  const user = demo?.namespace ?? params.get("namespace") ?? ui.namespace ?? "01493427";
-  const q = demo?.q ?? params.get("q") ?? "";
-
-  // A demo link is a fixed exhibit, not a continuation. Carrying the previous
-  // visitor's transcript into it buries the case being demonstrated under
-  // unrelated questions — which is exactly what happened the first time this page
-  // was opened for a screenshot.
-  if (demo) saveUiState({messages: []});
+  // No fallback to a hard-coded namespace. An empty field is honest about the fact
+  // that this page has no data of its own; auto-loading a benchmark id was how a
+  // synthetic persona ended up on screen unasked.
+  const user = params.get("namespace") ?? ui.namespace ?? "";
+  const q = params.get("q") ?? "";
 
   $("user").value = user;
-  renderChat(demo ? [] : (ui.messages ?? []));
-  if (!q) return;
+  renderChat(ui.messages ?? []);
+  if (!user || !q) return;
 
   $("q").value = q;
   // A restored search goes through the same request binding as a typed one, so an
   // in-flight restore cannot be overwritten by, or overwrite, a user's own search.
-  search(user, q, {goldenName: demo?.golden ?? null});
+  search(user, q);
 })();
 </script>
 </body>

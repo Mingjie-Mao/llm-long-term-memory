@@ -1,0 +1,18 @@
+# The playground's own dependencies, declared here rather than in pyproject.toml.
+#
+# pyproject.toml is inside the v2 experiment freeze's hashed inventory: adding a line
+# to it would make the in-flight dev100 store unable to prove its lineage. This file
+# is the deployable set for `demo-api/` alone and pulls no PyTorch — the encoder runs
+# on onnxruntime against the model exported by export_onnx.py.
+#
+# Roughly 162MB of wheels and model against ~565MB for the torch path, which is what
+# makes a 512MB instance viable at all.
+fastapi>=0.115
+uvicorn[standard]>=0.30
+pydantic>=2.7
+pydantic-settings>=2.3
+numpy>=2.0
+pyyaml>=6.0
+structlog>=24.1
+onnxruntime>=1.20
+tokenizers>=0.20

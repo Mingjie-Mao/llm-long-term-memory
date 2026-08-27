@@ -3,9 +3,19 @@
 **Project:** `llm-long-term-memory` (internal name ChronoMem)
 **Report date:** 2026-08-17
 **Status:** productised prototype; **held-out result measured 2026-08-19 — 70.0% on 100
-unseen questions against dev50's 72.0%** (section 11). Run-to-run variance of the
-answerer is unquantified and is being measured; until it is, every single-run
-comparison here carries an unstated error bar.
+unseen questions against dev50's 72.0%** (section 11).
+
+> ⚠️ **This document is a historical record and is no longer maintained.** It describes
+> the system as of 2026-08-17 and is superseded by [`REPORT.md`](REPORT.md), which is
+> organized by data flow rather than chronology and carries the current numbers. Kept
+> because its incident narratives — particularly the mixed-extractor-store investigation
+> in section 10 — are the primary account of how several safeguards came to exist.
+>
+> Figures here that have since moved: the test count (385 → 532), the memory count, and
+> the status line above. Most importantly, **the answerer's run-to-run variance is no
+> longer unquantified** — three repeats of `heldout100` flip 6 of 100 verdicts with an
+> accuracy range of 3 points ([heldout-variance.md](../results/heldout-variance.md)), so
+> the "unstated error bar" this report warned about has since been stated.
 
 Every number below was recomputed from committed artifacts in `results/raw/` at the
 time of writing, and each is labelled with the file it comes from. Where a figure
@@ -607,6 +617,13 @@ transcript; memories and raw turns are in neither, because a browser copy goes s
 against the store. Fixed demo routes (`?demo=mayo`, `?demo=timeline`,
 `?demo=collectibles`) rewrite themselves into plain shareable links.
 
+> **Superseded 2026-08-27.** The demo routes and the recorded-run replay were
+> removed: each hard-coded an evaluation namespace and the no-parameter case
+> defaulted into one, so the inspector opened onto a synthetic persona's private-
+> looking history with nothing marking it as a fixture. See the dated note in
+> [ROADMAP.md](ROADMAP.md) for what replaced them, and for the `autocomplete`
+> defect on the query box found in the same pass.
+
 **The Inspector became a debugging surface within minutes of existing.** It rendered
 a `collectibles` key as a supersession chain — G.I. Joe *replaced by* stamps
 *replaced by* a Mickey Mantle card — which looked convincingly like a data defect
@@ -828,7 +845,7 @@ nothing asked it to, because this run had the fallback off. A better retriever h
 fidelity has ten cases waiting.
 
 All three retrieval misses are `single-session-assistant`, and one of them is
-`41275add` — the Mayo question, which the demo answers correctly. A system cannot
+the Mayo question, which the demo answers correctly. A system cannot
 give two answers to one question, so the discrepancy was worth chasing, and it was
 not about the store:
 

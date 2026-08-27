@@ -1,6 +1,6 @@
 """The golden case: why memory-first with a raw-source fallback is necessary.
 
-Question `41275add` from LongMemEval — *"remind me of the Mayo Clinic video you
+The Mayo Clinic question from LongMemEval — *"remind me of the video you
 recommended"* — is one of four `single-session-assistant` questions that every
 variant answered wrong, `full_context` and `naive_rag` excepted. Tracing it
 (results/assistant-gap.md) showed why:

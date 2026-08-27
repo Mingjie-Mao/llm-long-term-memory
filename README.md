@@ -11,6 +11,16 @@ It is built around three constraints: a full chat history in the context window 
 expensive and grows without bound; a vector store over raw conversation cannot express
 that facts change; and compressing conversations into facts fixes both but is lossy.
 
+**Tech stack** · Python · FastAPI · SQLite + FTS5 · all-MiniLM-L6-v2 · Gemini · MCP · Docker
+
+**Core features** · Temporal facts · Supersession · Provenance to source turn ·
+Conditional raw fallback · Explainable retrieval
+
+**Interactive demo — <https://lltm-memory.pages.dev>** (bilingual). Three questions
+show a fact being superseded, a dropped link recovered from the raw archive, and
+memory changing what the answer says. The data on it is fictional and written for the
+demo; the measured numbers are below.
+
 ## Core design
 
 **Structured memory.** Each fact is a typed row keyed by `(subject, predicate,
@@ -229,8 +239,9 @@ Every tool takes an explicit `user_id`; there is no ambient session identity.
 - **Paired results come from one run per arm.** Three repeats of `heldout100` flip 6 of
   100 verdicts, which is enough to move a comparison on tens of questions across a
   significance threshold by itself.
-- **Four of five retrieval signals carry zero weight, and enabling them measured
-  worse.** `recency` is a no-op as configured.
+- **Four of five retrieval signals carry zero weight, and enabling them measured worse.**
+  `recency` was also retested at a corrected half-life and still carries no information —
+  the gold session is not preferentially recent.
 - **Not a product.** `user_id` comes from the request body rather than a trusted token,
   deletion is a status change rather than an erase, SQLite is single-writer, and no
   restore drill has been run.
@@ -248,4 +259,4 @@ Every tool takes an explicit `user_id`; there is no ambient session identity.
 
 ## License
 
-MIT
+[MIT](LICENSE)

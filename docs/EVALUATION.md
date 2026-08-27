@@ -1,5 +1,12 @@
 # Evaluation Protocol and Interpretation
 
+> **Historical document — frozen at the v1 evaluation stage.** The “Required next
+> run” section below records what was planned at that time; those runs have since
+> completed. Current results and the active v2 protocol live in
+> [`REPORT.md`](REPORT.md), [`../results/v2-progress.md`](../results/v2-progress.md),
+> and [`../results/v2-runbook.md`](../results/v2-runbook.md). This file is retained
+> because it defines the interpretation rules used for the published v1 rows.
+
 ## Scope of the published v1 result
 
 The four published rows use a stratified 50-question LongMemEval-S development
@@ -63,7 +70,7 @@ judge-lenient and two judge-strict disagreements. This supports the wording **no
 directional bias was observed in the three disagreements**; it does not prove that
 the judge is unbiased or that an LLM label is ground truth.
 
-## Required next run
+## Required next run at the time (completed)
 
 1. Run the temporal gate and ingest a fresh `two-stage` store, which now includes
    raw turns and source anchors.

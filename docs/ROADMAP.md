@@ -248,6 +248,30 @@ the archive still has it), `?demo=timeline` (one key, five values over time),
 into a plain shareable link on load. Plus a **Copy view link** button, so a bug
 report can be a URL instead of a list of steps.
 
+> **Removed 2026-08-27 — the demo routes and the recorded runs.** Each route
+> hard-coded a LongMemEval namespace, and the no-parameter case defaulted into one
+> of them, so opening the inspector put a synthetic persona's commute, battery
+> habits and collection on screen with nothing saying these are evaluation
+> fixtures. That is fine for a screenshot and wrong as a default: the fixtures look
+> exactly like a real person's private history, which is the one thing a memory
+> product must never be ambiguous about. `DEMOS`, the `?demo=` handling, the
+> default namespace and the recorded-run replay are gone; `results/golden-runs.json`
+> is emptied and `GET /v1/golden/{name}` now 404s for every name. The endpoint and
+> `scripts/record_golden.py` stay, so a deployment can record its own exhibit
+> against data written for that purpose. Two tests pin the absence.
+>
+> The same pass fixed a real defect next to it: the query box was
+> `<input type="text" id="q">` with no `autocomplete`. Browser form history is keyed
+> on a field's name — falling back to its id — and in Chrome that store is shared
+> across sites, so a field called `q` inherits suggestions from every search box on
+> the web that also calls itself `q`. Unrelated phrases from another site were
+> observed appearing in it. Both fields and the form are now `autocomplete="off"`
+> with names that cannot collide, and a **Clear local data** button wipes the
+> transcript, the namespace and the query string in one click.
+>
+> The demonstration moved to a separate self-contained page with openly fictional
+> data, so no evaluation fixture is ever presented as if it were a person.
+
 Restored searches go through the same request binding as typed ones, verified by
 firing a user search immediately after a restore and asserting the panel shows the
 later query.
@@ -332,7 +356,7 @@ Two levels, cheapest first. Source-local is precise because retrieval already fo
 the right memory and only the detail is missing; archive-wide exists because
 extraction can miss a fact entirely.
 
-**Verified against a real failure.** Question `41275add` ("the Mayo Clinic video you
+**Verified against a real failure.** The Mayo Clinic question ("the video you
 recommended") is one of the four `single-session-assistant` questions every variant
 got wrong. Structured memory holds nothing relevant; the archive search returns the
 source turn containing `youtube.com/watch?v=UfOvNlX9Hh0` — the gold answer.
@@ -699,8 +723,8 @@ failures in full.
 
 | experiment | pre-registration | state |
 |---|---|---|
-| extraction batch size {15, 5, 1} | [prereg-batch-size.md](../results/prereg-batch-size.md) | waiting on `dev100` ingest |
-| context shape: flat vs session-coherent | [prereg-context-shape.md](../results/prereg-context-shape.md) | corrected train gate in progress; final waits on complete `train150` |
+| extraction batch size {15, 5, 1} | [prereg-batch-size.md](../results/prereg-batch-size.md) | deferred to v3 — the position component was measured offline and accounts for only 22% of the loss ([diagnostics](../results/offline-diagnostics-2026-08-25.md)) |
+| context shape: flat vs session-coherent | [prereg-context-shape.md](../results/prereg-context-shape.md) | **train gate passed on the complete 150**; candidate frozen as `configs/v2.yaml`; amended 2026-08-25 to five arms; `dev100` ingest 45.6% |
 | repeats and reporting | [heldout-variance.md](../results/heldout-variance.md) | in force |
 
 Both pre-registrations had to be amended before running, and both amendments were
@@ -709,29 +733,30 @@ originally made final accuracy confirmatory, which the archive fallback absorbs 
 construction; the context one would have demanded an accuracy win from a design
 whose registered hypothesis is equal accuracy at better consistency.
 
-### The original P6 gate was measured incorrectly
+### The original P6 gate was measured incorrectly, and the final gate has now run
 
 The first free gate reported 64% Top-3 recall, but that number is superseded. Its
 script mixed incomplete questions into the denominator and compared scoped database
 session ids with public dataset ids. The repaired code refuses a final result from
 an incomplete store and evaluates the same top-20 memory input the answer path uses.
 
-The corrected partial result covers 103 questions whose ingestion is complete. It is
-diagnostic only; the fixed 150-question grid decides the candidate.
+**Final numbers, over the complete 150 questions** (the 103- and 145-question tables
+that stood here were provisional and are dropped):
 
 | | |
 |---|---:|
-| gold session found in the top-20 memory input | 98.1% |
-| gold session ranked in the **top 3 sessions**, `max` | 95.1% |
-| gold session ranked in the **top 3 sessions**, `mean` | **96.1%** |
-| gold session retained after `mean` / radius 1 / cap 30 assembly | **96.1%** |
+| gold session found in the top-20 memory input | 98.0% |
+| gold session ranked in the **top 3 sessions**, `max` | 94.7% |
+| gold session ranked in the **top 3 sessions**, `mean` | **95.3%** |
+| gold session retained after `mean` / radius 1 / cap 30 assembly | **95.3%** |
+| median context tokens (against 354.5 flat) | 140.5 |
 | pre-registered threshold | 80% |
 
-The provisional improvement comes from fixing session aggregation and preventing
-the context hard cap from discarding an oversized top-ranked session. Seven nearby
-controls and the selection rule were fixed before the remaining train questions
-arrive. `coherent-oracle` remains a labelled diagnostic ceiling, never a product
-arm. None of this spends answerer or judge quota.
+Seven nearby controls and the selection rule were fixed before the remaining train
+questions arrived, and the rule then chose `mean-r1-cap30` over `mean-r1-cap40` —
+which ties on both recall figures and truncates zero questions rather than one — because
+it prefers the smaller cap. `coherent-oracle` remains a labelled diagnostic ceiling,
+never a product arm. None of this spent answerer or judge quota.
 
 ### Debts this cannot repay itself
 

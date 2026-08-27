@@ -31,3 +31,15 @@ results/labels-*.csv
 
 # Local dev server config for the preview pane; machine-specific.
 .claude/
+
+# Cloudflare Pages deploy cache. Holds the account id and project name — no
+# credentials (the OAuth token lives in ~/Library/Preferences/.wrangler), but an
+# account id is not something to publish either. `public-demo/` is deliberately NOT
+# ignored: it is the deploy source and belongs in the repository.
+.wrangler/
+node_modules/
+
+# The playground store is throwaway per-session data, and the exported encoder is a
+# 87MB build artifact reproducible with demo-api/export_onnx.py.
+stores/demo-playground*
+demo-api/onnx-encoder/

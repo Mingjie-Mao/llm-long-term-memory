@@ -46,7 +46,14 @@ any weight on this signal is a no-op.
 never participated in any retrieval this project has ever run. No published result is
 wrong because of it — the weight was 0 anyway — but anyone who later sets that weight
 non-zero and expects an effect would get a silent no-op. A half-life in the 300-600 day
-range is what this corpus would need. Retesting it is free and is listed as future work.
+range is what this corpus would need.
+
+> **Retested 2026-08-25, and it does not help.** At half-lives of 400, 600 and 1200 days
+> with non-zero weight, Top-3 and assembled recall do not move at all and @2 drops 0.6-1.3
+> points ([diagnostics](offline-diagnostics-2026-08-25.md)). The defect was real, and
+> repairing it changes nothing: the gold session on this benchmark is not preferentially
+> recent, so the signal carries no information even when correctly scaled. This closes the
+> question on stronger grounds than "misconfigured, therefore untested".
 
 ## Why the others hurt
 

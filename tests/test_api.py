@@ -13,6 +13,7 @@ like a retrieval miss.
 from __future__ import annotations
 
 from datetime import datetime
+from types import SimpleNamespace
 
 import numpy as np
 import pytest
@@ -376,16 +377,18 @@ def test_the_inspector_page_carries_its_state_in_the_url(client):
     """A view has to survive a reload and paste into someone else's browser.
 
     Not a JS test — it asserts the contract the page depends on: the served HTML
-    reads `namespace`/`q` from the URL, rewrites without navigating, and ships the
-    fixed demo cases the README links to.
+    reads `namespace`/`q` from the URL and rewrites it without navigating.
+
+    The fixed `?demo=` routes this used to assert are deliberately gone; what is
+    left is the general property, which is the one that matters. A link built by
+    typing a namespace and a question still survives a reload and a paste.
     """
     page = client.get("/").text
 
     assert "URLSearchParams" in page
     assert "history.replaceState" in page, "must not reload; that would restart the search"
-    # The demo routes README links to.
-    for demo in ("mayo", "timeline", "collectibles"):
-        assert f"{demo}:" in page
+    assert 'params.get("namespace")' in page
+    assert 'params.get("q")' in page
 
     # Shadowing `history` inside the search function turned replaceState into an
     # Array method lookup and blanked the panel. Cheap to assert, silent to break.
@@ -543,11 +546,45 @@ def test_the_demo_page_never_calls_a_model_on_load(client):
     )
 
 
-def test_the_recorded_badge_is_present_in_the_page(client):
-    """A recorded result shown without a label is a mock pretending to be live."""
+def test_the_page_ships_no_benchmark_namespace_and_no_recorded_replay(client):
+    """The inspector must not open onto evaluation data.
+
+    It used to: four `?demo=` links hard-coded LongMemEval namespaces and the
+    no-parameter case defaulted into one of them, so opening the page showed a
+    synthetic persona's commute and battery habits with nothing saying these were
+    fixtures. Two recorded answer runs were replayed on top of that.
+
+    Asserted against the served page because the regression to prevent is someone
+    re-adding a convenient default id for a screenshot.
+    """
     page = client.get("/").text
-    assert "recorded run — not executed on page load" in page
-    assert "recorded run — STALE" in page
+
+    for namespace in ("41275add", "9a707b81", "01493427", "09d032c9"):
+        assert namespace not in page, f"{namespace} is a benchmark namespace"
+    assert "DEMOS" not in page
+    assert "/v1/golden/" not in page, "recorded-run replay must not be in the render path"
+
+
+def test_no_recorded_run_is_served(client):
+    """The shipped recordings were of benchmark personas and are gone. The endpoint
+    stays — a deployment may record its own — but must answer 404, not a leftover."""
+    for name in ("mayo", "battery"):
+        assert client.get(f"/v1/golden/{name}").status_code == 404
+
+
+def test_the_query_box_cannot_inherit_browser_form_history(client):
+    """Browser form history is keyed on a field's name, falling back to its id, and
+    in Chrome that store is shared across sites. The query box was `id="q"` with no
+    autocomplete, so it inherited suggestions from every search box on the web that
+    also calls itself `q` — unrelated phrases from another site were observed
+    appearing in it. A box that asks about a person's history is the last place that
+    should re-offer what the visitor typed elsewhere."""
+    page = client.get("/").text
+
+    assert '<form id="ask" autocomplete="off">' in page
+    assert page.count('autocomplete="off"') >= 3, "form and both inputs"
+    assert 'id="q"' in page and 'name="lltm-question"' in page
+    assert 'id="q" placeholder' not in page, "the unnamed, autocompleting field is back"
 
 
 def test_health_reports_degraded_when_search_cannot_run(client, monkeypatch):
@@ -583,3 +620,104 @@ def test_a_missing_encoder_is_503_with_a_remedy_not_a_bare_500(client, monkeypat
 
     assert response.status_code == 503
     assert "embed" in response.json()["detail"]
+
+
+def test_live_answer_uses_the_requested_limit_and_restores_the_shared_runner(client):
+    from llm_long_term_memory.api.app import get_service
+
+    class StubAnswerer:
+        top_k = 10
+
+        def answer(self, instance):
+            assert instance.question_id == "alice"
+            assert instance.question == "where do I live?"
+            assert self.top_k == 3
+            return SimpleNamespace(
+                text="Sydney",
+                context_tokens=42,
+                notes={
+                    "retrieval": [
+                        {
+                            "memory_id": "m_new",
+                            "content": "The user moved to Sydney.",
+                            "score": 0.9,
+                            "scope": "profile",
+                            "source_role": "user",
+                        }
+                    ],
+                    "answer_status": "answer",
+                    "fallback_level": "session",
+                    "fallback_reason": "need_source",
+                    "fallback_turns": ["The user moved to Sydney."],
+                    "candidates_considered": 4,
+                },
+            )
+
+    service = get_service()
+    answerer = StubAnswerer()
+    service._answerer = answerer
+
+    response = client.post(
+        "/v1/answer",
+        json={"user_id": "alice", "query": "where do I live?", "limit": 3},
+    )
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["answer"] == "Sydney"
+    assert body["top_k"] == 3
+    assert body["memories_selected"] == 1
+    assert body["answerer_calls"] == 2
+    assert answerer.top_k == 10
+
+
+def test_write_path_persists_a_turn_and_indexes_extracted_memories(client):
+    from llm_long_term_memory.api.app import get_service
+
+    service = get_service()
+
+    class StubExtractor:
+        def extract_turn(self, *, user_id, session_id, role, content, now):
+            assert user_id == "alice"
+            assert role == "user"
+            assert content == "I adopted a cat."
+            return SimpleNamespace(
+                memories=[
+                    memory(
+                        "m_cat",
+                        "alice",
+                        "The user adopted a cat.",
+                        predicate="owns",
+                        object="cat",
+                        source_session_id=session_id,
+                        source_turn_index=0,
+                    )
+                ],
+                usage={"requests": 1},
+            )
+
+    service.extractor = StubExtractor()
+    response = client.post(
+        "/v1/messages",
+        json={
+            "user_id": "alice",
+            "role": "user",
+            "content": "I adopted a cat.",
+            "session_id": "cat-chat",
+        },
+    )
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["session_id"] == "cat-chat"
+    assert body["turn_index"] == 0
+    assert [item["id"] for item in body["memories"]] == ["m_cat"]
+    from llm_long_term_memory.store import external_session_id
+
+    assert external_session_id(service.get("alice", "m_cat").source_session_id) == "cat-chat"
+
+
+def test_evidence_is_none_when_a_memory_has_no_source_anchor(client):
+    from llm_long_term_memory.api.app import get_service
+
+    assert get_service().evidence("alice", "m_rec") is None

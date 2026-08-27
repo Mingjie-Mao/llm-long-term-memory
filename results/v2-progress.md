@@ -1,8 +1,134 @@
 # v2 execution log
 
-This is a checkpoint log, not a results table.  `train150` is development data;
-`dev100` remains untouched until the candidate configuration is frozen, and
-`test100` remains sealed until v2 is frozen.
+This is a checkpoint log, not a results table, and it is append-only: earlier entries
+describe the state on their own date and are not rewritten when it changes. `train150` is
+development data; `dev100` was left untouched until the candidate configuration was frozen,
+and `test100` remains sealed until v2 is frozen.
+
+## 2026-08-27 — dev100 at 76.4%, and the resume rate is falling
+
+| item | verified state |
+|---|---:|
+| terminal sessions | 3,660 / 4,791 |
+| successful sessions | 3,073 |
+| explicit empty-result sessions | 587 |
+| content-policy blocks | 0 |
+| memories / index ids / vector rows | 9,569 / 9,569 / 9,569 |
+| extraction + adjudication requests | 576 + 421 |
+| archived pending sessions | 15 (raw-only, no memories) |
+| state checker | `issues: []`, SAFE TO RESUME |
+
+One quota day advanced the store by 1,477 sessions and 3,993 memories, then stopped at
+exactly 500/500 with exit 2. The 15 archived pending sessions are the batch the quota
+interrupted: they hold no memories and carry no terminal state, so the next run replays
+them rather than counting them as empty.
+
+**The store is not drifting from the development set.** Yield is 2.61 memories per
+session cumulatively and 2.70 over this day's sessions alone, against train150's 2.6.
+The empty rate is 16.0% cumulative and 16.9% over this day's sessions, against
+train150's 15.6%. Both sit inside the range train150 established, which is the check
+that matters before dev100 is allowed to decide anything.
+
+### The falling rate is adjudication, not extraction
+
+Sessions per request has fallen 4.39 → 3.45 → 2.87 across the three resumes. The cause
+is visible in the split: this day spent **236 extraction requests against 264
+adjudication requests**, so adjudication has overtaken extraction. Deduplication
+compares each new fact against what the store already holds, so its cost rises with
+store density — a denser store surfaces more near-duplicate candidates to adjudicate.
+
+This is expected behaviour rather than a fault, but it has a consequence worth
+recording before it is discovered the expensive way: **`test100` will cost more per
+session than `dev100` did**, and the request estimates in `v2-runbook.md` were written
+against the old rate. They should be re-derived from the measured rate, not carried
+over.
+
+### The supersession gap reproduces on a third store
+
+| store | `replaces` signals | rows actually superseded | ratio |
+|---|---:|---:|---:|
+| dev100 (partial) | 431 | 47 | **9.2 : 1** |
+| train150 | 833 | 76 | **11.0 : 1** |
+| heldout100 (§3.5) | — | — | 14.8 : 1 |
+
+A third independent store shows the same shape, which strengthens the reading in
+[REPORT §3.5](../docs/REPORT.md) that this is a second face of extraction loss rather
+than a defect in the temporal layer. It still does not separate the two surviving
+explanations — the earlier value was never extracted, or the extractor sets the flag on
+update-shaped wording regardless of whether a predecessor exists. That separation needs
+semantic judgement over the raw archive and has not been run.
+
+Nothing here is a dev100 *result*: these are ingest-process counts, not question scores,
+and no arm has been run. The sealed-row rule is untouched.
+
+## 2026-08-26 — dev100 rebuilt from a clean freeze, 45.6% ingested
+
+| item | verified state |
+|---|---:|
+| terminal sessions | 2,183 / 4,791 |
+| successful sessions | 1,845 |
+| explicit empty-result sessions | 338 |
+| content-policy blocks | 0 |
+| memories / index ids / vector rows | 5,576 / 5,576 / 5,576 |
+| extraction + adjudication requests | 340 + 157 |
+| archived pending sessions | 0 |
+| state checker | `issues: []`, SAFE TO RESUME |
+
+The run stopped cleanly at the daily quota with exit code 2 and no non-terminal batch.
+Yield matches train150 exactly at 2.6 memories per session, and the empty rate over
+substantive sessions is 13.8% against train150's 15.6%.
+
+This is the **second** dev100 store. The first reached 37% (1,789 sessions, 408 extractor
+calls) on 2026-08-25 and was discarded — not for anything it measured, but because its
+pre-ingest freeze had been captured against an uncommitted tree, and committing that work
+moved `git HEAD`, which the freeze compared leaf by leaf. The store could no longer be
+shown to have been produced under the frozen system. The calls are written off rather than
+re-freezing after the fact. The enforcement defect is fixed: fields whose names end in
+`_for_reference_only` are now recorded and not compared, so a commit no longer invalidates
+a freeze while every file that affects a result stays hashed individually.
+
+The pre-registration was amended before the rebuild, while no dev100 result existed:
+`naive_rag` and `memory-only` join as **reported baselines**, taking the protocol to five
+arms x three repeats. They cannot move the product choice — the decision still comes from
+`flat20` / `coherent-auto` / `coherent-oracle`, and a test gives a baseline the highest
+score and asserts the selection is unmoved. `two_stage_memory_only` was added because
+`two_stage` and `two_stage_fallback` both read `fallback.enabled`, so a memory-only arm was
+previously unreachable inside a single-config freeze.
+
+## 2026-08-25 — train150 complete, v2 candidate selected and frozen
+
+| item | verified state |
+|---|---:|
+| terminal sessions | **7,180 / 7,180** |
+| successful sessions | 5,927 |
+| explicit empty-result sessions | 1,253 |
+| content-policy blocks | 0 |
+| memories / index ids / vector rows | 18,519 / 18,519 / 18,519 |
+| ingest API calls / tokens | 2,592 / 20,844,680 |
+| failed API calls | 37 — all transport (23 DNS, 10x 503, 4 disconnects), none content or logic |
+| state checker | COMPLETE, `issues: []` |
+
+The final 197 sessions cost 92 calls and added 502 memories, 2.5 per session, consistent
+with the 2.6 corpus average.
+
+`finalize_train150.py` then ran with no API calls and produced the final zero-yield audit,
+the seven fixed context-grid artifacts, the selection record, and **`configs/v2.yaml`**.
+An independent earlier execution of the same finalizer produced a byte-identical config,
+which the tool's own guard confirmed by refusing to overwrite a differing one.
+
+**Selected by the fixed rule: `mean` aggregation, window radius 1, cap 30** — Top-3
+session recall 95.3%, assembled recall 95.3%, median context 140.5 tokens against 354.5
+flat, one question truncated. All three gates pass. Worth recording that `mean-r1-cap40`
+ties on both recall figures and truncates zero questions rather than one — the row a human
+would have picked — and the rule chose cap30 because "smaller hard cap" was written before
+the data arrived.
+
+The final zero-yield audit over all 7,180 sessions: 1,253 empty, of which 267 are below
+the minimum turn count and 986 are analysed in detail. **Zero content-policy refusals and
+zero identical-input-different-outcome cases**, 13 annotated evidence misses, 5
+source-format problems, 175 same-text-different-date outcome differences, 198 short
+sessions that may hold no durable fact, and **862 left undetermined** rather than
+relabelled as random failure.
 
 ## 2026-08-24 — train150 paused with 197 sessions remaining
 

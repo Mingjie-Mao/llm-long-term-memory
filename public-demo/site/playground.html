@@ -1,0 +1,641 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="A live playground over the llm-long-term-memory engine: write facts, watch old values close, and see what retrieval rejected and why.">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ctext y='14' font-size='14'%3E%F0%9F%A7%A0%3C/text%3E%3C/svg%3E">
+<title>Memory Playground</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+SC:wght@400;500;600&display=swap">
+
+<style>
+:root {
+  --ground:#E7EBEA; --surface:#FAFCFB; --sunken:#DFE5E3; --ink:#14201E;
+  --muted:#5C6A67; --faint:#5F6D69; --rule:#C9D2CF;
+  --accent:#0E6152; --accent-soft:#D3E5DF;
+  --amber:#855312; --amber-soft:#F0E2C9; --dim:#78837F; --red:#8C3A32;
+}
+:root:not([data-theme="light"]) { color-scheme: light; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground:#101614; --surface:#19201E; --sunken:#0B100F; --ink:#E2E9E6;
+    --muted:#93A19D; --faint:#8F9E99; --rule:#2B3733;
+    --accent:#63C4AB; --accent-soft:#1B322D;
+    --amber:#D6A257; --amber-soft:#322818; --dim:#6C7975; --red:#E0837A;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --ground:#101614; --surface:#19201E; --sunken:#0B100F; --ink:#E2E9E6;
+  --muted:#93A19D; --faint:#8F9E99; --rule:#2B3733;
+  --accent:#63C4AB; --accent-soft:#1B322D;
+  --amber:#D6A257; --amber-soft:#322818; --dim:#6C7975; --red:#E0837A;
+  color-scheme: dark;
+}
+* { box-sizing:border-box; }
+body {
+  margin:0; background:var(--ground); color:var(--ink);
+  font-family:"IBM Plex Sans","Noto Sans SC",-apple-system,sans-serif;
+  font-size:15px; line-height:1.55; -webkit-font-smoothing:antialiased;
+}
+body[data-lang="zh"] { font-family:"Noto Sans SC","IBM Plex Sans",-apple-system,sans-serif; }
+.wrap { max-width:1280px; margin:0 auto; padding:0 22px 60px; }
+
+/* ── masthead ─────────────────────────────────────────── */
+.top { display:flex; align-items:center; justify-content:space-between; gap:18px;
+       flex-wrap:wrap; padding:24px 0 16px; border-bottom:1px solid var(--rule); }
+.top h1 { margin:0; font-family:"Newsreader","Noto Sans SC",Georgia,serif;
+          font-size:24px; font-weight:600; letter-spacing:-.015em; }
+.top .sub { margin:3px 0 0; font-size:13.5px; color:var(--muted); max-width:58ch; }
+.tools { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+a.plain { color:var(--muted); text-decoration:none; font-size:13px; }
+a.plain:hover { color:var(--accent); }
+.langswitch { display:inline-flex; padding:3px; gap:2px; border:1px solid var(--rule);
+              border-radius:999px; background:var(--surface); }
+.langswitch button { appearance:none; border:0; cursor:pointer; padding:4px 12px;
+  border-radius:999px; background:transparent; color:var(--muted);
+  font:500 12.5px/1 "IBM Plex Mono",monospace; }
+.langswitch button[aria-pressed="true"] { background:var(--accent); color:var(--surface); }
+
+/* ── live status ──────────────────────────────────────── */
+.status { display:flex; align-items:center; gap:9px; flex-wrap:wrap;
+  padding:9px 14px; margin:14px 0 16px; border-radius:4px;
+  background:var(--surface); border:1px solid var(--rule);
+  font-family:"IBM Plex Mono",monospace; font-size:11.5px; color:var(--muted); }
+.dot { width:7px; height:7px; border-radius:50%; background:var(--dim); flex:none; }
+.dot.on { background:var(--accent); }
+.dot.off { background:var(--red); }
+.status .sep { color:var(--rule); }
+.status b { color:var(--ink); font-weight:500; }
+
+/* ── chips ────────────────────────────────────────────── */
+.chips { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:16px; }
+.chips .lbl { font-family:"IBM Plex Mono",monospace; font-size:11px; letter-spacing:.09em;
+              text-transform:uppercase; color:var(--faint); margin-right:2px; }
+.chip { appearance:none; cursor:pointer; padding:7px 13px; border-radius:3px;
+  border:1px solid var(--rule); background:var(--surface); color:var(--ink);
+  font:400 13.5px/1.3 inherit; }
+.chip:hover { border-color:var(--accent); color:var(--accent); }
+.chip:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+.chip[disabled] { opacity:.5; cursor:default; }
+
+/* ── three columns ────────────────────────────────────── */
+.cols { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.05fr) minmax(0,1fr);
+        gap:16px; align-items:start; }
+@media (max-width:1080px) { .cols { grid-template-columns:minmax(0,1fr) minmax(0,1fr); } }
+@media (max-width:720px)  { .cols { grid-template-columns:minmax(0,1fr); } }
+.col { background:var(--surface); border:1px solid var(--rule); border-radius:6px;
+       display:flex; flex-direction:column; min-height:340px; overflow:hidden; }
+.col > header { display:flex; align-items:baseline; justify-content:space-between; gap:8px;
+  padding:10px 15px; border-bottom:1px solid var(--rule); background:var(--sunken); }
+.col > header .h { font:500 11px/1 "IBM Plex Mono",monospace; letter-spacing:.11em;
+                   text-transform:uppercase; color:var(--muted); }
+.col > header .n { font:400 11px/1 "IBM Plex Mono",monospace; color:var(--faint);
+                   font-variant-numeric:tabular-nums; }
+.col > .inner { padding:14px 15px; flex:1; display:flex; flex-direction:column; gap:11px; }
+
+/* ── forms ────────────────────────────────────────────── */
+label { display:block; font:500 10.5px/1 "IBM Plex Mono",monospace; letter-spacing:.08em;
+        text-transform:uppercase; color:var(--faint); margin-bottom:5px; }
+input[type=text], textarea, select {
+  width:100%; padding:8px 10px; border:1px solid var(--rule); border-radius:4px;
+  background:var(--ground); color:var(--ink); font:inherit; font-size:14px;
+}
+textarea { resize:vertical; min-height:56px; line-height:1.5; }
+input:focus, textarea:focus, select:focus { outline:2px solid var(--accent); outline-offset:-1px; }
+.row2 { display:grid; grid-template-columns:1fr 1fr; gap:9px; }
+.check { display:flex; align-items:flex-start; gap:8px; font-size:13px; color:var(--muted); }
+.check input { width:auto; margin-top:2px; flex:none; }
+.check .why { font-size:12px; color:var(--faint); line-height:1.45; }
+button.go { appearance:none; cursor:pointer; padding:9px 15px; border:0; border-radius:4px;
+  background:var(--accent); color:var(--surface); font:600 13.5px/1 inherit; }
+button.go[disabled] { opacity:.55; cursor:default; }
+button.go:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+button.ghost { appearance:none; cursor:pointer; padding:7px 12px; border:1px solid var(--rule);
+  border-radius:4px; background:transparent; color:var(--muted); font:500 12.5px/1 inherit; }
+button.ghost:hover { color:var(--ink); }
+
+/* ── memory cards ─────────────────────────────────────── */
+.mem { border:1px solid var(--rule); border-left:3px solid var(--accent); border-radius:4px;
+       padding:10px 12px; background:var(--surface); }
+.mem.sup { border-left-color:var(--amber); background:var(--amber-soft); }
+.mem .k { font:500 10.5px/1 "IBM Plex Mono",monospace; letter-spacing:.09em;
+          text-transform:uppercase; color:var(--faint); }
+.mem .v { font-size:16px; font-weight:600; margin:4px 0 2px; }
+.mem.sup .v { font-weight:500; text-decoration:line-through;
+              text-decoration-color:var(--amber); color:var(--muted); }
+.mem .st { font-family:"IBM Plex Mono",monospace; font-size:11px; color:var(--accent); }
+.mem.sup .st { color:var(--amber); }
+.mem .said { margin-top:7px; font-size:12.5px; color:var(--muted); font-style:italic; }
+.mem details { margin-top:7px; }
+.mem summary { cursor:pointer; font-family:"IBM Plex Mono",monospace; font-size:11px;
+               color:var(--faint); list-style:none; }
+.mem summary::-webkit-details-marker { display:none; }
+.mem summary::before { content:"•••"; letter-spacing:1px; }
+.mem summary:hover { color:var(--accent); }
+.mem .tech { margin-top:7px; display:grid; grid-template-columns:auto 1fr; gap:3px 10px;
+  font-family:"IBM Plex Mono",monospace; font-size:11px; color:var(--muted);
+  word-break:break-all; }
+.mem .tech span:nth-child(odd) { color:var(--faint); }
+@keyframes flash { from { background:var(--accent-soft); } to { background:var(--surface); } }
+@keyframes flashsup { from { background:var(--accent-soft); } to { background:var(--amber-soft); } }
+.mem.just { animation:flash .9s ease-out; }
+.mem.sup.just { animation:flashsup .9s ease-out; }
+@media (prefers-reduced-motion:reduce) { .mem.just { animation:none; } }
+
+.grouphead { font:500 10.5px/1 "IBM Plex Mono",monospace; letter-spacing:.09em;
+  text-transform:uppercase; color:var(--muted); margin:4px 0 -2px; }
+.empty { color:var(--faint); font-size:13px; line-height:1.6; margin:0; }
+
+/* ── answer / trace ───────────────────────────────────── */
+.trace { display:grid; gap:0; margin:2px 0 4px; }
+.step { display:grid; grid-template-columns:16px 1fr; gap:9px; align-items:start;
+        font-size:12.5px; color:var(--muted); padding:3px 0; }
+.step .m { font-family:"IBM Plex Mono",monospace; color:var(--accent); }
+.step.no .m { color:var(--amber); }
+.rej { border:1px solid var(--rule); border-left:3px solid var(--dim); border-radius:4px;
+       padding:8px 11px; background:var(--surface); }
+.rej.sup { border-left-color:var(--amber); }
+.rej .t { font-size:13px; color:var(--muted); }
+.rej .r { margin-top:4px; font-family:"IBM Plex Mono",monospace; font-size:10.5px; }
+.rej.sup .r { color:var(--amber); }
+.rej:not(.sup) .r { color:var(--dim); }
+.hit { border:1px solid var(--rule); border-left:3px solid var(--accent); border-radius:4px;
+       padding:9px 11px; background:var(--surface); }
+.hit .t { font-size:13.5px; }
+.bar { margin-top:6px; display:grid; grid-template-columns:52px 1fr 34px; gap:8px;
+       align-items:center; font-family:"IBM Plex Mono",monospace; font-size:10.5px;
+       color:var(--faint); font-variant-numeric:tabular-nums; }
+.bar .t2 { height:4px; background:var(--sunken); border-radius:2px; overflow:hidden; }
+.bar .t2 i { display:block; height:100%; background:var(--accent); }
+
+/* ── dev drawer ───────────────────────────────────────── */
+.devwrap { margin-top:16px; }
+.devwrap > summary { cursor:pointer; font-family:"IBM Plex Mono",monospace; font-size:11.5px;
+  color:var(--faint); padding:7px 0; }
+.devwrap > summary:hover { color:var(--accent); }
+pre.api { margin:8px 0 0; padding:12px 14px; background:var(--sunken); border:1px solid var(--rule);
+  border-radius:4px; overflow-x:auto; font-family:"IBM Plex Mono",monospace;
+  font-size:11.5px; line-height:1.5; color:var(--ink); max-height:340px; }
+.toast { margin:0; font-family:"IBM Plex Mono",monospace; font-size:11.5px; color:var(--muted); }
+.toast.err { color:var(--red); }
+.note { font-size:12px; color:var(--faint); line-height:1.5; margin:0; }
+</style>
+</head>
+<body data-lang="en">
+<div class="wrap">
+
+  <header class="top">
+    <div>
+      <h1 data-zh="记忆实验台" data-en="Memory playground">Memory playground</h1>
+      <p class="sub" data-zh="这个页面跑在真实引擎上。写一条事实，看旧值被关闭；提一个问题，看检索选了什么、跳过了什么、为什么。你输入的内容存在一个一小时后被物理删除的临时命名空间里。"
+         data-en="This page runs against the real engine. Write a fact and watch the previous value close; ask something and see what retrieval selected, what it skipped, and why. What you type lives in a throwaway namespace that is physically deleted after an hour.">This page runs against the real engine.</p>
+    </div>
+    <div class="tools">
+      <a class="plain" href="./index.html" data-zh="← 项目主页" data-en="← Project">← Project</a>
+      <a class="plain" href="https://github.com/Mingjie-Mao/llm-long-term-memory" rel="noopener">GitHub</a>
+      <div class="langswitch" role="group" aria-label="Language">
+        <button type="button" id="bzh" aria-pressed="false">中文</button>
+        <button type="button" id="ben" aria-pressed="true">EN</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="status">
+    <span class="dot" id="dot"></span>
+    <span id="statusText">connecting…</span>
+    <span class="sep">·</span><span data-zh="编码器" data-en="encoder">encoder</span> <b id="enc">—</b>
+    <span class="sep">·</span><span data-zh="本页不调用任何语言模型" data-en="no language model is called on this page">no language model is called on this page</span>
+    <span style="flex:1"></span>
+    <button class="ghost" id="reset" data-zh="清空会话" data-en="Reset session">Reset session</button>
+  </div>
+
+  <div class="chips">
+    <span class="lbl" data-zh="模板" data-en="Templates">Templates</span>
+    <button class="chip" data-tpl="moved" data-zh="事实变了" data-en="Fact changed">Fact changed</button>
+    <button class="chip" data-tpl="detail" data-zh="细节丢了" data-en="Lost detail">Lost detail</button>
+    <button class="chip" data-tpl="multi" data-zh="多值键" data-en="Multi-valued key">Multi-valued key</button>
+    <button class="chip" data-tpl="empty" data-zh="从空开始" data-en="Start empty">Start empty</button>
+  </div>
+
+  <div class="cols">
+    <!-- ─────────────── 1. input ─────────────── -->
+    <section class="col">
+      <header><span class="h" data-zh="写入" data-en="Write">Write</span>
+              <span class="n" id="factCount">0</span></header>
+      <div class="inner">
+        <div>
+          <label data-zh="这条事实说的是什么" data-en="What was said">What was said</label>
+          <textarea id="content" placeholder="The user moved to Melbourne."></textarea>
+        </div>
+        <div class="row2">
+          <div>
+            <label data-zh="键" data-en="Key">Key</label>
+            <input type="text" id="predicate" value="lives_in" autocomplete="off" spellcheck="false">
+          </div>
+          <div>
+            <label data-zh="值" data-en="Value">Value</label>
+            <input type="text" id="object" placeholder="Melbourne" autocomplete="off">
+          </div>
+        </div>
+        <div>
+          <label data-zh="发生时间" data-en="When it happened">When it happened</label>
+          <input type="text" id="when" placeholder="2026-06-04" autocomplete="off">
+        </div>
+        <div class="check">
+          <input type="checkbox" id="replaces">
+          <div>
+            <div data-zh="这句话取代了同一个键上的旧值" data-en="This closes the previous value on the same key">This closes the previous value on the same key</div>
+            <div class="why" data-zh="逐条判定，不是逐键判定。这个区别有来历：某个键上只要有一处标了取代，就曾把整条链上所有相邻的事实都退休掉——“每周约 $100 买菜”被“上周六在沃尔玛花了 $75”取代，而两者本来都成立。"
+                 data-en="A per-fact verdict, not a per-key one. The distinction has a history: one `replaces` anywhere on a key once retired every consecutive pair on it — “averaging $100 a week on groceries” closed by “spent $75 at Walmart on Saturday”, two facts that were both true.">A per-fact verdict, not a per-key one.</div>
+          </div>
+        </div>
+        <button class="go" id="save" data-zh="写入记忆" data-en="Save to memory">Save to memory</button>
+        <p class="toast" id="writeToast"></p>
+
+        <div style="margin-top:auto">
+          <label data-zh="原始对话（供回原文检索）" data-en="Raw conversation (for archive search)">Raw conversation</label>
+          <textarea id="turn" placeholder="Your booking reference is VX-928173."></textarea>
+          <button class="ghost" id="saveTurn" style="margin-top:7px"
+                  data-zh="存为原文轮次" data-en="Store as a raw turn">Store as a raw turn</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─────────────── 2. state ─────────────── -->
+    <section class="col">
+      <header><span class="h" data-zh="记忆状态" data-en="Memory state">Memory state</span>
+              <span class="n" id="memCount"></span></header>
+      <div class="inner" id="memPane"></div>
+    </section>
+
+    <!-- ─────────────── 3. output ─────────────── -->
+    <section class="col">
+      <header><span class="h" data-zh="检索" data-en="Retrieve">Retrieve</span>
+              <span class="n" id="lat"></span></header>
+      <div class="inner">
+        <div>
+          <label data-zh="问一个问题" data-en="Ask something">Ask something</label>
+          <input type="text" id="q" placeholder="where do I live now?" autocomplete="off">
+        </div>
+        <div class="row2">
+          <button class="go" id="ask" data-zh="检索记忆" data-en="Search memory">Search memory</button>
+          <button class="ghost" id="askRaw" data-zh="搜原始对话" data-en="Search raw">Search raw</button>
+        </div>
+        <div id="outPane"></div>
+      </div>
+    </section>
+  </div>
+
+  <details class="devwrap">
+    <summary data-zh="&lt;/&gt; 开发者：最近一次请求与响应" data-en="&lt;/&gt; Developer: last request and response">&lt;/&gt; Developer</summary>
+    <pre class="api" id="api">nothing yet</pre>
+  </details>
+
+  <p class="note" style="margin-top:14px"
+     data-zh="公开实验台，请勿输入敏感信息。会话数据在一小时后从 SQLite 和向量索引中物理删除，“清空会话”会立刻删除。这里没有账号、没有登录，命名空间由服务端签发，前端无法指定或伪造。"
+     data-en="Public playground — do not enter sensitive information. Session data is physically deleted from SQLite and the vector index after an hour, and immediately when you press Reset session. There are no accounts and no login: the namespace is minted and signed by the server, and the page cannot name or forge another one.">Public playground — do not enter sensitive information.</p>
+
+</div>
+
+<script>
+"use strict";
+
+const LOCAL = location.hostname === "localhost" || location.hostname === "127.0.0.1";
+const API = LOCAL ? "http://127.0.0.1:8100" : "https://lltm-playground.onrender.com";
+
+/* Render's free plan stops the service after about fifteen minutes of quiet, so the
+   first request after a lull pays for a process boot and an 87MB model load. Left
+   alone that reads as a broken page for half a minute, which is exactly the reaction
+   this playground exists to prevent — so the wait is named while it happens, and the
+   first call is given a long budget rather than a default one. */
+const COLD_START_MS = 90_000;
+
+let lang = /^zh\b/i.test(navigator.language || "") ? "zh" : "en";
+let token = null;
+let lastMemIds = new Set();
+
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[c]));
+const T = (zh, en) => (lang === "zh" ? zh : en);
+
+/* Every call goes through here so the developer drawer always reflects what actually
+   happened, including failures. A demo that only shows the happy path in its trace is
+   the kind of demo this page exists to stop being. */
+async function api(method, path, body) {
+  const started = performance.now();
+  const headers = { "content-type": "application/json" };
+  if (token) headers["x-demo-token"] = token;
+  let res, json;
+  try {
+    res = await fetch(API + path, {
+      method, headers,
+      body: body ? JSON.stringify(body) : undefined,
+      signal: AbortSignal.timeout(token ? 20_000 : COLD_START_MS),
+    });
+    json = await res.json().catch(() => ({}));
+  } catch (e) {
+    show(`${method} ${path}\n\nnetwork error: ${e.message}\n\nIs the backend running?`);
+    throw e;
+  }
+  const ms = (performance.now() - started).toFixed(0);
+  show(`${method} ${path}  →  ${res.status} ${res.statusText}   ${ms}ms\n` +
+       (body ? `\nrequest\n${JSON.stringify(body, null, 2)}\n` : "") +
+       `\nresponse\n${JSON.stringify(json, null, 2)}`);
+  if (!res.ok) {
+    const err = new Error(json?.detail?.message || json?.detail || res.statusText);
+    err.status = res.status;
+    throw err;
+  }
+  return json;
+}
+function show(text) { $("api").textContent = text; }
+
+function toast(el, message, isError = false) {
+  el.textContent = message;
+  el.className = "toast" + (isError ? " err" : "");
+  if (!isError) setTimeout(() => { if (el.textContent === message) el.textContent = ""; }, 3500);
+}
+
+// ───────────────────────────────────────────────── session
+let waking = null;
+
+function sayWaking() {
+  let seconds = 0;
+  $("dot").className = "dot";
+  const tick = () => {
+    seconds += 1;
+    if (seconds === 3) {
+      $("statusText").textContent = T(
+        "后端在唤醒中 — 免费实例闲置后会休眠，冷启动要几十秒。只有第一次这么慢。",
+        "waking the backend — the free instance sleeps when idle, so a cold start takes tens of seconds. Only the first request is slow.");
+    } else if (seconds > 3) {
+      $("statusText").textContent = T(
+        `后端在唤醒中，已等待 ${seconds} 秒 — 只有第一次这么慢。`,
+        `waking the backend, ${seconds}s — only the first request is slow.`);
+    }
+  };
+  return setInterval(tick, 1000);
+}
+
+async function newSession() {
+  $("dot").className = "dot";
+  $("statusText").textContent = T("正在连接…", "connecting…");
+  clearInterval(waking);
+  waking = sayWaking();
+  try {
+    const h = await api("GET", "/demo/health");
+    const s = await api("POST", "/demo/session");
+    token = s.token;
+    $("enc").textContent = h.encoder;
+    $("dot").className = "dot on";
+    $("statusText").innerHTML =
+      T(`后端在线 · 会话 <b>${esc(token.split(".")[0])}</b> · ${h.session_ttl_minutes} 分钟后自动删除`,
+        `backend online · session <b>${esc(token.split(".")[0])}</b> · deleted after ${h.session_ttl_minutes} min`);
+    clearInterval(waking);
+    lastMemIds = new Set();
+    await refresh();
+    $("outPane").innerHTML = `<p class="empty">${esc(T("写几条事实，然后问一个问题。", "Write a fact or two, then ask something."))}</p>`;
+  } catch (e) {
+    clearInterval(waking);
+    $("dot").className = "dot off";
+    $("statusText").textContent = LOCAL
+      ? T(`后端未连接（${e.message}）。本地需要先启动 demo-api。`,
+          `backend unreachable (${e.message}). Start demo-api locally first.`)
+      : T(`后端暂时不可用（${e.message}）。免费实例可能正在重启，稍后重试。`,
+          `backend unavailable (${e.message}). The free instance may be restarting; try again shortly.`);
+  }
+}
+
+// ───────────────────────────────────────────────── memory state
+function memCard(m, isNew) {
+  const sup = m.status === "superseded";
+  const when = (m.valid_from || "").slice(0, 7);
+  const until = (m.valid_to || "").slice(0, 7);
+  return `<div class="mem ${sup ? "sup" : ""} ${isNew ? "just" : ""}">
+    <div class="k">${esc(m.predicate)}</div>
+    <div class="v">${esc(m.object || m.content)}</div>
+    <div class="st">${sup
+      ? esc(T(`已取代 · ${when} 至 ${until}`, `superseded · ${when} to ${until}`))
+      : esc(T(`生效中 · ${when} 起`, `current · since ${when}`))}</div>
+    <div class="said">“${esc(m.content)}”</div>
+    <details><summary></summary>
+      <div class="tech">
+        <span>id</span><span>${esc(m.id)}</span>
+        <span>subject</span><span>${esc(m.subject)}</span>
+        <span>scope</span><span>${esc(m.scope || "—")}</span>
+        <span>event_time</span><span>${esc(m.event_time || "—")}</span>
+        <span>valid_to</span><span>${esc(m.valid_to || "—")}</span>
+        <span>replaces_previous</span><span>${m.replaces_previous}</span>
+        <span>superseded_by</span><span>${esc(m.superseded_by || "—")}</span>
+        <span>single-valued key</span><span>${m.single_valued_key}</span>
+      </div></details>
+  </div>`;
+}
+
+async function refresh(justCreated) {
+  const data = await api("GET", "/demo/memories");
+  const seen = new Set([...data.active, ...data.superseded].map((m) => m.id));
+  const isNew = (m) => m.id === justCreated || (lastMemIds.size > 0 && !lastMemIds.has(m.id));
+
+  let html = "";
+  if (!data.total) {
+    html = `<p class="empty">${esc(T(
+      "还没有记忆。左边写一条，或者点上面的模板。",
+      "No memories yet. Write one on the left, or load a template above."))}</p>`;
+  } else {
+    if (data.active.length) {
+      html += `<div class="grouphead">${esc(T("生效中", "In force"))}</div>`;
+      html += data.active.map((m) => memCard(m, isNew(m))).join("");
+    }
+    if (data.superseded.length) {
+      html += `<div class="grouphead">${esc(T("已经不成立", "No longer true"))}</div>`;
+      html += data.superseded.map((m) => memCard(m, isNew(m))).join("");
+    }
+  }
+  $("memPane").innerHTML = html;
+  $("memCount").textContent = data.total ? `${data.active.length} + ${data.superseded.length}` : "";
+  $("factCount").textContent = data.total ? T(`${data.total} 条`, `${data.total} facts`) : "";
+  lastMemIds = seen;
+}
+
+// ───────────────────────────────────────────────── write
+async function saveFact() {
+  const content = $("content").value.trim();
+  const predicate = $("predicate").value.trim();
+  const object = $("object").value.trim();
+  if (!content || !predicate || !object) {
+    toast($("writeToast"), T("三个字段都要填。", "All three fields are required."), true);
+    return;
+  }
+  $("save").disabled = true;
+  $("save").textContent = T("写入中…", "Saving…");
+  try {
+    const r = await api("POST", "/demo/facts", {
+      predicate, object, content,
+      event_time: $("when").value.trim() || null,
+      replaces_previous: $("replaces").checked,
+    });
+    await refresh(r.created.id);
+    const closed = r.changed_by_this_write.length;
+    toast($("writeToast"), closed
+      ? T(`写入 1 条，关闭了 ${closed} 条旧值`, `1 written, ${closed} previous value(s) closed`)
+      : T("写入 1 条", "1 written"));
+    $("content").value = ""; $("object").value = ""; $("replaces").checked = false;
+  } catch (e) {
+    toast($("writeToast"), e.message, true);
+  } finally {
+    $("save").disabled = false;
+    $("save").textContent = T("写入记忆", "Save to memory");
+  }
+}
+
+// ───────────────────────────────────────────────── retrieve
+async function ask() {
+  const q = $("q").value.trim();
+  if (!q) return;
+  $("ask").disabled = true;
+  try {
+    const r = await api("POST", "/demo/search", { query: q, limit: 5 });
+    $("lat").textContent = `${r.latency_ms} ms`;
+
+    const sup = r.rejected.filter((x) => x.reason === "superseded");
+    const low = r.rejected.filter((x) => x.reason === "below_rank");
+    let html = `<div class="trace">
+      <div class="step"><span class="m">1</span><span>${esc(T(
+        `检索 ${r.candidates_considered} 条候选`, `searched ${r.candidates_considered} candidate(s)`))}</span></div>
+      <div class="step ${r.memories.length ? "" : "no"}"><span class="m">2</span><span>${esc(
+        r.memories.length ? T(`选中 ${r.memories.length} 条`, `selected ${r.memories.length}`)
+                          : T("没有相关记忆", "nothing relevant"))}</span></div>
+      ${sup.length ? `<div class="step no"><span class="m">✕</span><span>${esc(T(
+        `${sup.length} 条已不成立，被时间过滤挡下`, `${sup.length} no longer true, removed by temporal filtering`))}</span></div>` : ""}
+      ${low.length ? `<div class="step"><span class="m">✕</span><span>${esc(T(
+        `${low.length} 条仍成立但分数没进前列`, `${low.length} still true but ranked below the cut`))}</span></div>` : ""}
+    </div>`;
+
+    if (r.memories.length) {
+      html += `<div class="grouphead">${esc(T("选中", "Selected"))}</div>`;
+      html += r.memories.map((m) => `<div class="hit">
+        <div class="t">${esc(m.content)}</div>
+        <div class="bar"><span>semantic</span>
+          <span class="t2"><i style="width:${Math.round((m.signals.semantic || 0) * 100)}%"></i></span>
+          <span>${(m.score).toFixed(2)}</span></div>
+      </div>`).join("");
+    }
+    if (r.rejected.length) {
+      html += `<div class="grouphead">${esc(T("未选中，以及原因", "Rejected, with the reason"))}</div>`;
+      html += r.rejected.map((x) => `<div class="rej ${x.reason === "superseded" ? "sup" : ""}">
+        <div class="t">${esc(x.content)}</div>
+        <div class="r">${esc(x.reason)}${x.superseded_by ? ` → ${esc(x.superseded_by)}` : ""}</div>
+      </div>`).join("");
+    }
+    $("outPane").innerHTML = html;
+  } catch (e) {
+    $("outPane").innerHTML = `<p class="toast err">${esc(e.message)}</p>`;
+  } finally {
+    $("ask").disabled = false;
+  }
+}
+
+async function askRaw() {
+  const q = $("q").value.trim();
+  if (!q) return;
+  try {
+    const r = await api("POST", "/demo/raw/search", { query: q, limit: 3 });
+    $("lat").textContent = `${r.latency_ms} ms`;
+    $("outPane").innerHTML = r.turns.length
+      ? `<div class="grouphead">${esc(T("原始对话（BM25）", "Raw conversation (BM25)"))}</div>` +
+        r.turns.map((t) => `<div class="hit"><div class="t">${esc(t.content)}</div>
+          <div class="bar" style="grid-template-columns:1fr"><span>${esc(t.role)} · turn ${t.turn_index}</span></div></div>`).join("")
+      : `<p class="empty">${esc(T("原文档案里没有匹配。先在左下角存一条原始对话。",
+          "Nothing in the archive. Store a raw turn on the lower left first."))}</p>`;
+  } catch (e) {
+    $("outPane").innerHTML = `<p class="toast err">${esc(e.message)}</p>`;
+  }
+}
+
+// ───────────────────────────────────────────────── templates
+const TEMPLATES = {
+  moved: { content: "The user moved to Melbourne.", predicate: "lives_in", object: "Melbourne",
+           when: "2026-06-04", replaces: true, q: "where do I live now?",
+           seed: [{ content: "The user lives in Sydney.", predicate: "lives_in", object: "Sydney", event_time: "2025-01-10" }] },
+  detail: { content: "The assistant recommended a desk lamp.", predicate: "assistant_recommendation",
+            object: "a desk lamp", when: "", replaces: false, q: "booking reference",
+            turn: "Your booking reference is VX-928173 and the lamp ships to level 3." },
+  multi: { content: "The user owns a dog.", predicate: "owns_pet", object: "a dog", when: "2026-02-01",
+           replaces: false, q: "what pets are there?",
+           seed: [{ content: "The user owns a cat.", predicate: "owns_pet", object: "a cat", event_time: "2025-05-02" }] },
+  empty: { content: "", predicate: "", object: "", when: "", replaces: false, q: "" },
+};
+
+async function loadTemplate(name) {
+  const t = TEMPLATES[name];
+  document.querySelectorAll(".chip").forEach((c) => (c.disabled = true));
+  try {
+    if (name === "empty") await newSession();
+    for (const s of t.seed || []) await api("POST", "/demo/facts", s);
+    if (t.turn) await api("POST", "/demo/turns", { role: "assistant", content: t.turn });
+    $("content").value = t.content;
+    $("predicate").value = t.predicate;
+    $("object").value = t.object;
+    $("when").value = t.when;
+    $("replaces").checked = t.replaces;
+    $("q").value = t.q;
+    if (t.turn) $("turn").value = t.turn;
+    await refresh();
+    toast($("writeToast"), T("模板已载入 — 随便改，然后写入。", "Template loaded — edit anything, then save."));
+  } catch (e) {
+    toast($("writeToast"), e.message, true);
+  } finally {
+    document.querySelectorAll(".chip").forEach((c) => (c.disabled = false));
+  }
+}
+
+// ───────────────────────────────────────────────── language
+function applyLang(next) {
+  lang = next;
+  document.body.dataset.lang = lang;
+  document.documentElement.lang = lang === "zh" ? "zh-CN" : "en";
+  document.querySelectorAll("[data-zh]").forEach((el) => {
+    const v = el.getAttribute(lang === "zh" ? "data-zh" : "data-en");
+    if (v !== null) { if (el.tagName === "SUMMARY") el.innerHTML = v; else el.textContent = v; }
+  });
+  $("bzh").setAttribute("aria-pressed", String(lang === "zh"));
+  $("ben").setAttribute("aria-pressed", String(lang === "en"));
+  $("save").textContent = T("写入记忆", "Save to memory");
+  try { localStorage.setItem("lltm.pg.lang", lang); } catch { /* private mode */ }
+  // Only after a session exists. Calling it on first paint fired a 401 before the
+  // token had been minted — swallowed by the catch, and still a real request that a
+  // reader opening the console would see and reasonably read as broken.
+  if (token) refresh().catch(() => {});
+}
+
+$("bzh").addEventListener("click", () => applyLang("zh"));
+$("ben").addEventListener("click", () => applyLang("en"));
+$("save").addEventListener("click", saveFact);
+$("ask").addEventListener("click", ask);
+$("askRaw").addEventListener("click", askRaw);
+$("q").addEventListener("keydown", (e) => { if (e.key === "Enter") ask(); });
+$("saveTurn").addEventListener("click", async () => {
+  const c = $("turn").value.trim();
+  if (!c) return;
+  try { await api("POST", "/demo/turns", { role: "assistant", content: c });
+        toast($("writeToast"), T("已存入原文档案", "Stored in the archive")); }
+  catch (e) { toast($("writeToast"), e.message, true); }
+});
+$("reset").addEventListener("click", async () => {
+  try { await api("DELETE", "/demo/session"); } catch { /* already gone */ }
+  await newSession();
+});
+document.querySelectorAll(".chip").forEach((c) =>
+  c.addEventListener("click", () => loadTemplate(c.dataset.tpl)));
+
+try { const s = localStorage.getItem("lltm.pg.lang"); if (s === "zh" || s === "en") lang = s; } catch { /* ignore */ }
+applyLang(lang);
+newSession();
+</script>
+</body>
+</html>

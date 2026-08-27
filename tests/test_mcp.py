@@ -21,6 +21,7 @@ import pytest
 
 pytest.importorskip("mcp")
 
+from llm_long_term_memory import mcp_server
 from llm_long_term_memory.api.service import MemoryService
 from llm_long_term_memory.mcp_server import build_server
 from llm_long_term_memory.store import Memory, Session, Turn
@@ -211,3 +212,25 @@ def test_forget_evicts_rather_than_deleting(server):
 
     body = call(server, "search_memory", {"user_id": "alice", "query": "where do they live?"})
     assert "m_new" not in [m["id"] for m in body["memories"]]
+
+
+@pytest.mark.parametrize(
+    ("transport", "expected"),
+    [("stdio", "stdio"), ("http", "http")],
+)
+def test_run_dispatches_the_selected_transport(monkeypatch, transport, expected):
+    calls = []
+
+    class StubServer:
+        async def run_stdio_async(self):
+            calls.append("stdio")
+
+        async def run_streamable_http_async(self):
+            calls.append("http")
+
+    service = object()
+    monkeypatch.setattr(mcp_server, "build_server", lambda received: StubServer())
+
+    mcp_server.run(transport, service=service)
+
+    assert calls == [expected]

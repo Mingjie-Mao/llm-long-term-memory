@@ -6,10 +6,10 @@ make no API calls.  Quota pauses always resume the same command.  Never add
 
 | step | action | completion evidence |
 |---:|---|---|
-| 1 | finish train150 | 7,180/7,180 terminal in checkpoint and store |
-| 2–3 | final zero audit + fixed train grid + write v2 config | final audit, selection record and verified `configs/v2.yaml` |
-| 5a | freeze dev ingestion inputs | immutable pre-ingest hash, untouched `dev100` store name |
-| 5b | ingest dev100 | complete store, then post-ingest hash |
+| ~~1~~ | ~~finish train150~~ | **done 2026-08-25** — 7,180/7,180, 18,519 memories |
+| ~~2–3~~ | ~~final zero audit + fixed train grid + write v2 config~~ | **done 2026-08-25** — audit, selection record and `configs/v2.yaml` (`mean` / radius 1 / cap 30) |
+| ~~5a~~ | ~~freeze dev ingestion inputs~~ | **done 2026-08-26** — `v2-candidate-preingest`, verifies PASS. A first attempt on 2026-08-25 was discarded with its 37%-complete store; see `prereg-context-shape.md` amendment 2 |
+| 5b | ingest dev100 | **in progress — 2,183/4,791 (45.6%)**; resume the same command each quota day |
 | 5c | run aggregate-only dev experiment | five arms x three repeats and `dev100-aggregate.md` |
 | 6a | choose v2 by registered dev rule | decision recorded without individual dev rows |
 | 6b | freeze and ingest test100 | pre- and post-ingest hashes |
@@ -62,8 +62,10 @@ candidate config.
 
 ## 5. dev100 validation
 
-The arm order is the pre-registration's paired baseline, candidate, then oracle
-ceiling.
+The frozen variant order is the pre-registration's flat baseline, coherent
+candidate, oracle ceiling, reported retrieval baseline, then memory-only
+ablation.  Keep the same five variants, in this order, for every dev100 freeze
+and ingest resume.
 
 ```bash
 .venv/bin/python scripts/freeze_v2.py --capture \
@@ -73,7 +75,9 @@ ceiling.
   --pre-ingest-store-name dev100 \
   --variant two_stage_fallback \
   --variant two_stage_coherent \
-  --variant two_stage_coherent_oracle
+  --variant two_stage_coherent_oracle \
+  --variant naive_rag \
+  --variant two_stage_memory_only
 ```
 
 ```bash
@@ -84,7 +88,9 @@ ceiling.
   --store-name dev100 \
   --variant two_stage_fallback \
   --variant two_stage_coherent \
-  --variant two_stage_coherent_oracle
+  --variant two_stage_coherent_oracle \
+  --variant naive_rag \
+  --variant two_stage_memory_only
 ```
 
 Repeat the second command after quota resets until complete, then freeze the actual
@@ -98,7 +104,9 @@ store:
   --store-name dev100 \
   --variant two_stage_fallback \
   --variant two_stage_coherent \
-  --variant two_stage_coherent_oracle
+  --variant two_stage_coherent_oracle \
+  --variant naive_rag \
+  --variant two_stage_memory_only
 ```
 
 The post-ingest freeze is accepted only if it extends the original pre-ingest
@@ -123,7 +131,7 @@ Preflight once without `--run`, then start/resume validation:
   --runs 3
 ```
 
-Only aggregate counts are printed while running.  Scores appear after all nine
+Only aggregate counts are printed while running.  Scores appear after all 15
 arm/repeat combinations finish.
 
 ## 6. test100, once
