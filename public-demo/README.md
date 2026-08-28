@@ -4,9 +4,15 @@ The public demonstration page, deployed at **<https://lltm-memory.pages.dev>**.
 
 ```
 public-demo/
-├── README.md      this file — notes, never deployed
-└── site/          the deploy root: only what should be public
-    └── index.html
+├── README.md       this file — notes, never deployed
+├── check_site.py   stdlib-only CI check, never deployed
+└── site/           the complete deploy root
+    ├── index.html     semantic page structure
+    ├── styles.css    responsive visual system
+    ├── app.js        browser and live-engine interaction
+    ├── content.js    bilingual fictional scenarios
+    ├── release.json measured figures shown on the page
+    └── playground.html legacy redirect
 ```
 
 The split is not tidiness. The first version of this directory kept the README beside
@@ -16,16 +22,48 @@ about the repository root holding `.env` and the `stores/` databases — to anyo
 guessed the path. Deploying a directory publishes *everything* in it, so the deploy
 root now contains nothing but the site.
 
-`site/index.html` is one self-contained file: no build step, no framework, no network
-requests except Google Fonts. Every memory, conversation and retrieval result in it
-is **fictional data written for the demo** — no evaluation fixture and no real store
-content appears here, and the page reads nothing from the visitor. The only measured
-figures on it are the benchmark numbers in the "Measured" table, which come from
-`docs/REPORT.md`.
+The site has no framework, package install or build step. Splitting structure, style,
+interaction and content keeps a deploy diff reviewable without adding a JavaScript
+toolchain. It makes two deliberately different promises:
 
-It is bilingual: one toggle swaps every string, including the demo data, via
-`data-zh` / `data-en` attributes and a parallel `CASES` table in the script. The
+- the guided tour runs entirely in the browser over curated fictional scenarios and
+  transmits nothing;
+- the live engine sends only the visitor's chosen scenario or developer-mode input to
+  `demo-api`, under a server-issued namespace that is hard-deleted after 60 minutes.
+
+The page loads no third-party font or analytics. Its only non-static network traffic is
+to the project's own public demo API. Measured figures come from `release.json`, the one
+site-facing release manifest; explanatory links point to the complete evidence rather
+than duplicating another table in the page.
+
+It is bilingual: one toggle swaps static copy and every guided/live scenario view via
+`data-zh` / `data-en` attributes and parallel `zh` / `en` data in `content.js`. The
 choice is remembered in `localStorage` and defaults from `navigator.language`.
+
+Run the zero-dependency contract check before deploying:
+
+```bash
+python3 public-demo/check_site.py
+```
+
+## Run it locally
+
+`app.js` treats `localhost` and `127.0.0.1` as development and calls the demo API on
+port 8100 instead of the deployed service, so both halves have to be up. From the
+repository root, in two shells:
+
+```bash
+.venv/bin/python -m uvicorn app:app --app-dir demo-api --host 127.0.0.1 --port 8100
+```
+
+```bash
+.venv/bin/python -m http.server 8779 --bind 127.0.0.1 --directory public-demo/site
+```
+
+Then open <http://localhost:8779>. Port 8779 is not arbitrary: it is the local origin
+`render.yaml` allows in `LLTM_DEMO_ORIGINS`, so the same page can also be pointed at the
+deployed API without a CORS failure. Opening `index.html` from the filesystem does not
+work: the page is an ES module, so `file://` fails the module fetch.
 
 ## Why this exists separately from the inspector
 
@@ -55,8 +93,19 @@ lives in this repository.
 root holds `.env`, the `stores/` databases and a 277 MB dataset, none of which belongs
 on a public CDN.
 
-**Check the `Uploaded N files` line every time.** A correct deploy is exactly one
-file. Any other number means something joined the deploy root that should not have.
+**Every `blob/main/` link on the page must already exist on `main`.** The page links to
+`docs/CURRENT_STATUS.md`, `docs/REPORT.md`, `results/data-protocol.md` and
+`results/heldout-variance.md`. `check_site.py` verifies local assets but cannot verify
+GitHub URLs, so deploying the page ahead of the branch that adds a linked document
+publishes a 404. Confirm with:
+
+```bash
+for f in docs/CURRENT_STATUS.md docs/REPORT.md results/data-protocol.md results/heldout-variance.md; do git cat-file -e origin/main:$f || echo "MISSING ON MAIN: $f"; done
+```
+
+**Check the `Uploaded N files` line every time.** A correct deploy contains exactly
+the six files asserted by `check_site.py`. Any other file means the public surface
+changed and must be reviewed before deployment.
 
 ## Not covered by the experiment freeze
 

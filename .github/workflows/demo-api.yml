@@ -8,14 +8,15 @@
 #
 # So this runs the two checks that would have caught it, on every change that touches
 # the service. It deliberately does not use `uv sync`: the point is to exercise the
-# dependency set `demo-api/requirements.txt` declares, not the one a developer has.
-name: demo-api
+# exact dependency lock `demo-api/requirements.txt` declares, not the one a developer has.
+name: public-demo
 
 on:
   push:
     branches: [main]
     paths:
       - "demo-api/**"
+      - "public-demo/**"
       - "render.yaml"
       - ".github/workflows/demo-api.yml"
       # The service imports the engine from source, so an engine change can break it
@@ -24,11 +25,22 @@ on:
   pull_request:
     paths:
       - "demo-api/**"
+      - "public-demo/**"
       - "render.yaml"
       - ".github/workflows/demo-api.yml"
       - "src/llm_long_term_memory/**"
 
 jobs:
+  static-site:
+    name: static site structure and accessibility contract
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: astral-sh/setup-uv@v7
+      - run: uv python install 3.12
+      - name: Check deploy surface, labels, translations, and release manifest
+        run: uv run --no-project python public-demo/check_site.py
+
   deploy-environment:
     name: imports under the declared dependencies
     runs-on: ubuntu-latest
