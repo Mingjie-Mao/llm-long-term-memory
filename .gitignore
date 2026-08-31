@@ -43,3 +43,17 @@ node_modules/
 # 87MB build artifact reproducible with demo-api/export_onnx.py.
 stores/demo-playground*
 demo-api/onnx-encoder/
+
+# dev100's per-question rows, held back until the dev decision is recorded.
+#
+# The data protocol allows dev100 to be read as aggregate metrics only — "Read
+# aggregate metrics and pre-declared slices, nothing else." Sealing exists so that
+# reading a single failure takes a deliberate act; publishing the rows to a public
+# repository while the decision is still open puts them in PR diffs, the GitHub UI
+# and code search, which is the accidental exposure the seal is for.
+#
+# The cost/latency `*.usage.json` and the audit checkpoints carry no answers, no
+# question ids and no verdicts, so they are committed as the evidence of what ran.
+# The rows themselves are kept locally and are committed once the arm decision is on
+# record — at which point reading them costs nothing, exactly as with heldout100.
+results/sealed/**/*.jsonl

@@ -1,0 +1,114 @@
+{
+  "schema_version": 1,
+  "captured_at_utc": "2026-08-29T17:46:08Z",
+  "git_head_for_reference_only": "eecb736e90cddefb6ffb9773d98293b44af91734",
+  "freeze": {
+    "path": "results/frozen/v2-candidate/freeze.json",
+    "sha256": "1da44e12a6674d742fe3d2ce82c243b941d20f815d18552c17e087bc61b1a437",
+    "bytes": 27968
+  },
+  "ingest_usage": {
+    "path": "results/raw/dev100.ingest.usage.json",
+    "sha256": "67b958d682afd09b5e32c438005b6c46cba495aa67936eb06b4b85d6b4de1724",
+    "bytes": 304250
+  },
+  "validation": {
+    "expected_rows": 1500,
+    "sealed_rows": 738,
+    "scores_inspected": false,
+    "files": [
+      {
+        "path": "results/sealed/dev100/flat20.rep1.jsonl",
+        "rows": 100,
+        "bytes": 628027,
+        "sha256": "72ff010beea1603dbd066fb22a2f0316fd0c5994d1e84c7cecf047e39a56b54e"
+      },
+      {
+        "path": "results/sealed/dev100/flat20.rep2.jsonl",
+        "rows": 100,
+        "bytes": 628781,
+        "sha256": "23507c42ada2b45ffcdea03121b04b61c2317388cdf0d2f2e652d116aec7737e"
+      },
+      {
+        "path": "results/sealed/dev100/flat20.rep3.jsonl",
+        "rows": 100,
+        "bytes": 628330,
+        "sha256": "2ebff38fada10a99f640d0969c078613821910f9d71b57f1357461607088985b"
+      },
+      {
+        "path": "results/sealed/dev100/coherent-auto.rep1.jsonl",
+        "rows": 100,
+        "bytes": 413791,
+        "sha256": "69073131e73db6e841d3479dc0be367db54b19862c19283ff153ff32c3824c36"
+      },
+      {
+        "path": "results/sealed/dev100/coherent-auto.rep2.jsonl",
+        "rows": 100,
+        "bytes": 413514,
+        "sha256": "a1d20a53f5b672d94f0236dc342ca8b4e7d971c2cac560607bbfef889dd8bebb"
+      },
+      {
+        "path": "results/sealed/dev100/coherent-auto.rep3.jsonl",
+        "rows": 100,
+        "bytes": 412880,
+        "sha256": "ff18b501121e7c568995786151f9098f6afcc5afbbefa1c82508430963477a9b"
+      },
+      {
+        "path": "results/sealed/dev100/coherent-oracle.rep1.jsonl",
+        "rows": 100,
+        "bytes": 368542,
+        "sha256": "b43bf1590e6da9df3b155e3a8355ab7453f0b1680a33bc5d9b90d0f566ad7bac"
+      },
+      {
+        "path": "results/sealed/dev100/coherent-oracle.rep2.jsonl",
+        "rows": 38,
+        "bytes": 137596,
+        "sha256": "a3aaa668c702df152e499a8cb8ec5a290a837abc8f1676f6224ee786edfe8984"
+      }
+    ],
+    "usage_files": [
+      {
+        "path": "results/sealed/dev100/flat20.rep1.usage.json",
+        "bytes": 52786,
+        "sha256": "955e391a7c20eea9720e81bf0340af577705980e9afae9ba785b3d873cd9c8c9"
+      },
+      {
+        "path": "results/sealed/dev100/flat20.rep2.usage.json",
+        "bytes": 50393,
+        "sha256": "e8f24827240e8ef8c7d69e420b71a815a632ee0516eae74ddcbe15120ba90218"
+      },
+      {
+        "path": "results/sealed/dev100/flat20.rep3.usage.json",
+        "bytes": 50024,
+        "sha256": "10e725684272c5f338cfe5b82bfe0ed83c0776b7d55f3e118c0366b4537533b1"
+      },
+      {
+        "path": "results/sealed/dev100/coherent-auto.rep1.usage.json",
+        "bytes": 49040,
+        "sha256": "d44e6a7b265ef6c42a23a56a2c4452916dc02c7a3f6f0d08717c8bb1b307ffb2"
+      },
+      {
+        "path": "results/sealed/dev100/coherent-auto.rep2.usage.json",
+        "bytes": 47986,
+        "sha256": "f3001e8b6c9cf246fcfaaac3be23eb8c5d9ae05f502dfc8b93cc1751eb5a2c05"
+      },
+      {
+        "path": "results/sealed/dev100/coherent-auto.rep3.usage.json",
+        "bytes": 49042,
+        "sha256": "06102e3395cd9fef08347085fc317ab60f6ca28260c733aad71fc037549265d4"
+      },
+      {
+        "path": "results/sealed/dev100/coherent-oracle.rep1.usage.json",
+        "bytes": 48924,
+        "sha256": "10bfe6e8d482bf09994eef44818a808aa255d00ee03d7d368d9b6e17e502fff0"
+      },
+      {
+        "path": "results/sealed/dev100/coherent-oracle.rep2.usage.json",
+        "bytes": 19376,
+        "sha256": "da0462c15fbdfef1b67674c3fcde64edc549ad97dd5c5e27c06e58a5438e3749"
+      }
+    ]
+  },
+  "pause_reason": "Provider daily quota reached during coherent-oracle repeat 2; the runner exited normally with no scores exposed.",
+  "policy": "Immutable count-and-checksum snapshot. It contains no question text, answer, verdict or score. Resume appends to the live sealed files; later checkpoints create a new snapshot instead of modifying this one."
+}
