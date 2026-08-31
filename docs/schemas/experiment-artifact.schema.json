@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://lltm-memory.pages.dev/schemas/experiment-artifact.schema.json",
+  "title": "LLTM immutable experiment artifact",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "experiment_id",
+    "created_at_utc",
+    "producer",
+    "fingerprints",
+    "files",
+    "outcome",
+    "evidence"
+  ],
+  "properties": {
+    "schema_version": {"const": 1},
+    "experiment_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{2,127}$"},
+    "created_at_utc": {"type": "string", "format": "date-time"},
+    "producer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["command", "source_commit"],
+      "properties": {
+        "command": {"type": "string", "minLength": 1},
+        "source_commit": {"type": "string", "pattern": "^[0-9a-f]{7,64}$"}
+      }
+    },
+    "fingerprints": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_sha256", "config_sha256", "inputs_sha256"],
+      "properties": {
+        "source_sha256": {"$ref": "#/$defs/sha256"},
+        "config_sha256": {"$ref": "#/$defs/sha256"},
+        "inputs_sha256": {"$ref": "#/$defs/sha256"},
+        "store_sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "files": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/file"}
+    },
+    "usage_file": {"type": "string", "minLength": 1},
+    "summary_file": {"type": "string", "minLength": 1},
+    "outcome": {"enum": ["positive", "negative", "inconclusive", "invalid"]},
+    "outcome_reason": {"type": "string", "minLength": 1},
+    "evidence": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1},
+      "uniqueItems": true
+    }
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "file": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256", "bytes", "class"],
+      "properties": {
+        "path": {"type": "string", "minLength": 1},
+        "sha256": {"$ref": "#/$defs/sha256"},
+        "bytes": {"type": "integer", "minimum": 0},
+        "class": {"enum": ["registry", "input", "raw", "usage", "summary", "outcome", "audit"]}
+      }
+    }
+  }
+}
+

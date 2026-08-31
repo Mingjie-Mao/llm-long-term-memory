@@ -1,0 +1,108 @@
+{
+  "schema_version": 1,
+  "generated_at_utc": "2026-08-29T06:09:39Z",
+  "entries": [
+    {
+      "id": "utility-predictor-p6",
+      "title": "Utility predictor lost to the mean baseline",
+      "classification": "negative",
+      "decision": "disabled",
+      "reason": "Held-out RMSE was 0.310 versus 0.263 for predicting the mean, so the predictor cannot justify a learned packing policy.",
+      "experiment_ids": ["p6-utility-pilot"],
+      "evidence_paths": ["results/p6-pilot.md", "results/raw/influence-chronomem.features.json"],
+      "recorded_at_utc": "2026-08-14T00:00:00Z"
+    },
+    {
+      "id": "cross-encoder-reranking-dev31",
+      "title": "Cross-encoder reranking changed no answers and lowered recall",
+      "classification": "negative",
+      "decision": "disabled",
+      "reason": "At k=10 every answer was identical while source-session recall fell; the serving dependency and model download earned no product benefit.",
+      "experiment_ids": ["dev31-rerank-pareto"],
+      "evidence_paths": ["results/rerank-pareto.md", "results/raw/two_stage.k10_ce.jsonl", "results/raw/two_stage.k10_plain.jsonl"],
+      "recorded_at_utc": "2026-08-14T00:00:00Z"
+    },
+    {
+      "id": "always-on-evidence-hydration",
+      "title": "Always-on evidence hydration cost three times the context",
+      "classification": "negative",
+      "decision": "superseded",
+      "reason": "A non-significant 2W-1L change cost roughly three times the context; conditional raw fallback replaced the always-on policy.",
+      "experiment_ids": ["a2-evidence-hydration"],
+      "evidence_paths": ["results/a2-pilot.md", "results/shipped-but-disabled.md"],
+      "recorded_at_utc": "2026-08-25T00:00:00Z",
+      "replacement_experiment_id": "conditional-raw-fallback-v1"
+    },
+    {
+      "id": "retrieval-extra-signals-train150",
+      "title": "Four extra retrieval signals failed to improve source recall",
+      "classification": "negative",
+      "decision": "disabled",
+      "reason": "Importance, BM25 and entity weighting reduced Top-3 recall; corrected recency weighting left Top-3 unchanged and reduced Top-2.",
+      "experiment_ids": ["train150-retrieval-weight-sweep", "train150-recency-halflife-sweep"],
+      "evidence_paths": ["results/retrieval-weights.md", "results/offline-diagnostics-2026-08-25.md", "results/analysis/weight-sweep-full-hybrid.json"],
+      "recorded_at_utc": "2026-08-25T00:00:00Z"
+    },
+    {
+      "id": "predicate-normalization-supersession",
+      "title": "Predicate normalization did not repair orphaned replacements",
+      "classification": "negative",
+      "decision": "do_not_ship",
+      "reason": "Canonicalization reunited only 2 train150 signals and no heldout100 signals with a predecessor, falsifying the proposed mechanism.",
+      "experiment_ids": ["offline-predicate-normalization-20260825"],
+      "evidence_paths": ["results/offline-diagnostics-2026-08-25.md"],
+      "recorded_at_utc": "2026-08-25T00:00:00Z"
+    },
+    {
+      "id": "tail-retry-as-batch-size-substitute",
+      "title": "Tail-only retry recovered too little of batching loss",
+      "classification": "negative",
+      "decision": "do_not_ship",
+      "reason": "Position explained 22% of the tail-to-batch1 gap while batch crowding explained 78%; tail retry is not a substitute for smaller batches.",
+      "experiment_ids": ["batch-position-reversal-pilot"],
+      "evidence_paths": ["results/batch-position-pilot.md", "results/offline-diagnostics-2026-08-25.md"],
+      "recorded_at_utc": "2026-08-25T00:00:00Z"
+    },
+    {
+      "id": "event-render-preposition",
+      "title": "Changing event annotations from since to on fixed neither target",
+      "classification": "negative",
+      "decision": "do_not_ship",
+      "reason": "Both mechanism-check questions remained wrong, three unrelated answers regressed, and the change had no measurable benefit.",
+      "experiment_ids": ["dev50-event-preposition-render"],
+      "evidence_paths": ["results/render-preposition.md"],
+      "recorded_at_utc": "2026-08-25T00:00:00Z"
+    },
+    {
+      "id": "memory-consolidation-unmeasured",
+      "title": "Memory consolidation is implemented but unmeasured",
+      "classification": "inconclusive",
+      "decision": "needs_more_evidence",
+      "reason": "The subsystem is disabled and has no experiment establishing whether it should ship or be deleted.",
+      "experiment_ids": ["consolidation-unmeasured"],
+      "evidence_paths": ["results/shipped-but-disabled.md"],
+      "recorded_at_utc": "2026-08-25T00:00:00Z"
+    },
+    {
+      "id": "decay-reinforcement-unmeasured",
+      "title": "Decay and reinforcement fields are carried but unmeasured",
+      "classification": "inconclusive",
+      "decision": "needs_more_evidence",
+      "reason": "Four schema columns and disabled retrieval hooks have no measurement-backed product decision.",
+      "experiment_ids": ["decay-reinforcement-unmeasured"],
+      "evidence_paths": ["results/shipped-but-disabled.md"],
+      "recorded_at_utc": "2026-08-25T00:00:00Z"
+    },
+    {
+      "id": "dev100-first-preingest-attempt",
+      "title": "First dev100 pre-ingest attempt was discarded",
+      "classification": "invalid",
+      "decision": "superseded",
+      "reason": "The first attempt was only 37 percent complete and did not belong to the accepted pre-ingest freeze; it was explicitly replaced before formal validation.",
+      "experiment_ids": ["v2-dev100-preingest-attempt-1"],
+      "evidence_paths": ["results/prereg-context-shape.md"],
+      "recorded_at_utc": "2026-08-26T00:00:00Z",
+      "replacement_experiment_id": "v2-candidate-preingest"
+    }
+  ]
+}

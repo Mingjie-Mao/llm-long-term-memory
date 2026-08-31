@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://lltm-memory.pages.dev/schemas/negative-results-index.schema.json",
+  "title": "LLTM negative-result decision index",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "generated_at_utc", "entries"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "generated_at_utc": {"type": "string", "format": "date-time"},
+    "entries": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/entry"}
+    }
+  },
+  "$defs": {
+    "entry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "title",
+        "classification",
+        "decision",
+        "reason",
+        "experiment_ids",
+        "evidence_paths",
+        "recorded_at_utc"
+      ],
+      "properties": {
+        "id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{2,127}$"},
+        "title": {"type": "string", "minLength": 1},
+        "classification": {"enum": ["negative", "inconclusive", "invalid"]},
+        "decision": {"enum": ["do_not_ship", "disabled", "superseded", "needs_more_evidence"]},
+        "reason": {"type": "string", "minLength": 1},
+        "experiment_ids": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        },
+        "evidence_paths": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        },
+        "recorded_at_utc": {"type": "string", "format": "date-time"},
+        "replacement_experiment_id": {"type": "string", "minLength": 1}
+      }
+    }
+  }
+}
+
