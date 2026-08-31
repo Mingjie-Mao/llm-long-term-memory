@@ -275,11 +275,12 @@ button:disabled { opacity: .46; cursor: not-allowed; }
 @keyframes reveal { from { transform: translateY(8px); opacity: .45; } }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .reveal-card.revealed { animation: none; } }
 
+.proof-block { margin: 0 0 30px; }
 .proof {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 1px;
-  margin: 0 0 30px;
+  margin: 0;
   border: 1px solid var(--rule);
   border-radius: 8px;
   overflow: hidden;
@@ -289,6 +290,12 @@ button:disabled { opacity: .46; cursor: not-allowed; }
 .proof strong { display: block; color: var(--accent); font: 600 27px/1.1 var(--mono); letter-spacing: -.03em; }
 .proof span { display: block; margin-top: 6px; font-size: 13px; }
 .proof small { display: block; margin-top: 4px; color: var(--faint); font: 500 10px/1.45 var(--mono); }
+.proof-meta {
+  margin: 9px 2px 0;
+  color: var(--faint);
+  font: 500 10px/1.5 var(--mono);
+}
+.proof-meta a { color: var(--muted); text-underline-offset: 3px; }
 
 .engine-status {
   min-height: 54px;
@@ -417,11 +424,19 @@ footer code { padding: 2px 5px; border-radius: 3px; background: var(--surface-2)
 .step-nav button[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); color: var(--ink); }
 .step-nav button[aria-pressed="true"] b { color: var(--accent); }
 
-@media (max-width: 900px) {
+@media (max-width: 920px) {
   .journey,
   .live-journey { grid-template-columns: 1fr; }
   .journey-card,
   .live-card { min-height: auto; }
+  /* Once the three columns collapse, keep the story compact and explicit. */
+  .step-nav { display: flex; gap: 7px; margin-bottom: 14px; }
+  .journey[data-step="1"] > .journey-card:not(:nth-of-type(1)),
+  .journey[data-step="2"] > .journey-card:not(:nth-of-type(2)),
+  .journey[data-step="3"] > .journey-card:not(:nth-of-type(3)),
+  .live-journey[data-step="1"] > .live-card:not(:nth-of-type(1)),
+  .live-journey[data-step="2"] > .live-card:not(:nth-of-type(2)),
+  .live-journey[data-step="3"] > .live-card:not(:nth-of-type(3)) { display: none; }
   .proof { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .principles { grid-template-columns: 1fr; gap: 16px; }
   .developer-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -455,14 +470,6 @@ footer code { padding: 2px 5px; border-radius: 3px; background: var(--surface-2)
   .advanced-grid { grid-template-columns: 1fr; padding: 11px; }
   .field-row { grid-template-columns: 1fr; gap: 0; }
   .button-row > * { flex: 1; }
-  /* One step at a time: the three-column narrative does not survive a phone column. */
-  .step-nav { display: flex; gap: 7px; margin-bottom: 14px; }
-  .journey[data-step="1"] > .journey-card:not(:nth-of-type(1)),
-  .journey[data-step="2"] > .journey-card:not(:nth-of-type(2)),
-  .journey[data-step="3"] > .journey-card:not(:nth-of-type(3)),
-  .live-journey[data-step="1"] > .live-card:not(:nth-of-type(1)),
-  .live-journey[data-step="2"] > .live-card:not(:nth-of-type(2)),
-  .live-journey[data-step="3"] > .live-card:not(:nth-of-type(3)) { display: none; }
   .developer-grid { grid-template-columns: 1fr; }
 }
 

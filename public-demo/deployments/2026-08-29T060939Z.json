@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "deployed_at_utc": "2026-08-29T06:09:39Z",
+  "provider": "cloudflare-pages",
+  "project": "lltm-memory",
+  "branch": "main",
+  "deployment_id": "18c9bea7",
+  "deployment_url": "https://18c9bea7.lltm-memory.pages.dev",
+  "production_url": "https://lltm-memory.pages.dev",
+  "git_head_for_reference_only": "eecb736e90cddefb6ffb9773d98293b44af91734",
+  "dirty_worktree": true,
+  "commit_created": false,
+  "push_performed": false,
+  "deploy_root": "public-demo/site",
+  "files": [
+    {"path": "app.js", "sha256": "782db032de0a66323706a7eda3e19132aed65c6ae5292fe6341a5425d40e6887"},
+    {"path": "content.js", "sha256": "364ef6da341aa95271fab7bae2edd78b0f64734872ec53d1fd3afff94030a575"},
+    {"path": "index.html", "sha256": "0d3a4a39f0c6709725b10d596d24268f2141848f93d9dd498dae2bd92037fc55"},
+    {"path": "playground.html", "sha256": "046fbba8e31d826539c2b3a640d601339eebe016316128a84117ebee44970486"},
+    {"path": "release.json", "sha256": "e3b91d0f0f11a242e45176b487172b14af48de47ba31f231ce434ab7057676e5"},
+    {"path": "release.schema.json", "sha256": "f139a50513bec652f0a882b99d7d1985873d18272746f93b378e173cd29110e0"},
+    {"path": "styles.css", "sha256": "49b7bde6cf88d26cb1b6d3ba34ba736d45590525a3963ad98cf91c73fc369099"}
+  ],
+  "predeploy_gates": [
+    "public-demo/check_site.py",
+    "node --check public-demo/site/app.js",
+    "JSON Schema draft 2020-12 validation",
+    "git diff --check",
+    "full pytest suite",
+    "ruff",
+    "v2-candidate validation preflight"
+  ],
+  "production_verification": {
+    "truthful_retention_copy": true,
+    "release_provenance_visible": true,
+    "tablet_768_no_horizontal_overflow": true,
+    "tablet_768_single_card_pagers": true,
+    "bilingual_accessible_names": true,
+    "fresh_namespace_on_repeated_preset": true,
+    "browser_console_errors": 0
+  }
+}

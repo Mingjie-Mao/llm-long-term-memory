@@ -10,9 +10,10 @@ let tourRan = false;
 let token = null;
 let liveReady = false;
 let liveBusy = false;
-let sessionDirty = false;
 let wakingTimer = null;
 let lastLive = null;
+let releaseData = null;
+let liveHealth = null;
 let currentEngineMessage = {
   zh: "正在连接真实引擎…",
   en: "Connecting to the live engine…",
@@ -85,21 +86,57 @@ function selectTour(name) {
   renderTour();
 }
 
+function renderMetrics() {
+  if (!releaseData) return;
+  const release = releaseData;
+  const heldout = release.heldout;
+  const engineering = release.engineering;
+  setText("metricAccuracy", `${heldout.accuracy.toFixed(1)}%`);
+  setText(
+    "metricAccuracySource",
+    T(`${heldout.dataset} · 冻结后单次运行`, `${heldout.dataset} · one frozen run`),
+  );
+  setText("metricContext", heldout.median_context_tokens.toLocaleString("en-US"));
+  setText(
+    "metricContextSource",
+    T(
+      `整段对话中位数 ${heldout.whole_transcript_median_tokens.toLocaleString("en-US")}`,
+      `whole-transcript median ${heldout.whole_transcript_median_tokens.toLocaleString("en-US")}`,
+    ),
+  );
+  setText("metricArchive", `+${heldout.raw_archive_recovery_pp}pp`);
+  setText(
+    "metricArchiveSource",
+    T(
+      `结构化记忆 ${heldout.structured_memory_accuracy.toFixed(1)}% → 最终 ${heldout.accuracy.toFixed(1)}%`,
+      `structured memory ${heldout.structured_memory_accuracy.toFixed(1)}% → final ${heldout.accuracy.toFixed(1)}%`,
+    ),
+  );
+  setText("metricTests", engineering.tests.toLocaleString("en-US"));
+  setText(
+    "metricTestsSource",
+    T(`行覆盖率 ${engineering.line_coverage}%`, `${engineering.line_coverage}% line coverage`),
+  );
+  setText(
+    "releaseMeta",
+    T(
+      `${release.release} 指标 · 工程验证于 ${engineering.verified_at}`,
+      `${release.release} metrics · engineering verified ${engineering.verified_at}`,
+    ),
+  );
+  setText("releaseCommit", engineering.source_commit);
+  $("releaseCommit").href = `https://github.com/Mingjie-Mao/llm-long-term-memory/commit/${engineering.source_commit}`;
+}
+
 async function loadMetrics() {
   try {
     const response = await fetch("./release.json", { cache: "no-store" });
     if (!response.ok) throw new Error(`release manifest returned ${response.status}`);
-    const release = await response.json();
-    setText("metricAccuracy", `${release.heldout.accuracy.toFixed(1)}%`);
-    setText("metricAccuracySource", T("heldout100 · 冻结后单次运行", "heldout100 · one frozen run"));
-    setText("metricContext", release.heldout.median_context_tokens.toLocaleString("en-US"));
-    setText("metricContextSource", T("整段对话中位数 109,260", "whole-transcript median 109,260"));
-    setText("metricArchive", `+${release.heldout.raw_archive_recovery_pp}pp`);
-    setText("metricArchiveSource", T("结构化记忆 50.0% → 最终 70.0%", "structured memory 50.0% → final 70.0%"));
-    setText("metricTests", release.engineering.tests.toLocaleString("en-US"));
-    setText("metricTestsSource", T(`行覆盖率 ${release.engineering.line_coverage}%`, `${release.engineering.line_coverage}% line coverage`));
+    releaseData = await response.json();
+    renderMetrics();
   } catch (error) {
     console.warn("release metrics unavailable", error);
+    setText("releaseMeta", T("指标清单暂时无法读取。", "Metric manifest unavailable."));
   }
 }
 
@@ -163,6 +200,15 @@ function setEngineState(state, zh, en) {
   $("retry").classList.toggle("hidden", state !== "error");
 }
 
+function showReadyState() {
+  if (!liveHealth || !token) return;
+  setEngineState(
+    "ready",
+    `真实引擎在线 · 临时会话 ${token.split(".")[0]} · ${liveHealth.session_ttl_minutes} 分钟后失效`,
+    `Live engine ready · temporary session ${token.split(".")[0]} · expires after ${liveHealth.session_ttl_minutes} min`,
+  );
+}
+
 function beginWakeClock() {
   let seconds = 0;
   clearInterval(wakingTimer);
@@ -190,14 +236,10 @@ async function connectEngine() {
     const session = await api("POST", "/demo/session");
     clearInterval(wakingTimer);
     token = session.token;
+    liveHealth = health;
     liveReady = true;
-    sessionDirty = false;
     setText("enc", health.encoder);
-    setEngineState(
-      "ready",
-      `真实引擎在线 · 临时会话 ${token.split(".")[0]} · ${health.session_ttl_minutes} 分钟后删除`,
-      `Live engine ready · temporary session ${token.split(".")[0]} · deleted after ${health.session_ttl_minutes} min`,
-    );
+    showReadyState();
     setLiveControls();
   } catch (error) {
     clearInterval(wakingTimer);
@@ -217,7 +259,6 @@ async function freshSession() {
   token = null;
   const session = await api("POST", "/demo/session");
   token = session.token;
-  sessionDirty = false;
 }
 
 function renderConversation(name) {
@@ -267,6 +308,14 @@ async function runLiveScenario(name) {
   if (!liveReady || liveBusy) return;
   liveBusy = true;
   setLiveControls();
+  document.querySelectorAll("[data-live]").forEach((button) => {
+    button.setAttribute("aria-pressed", String(button.dataset.live === name));
+  });
+  setEngineState(
+    "loading",
+    "正在清理临时会话并运行场景…",
+    "Clearing the temporary session and running the scenario…",
+  );
   setText("liveAnnounce", T("场景运行中。", "Scenario running."));
   setStep("liveJourney", 1);
   renderConversation(name);
@@ -274,7 +323,9 @@ async function runLiveScenario(name) {
   setText("liveResult", "…");
   const scenario = SCENARIOS[name];
   try {
-    if (sessionDirty) await freshSession();
+    // Every preset starts from a newly minted namespace. A partially failed run can
+    // therefore never contaminate the next scenario or a repeated click.
+    await freshSession();
     for (const fact of scenario.engine.facts || []) await api("POST", "/demo/facts", fact);
     for (const turn of scenario.engine.turns || []) await api("POST", "/demo/turns", turn);
     const memories = await api("GET", "/demo/memories");
@@ -283,14 +334,22 @@ async function runLiveScenario(name) {
       : await api("POST", "/demo/search", { query: scenario.engine.query, limit: 5 });
     renderMemories(memories);
     renderResult(name, result, scenario.engine.searchMode);
-    sessionDirty = true;
     lastLive = { name, memories, result, mode: scenario.engine.searchMode };
     setStep("liveJourney", 3);
     setText("liveAnnounce", T("真实引擎场景运行完成，已跳到第三步结果。", "Live engine scenario complete; moved to step three, the result."));
   } catch (error) {
     $("liveResult").innerHTML = `<p class="message error" role="alert">${esc(error.message)}</p>`;
     setText("liveAnnounce", T(`场景失败：${error.message}`, `Scenario failed: ${error.message}`));
+    if (!token) {
+      liveReady = false;
+      setEngineState(
+        "error",
+        `无法创建干净的临时会话：${error.message}`,
+        `Could not create a clean temporary session: ${error.message}`,
+      );
+    }
   } finally {
+    if (liveReady && token) showReadyState();
     liveBusy = false;
     setLiveControls();
   }
@@ -324,7 +383,6 @@ async function writeFact() {
   try {
     const result = await api("POST", "/demo/facts", body);
     await refreshAdvancedMemory();
-    sessionDirty = true;
     advancedMessage(T(`写入成功；关闭 ${result.changed_by_this_write.length} 条旧值。`, `Written; ${result.changed_by_this_write.length} old value(s) closed.`));
   } catch (error) {
     advancedMessage(error.message, true);
@@ -341,7 +399,6 @@ async function writeTurn() {
   setLiveControls();
   try {
     await api("POST", "/demo/turns", { role: "assistant", content });
-    sessionDirty = true;
     advancedMessage(T("已存入原文档案。", "Stored in the raw archive."));
   } catch (error) {
     advancedMessage(error.message, true);
@@ -381,9 +438,13 @@ function applyLanguage(next) {
   document.querySelectorAll("[data-placeholder-zh]").forEach((element) => {
     element.placeholder = element.getAttribute(lang === "zh" ? "data-placeholder-zh" : "data-placeholder-en");
   });
+  document.querySelectorAll("[data-aria-zh]").forEach((element) => {
+    element.setAttribute("aria-label", element.getAttribute(lang === "zh" ? "data-aria-zh" : "data-aria-en"));
+  });
   $("bzh").setAttribute("aria-pressed", String(lang === "zh"));
   $("ben").setAttribute("aria-pressed", String(lang === "en"));
   setText("statusText", T(currentEngineMessage.zh, currentEngineMessage.en));
+  renderMetrics();
   try { localStorage.setItem("lltm.demo.lang", lang); } catch { /* private mode */ }
   renderTour();
   if (lastLive) {

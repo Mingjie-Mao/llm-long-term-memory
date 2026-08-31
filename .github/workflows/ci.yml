@@ -64,3 +64,13 @@ jobs:
 
       - name: Test
         run: uv run pytest --cov=llm_long_term_memory --cov-report=term-missing
+
+      # The public page renders its figures from `release.json` rather than from
+      # hard-coded HTML, and `check_site.py` enforces that. But that only moved the
+      # drift: nothing checked whether the manifest's own numbers were still true, so
+      # `tests: 560` was as hand-maintained as the HTML string had been. This runs
+      # here because this is the job that knows the answer, and only on one platform
+      # because the count does not vary by OS.
+      - name: Release figures match what was measured
+        if: matrix.os == 'ubuntu-latest'
+        run: uv run python public-demo/check_release_figures.py

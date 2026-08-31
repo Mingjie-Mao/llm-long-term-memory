@@ -6,20 +6,20 @@
   <meta name="description" content="A temporal long-term memory layer for LLM agents: update facts, recover exact details, and explain every retrieval.">
   <meta name="color-scheme" content="light dark">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ctext y='14' font-size='14'%3E%F0%9F%A7%A0%3C/text%3E%3C/svg%3E">
-  <link rel="stylesheet" href="./styles.css">
+  <link rel="stylesheet" href="./styles.css?v=20260829c">
   <title>LLM Long-Term Memory</title>
 </head>
 <body data-lang="en">
   <a class="skip" href="#main" data-zh="跳到主要内容" data-en="Skip to main content">Skip to main content</a>
   <header class="masthead">
-    <a class="brand" href="./" aria-label="LLM Long-Term Memory home">
+    <a class="brand" href="./" aria-label="LLM Long-Term Memory home" data-aria-zh="LLM 长期记忆层首页" data-aria-en="LLM Long-Term Memory home">
       <span data-zh="LLM 长期记忆层" data-en="LLM Long-Term Memory">LLM Long-Term Memory</span>
       <small>SQLite + FTS5 · MIT</small>
     </a>
-    <nav class="topnav" aria-label="Primary">
+    <nav class="topnav" aria-label="Primary" data-aria-zh="主要导航" data-aria-en="Primary navigation">
       <a href="https://github.com/Mingjie-Mao/llm-long-term-memory" rel="noopener">GitHub</a>
       <a href="https://github.com/Mingjie-Mao/llm-long-term-memory/blob/main/docs/CURRENT_STATUS.md" rel="noopener" data-zh="当前状态" data-en="Current status">Current status</a>
-      <div class="langswitch" role="group" aria-label="Language">
+      <div class="langswitch" role="group" aria-label="Language" data-aria-zh="语言" data-aria-en="Language">
         <button type="button" id="bzh" aria-pressed="false">中文</button>
         <button type="button" id="ben" aria-pressed="true">EN</button>
       </div>
@@ -35,10 +35,10 @@
         <button class="primary" id="runTour" type="button" data-zh="运行 30 秒演示" data-en="Run the 30-second tour">Run the 30-second tour</button>
         <a class="secondary" href="#live" data-zh="进入真实引擎" data-en="Open the live engine">Open the live engine</a>
       </div>
-      <ul class="trust" aria-label="Demo properties">
+      <ul class="trust" aria-label="Demo properties" data-aria-zh="演示属性" data-aria-en="Demo properties">
         <li data-zh="引导体验在浏览器本地运行" data-en="guided tour runs in your browser">guided tour runs in your browser</li>
         <li data-zh="不调用语言模型" data-en="no language model call">no language model call</li>
-        <li data-zh="公开演示数据 60 分钟后物理删除" data-en="public demo data is hard-deleted after 60 minutes">public demo data is hard-deleted after 60 minutes</li>
+        <li data-zh="真实引擎访问权限 60 分钟后失效" data-en="live-engine access expires after 60 minutes">live-engine access expires after 60 minutes</li>
       </ul>
     </section>
 
@@ -51,12 +51,12 @@
         <span class="mode-badge" data-zh="精选场景 · 浏览器本地" data-en="curated scenario · browser-local">curated scenario · browser-local</span>
       </div>
       <p class="section-copy" data-zh="这是诚实标注的交互式讲解，不冒充模型抽取或线上请求。下面的真实引擎会运行同一套存储、时间解析和检索代码。" data-en="This is an explicitly labelled interactive walkthrough, not a model extraction or network request. The live engine below runs the actual storage, temporal resolution, and retrieval code.">This is an explicitly labelled interactive walkthrough.</p>
-      <div class="scenario-tabs" role="group" aria-label="Guided scenarios">
+      <div class="scenario-tabs" role="group" aria-label="Guided scenarios" data-aria-zh="引导场景" data-aria-en="Guided scenarios">
         <button type="button" aria-pressed="true" data-tour="changed" data-zh="事实变了" data-en="A fact changed">A fact changed</button>
         <button type="button" aria-pressed="false" data-tour="detail" data-zh="细节丢了" data-en="An exact detail was lost">An exact detail was lost</button>
         <button type="button" aria-pressed="false" data-tour="multi" data-zh="多值不误删" data-en="Multiple values stay true">Multiple values stay true</button>
       </div>
-      <div class="step-nav" id="tourNav" role="group" aria-label="Tour steps">
+      <div class="step-nav" id="tourNav" role="group" aria-label="Tour steps" data-aria-zh="引导演示步骤" data-aria-en="Guided tour steps">
         <button type="button" data-step-nav="tourJourney" data-step="1" aria-pressed="true"><b>01</b><span data-zh="对话" data-en="Conversation">Conversation</span></button>
         <button type="button" data-step-nav="tourJourney" data-step="2" aria-pressed="false"><b>02</b><span data-zh="记忆变化" data-en="Memory delta">Memory delta</span></button>
         <button type="button" data-step-nav="tourJourney" data-step="3" aria-pressed="false"><b>03</b><span data-zh="结果" data-en="Result">Result</span></button>
@@ -81,11 +81,19 @@
       <p class="sr-only" id="tourAnnounce" role="status" aria-live="polite"></p>
     </section>
 
-    <section class="proof" aria-label="Measured evidence">
-      <article><strong id="metricAccuracy">—</strong><span data-zh="未见测试集准确率" data-en="held-out accuracy">held-out accuracy</span><small id="metricAccuracySource">—</small></article>
-      <article><strong id="metricContext">—</strong><span data-zh="上下文 token 中位数" data-en="median context tokens">median context tokens</span><small id="metricContextSource">—</small></article>
-      <article><strong id="metricArchive">—</strong><span data-zh="由原文档案救回" data-en="recovered by the raw archive">recovered by the raw archive</span><small id="metricArchiveSource">—</small></article>
-      <article><strong id="metricTests">—</strong><span data-zh="自动化测试" data-en="automated tests">automated tests</span><small id="metricTestsSource">—</small></article>
+    <section class="proof-block" aria-labelledby="proof-title">
+      <h2 class="sr-only" id="proof-title" data-zh="可复核的发布指标" data-en="Verifiable release metrics">Verifiable release metrics</h2>
+      <div class="proof">
+        <article><strong id="metricAccuracy">—</strong><span data-zh="未见测试集准确率" data-en="held-out accuracy">held-out accuracy</span><small id="metricAccuracySource">—</small></article>
+        <article><strong id="metricContext">—</strong><span data-zh="上下文 token 中位数" data-en="median context tokens">median context tokens</span><small id="metricContextSource">—</small></article>
+        <article><strong id="metricArchive">—</strong><span data-zh="由原文档案救回" data-en="recovered by the raw archive">recovered by the raw archive</span><small id="metricArchiveSource">—</small></article>
+        <article><strong id="metricTests">—</strong><span data-zh="自动化测试" data-en="automated tests">automated tests</span><small id="metricTestsSource">—</small></article>
+      </div>
+      <p class="proof-meta">
+        <span id="releaseMeta" role="status" aria-live="polite">Loading release provenance…</span>
+        <span aria-hidden="true"> · </span><a id="releaseCommit" href="https://github.com/Mingjie-Mao/llm-long-term-memory" rel="noopener">source</a>
+        <span aria-hidden="true"> · </span><a href="./release.json" data-zh="查看指标清单" data-en="view metric manifest">view metric manifest</a>
+      </p>
     </section>
 
     <section class="live section" id="live" aria-labelledby="live-title">
@@ -105,13 +113,13 @@
         <button class="secondary compact hidden" id="retry" type="button" data-zh="重试连接" data-en="Retry connection">Retry connection</button>
       </div>
 
-      <div class="scenario-tabs live-tabs" role="group" aria-label="Live engine scenarios">
-        <button type="button" data-live="changed" data-requires-live disabled data-zh="运行：事实变了" data-en="Run: a fact changed">Run: a fact changed</button>
-        <button type="button" data-live="detail" data-requires-live disabled data-zh="运行：找回编号" data-en="Run: recover an exact code">Run: recover an exact code</button>
-        <button type="button" data-live="multi" data-requires-live disabled data-zh="运行：多值不误删" data-en="Run: multiple values stay true">Run: multiple values stay true</button>
+      <div class="scenario-tabs live-tabs" role="group" aria-label="Live engine scenarios" data-aria-zh="真实引擎场景" data-aria-en="Live engine scenarios">
+        <button type="button" data-live="changed" data-requires-live disabled aria-pressed="false" data-zh="运行：事实变了" data-en="Run: a fact changed">Run: a fact changed</button>
+        <button type="button" data-live="detail" data-requires-live disabled aria-pressed="false" data-zh="运行：找回编号" data-en="Run: recover an exact code">Run: recover an exact code</button>
+        <button type="button" data-live="multi" data-requires-live disabled aria-pressed="false" data-zh="运行：多值不误删" data-en="Run: multiple values stay true">Run: multiple values stay true</button>
       </div>
 
-      <div class="step-nav" id="liveNav" role="group" aria-label="Live engine steps">
+      <div class="step-nav" id="liveNav" role="group" aria-label="Live engine steps" data-aria-zh="真实引擎步骤" data-aria-en="Live engine steps">
         <button type="button" data-step-nav="liveJourney" data-step="1" aria-pressed="true"><b>01</b><span data-zh="对话" data-en="Conversation">Conversation</span></button>
         <button type="button" data-step-nav="liveJourney" data-step="2" aria-pressed="false"><b>02</b><span data-zh="记忆变化" data-en="Memory delta">Memory delta</span></button>
         <button type="button" data-step-nav="liveJourney" data-step="3" aria-pressed="false"><b>03</b><span data-zh="结果" data-en="Result">Result</span></button>
@@ -204,10 +212,10 @@
   </main>
 
   <footer>
-    <p data-zh="公开演示，请勿输入敏感信息。真实引擎会把内容存入服务端签发的临时命名空间，并在 60 分钟后物理删除。引导体验不发送输入。" data-en="Public demo: do not enter sensitive information. The live engine stores content in a server-minted temporary namespace and hard-deletes it after 60 minutes. The guided tour sends no input.">Public demo: do not enter sensitive information.</p>
+    <p data-zh="公开演示，请勿输入敏感信息。真实引擎把内容存入临时命名空间，访问凭证 60 分钟后失效；当前原型不提供生产级留存保证。引导体验不发送输入。" data-en="Public demo: do not enter sensitive information. The live engine uses a temporary namespace whose access expires after 60 minutes; this prototype is not a production retention guarantee. The guided tour sends no input.">Public demo: do not enter sensitive information.</p>
     <p><code>docker compose up --build</code> · <a href="https://github.com/Mingjie-Mao/llm-long-term-memory" rel="noopener">GitHub</a></p>
   </footer>
 
-  <script type="module" src="./app.js"></script>
+  <script type="module" src="./app.js?v=20260829c"></script>
 </body>
 </html>

@@ -12,6 +12,7 @@ public-demo/
     ├── app.js        browser and live-engine interaction
     ├── content.js    bilingual fictional scenarios
     ├── release.json measured figures shown on the page
+    ├── release.schema.json public contract for the measured figures
     └── playground.html legacy redirect
 ```
 
@@ -29,11 +30,17 @@ toolchain. It makes two deliberately different promises:
 - the guided tour runs entirely in the browser over curated fictional scenarios and
   transmits nothing;
 - the live engine sends only the visitor's chosen scenario or developer-mode input to
-  `demo-api`, under a server-issued namespace that is hard-deleted after 60 minutes.
+  `demo-api`, under a server-issued namespace whose access expires after 60 minutes.
+
+Explicit session deletion hard-deletes that namespace. The `main` implementation does not yet
+make the expiry sweep durable across a process restart, so the public page deliberately does not
+present the 60-minute access lifetime as a production retention guarantee. The restart-durable
+cleanup exists on the isolated repair branch and must be merged or ported before strengthening
+that claim.
 
 The page loads no third-party font or analytics. Its only non-static network traffic is
 to the project's own public demo API. Measured figures come from `release.json`, the one
-site-facing release manifest; explanatory links point to the complete evidence rather
+site-facing release manifest, validated against `release.schema.json`; explanatory links point to the complete evidence rather
 than duplicating another table in the page.
 
 It is bilingual: one toggle swaps static copy and every guided/live scenario view via
@@ -104,7 +111,7 @@ for f in docs/CURRENT_STATUS.md docs/REPORT.md results/data-protocol.md results/
 ```
 
 **Check the `Uploaded N files` line every time.** A correct deploy contains exactly
-the six files asserted by `check_site.py`. Any other file means the public surface
+the seven files asserted by `check_site.py`. Any other file means the public surface
 changed and must be reviewed before deployment.
 
 ## Not covered by the experiment freeze
