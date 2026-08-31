@@ -254,6 +254,8 @@ Every tool takes an explicit `user_id`; there is no ambient session identity.
 | [Design decisions](docs/DECISIONS.md) | 30 numbered decisions with the measurement behind each |
 | [Engineering report](docs/ENGINEERING_REPORT.md) | Earlier chronological write-up, including the mixed-extractor-store incident |
 | [Roadmap](docs/ROADMAP.md) | What is done, what is next |
+| [Current status](docs/CURRENT_STATUS.md) | Maintained experiment state, freeze boundary and immediate next action |
+| [Architecture separation plan](docs/ARCHITECTURE_SEPARATION_PLAN.md) | Phased split of product core, research code, negative results and audit evidence |
 | [Data protocol](results/data-protocol.md) | How the five question sets are allowed to be used |
 | [`results/`](results/) | Pre-registrations, raw runs and per-experiment write-ups |
 

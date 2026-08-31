@@ -235,6 +235,8 @@ uv run lltm mcp --transport http   # streamable HTTP
 | [设计决策](docs/DECISIONS.md) | 30 条编号决策，每条附支撑它的测量 |
 | [工程报告](docs/ENGINEERING_REPORT.md) | 更早的按时间线写的记录，含混合抽取器 store 事故 |
 | [路线图](docs/ROADMAP.md) | 已完成的和接下来的 |
+| [当前状态](docs/CURRENT_STATUS.md) | 持续更新的实验状态、冻结边界和最近一步 |
+| [架构分层计划](docs/ARCHITECTURE_SEPARATION_PLAN.md) | 分阶段拆分产品核心、研究代码、负结果和审计证据 |
 | [数据协议](results/data-protocol.md) | 五个问题集合各自允许怎么用 |
 | [`results/`](results/) | 预注册、原始运行记录和逐个实验的写作 |
 

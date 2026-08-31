@@ -13,12 +13,17 @@ import sys
 import tempfile
 from pathlib import Path
 
-os.environ.setdefault("LLTM_DEMO_STORE", str(Path(tempfile.mkdtemp()) / "playground"))
+scratch = Path(tempfile.mkdtemp())
+os.environ.setdefault("LLTM_DEMO_STORE", str(scratch / "playground"))
 os.environ.setdefault("LLTM_DEMO_SECRET", "smoke-secret-not-for-deployment")
+# Some native runtime dependencies persist process-local telemetry beside the
+# current directory. Keep every smoke-test artefact inside the same disposable
+# directory as its database instead of dirtying the repository root.
+os.chdir(scratch)
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from app import app
-from fastapi.testclient import TestClient
+from app import app  # noqa: E402
+from fastapi.testclient import TestClient  # noqa: E402
 
 ok, failed = 0, 0
 
