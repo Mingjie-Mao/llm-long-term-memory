@@ -1,0 +1,152 @@
+{
+  "arms": [
+    {
+      "arm": "v2-control",
+      "correct_with_raw_fallback_rate": 0.23809523809523808,
+      "fallback_trigger_rate": 0.42857142857142855,
+      "majority_accuracy": 0.6666666666666666,
+      "majority_accuracy_by_type": {
+        "knowledge-update": 0.6,
+        "multi-session": 0.7,
+        "single-session-assistant": 0.8333333333333334,
+        "single-session-preference": 0.0,
+        "single-session-user": 0.9,
+        "temporal-reasoning": 0.4
+      },
+      "majority_failure_types": {
+        "wrong_after_raw_fallback": 8,
+        "wrong_despite_gold_session_context": 6
+      },
+      "mean_accuracy": 0.6666666666666666,
+      "median_context_tokens": 585.5,
+      "questions": 42,
+      "recall_by_stage": {
+        "candidates": 1.0,
+        "ranked": 1.0,
+        "selected": 1.0
+      },
+      "run_accuracies": [
+        0.6666666666666666
+      ],
+      "runs": 1,
+      "spread_accuracy": 0.0,
+      "stdev_accuracy": 0.0,
+      "unanimous_agreement": 1.0,
+      "usage": {
+        "by_role": {
+          "answerer": {
+            "failed_requests": 1,
+            "input_tokens": 57234,
+            "output_tokens": 2598,
+            "requests": 61
+          },
+          "judge": {
+            "failed_requests": 1,
+            "input_tokens": 8996,
+            "output_tokens": 1439,
+            "requests": 43
+          }
+        },
+        "failed_requests": 2,
+        "input_tokens": 66230,
+        "output_tokens": 4037,
+        "requests": 104
+      }
+    },
+    {
+      "arm": "v3.1-reasoned",
+      "correct_with_raw_fallback_rate": 0.21428571428571427,
+      "fallback_trigger_rate": 0.35714285714285715,
+      "majority_accuracy": 0.6666666666666666,
+      "majority_accuracy_by_type": {
+        "knowledge-update": 0.8,
+        "multi-session": 0.6,
+        "single-session-assistant": 0.8333333333333334,
+        "single-session-preference": 1.0,
+        "single-session-user": 0.9,
+        "temporal-reasoning": 0.3
+      },
+      "majority_failure_types": {
+        "wrong_after_raw_fallback": 6,
+        "wrong_despite_gold_session_context": 8
+      },
+      "mean_accuracy": 0.6666666666666666,
+      "median_context_tokens": 557.5,
+      "questions": 42,
+      "recall_by_stage": {
+        "candidates": 1.0,
+        "ranked": 1.0,
+        "selected": 1.0
+      },
+      "run_accuracies": [
+        0.6666666666666666
+      ],
+      "runs": 1,
+      "spread_accuracy": 0.0,
+      "stdev_accuracy": 0.0,
+      "unanimous_agreement": 1.0,
+      "usage": {
+        "by_role": {
+          "answerer": {
+            "failed_requests": 3,
+            "input_tokens": 64098,
+            "output_tokens": 3318,
+            "requests": 60
+          },
+          "judge": {
+            "failed_requests": 1,
+            "input_tokens": 9762,
+            "output_tokens": 1387,
+            "requests": 43
+          }
+        },
+        "failed_requests": 4,
+        "input_tokens": 73860,
+        "output_tokens": 4705,
+        "requests": 103
+      }
+    }
+  ],
+  "manifest": {
+    "name": "v3-reasoning-tune42",
+    "questions": 42
+  },
+  "paired": {
+    "accuracy_delta": 0.0,
+    "baseline": "v2-control",
+    "both_right": 26,
+    "both_wrong": 12,
+    "candidate": "v3.1-reasoned",
+    "candidate_losses": 2,
+    "candidate_wins": 2,
+    "p_value": 1.0,
+    "questions": 42
+  },
+  "privacy": {
+    "aggregate_only": true,
+    "contains_question_ids_or_text": false
+  },
+  "schema_version": 1,
+  "sealed_artifacts": {
+    "v2-control.jsonl": {
+      "bytes": 267515,
+      "sha256": "1715cd22472540a28c94de524df4b4478ca08e4359a61f906c95ec824f4ef9be"
+    },
+    "v2-control.usage.json": {
+      "bytes": 22490,
+      "sha256": "ad1c3a62502f86b1e24d601796fe7a43aebefe15286a52aeceb86a6e8fcc836f"
+    },
+    "v3.1-reasoned.jsonl": {
+      "bytes": 270077,
+      "sha256": "8463f9cd3e7a365b073270f558e49326a8534224671df4c208a59368bc31ee71"
+    },
+    "v3.1-reasoned.usage.json": {
+      "bytes": 22747,
+      "sha256": "bd5b9abceba9f2b5a5bd31a99d5f0fd9adac19f6433862755a79cac6d8c39bbf"
+    }
+  },
+  "shared_store": {
+    "ingestion_reused": true,
+    "name": "train150"
+  }
+}

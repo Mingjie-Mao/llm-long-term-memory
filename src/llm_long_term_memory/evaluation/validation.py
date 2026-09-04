@@ -25,6 +25,8 @@ from .harness import QuestionResult, RunReport
 from .reproducibility import sha256_file
 
 RECALL_STAGES = ("candidates", "ranked", "selected")
+DEV_DECISION_ARMS = ("flat20", "coherent-auto", "coherent-oracle")
+DEV_REPORT_ARMS = (*DEV_DECISION_ARMS, "naive_rag", "memory-only")
 
 
 class ValidationArtifactError(ValueError):
@@ -109,8 +111,8 @@ def select_dev_candidate(arms: list[ArmAggregate]) -> DevCandidateDecision:
     # (`naive_rag`, `memory-only`) may also be present; they answer "compared with
     # what?" in the final table and must not be able to move the product choice, so
     # they are required to be absent from this computation rather than tolerated.
-    decision_arms = {"flat20", "coherent-auto", "coherent-oracle"}
-    reportable = decision_arms | {"naive_rag", "memory-only"}
+    decision_arms = set(DEV_DECISION_ARMS)
+    reportable = set(DEV_REPORT_ARMS)
     if not decision_arms <= set(by_name):
         raise ValidationArtifactError(
             "dev decision requires exactly flat20, coherent-auto and coherent-oracle"
@@ -231,7 +233,7 @@ def load_dev_decision(decision_path: str | Path, aggregate_path: str | Path) -> 
         raise ValidationArtifactError("dev100 decision disagrees with its aggregate report")
     expected_artifacts = {
         filename
-        for name in ("flat20", "coherent-auto", "coherent-oracle")
+        for name in DEV_REPORT_ARMS
         for number in range(1, 4)
         for filename in (f"{name}.rep{number}.jsonl", f"{name}.rep{number}.usage.json")
     }

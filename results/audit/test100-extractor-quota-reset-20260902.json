@@ -1,0 +1,20 @@
+{
+  "reason": "The user reported that the provider quota had recovered before the local Pacific-date counter changed.",
+  "evidence": "A real gemini-3.1-flash-lite preflight request with no test100 content was accepted.",
+  "previous_local_state": {
+    "day": "2026-09-01",
+    "count": 500
+  },
+  "aligned_local_state": {
+    "day": "2026-09-01",
+    "count": 1
+  },
+  "probe_counted": true,
+  "experiment_configuration_changed": false,
+  "formal_request_outcome": "The next real extraction request was rejected by Google with 429 RESOURCE_EXHAUSTED.",
+  "final_local_state": {
+    "day": "2026-09-01",
+    "count": 500
+  },
+  "decision": "Do not bypass the provider response; wait for the next Pacific-midnight reset."
+}

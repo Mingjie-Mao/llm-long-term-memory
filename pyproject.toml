@@ -60,6 +60,14 @@ packages = ["src/llm_long_term_memory"]
 [tool.ruff]
 line-length = 100
 target-version = "py311"
+# Archived verifiers are evidence, not source. Every `conclusion.json` records the
+# byte length and sha256 of the verifier that produced its verdict, and the verifier
+# checks that inventory — including its own entry. A formatter that rewrote one would
+# silently invalidate the archive it exists to prove, and the failure would surface as
+# an unrelated "evidence changed" error in whatever ran next. Excluding them is not a
+# style exemption: these files are finished and must never be edited again, so there is
+# nothing for either the linter or the formatter to act on.
+extend-exclude = ["tools/verify_*.py"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]

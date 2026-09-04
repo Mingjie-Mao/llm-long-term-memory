@@ -45,6 +45,10 @@ class StubRunner:
         return Answer(text="Sydney", context_tokens=10, prompt_tokens=12, output_tokens=2)
 
 
+class VersionedStubRunner(StubRunner):
+    answer_prompt_version = "memory-reasoned-v3"
+
+
 class StubJudge:
     def __init__(self, correct=True):
         self.correct = correct
@@ -65,6 +69,14 @@ def test_results_are_written_as_they_complete(tmp_path):
 
     assert report.n == 5
     assert len(out.read_text(encoding="utf-8").strip().splitlines()) == 5
+
+
+def test_result_records_the_runners_actual_answer_prompt_version(tmp_path):
+    report = run_eval(
+        VersionedStubRunner(), StubJudge(), [instance("q1")], tmp_path / "reasoned.jsonl"
+    )
+
+    assert report.results[0].answer_prompt_version == "memory-reasoned-v3"
 
 
 def test_the_question_type_reaches_the_judge(tmp_path):

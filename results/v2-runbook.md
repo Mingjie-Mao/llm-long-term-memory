@@ -9,11 +9,11 @@ make no API calls.  Quota pauses always resume the same command.  Never add
 | ~~1~~ | ~~finish train150~~ | **done 2026-08-25** — 7,180/7,180, 18,519 memories |
 | ~~2–3~~ | ~~final zero audit + fixed train grid + write v2 config~~ | **done 2026-08-25** — audit, selection record and `configs/v2.yaml` (`mean` / radius 1 / cap 30) |
 | ~~5a~~ | ~~freeze dev ingestion inputs~~ | **done 2026-08-26** — `v2-candidate-preingest`, verifies PASS. A first attempt on 2026-08-25 was discarded with its 37%-complete store; see `prereg-context-shape.md` amendment 2 |
-| 5b | ingest dev100 | **in progress — 2,183/4,791 (45.6%)**; resume the same command each quota day |
-| 5c | run aggregate-only dev experiment | five arms x three repeats and `dev100-aggregate.md` |
-| 6a | choose v2 by registered dev rule | decision recorded without individual dev rows |
-| 6b | freeze and ingest test100 | pre- and post-ingest hashes |
-| 6c | spend test100 once | durable ledger + one aggregate report for v2 and baselines |
+| ~~5b~~ | ~~ingest dev100~~ | **done 2026-08-28** — 4,791/4,791, 12,436 memories |
+| ~~5c~~ | ~~run aggregate-only dev experiment~~ | **done 2026-09-01** — five arms x three repeats, 1,500/1,500 sealed rows |
+| ~~6a~~ | ~~choose v2 by registered dev rule~~ | **done 2026-09-01** — `flat20` / `two_stage_fallback`; decision bound to all 30 sealed artifacts |
+| ~~6b~~ | ~~freeze and ingest test100~~ | **done 2026-09-03** — 4,714/4,714 sessions, 12,471 memories; `v2-final` verifies PASS |
+| ~~6c~~ | ~~spend test100 once~~ | **done 2026-09-03** — ledger complete; v2 72%, full context 86%, naive RAG 65%; second run forbidden |
 | 7 | product hardening | only after experimental conclusion is fixed; follow `docs/PRODUCTIZATION_V2_PLAN.md` |
 
 ## 1. Resume train150
@@ -140,8 +140,9 @@ First record which product arm survived dev100.  Final arms are registered in
 `prereg-v2-final.md`: `v2`, `full_context`, `naive_rag`, and—only when it is not
 identical to v2—`flat_memory_fallback`.
 
-The commands below show the coherent-v2 case.  If dev selects flat fallback, change
-the first variant to `two_stage_fallback` and omit the final duplicate variant/arm.
+The registered dev rule selected flat fallback. The final protocol therefore has
+three distinct arms: v2, full context, and naive RAG. The duplicate flat-fallback
+ablation is omitted exactly as pre-registered.
 
 ```bash
 .venv/bin/python scripts/freeze_v2.py --capture \
@@ -149,10 +150,9 @@ the first variant to `two_stage_fallback` and omit the final duplicate variant/a
   --config configs/v2.yaml \
   --manifest results/manifests/test100.json \
   --pre-ingest-store-name test100 \
-  --variant two_stage_coherent \
+  --variant two_stage_fallback \
   --variant full_context \
-  --variant naive_rag \
-  --variant two_stage_fallback
+  --variant naive_rag
 ```
 
 ```bash
@@ -161,10 +161,9 @@ the first variant to `two_stage_fallback` and omit the final duplicate variant/a
   --config configs/v2.yaml \
   --manifest results/manifests/test100.json \
   --store-name test100 \
-  --variant two_stage_coherent \
+  --variant two_stage_fallback \
   --variant full_context \
-  --variant naive_rag \
-  --variant two_stage_fallback
+  --variant naive_rag
 ```
 
 After the test store is complete:
@@ -175,10 +174,9 @@ After the test store is complete:
   --config configs/v2.yaml \
   --manifest results/manifests/test100.json \
   --store-name test100 \
-  --variant two_stage_coherent \
+  --variant two_stage_fallback \
   --variant full_context \
-  --variant naive_rag \
-  --variant two_stage_fallback
+  --variant naive_rag
 ```
 
 For `test100`, both freezes also hash the dev100 aggregate and automatic decision.
@@ -193,14 +191,17 @@ Run the final preflight without `--run`.  When it passes, add `--run` exactly on
   --config configs/v2.yaml \
   --manifest results/manifests/test100.json \
   --store-name test100 \
-  --arm v2=two_stage_coherent \
+  --arm v2=two_stage_fallback \
   --arm full_context=full_context \
-  --arm naive_rag=naive_rag \
-  --arm flat_memory_fallback=two_stage_fallback
+  --arm naive_rag=naive_rag
 ```
 
 Quota pauses return 2 and keep ledger status `started`; use the identical command to
 resume.  Once ledger status is `complete`, the runner refuses another execution.
+
+Final evidence is in `results/final/test100-aggregate.json` and
+`results/final/test100-aggregate.md`. The aggregate contains no question text or ids and
+hash-binds all six sealed row/usage artifacts. Do not run the command with `--run` again.
 
 ## 7. Product hardening
 

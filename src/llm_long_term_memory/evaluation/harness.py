@@ -263,7 +263,9 @@ def _run_eval_locked(runner, judge, instances, path, usage, resume, on_progress)
                 latency_ms=answer.latency_ms,
                 evidence_recalled=answer.notes.get("evidence_recalled"),
                 source_session_recalled=answer.notes.get("source_session_recalled"),
-                answer_prompt_version=ANSWER_PROMPT_VERSION,
+                answer_prompt_version=getattr(
+                    runner, "answer_prompt_version", ANSWER_PROMPT_VERSION
+                ),
                 judge_prompt_version=JUDGE_PROMPT_VERSION,
                 # From the store, not from the checked-out code: it describes the
                 # data being evaluated, which an older store will not share.

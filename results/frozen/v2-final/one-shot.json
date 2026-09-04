@@ -1,0 +1,28 @@
+{
+  "aggregate_sha256": "f0b5d491296662ff0e336a33e137d46afc954ce5d2d45e2d7454d98105cb5bf2",
+  "arms": [
+    {
+      "name": "v2",
+      "variant": "two_stage_fallback"
+    },
+    {
+      "name": "full_context",
+      "variant": "full_context"
+    },
+    {
+      "name": "naive_rag",
+      "variant": "naive_rag"
+    }
+  ],
+  "completed_at_utc": "2026-09-02T17:02:47.119133+00:00",
+  "freeze_sha256": "eb859d1643edbc4fd893c6210e96862e9bad972e81be11f55487e0a637213d13",
+  "rows": {
+    "full_context": 100,
+    "naive_rag": 100,
+    "v2": 100
+  },
+  "rule": "one resumable run per pre-registered arm; never fresh/repeated",
+  "schema_version": 2,
+  "started_at_utc": "2026-09-02T15:43:48.532687+00:00",
+  "status": "complete"
+}

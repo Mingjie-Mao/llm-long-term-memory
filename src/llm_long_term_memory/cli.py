@@ -259,6 +259,12 @@ def _build(
         # forbids. Reporting it as a split of the fallback arm is not the same
         # measurement either: in that arm the answerer knows it may ask for source.
         "two_stage_memory_only",
+        # v3 research arm: same v2 store/retrieval/fallback, with an explicit
+        # evidence/check/calculation answer policy. It never uses benchmark labels.
+        "two_stage_reasoned",
+        # v3.2: hydrate compact source spans only for time, aggregation and current-
+        # state reasoning. Direct lookups keep the short v2 context.
+        "two_stage_reasoned_evidence",
     ):
         from llm_long_term_memory.retrieve import SessionBudget
         from llm_long_term_memory.store import NumpyFlatIndex, SQLiteMemoryStore
@@ -302,8 +308,10 @@ def _build(
             decay_halflife_days=cfg.decay.halflife_days,
             reinforcement=cfg.decay.reinforcement,
             evidence_hydration="_hydrated" in variant,
+            adaptive_reasoning_hydration=variant == "two_stage_reasoned_evidence",
             hydration_neighbouring_sentences=cfg.hydration.neighbouring_sentences,
             hydration_max_tokens=cfg.hydration.max_tokens,
+            hydration_allocation=cfg.hydration.allocation,
             token_budget=cfg.pack.token_budget if cfg.pack.enabled else 0,
             utility_model=utility_model,
             type_floors=cfg.pack.type_floors if cfg.pack.enabled else None,
@@ -324,6 +332,9 @@ def _build(
             if variant in {"two_stage_coherent", "two_stage_coherent_oracle"}
             else None,
             oracle_session_context=variant == "two_stage_coherent_oracle",
+            answer_policy="reasoned_v3"
+            if variant in {"two_stage_reasoned", "two_stage_reasoned_evidence"}
+            else "v2",
         )
         runner.name = variant
     else:
@@ -338,7 +349,8 @@ def eval_run(
         help=(
             "full_context | naive_rag | two_stage | two_stage_no_temporal | "
             "two_stage_hydrated | two_stage_hydrated_no_temporal | two_stage_coherent | "
-            "two_stage_coherent_oracle | two_stage_memory_only. "
+            "two_stage_coherent_oracle | two_stage_memory_only | two_stage_reasoned | "
+            "two_stage_reasoned_evidence. "
             "The chronomem* names belong to the frozen v1 run and are kept so its "
             "rows are not overwritten by a re-measurement of a different pipeline."
         ),

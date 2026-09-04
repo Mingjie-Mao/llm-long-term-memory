@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 import re
+from collections import defaultdict
 from dataclasses import dataclass, field
+from typing import Literal
 
 from llm_long_term_memory.store import Memory, MemoryStore
 
@@ -26,6 +28,9 @@ class HydrationResult:
     tokens: int = 0
     missing_anchors: int = 0
     skipped_for_budget: int = 0
+    redundant_anchors: int = 0
+    eligible_sessions: int = 0
+    hydrated_sessions: int = 0
 
 
 def _expand_to_sentences(text: str, start: int, end: int, neighbours: int) -> str:
@@ -56,15 +61,44 @@ class EvidenceHydrator:
         *,
         neighbouring_sentences: int = 1,
         chars_per_token: float = 4.6,
+        allocation: Literal["ranked", "session_fair"] = "ranked",
     ) -> None:
+        if allocation not in {"ranked", "session_fair"}:
+            raise ValueError(f"unknown hydration allocation: {allocation!r}")
         self.store = store
         self.neighbouring_sentences = max(0, neighbouring_sentences)
         self.chars_per_token = chars_per_token
+        self.allocation = allocation
+
+    @staticmethod
+    def _session_fair_order(evidence: list[HydratedEvidence]) -> list[HydratedEvidence]:
+        """Keep rank within a session but give every session an equal first chance.
+
+        Retrieval rank still decides which session appears first and which source span
+        represents it. Round-robin only prevents several memories from that first
+        session consuming the whole raw-evidence budget before another selected
+        session contributes anything.
+        """
+        by_session: dict[str, list[HydratedEvidence]] = defaultdict(list)
+        for item in evidence:
+            by_session[item.session_id].append(item)
+        ordered: list[HydratedEvidence] = []
+        depth = 0
+        while True:
+            added = False
+            for items in by_session.values():
+                if depth < len(items):
+                    ordered.append(items[depth])
+                    added = True
+            if not added:
+                return ordered
+            depth += 1
 
     def hydrate(self, memories: list[Memory], max_tokens: int = 0) -> HydrationResult:
         result = HydrationResult()
         seen: set[tuple[str, int, int, int]] = set()
         sessions: dict[str, dict[int, object]] = {}
+        candidates: list[HydratedEvidence] = []
 
         for memory in memories:
             anchor = (
@@ -92,10 +126,7 @@ class EvidenceHydrator:
                 continue
             text = _expand_to_sentences(turn.content, start, end, self.neighbouring_sentences)
             token_count = max(1, int(len(text) / self.chars_per_token)) if text else 0
-            if max_tokens and result.tokens + token_count > max_tokens:
-                result.skipped_for_budget += 1
-                continue
-            result.evidence.append(
+            candidates.append(
                 HydratedEvidence(
                     memory_id=memory.id,
                     session_id=session_id,
@@ -105,7 +136,30 @@ class EvidenceHydrator:
                     token_count=token_count,
                 )
             )
-            result.tokens += token_count
+
+        if self.allocation == "session_fair":
+            # Different extracted facts can point at different character spans in
+            # the same source sentence. Sending that sentence twice costs tokens
+            # without adding evidence, so compact mode keeps its first-ranked copy.
+            unique: list[HydratedEvidence] = []
+            seen_source: set[tuple[str, int, str]] = set()
+            for item in candidates:
+                source = (item.session_id, item.turn_index, item.text)
+                if source in seen_source:
+                    result.redundant_anchors += 1
+                    continue
+                seen_source.add(source)
+                unique.append(item)
+            candidates = self._session_fair_order(unique)
+
+        result.eligible_sessions = len({item.session_id for item in candidates})
+        for item in candidates:
+            if max_tokens and result.tokens + item.token_count > max_tokens:
+                result.skipped_for_budget += 1
+                continue
+            result.evidence.append(item)
+            result.tokens += item.token_count
+        result.hydrated_sessions = len({item.session_id for item in result.evidence})
         return result
 
 

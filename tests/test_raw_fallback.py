@@ -128,6 +128,8 @@ def wired(tmp_path):
                 scope="recommendation",
                 source_session_id="s1",
                 source_turn_index=1,
+                source_char_start=0,
+                source_char_end=500,
             ),
             Memory(
                 id="m_pref",
@@ -178,6 +180,84 @@ def test_memory_alone_answers_without_touching_the_archive(wired):
     assert "Mayo Clinic" in answer.text
 
 
+def test_reasoned_policy_uses_its_schema_and_returns_only_the_answer(wired):
+    store, index = wired
+    client = ScriptedClient(
+        {
+            "status": "answer",
+            "answer": "Use the short Mayo Clinic video.",
+            "evidence_summary": ["The user prefers short instructional videos."],
+            "calculation": "",
+            "confidence": "high",
+        }
+    )
+
+    answer = runner(store, index, client, answer_policy="reasoned_v3").answer(
+        instance("Any tips for a posture video?")
+    )
+
+    assert answer.text == "Use the short Mayo Clinic video."
+    assert answer.notes["answer_policy"] == "reasoned_v3"
+    assert answer.notes["reasoning_kind"] == "preference_application"
+    assert answer.notes["answer_confidence"] == "high"
+    assert "Required answer operation: preference_application" in client.calls[0]
+
+
+def test_adaptive_reasoning_hydrates_temporal_source_before_answering(wired):
+    store, index = wired
+    client = ScriptedClient(
+        {
+            "status": "answer",
+            "answer": "It was two days later.",
+            "evidence_summary": ["The source turn contains the dated detail."],
+            "calculation": "May 3 - May 1 = 2 days",
+            "confidence": "high",
+        }
+    )
+    inst = instance("How many days after the recommendation did I share the video?")
+    inst.answer_session_ids = ["s1"]
+
+    answer = runner(
+        store,
+        index,
+        client,
+        answer_policy="reasoned_v3",
+        adaptive_reasoning_hydration=True,
+    ).answer(inst)
+
+    assert len(client.calls) == 1
+    assert "Verbatim source evidence" in client.calls[0]
+    assert MAYO_URL in client.calls[0]
+    assert answer.notes["hydration_applied"] is True
+    assert answer.notes["recall_coverage"]["selected"] == 1.0
+    assert answer.notes["all_source_sessions_recalled"] is True
+    assert answer.notes["answer_calculation"] == "May 3 - May 1 = 2 days"
+
+
+def test_adaptive_reasoning_keeps_direct_lookup_context_short(wired):
+    store, index = wired
+    client = ScriptedClient(
+        {
+            "status": "answer",
+            "answer": "The Mayo Clinic video.",
+            "evidence_summary": ["The assistant recommended it."],
+            "calculation": "",
+            "confidence": "high",
+        }
+    )
+
+    answer = runner(
+        store,
+        index,
+        client,
+        answer_policy="reasoned_v3",
+        adaptive_reasoning_hydration=True,
+    ).answer(instance("What video was recommended?"))
+
+    assert "Verbatim source evidence" not in client.calls[0]
+    assert answer.notes["hydration_applied"] is False
+
+
 def test_source_local_fallback_recovers_a_detail_extraction_dropped(wired):
     """The defining case. The memory is true, on topic, and cannot answer the
     question, because the URL never survived extraction."""
@@ -199,6 +279,27 @@ def test_source_local_fallback_recovers_a_detail_extraction_dropped(wired):
     assert MAYO_URL in answer.text, "the exact string came back from the raw turn"
     # The second prompt must actually contain the verbatim turn.
     assert MAYO_URL in client.calls[1]
+
+
+def test_reasoned_fallback_keeps_operation_guide_on_second_pass(wired):
+    store, index = wired
+    client = ScriptedClient(
+        {
+            "status": "need_source",
+            "reason": "The exact URL is absent from structured memory.",
+            "source_query": "Mayo Clinic posture URL",
+            "confidence": "low",
+        },
+        f"The link was {MAYO_URL}",
+    )
+
+    answer = runner(store, index, client, answer_policy="reasoned_v3").answer(
+        instance("What was the exact video link?")
+    )
+
+    assert MAYO_URL in answer.text
+    assert "Required answer operation: direct" in client.calls[1]
+    assert "The exact URL is absent" in client.calls[1]
 
 
 def test_runner_applies_configured_fallback_budgets(wired):

@@ -1,0 +1,81 @@
+{
+  "created_at_utc": "2026-09-04T09:15:27.639809+00:00",
+  "experiment_id": "v3-phase4-tune2",
+  "files": [
+    {
+      "bytes": 1471,
+      "path": "configs/v3-phase4-adaptive.yaml",
+      "sha256": "d0f5f9ffc4e1ec71fb369d4d5efb2047be42c237dc4be7364b4c6523946548f2"
+    },
+    {
+      "bytes": 2942,
+      "path": "results/archive/v3-phase3-tune1/conclusion.json",
+      "sha256": "5a02bec1dc292bd7b95a9f8adfe918d22e242bac60386d3bca1b0172b7b787a9"
+    },
+    {
+      "bytes": 903,
+      "path": "results/archive/v3-phase4-tune2/README.md",
+      "sha256": "517be8a5dd56eb43f61cc2d965570609ae59aac31c3bddb81cf8fc76b91f6238"
+    },
+    {
+      "bytes": 430185,
+      "path": "results/archive/v3-phase4-tune2/source.tar.gz",
+      "sha256": "62d0614beea046c3224d7c5f819df2e7e688d68faded03c70398fef54306fb47"
+    },
+    {
+      "bytes": 26480,
+      "path": "results/frozen/v3-phase4-tune2/freeze.json",
+      "sha256": "f25a05183095fbcafb0f26409f05bee9dd5dc2c735f46207f37457f77dd29970"
+    },
+    {
+      "bytes": 995,
+      "path": "results/manifests/v3-reasoning-tune42.json",
+      "sha256": "792e5bf8be75e1e8617f56ee39fa38a0510f6dfe71502a46b661e7524544e4e2"
+    },
+    {
+      "bytes": 1899,
+      "path": "results/prereg-v3-phase4-adaptive.md",
+      "sha256": "ced9f3047b6affa0e4b5e85b6b1991245f1b9176d9aba76b4f2c3ce7c5f3909f"
+    },
+    {
+      "bytes": 267515,
+      "path": "results/sealed/v3-phase3-tune1/v2-control.jsonl",
+      "sha256": "1715cd22472540a28c94de524df4b4478ca08e4359a61f906c95ec824f4ef9be"
+    },
+    {
+      "bytes": 22490,
+      "path": "results/sealed/v3-phase3-tune1/v2-control.usage.json",
+      "sha256": "ad1c3a62502f86b1e24d601796fe7a43aebefe15286a52aeceb86a6e8fcc836f"
+    },
+    {
+      "bytes": 287731,
+      "path": "results/sealed/v3-phase4-tune2/v3.2-adaptive.jsonl",
+      "sha256": "8d3ef4b226920f3fbd1807dc00f2f26941083633e1541ba09782dc4e1e6bc0a1"
+    },
+    {
+      "bytes": 26943,
+      "path": "results/sealed/v3-phase4-tune2/v3.2-adaptive.usage.json",
+      "sha256": "b3e583c138f1d5eb0beb28ca1235a116744e83b9b580e02da434a9c216a56fc5"
+    },
+    {
+      "bytes": 5137,
+      "path": "results/validation/v3-phase4-tune2.json",
+      "sha256": "d424893bff7da10404e32e4b6873ac6e9f36c0d29f5038ea07baaaa5a7ea110a"
+    },
+    {
+      "bytes": 846,
+      "path": "results/validation/v3-phase4-tune2.md",
+      "sha256": "b4bb056106682b4eb956716e5d62f48a73a812b27f344d327b8f7cce7bf58511"
+    },
+    {
+      "bytes": 10642,
+      "path": "tools/verify_v3_phase4_tune2.py",
+      "sha256": "cca99195a49497f08f7eda4b5d174efec65d61576a9917df74675f44f5eb7b6f"
+    }
+  ],
+  "outcome": "stopped_on_context_budget",
+  "outcome_reason": "v3.2 improved overall accuracy from 66.7% to 73.8% and temporal accuracy from 40% to 60%, but its 2.52x median context ratio exceeded the pre-registered 2x limit, so it cannot proceed to dev60.",
+  "schema_version": 1,
+  "source_sha256": "20af44317ff37f4ad7d1fd63252dbb5b10fd252e14bd304ea7e5aee891bfc6c0",
+  "summary_file": "results/validation/v3-phase4-tune2.json"
+}

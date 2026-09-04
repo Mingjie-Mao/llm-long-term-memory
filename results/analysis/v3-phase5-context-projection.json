@@ -1,0 +1,33 @@
+{
+  "assumption": "Retrieval is replayed exactly; the observed raw-fallback token increment is carried forward. Answer accuracy and future fallback decisions are not predicted.",
+  "kind": "offline_context_projection",
+  "provider_calls": 0,
+  "questions": 42,
+  "schema_version": 1,
+  "source": {
+    "new_config_sha256": "c181cbbb94e61d9f824e42c5347b9fede449d5c9eb97d4284763d0a0632fe732",
+    "observed_rows": "results/sealed/v3-phase4-tune2/v3.2-adaptive.jsonl",
+    "observed_rows_sha256": "8d3ef4b226920f3fbd1807dc00f2f26941083633e1541ba09782dc4e1e6bc0a1",
+    "old_config_sha256": "d0f5f9ffc4e1ec71fb369d4d5efb2047be42c237dc4be7364b4c6523946548f2"
+  },
+  "v2_median_context_tokens": 585.5,
+  "v3_2_observed": {
+    "full_hydrated_gold_session_coverage_rate": 0.8571428571428571,
+    "mean_hydrated_gold_session_coverage": 0.943452380952381,
+    "median_context_tokens": 1476.5
+  },
+  "v3_3_projected": {
+    "context_ratio_vs_v2": 1.9197267292912041,
+    "deduplicated_source_anchors": 0,
+    "eligible_sessions": 341,
+    "full_hydrated_gold_session_coverage_rate": 0.8571428571428571,
+    "hydrated_questions": 28,
+    "hydrated_sessions": 316,
+    "max_context_tokens": 1725,
+    "mean_hydrated_gold_session_coverage": 0.9494047619047619,
+    "median_context_tokens": 1124.0,
+    "median_hydration_tokens": 415.0,
+    "p95_context_tokens": 1648,
+    "session_coverage": 0.9266862170087976
+  }
+}

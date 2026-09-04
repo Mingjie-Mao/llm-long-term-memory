@@ -1,0 +1,45 @@
+{
+  "aborted_ledger": {
+    "arms": [
+      {
+        "name": "v2-control",
+        "variant": "two_stage_fallback"
+      },
+      {
+        "name": "v3.3-compact",
+        "variant": "two_stage_reasoned_evidence"
+      }
+    ],
+    "completed_at_utc": null,
+    "expected_rows": 360,
+    "freeze_sha256": "59530e09044bcd57a78deb33cc655ded838d62e85b84068e155ef287bec98146",
+    "questions": 60,
+    "rows": {
+      "v2-control.rep1": 0,
+      "v2-control.rep2": 0,
+      "v2-control.rep3": 0,
+      "v3.3-compact.rep1": 0,
+      "v3.3-compact.rep2": 0,
+      "v3.3-compact.rep3": 0
+    },
+    "rule": "one resumable dev60 execution; never fresh, repeated, or tuned",
+    "runs_per_arm": 3,
+    "schema_version": 1,
+    "started_at_utc": "2026-09-04T19:06:09.774559+00:00",
+    "status": "started"
+  },
+  "candidate_changed": false,
+  "decision": "Abort the execution, delete the empty ledger and its empty row file, add a provider request timeout, re-capture the freeze, and start the single dev60 execution again from zero. No dev60 question, answer or judge output was generated or read, so no result was discarded and the one-shot rule is not spent.",
+  "dev60_content_observed": false,
+  "evidence": {
+    "process": "pid 45613 ran 31m32s with 13.74s of CPU time; the socket to the provider stayed ESTABLISHED with Recv-Q 0 and Send-Q 0",
+    "quota_counter": "stores/quota/quota-gemini-3.5-flash-lite.json last advanced at 2026-09-04T19:07:07Z and never again, so exactly one answerer request was issued",
+    "rows_written": 0,
+    "usage_checkpoint_written": false
+  },
+  "experiment_configuration_changed": false,
+  "reason": "The first dev60 execution hung on its first answerer request and produced no rows.",
+  "root_cause": "GeminiClient constructed google.genai.Client without http_options.timeout. google-genai 2.17.0 defaults to no timeout, so a half-open TCP connection blocks the read forever. The existing retry budgets (max_retries=5, max_transport_retries=12) are driven by caught exceptions and therefore never fire on a blocking read.",
+  "rows_discarded": 0,
+  "source_changed": "Transport timeout only: src/llm_long_term_memory/llm/client.py"
+}

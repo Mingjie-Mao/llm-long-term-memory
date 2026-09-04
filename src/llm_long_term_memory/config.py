@@ -14,7 +14,7 @@ model and silently changing your results mid-project.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 import yaml
 from pydantic import BaseModel, Field
@@ -158,6 +158,7 @@ class ConsolidationConfig(BaseModel):
 class HydrationConfig(BaseModel):
     neighbouring_sentences: int = 1
     max_tokens: int = 800
+    allocation: Literal["ranked", "session_fair"] = "ranked"
 
 
 class FallbackConfig(BaseModel):

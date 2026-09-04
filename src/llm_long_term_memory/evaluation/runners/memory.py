@@ -40,7 +40,14 @@ from llm_long_term_memory.store import (
     external_session_id,
 )
 
-from .base import ANSWER_SYSTEM, Answer, AnswerVerdict
+from .base import ANSWER_PROMPT_VERSION, ANSWER_SYSTEM, Answer, AnswerVerdict
+from .reasoning import (
+    REASONED_ANSWER_PROMPT_VERSION,
+    REASONED_ANSWER_SYSTEM,
+    ReasonedAnswerVerdict,
+    reasoning_kind,
+    render_reasoned_prompt,
+)
 
 _TEMPLATE = """\
 Here is what is known about the user, drawn from their chat history.
@@ -61,6 +68,14 @@ TEMPORAL_NOTE = (
 
 def _external_session_ids(values) -> set[str]:
     return {external_session_id(value) for value in values if value}
+
+
+def _session_coverage(evidence: set[str], values) -> float | None:
+    """Fraction of all gold sessions present, while keeping legacy any-hit recall."""
+    if not evidence:
+        return None
+    present = evidence & _external_session_ids(values)
+    return len(present) / len(evidence)
 
 
 # Scope -> heading, in the order they are shown. Ordering is semantic rather than
@@ -144,8 +159,10 @@ class MemoryRunner:
         decay_halflife_days: float = 60.0,
         reinforcement: float = 0.30,
         evidence_hydration: bool = False,
+        adaptive_reasoning_hydration: bool = False,
         hydration_neighbouring_sentences: int = 1,
         hydration_max_tokens: int = 800,
+        hydration_allocation: str = "ranked",
         token_budget: int = 0,
         utility_model=None,
         type_floors: dict[str, float] | None = None,
@@ -157,6 +174,7 @@ class MemoryRunner:
         raw_fallback_max_chars: int = 2400,
         session_budget: SessionBudget | None = None,
         oracle_session_context: bool = False,
+        answer_policy: str = "v2",
     ) -> None:
         self.client = client
         self.model = model
@@ -178,6 +196,20 @@ class MemoryRunner:
         if oracle_session_context and session_budget is None:
             raise ValueError("oracle_session_context requires a session_budget")
         self.oracle_session_context = oracle_session_context
+        if answer_policy not in {"v2", "reasoned_v3"}:
+            raise ValueError(f"unknown answer policy {answer_policy!r}")
+        self.answer_policy = answer_policy
+        self.answer_system = (
+            REASONED_ANSWER_SYSTEM if answer_policy == "reasoned_v3" else ANSWER_SYSTEM
+        )
+        self.answer_prompt_version = (
+            REASONED_ANSWER_PROMPT_VERSION
+            if answer_policy == "reasoned_v3"
+            else ANSWER_PROMPT_VERSION
+        )
+        self.verdict_schema = (
+            ReasonedAnswerVerdict if answer_policy == "reasoned_v3" else AnswerVerdict
+        )
         self.retriever = HybridRetriever(
             store,
             index,
@@ -191,11 +223,13 @@ class MemoryRunner:
         self.decay_halflife_days = decay_halflife_days
         self.reinforcement = reinforcement
         self.evidence_hydration = evidence_hydration
+        self.adaptive_reasoning_hydration = adaptive_reasoning_hydration
         self.hydration_max_tokens = hydration_max_tokens
         self.hydrator = EvidenceHydrator(
             store,
             neighbouring_sentences=hydration_neighbouring_sentences,
             chars_per_token=chars_per_token,
+            allocation=hydration_allocation,
         )
         # 0 disables packing and keeps the plain top-k truncation, so the P6 rows
         # are a change of selection policy against an otherwise identical pipeline.
@@ -345,7 +379,15 @@ class MemoryRunner:
             packed = self._pack(selected, retrieved_by_id, instance.question)
             selected = packed.selected
 
-        context, hydration = self._assemble_context(selected)
+        operation = (
+            reasoning_kind(instance.question) if self.answer_policy == "reasoned_v3" else None
+        )
+        hydrate_for_reasoning = self.adaptive_reasoning_hydration and operation in {
+            "temporal",
+            "multi_session_aggregation",
+            "current_state",
+        }
+        context, hydration = self._assemble_context(selected, force_hydration=hydrate_for_reasoning)
         assembly_latency_ms = (perf_counter() - assembly_started) * 1000
         if self.fallback is not None:
             completion, answer_text, verdict, raw_evidence = self._answer_with_fallback(
@@ -360,6 +402,10 @@ class MemoryRunner:
             )
 
         evidence = set(instance.answer_session_ids)
+        candidate_sessions = _external_session_ids(trace.candidate_session_ids)
+        ranked_sessions = _external_session_ids(hit.memory.source_session_id for hit in retrieved)
+        selected_sessions = _external_session_ids(m.source_session_id for m in selected)
+        hydrated_sessions = _external_session_ids(e.session_id for e in hydration.evidence)
         return Answer(
             text=answer_text,
             context_tokens=int(
@@ -422,12 +468,8 @@ class MemoryRunner:
                 "token_budget": self.token_budget,
                 "packed_utilisation": packed.utilisation if packed else None,
                 "dropped_negative": packed.dropped_negative if packed else None,
-                "source_session_recalled": bool(
-                    evidence & _external_session_ids(m.source_session_id for m in selected)
-                ),
-                "evidence_recalled": bool(
-                    evidence & _external_session_ids(m.source_session_id for m in selected)
-                ),
+                "source_session_recalled": bool(evidence & selected_sessions),
+                "evidence_recalled": bool(evidence & selected_sessions),
                 # Staged recall. One end-of-pipeline number cannot distinguish "never
                 # found it" from "found it and then dropped it", and those call for
                 # opposite fixes. Production stages are nested. In the explicitly
@@ -435,30 +477,47 @@ class MemoryRunner:
                 # `ranked` missed; that non-production ceiling is intentionally not
                 # interpreted as a ranking fix.
                 "recall_stages": {
-                    "candidates": bool(
-                        evidence & _external_session_ids(trace.candidate_session_ids)
-                    ),
-                    "ranked": bool(
-                        evidence
-                        & _external_session_ids(hit.memory.source_session_id for hit in retrieved)
-                    ),
-                    "selected": bool(
-                        evidence & _external_session_ids(m.source_session_id for m in selected)
-                    ),
-                    "hydrated": bool(
-                        evidence & _external_session_ids(e.session_id for e in hydration.evidence)
-                    )
-                    if self.evidence_hydration
+                    "candidates": bool(evidence & candidate_sessions),
+                    "ranked": bool(evidence & ranked_sessions),
+                    "selected": bool(evidence & selected_sessions),
+                    "hydrated": bool(evidence & hydrated_sessions)
+                    if self.evidence_hydration or hydrate_for_reasoning
                     else None,
                 },
+                "recall_coverage": {
+                    "candidates": _session_coverage(evidence, candidate_sessions),
+                    "ranked": _session_coverage(evidence, ranked_sessions),
+                    "selected": _session_coverage(evidence, selected_sessions),
+                    "hydrated": _session_coverage(evidence, hydrated_sessions)
+                    if self.evidence_hydration or hydrate_for_reasoning
+                    else None,
+                },
+                "all_source_sessions_recalled": (
+                    _session_coverage(evidence, selected_sessions) == 1.0 if evidence else None
+                ),
                 "candidates_considered": len(trace.candidate_ids),
                 "reranked": trace.reranked,
                 "evidence_hydration": self.evidence_hydration,
+                "adaptive_reasoning_hydration": self.adaptive_reasoning_hydration,
+                "hydration_applied": bool(hydration.evidence),
                 "hydrated_memory_ids": [item.memory_id for item in hydration.evidence],
                 "hydrated_tokens": hydration.tokens,
                 "hydration_missing_anchors": hydration.missing_anchors,
                 "hydration_skipped_for_budget": hydration.skipped_for_budget,
+                "hydration_redundant_anchors": hydration.redundant_anchors,
+                "hydration_eligible_sessions": hydration.eligible_sessions,
+                "hydration_sessions": hydration.hydrated_sessions,
+                "hydration_session_coverage": (
+                    hydration.hydrated_sessions / hydration.eligible_sessions
+                    if hydration.eligible_sessions
+                    else None
+                ),
                 "answer_status": verdict.status if verdict else None,
+                "answer_policy": self.answer_policy,
+                "reasoning_kind": operation,
+                "answer_confidence": getattr(verdict, "confidence", None),
+                "answer_evidence_summary": getattr(verdict, "evidence_summary", None),
+                "answer_calculation": getattr(verdict, "calculation", None),
                 "fallback_level": raw_evidence.level if raw_evidence else "none",
                 "fallback_reason": (
                     raw_evidence.reason if raw_evidence and raw_evidence.used else None
@@ -479,11 +538,13 @@ class MemoryRunner:
         completion = self._complete(instance, context)
         return completion.text.strip()
 
-    def _assemble_context(self, memories: list[Memory]) -> tuple[str, HydrationResult]:
+    def _assemble_context(
+        self, memories: list[Memory], *, force_hydration: bool = False
+    ) -> tuple[str, HydrationResult]:
         body = render_grouped(memories, self.temporal)
         context = f"{TEMPORAL_NOTE}\n\n{body}" if self.temporal else body
         hydration = HydrationResult()
-        if self.evidence_hydration:
+        if self.evidence_hydration or force_hydration:
             hydration = self.hydrator.hydrate(memories, max_tokens=self.hydration_max_tokens)
             if hydration.evidence:
                 context = (
@@ -515,7 +576,7 @@ Question: {question}
         """
         first = self._complete(instance, context, structured=True)
         try:
-            verdict = AnswerVerdict.model_validate_json(first.text)
+            verdict = self.verdict_schema.model_validate_json(first.text)
         except ValueError:
             # A model that ignored the schema still produced an answer; treat the
             # raw text as one rather than failing the question.
@@ -534,17 +595,27 @@ Question: {question}
             # measured strength worth protecting.
             return first, (verdict.answer or "I do not know.").strip(), verdict, evidence
 
-        prompt = self._FALLBACK_TEMPLATE.format(
-            reason=verdict.reason or "the requested detail was missing",
-            evidence=evidence.render(max_chars=self.raw_fallback_max_chars),
-            date=instance.question_date,
-            question=instance.question,
-        )
+        rendered_evidence = evidence.render(max_chars=self.raw_fallback_max_chars)
+        if self.answer_policy == "reasoned_v3":
+            prompt = render_reasoned_prompt(
+                f"{context}\n\nThe first pass requested source because: "
+                f"{verdict.reason or 'the requested detail was missing'}\n\n"
+                f"Verbatim source evidence:\n{rendered_evidence}",
+                instance.question_date,
+                instance.question,
+            )
+        else:
+            prompt = self._FALLBACK_TEMPLATE.format(
+                reason=verdict.reason or "the requested detail was missing",
+                evidence=rendered_evidence,
+                date=instance.question_date,
+                question=instance.question,
+            )
         second = self.client.generate(
             role="answerer",
             model=self.model,
             prompt=prompt,
-            system=ANSWER_SYSTEM,
+            system=self.answer_system,
             temperature=0.0,
             max_output_tokens=self.max_output_tokens,
             est_input_tokens=int(len(prompt) / self.chars_per_token),
@@ -552,14 +623,20 @@ Question: {question}
         return second, second.text.strip(), verdict, evidence
 
     def _complete(self, instance: Instance, context: str, structured: bool = False):
-        prompt = _TEMPLATE.format(
-            context=context, date=instance.question_date, question=instance.question
+        prompt = (
+            render_reasoned_prompt(context, instance.question_date, instance.question)
+            if self.answer_policy == "reasoned_v3"
+            else _TEMPLATE.format(
+                context=context,
+                date=instance.question_date,
+                question=instance.question,
+            )
         )
         completion = self.client.generate(
             role="answerer",
             model=self.model,
             prompt=prompt,
-            system=ANSWER_SYSTEM,
+            system=self.answer_system,
             temperature=0.0,
             max_output_tokens=self.max_output_tokens,
             est_input_tokens=int(len(prompt) / self.chars_per_token),

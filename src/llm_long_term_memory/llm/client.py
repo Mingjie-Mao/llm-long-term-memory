@@ -157,8 +157,25 @@ class GeminiClient:
         usage: UsageTracker | None = None,
         max_retries: int = 5,
         max_transport_retries: int = 12,
+        timeout_seconds: float = 180.0,
     ) -> None:
-        self._client = genai.Client(api_key=api_key)
+        # `HttpOptions.timeout` defaults to None, which means *no* timeout, and that
+        # turns a half-open TCP connection into a permanent stall: the request is
+        # sent, the peer never answers and never closes, and the read blocks forever.
+        # Neither retry budget below can help, because both are driven by caught
+        # exceptions and a blocking read raises nothing. The v3 dev60 run hung this
+        # way for 31 minutes on its first answerer call, with 13.7s of CPU time and a
+        # socket whose send and receive queues were both empty
+        # (results/audit/dev60-transport-hang-abort-20260904T190609Z.json).
+        #
+        # 180s rather than something tighter: the slowest *successful* answerer call
+        # in the tune3 run took 101s, and a timeout that reaps those would convert a
+        # slow provider into missing rows.
+        self._client = genai.Client(
+            api_key=api_key,
+            http_options=types.HttpOptions(timeout=int(timeout_seconds * 1000)),
+        )
+        self.timeout_seconds = timeout_seconds
         self.quota = quota
         self.usage = usage or UsageTracker()
         self.max_retries = max_retries

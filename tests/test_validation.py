@@ -123,13 +123,21 @@ def test_dev_decision_is_cryptographically_bound_to_its_aggregate(tmp_path):
             arm("flat20", 0.70, 100),
             arm("coherent-auto", 0.71, 120),
             arm("coherent-oracle", 0.72, 120),
+            arm("naive_rag", 0.99, 13_000),
+            arm("memory-only", 0.98, 90),
         ]
     ).to_dict()
     results = tmp_path / "results"
     sealed = results / "sealed" / "dev100"
     sealed.mkdir(parents=True)
     artifacts = []
-    for name in ("flat20", "coherent-auto", "coherent-oracle"):
+    for name in (
+        "flat20",
+        "coherent-auto",
+        "coherent-oracle",
+        "naive_rag",
+        "memory-only",
+    ):
         for number in range(1, 4):
             for suffix in ("jsonl", "usage.json"):
                 path = sealed / f"{name}.rep{number}.{suffix}"

@@ -133,6 +133,13 @@ def main() -> int:
         action="store_true",
         help="replace an existing freeze; never use after reading validation/test results",
     )
+    parser.add_argument(
+        "--protocol-path",
+        action="append",
+        type=Path,
+        default=[],
+        help="additional pre-registered artifact to hash for a non-formal research freeze",
+    )
     args = parser.parse_args()
     settings = Settings()
     destination = REPO / "results" / "frozen" / args.name / "freeze.json"
@@ -186,7 +193,10 @@ def main() -> int:
         variants=tuple(args.variant),
         store_name=args.store_name,
         pre_ingest_store_name=args.pre_ingest_store_name,
-        protocol_paths=formal_protocol_paths(REPO, manifest.name),
+        protocol_paths=(
+            *formal_protocol_paths(REPO, manifest.name),
+            *(rooted(path) for path in args.protocol_path),
+        ),
     )
     try:
         current = capture_system(request)

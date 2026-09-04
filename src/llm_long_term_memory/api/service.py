@@ -158,6 +158,7 @@ class MemoryService:
         self.hydrator = EvidenceHydrator(
             self.store,
             neighbouring_sentences=self.config.hydration.neighbouring_sentences,
+            allocation=self.config.hydration.allocation,
         )
 
     @property
