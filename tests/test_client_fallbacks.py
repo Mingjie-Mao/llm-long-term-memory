@@ -7,12 +7,15 @@ provider changes something.
 
 from __future__ import annotations
 
+from datetime import datetime
+
 import httpx
 import pytest
 from google.genai import errors, types
 
 from llm_long_term_memory.llm import Limits, QuotaManager
 from llm_long_term_memory.llm.client import DailyQuotaExhausted, GeminiClient
+from llm_long_term_memory.llm.rate_limiter import QUOTA_TZ
 
 
 class FakeAPIError(errors.APIError):
@@ -217,7 +220,15 @@ def test_server_refusal_outranks_the_local_counter(client):
 
     assert limiter.remaining_today == 0
     assert caught.value.wait.is_daily
-    assert caught.value.wait.seconds > 60, "a real reset time, not a zero wait"
+    # The clock is pinned rather than read. Asserting "> 60 seconds" against the real
+    # wall clock made this fail for the one minute a day either side of Pacific
+    # midnight, when the true reset genuinely is seconds away — caught at 23:59:43
+    # Pacific. What the test means is that the wait is computed from the next reset
+    # instead of defaulting to zero, so it pins a time where that distinction is visible.
+    limiter._wall_clock = lambda: datetime(2026, 9, 12, 8, 0, tzinfo=QUOTA_TZ)
+    assert limiter._seconds_until_reset() == pytest.approx(16 * 3600), (
+        "a real reset time, not a zero wait"
+    )
 
 
 def test_404_is_not_retried(client):

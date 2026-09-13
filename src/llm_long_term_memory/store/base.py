@@ -145,6 +145,10 @@ class MemoryStore(Protocol):
         """Every namespace present. Whole-store passes must walk all of them."""
         ...
 
+    def session_ids_for_user(self, user_id: str) -> set[str]:
+        """Session ids belonging to one namespace."""
+        ...
+
     def session_ids(self) -> set[str]:
         """Every archived source session id, including resumable in-flight work."""
         ...

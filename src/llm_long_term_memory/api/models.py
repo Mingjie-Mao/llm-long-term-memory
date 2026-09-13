@@ -13,6 +13,8 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, Field
 
+from llm_long_term_memory.store import external_session_id
+
 
 class SourceRef(BaseModel):
     """Where a memory came from. Every memory has one; this is the product's
@@ -58,7 +60,7 @@ class MemoryOut(BaseModel):
             valid_to=memory.valid_to,
             superseded_by=memory.superseded_by,
             source=SourceRef(
-                session_id=memory.source_session_id,
+                session_id=external_session_id(memory.source_session_id),
                 turn_index=memory.source_turn_index,
                 char_start=memory.source_char_start,
                 char_end=memory.source_char_end,
@@ -103,7 +105,11 @@ class RejectedOut(BaseModel):
 
 
 class SearchRequest(BaseModel):
-    user_id: str = Field(min_length=1)
+    # Optional since trusted identity landed: an authenticated caller's namespace comes
+    # from its credential, and requiring it in the body as well would mean every client
+    # sends a value the server is about to overwrite or reject. In open mode it is still
+    # how the namespace is chosen, and the service refuses an empty one.
+    user_id: str | None = Field(default=None, min_length=1)
     query: str = Field(min_length=1)
     limit: int | None = Field(default=None, ge=1, le=100)
     include_superseded: bool = False
@@ -119,10 +125,14 @@ class SearchResponse(BaseModel):
 
 
 class MessageRequest(BaseModel):
-    user_id: str = Field(min_length=1)
+    # Optional since trusted identity landed: an authenticated caller's namespace comes
+    # from its credential, and requiring it in the body as well would mean every client
+    # sends a value the server is about to overwrite or reject. In open mode it is still
+    # how the namespace is chosen, and the service refuses an empty one.
+    user_id: str | None = Field(default=None, min_length=1)
     role: Literal["user", "assistant"] = "user"
-    content: str = Field(min_length=1)
-    session_id: str | None = None
+    content: str = Field(min_length=1, max_length=20_000)
+    session_id: str | None = Field(default=None, min_length=1, max_length=200)
 
 
 class MessageResponse(BaseModel):
@@ -216,7 +226,11 @@ class GoldenRunResponse(BaseModel):
 
 
 class AnswerRequest(BaseModel):
-    user_id: str = Field(min_length=1)
+    # Optional since trusted identity landed: an authenticated caller's namespace comes
+    # from its credential, and requiring it in the body as well would mean every client
+    # sends a value the server is about to overwrite or reject. In open mode it is still
+    # how the namespace is chosen, and the service refuses an empty one.
+    user_id: str | None = Field(default=None, min_length=1)
     query: str = Field(min_length=1)
     limit: int | None = Field(default=None, ge=1, le=100)
 
@@ -252,3 +266,7 @@ class HealthResponse(BaseModel):
     memories: int
     search_available: bool = True
     detail: str | None = None
+    # False means every caller may name any namespace. Reported because an open
+    # deployment that looks identical to a secured one is how a prototype gets
+    # pointed at real users.
+    authenticated_access: bool = False

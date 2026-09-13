@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="830" viewBox="0 0 1200 830" role="img" aria-labelledby="title desc">
+<title id="title">From conversation sessions to versioned facts</title>
+<desc id="desc">Architecture verified against the repository on 2026-09-07. See docs/ARCHITECTURE.md for the detailed figure caption and source mapping. Solid arrows show flow; dashed arrows show conditional paths.</desc>
+<rect x="0" y="0" width="1200" height="830" rx="7" fill="#FFFFFF" stroke="none" stroke-width="1.3"/>
+<text x="40" y="42" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#345E80" text-anchor="start">FIGURE 02</text>
+<text x="40" y="82" font-family="Georgia, Times New Roman, serif" font-size="31" font-weight="400" fill="#203247" text-anchor="start">From conversation sessions to versioned facts</text>
+<text x="40" y="113" font-family="Helvetica, Arial, sans-serif" font-size="17" font-weight="400" fill="#586775" text-anchor="start">The batch pipeline: extraction, source registration, deduplication, persistence, then temporal resolution.</text>
+<polyline points="40,133 1160,133" fill="none" stroke="#CED6DC" stroke-width="1" stroke-linejoin="round"/>
+<text x="40" y="175" font-family="Helvetica, Arial, sans-serif" font-size="17" font-weight="700" fill="#586775" text-anchor="start">A. EXTRACT  /  ONE NAMESPACE PER BATCH</text>
+<rect x="40" y="202" width="200" height="126" rx="7" fill="#EEF4F8" stroke="#345E80" stroke-width="1.3"/>
+<text x="56" y="231" font-family="Helvetica, Arial, sans-serif" font-size="19" font-weight="700" fill="#345E80" text-anchor="start">1  Batch sessions</text>
+<text x="56" y="259" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="400" fill="#203247" text-anchor="start">Skip completed work</text>
+<text x="56" y="283" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="400" fill="#203247" text-anchor="start">Check ingest fingerprint</text>
+<rect x="270" y="202" width="200" height="126" rx="7" fill="#EEF4F8" stroke="#345E80" stroke-width="1.3"/>
+<text x="286" y="231" font-family="Helvetica, Arial, sans-serif" font-size="19" font-weight="700" fill="#345E80" text-anchor="start">2  Stage A</text>
+<text x="286" y="259" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="400" fill="#203247" text-anchor="start">Fact lines + speaker</text>
+<text x="286" y="283" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="400" fill="#203247" text-anchor="start">Subject + scope</text>
+<rect x="500" y="202" width="200" height="126" rx="7" fill="#EEF4F8" stroke="#345E80" stroke-width="1.3"/>
+<text x="516" y="231" font-family="Helvetica, Arial, sans-serif" font-size="19" font-weight="700" fill="#345E80" text-anchor="start">3  Stage B</text>
+<text x="516" y="259" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="400" fill="#203247" text-anchor="start">Temporal key + object</text>
+<text x="516" y="283" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="400" fill="#203247" text-anchor="start">Update operation</text>
+<rect x="730" y="202" width="200" height="126" rx="7" fill="#EEF4F8" stroke="#345E80" stroke-width="1.3"/>
+<text x="746" y="231" font-family="Helvetica, Arial, sans-serif" font-size="19" font-weight="700" fill="#345E80" text-anchor="start">4  Rules</text>
+<text x="746" y="259" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="400" fill="#203247" text-anchor="start">Type, entities, priority</text>
+<text x="746" y="283" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="400" fill="#203247" text-anchor="start">Date from session</text>
+<rect x="960" y="202" width="200" height="126" rx="7" fill="#EEF4F8" stroke="#345E80" stroke-width="1.3"/>
+<text x="976" y="231" font-family="Helvetica, Arial, sans-serif" font-size="19" font-weight="700" fill="#345E80" text-anchor="start">5  Source anchors</text>
+<text x="976" y="259" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="400" fill="#203247" text-anchor="start">Best lexical sentence</text>
+<text x="976" y="283" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="400" fill="#203247" text-anchor="start">Turn + character span</text>
+<polyline points="240,265 270,265" fill="none" stroke="#8795A1" stroke-width="1.7" stroke-linejoin="round"/>
+<polygon points="270,265 262.0,261.3 262.0,268.7" fill="#8795A1"/>
+<polyline points="470,265 500,265" fill="none" stroke="#8795A1" stroke-width="1.7" stroke-linejoin="round"/>
+<polygon points="500,265 492.0,261.3 492.0,268.7" fill="#8795A1"/>
+<polyline points="700,265 730,265" fill="none" stroke="#8795A1" stroke-width="1.7" stroke-linejoin="round"/>
+<polygon points="730,265 722.0,261.3 722.0,268.7" fill="#8795A1"/>
+<polyline points="930,265 960,265" fill="none" stroke="#8795A1" stroke-width="1.7" stroke-linejoin="round"/>
+<polygon points="960,265 952.0,261.3 952.0,268.7" fill="#8795A1"/>
+<text x="286" y="352" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="400" fill="#345E80" text-anchor="start">1 LLM request</text>
+<text x="516" y="352" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="400" fill="#345E80" text-anchor="start">+1 if facts exist</text>
+<text x="744" y="352" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="400" fill="#586775" text-anchor="start">No LLM request</text>
+<text x="40" y="411" font-family="Helvetica, Arial, sans-serif" font-size="17" font-weight="700" fill="#586775" text-anchor="start">B. STORE AND UPDATE  /  AFTER EXTRACTION RETURNS</text>
+<rect x="40" y="441" width="200" height="151" rx="7" fill="#FBF5EB" stroke="#96662D" stroke-width="1.3"/>
+<text x="56" y="470" font-family="Helvetica, Arial, sans-serif" font-size="19" font-weight="700" fill="#96662D" text-anchor="start">6  Archive source</text>
+<text x="56" y="498" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="400" fill="#203247" text-anchor="start">sessions + turns</text>
+<text x="56" y="522" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="400" fill="#203247" text-anchor="start">FTS5 triggers update</text>
+<text x="56" y="546" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="400" fill="#203247" text-anchor="start">Scoped session IDs</text>
+<rect x="270" y="441" width="200" height="151" rx="7" fill="#EEF4F8" stroke="#345E80" stroke-width="1.3"/>
+<text x="286" y="470" font-family="Helvetica, Arial, sans-serif" font-size="19" font-weight="700" fill="#345E80" text-anchor="start">7  Deduplicate</text>
+<text x="286" y="498" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="400" fill="#203247" text-anchor="start">Embed candidates</text>
+<text x="286" y="522" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="400" fill="#203247" text-anchor="start">Find close / keyed facts</text>
+<text x="286" y="546" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="400" fill="#203247" text-anchor="start">LLM judges neighbours</text>
+<rect x="500" y="441" width="200" height="151" rx="7" fill="#EFF6F3" stroke="#32766D" stroke-width="1.3"/>
+<text x="516" y="470" font-family="Helvetica, Arial, sans-serif" font-size="19" font-weight="700" fill="#32766D" text-anchor="start">8  Persist facts</text>
+<text x="516" y="498" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="400" fill="#203247" text-anchor="start">INSERT memory rows</text>
+<text x="516" y="522" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="400" fill="#203247" text-anchor="start">Add normalized vectors</text>
+<text x="516" y="546" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="400" fill="#203247" text-anchor="start">Keep new / distinct facts</text>
+<rect x="730" y="441" width="200" height="151" rx="7" fill="#EFF6F3" stroke="#32766D" stroke-width="1.3"/>
+<text x="746" y="470" font-family="Helvetica, Arial, sans-serif" font-size="19" font-weight="700" fill="#32766D" text-anchor="start">9  Resolve keys</text>
+<text x="746" y="498" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="400" fill="#203247" text-anchor="start">Read active + history</text>
+<text x="746" y="522" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="400" fill="#203247" text-anchor="start">Sort by event_time</text>
+<text x="746" y="546" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="400" fill="#203247" text-anchor="start">Rewrite validity windows</text>
+<rect x="960" y="441" width="200" height="151" rx="7" fill="#EFF6F3" stroke="#32766D" stroke-width="1.3"/>
+<text x="976" y="470" font-family="Helvetica, Arial, sans-serif" font-size="19" font-weight="700" fill="#32766D" text-anchor="start">10  Checkpoint</text>
+<text x="976" y="498" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="400" fill="#203247" text-anchor="start">Save vector sidecars</text>
+<text x="976" y="522" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="400" fill="#203247" text-anchor="start">Save session progress</text>
+<text x="976" y="546" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="400" fill="#203247" text-anchor="start">Resume after quota stop</text>
+<polyline points="1060,328 1060,386 20,386 20,516 40,516" fill="none" stroke="#8795A1" stroke-width="1.7" stroke-linejoin="round"/>
+<polygon points="40,516 32.0,512.3 32.0,519.7" fill="#8795A1"/>
+<polyline points="240,516 270,516" fill="none" stroke="#8795A1" stroke-width="1.7" stroke-linejoin="round"/>
+<polygon points="270,516 262.0,512.3 262.0,519.7" fill="#8795A1"/>
+<polyline points="470,516 500,516" fill="none" stroke="#8795A1" stroke-width="1.7" stroke-linejoin="round"/>
+<polygon points="500,516 492.0,512.3 492.0,519.7" fill="#8795A1"/>
+<polyline points="700,516 730,516" fill="none" stroke="#8795A1" stroke-width="1.7" stroke-linejoin="round"/>
+<polygon points="730,516 722.0,512.3 722.0,519.7" fill="#8795A1"/>
+<polyline points="930,516 960,516" fill="none" stroke="#8795A1" stroke-width="1.7" stroke-linejoin="round"/>
+<polygon points="960,516 952.0,512.3 952.0,519.7" fill="#8795A1"/>
+<rect x="40" y="635" width="1120" height="101" rx="7" fill="#F6F7F8" stroke="#CED6DC" stroke-width="1.3"/>
+<text x="59" y="664" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="700" fill="#203247" text-anchor="start">Cost and failure semantics</text>
+<text x="59" y="694" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="400" fill="#203247" text-anchor="start">Two extraction requests when Stage A yields facts; near-duplicate adjudication can add requests.</text>
+<text x="59" y="720" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="400" fill="#203247" text-anchor="start">A similarity of 0.92 nominates neighbours. Only a DUPLICATE verdict drops the new fact.</text>
+<polyline points="40,753 1160,753" fill="none" stroke="#CED6DC" stroke-width="1" stroke-linejoin="round"/>
+<text x="40" y="776" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="400" fill="#586775" text-anchor="start">Content-blocked batches retain raw turns and record their blocked status. Other failed batches remain pending.</text>
+<text x="40" y="799" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="400" fill="#586775" text-anchor="start">Temporal resolution follows memory insertion. Vector files and SQLite do not share a single atomic transaction.</text>
+</svg>

@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "deployed_at_utc": "2026-09-13T03:36:46Z",
+  "provider": "cloudflare-pages",
+  "project": "lltm-memory",
+  "branch": "main",
+  "deployment_id": "b86f451c",
+  "deployment_url": "https://b86f451c.lltm-memory.pages.dev",
+  "production_url": "https://lltm-memory.pages.dev",
+  "git_head": "5a456a78755ae0f0f25c6fa9d51747342bee8f80",
+  "dirty_worktree": false,
+  "note": "The page was rebuilt around a live worked example and a box the visitor drives. Everything about gates, p-values, ablations and preregistration was removed from the page and stays in the repository.",
+  "deploy_root": "public-demo/site",
+  "files": [
+    {
+      "path": "app.js",
+      "sha256": "64129a96146b25f10c182eed6bb413b91e47d9cbe14a1bcb58da2f8cff653e66"
+    },
+    {
+      "path": "content.js",
+      "sha256": "363fbf0eedfd3d9d7fde7b58ec276da7dea69c46335187c281187a434d59f468"
+    },
+    {
+      "path": "index.html",
+      "sha256": "c670df2fcd61d301ce0434f323b50490ad558f6e2a506c6618b83fb40e6bf4f1"
+    },
+    {
+      "path": "playground.html",
+      "sha256": "082b5c8d05f815ff6f51b4254532af7807bd8b5213bf11fcaf08c4ba2465bdc7"
+    },
+    {
+      "path": "release.json",
+      "sha256": "3e586b9e076fa97de7e7320c086bfb25d52d620aa5f3024e2e6cd9ec91e87f0b"
+    },
+    {
+      "path": "release.schema.json",
+      "sha256": "532aafd6228c94fe79eeae3747e75a9300c1b2eca453843749a63a12284e1357"
+    },
+    {
+      "path": "styles.css",
+      "sha256": "dda099d161c1f0d93e2d4c38d43bd689ddb4055174b4ed6c87cbd18936ed9324"
+    }
+  ],
+  "predeploy_gates": [
+    "public-demo/check_site.py",
+    "node --input-type=module --check (app.js, content.js)",
+    "JSON Schema draft 2020-12 validation of release.json",
+    "git diff --check",
+    "full pytest suite (863 passed)",
+    "ruff check and format",
+    "public-demo/check_release_figures.py"
+  ],
+  "postdeploy_checks": [
+    "production URL serves the new page and no longer contains the retired tour copy",
+    "CORS preflight from the production origin accepts POST with x-demo-token",
+    "walkthrough run live in a browser: Canberra superseded, Sydney active, plan kept separate, question answered Sydney",
+    "interactive box run live: TensorFlow superseded by PyTorch, question answered PyTorch",
+    "zero console errors on the production origin"
+  ]
+}

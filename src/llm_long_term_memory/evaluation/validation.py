@@ -668,3 +668,37 @@ def render_markdown(
         ]
     )
     return "\n".join(lines) + "\n"
+
+
+class VacuousGateError(ValidationArtifactError):
+    """A gate's input never varied, so passing it says nothing."""
+
+
+def assert_gate_input_observed(
+    name: str,
+    values: list[object],
+    *,
+    default: object,
+) -> None:
+    """Refuse a gate whose input is pinned at its schema default on every row.
+
+    A gate that compares a quantity which is structurally always zero passes without
+    testing anything, and reports as a pass. That is not hypothetical: the registered
+    `dev60` check `no_new_confident_errors` counted rows whose `confidence` was `high`,
+    while the answerer was never actually sent the schema field — so `confidence` read
+    `medium`, its default, on 100% of rows in every v3 phase. Eight of the nine gates
+    measured something. That one could not have failed.
+
+    The signature is the shape it is because a field can be legitimately constant: a
+    run where every row really is `medium` is possible. What is never legitimate is
+    constant *at the default*, since that is indistinguishable from never having been
+    asked — so the default has to be named at the call site rather than guessed here.
+    """
+    if not values:
+        raise VacuousGateError(f"gate {name!r} has no rows to observe")
+    distinct = {repr(value) for value in values}
+    if len(distinct) == 1 and repr(default) in distinct:
+        raise VacuousGateError(
+            f"gate {name!r} is vacuous: every row carries the default {default!r}, "
+            "which cannot be distinguished from the field never being populated"
+        )

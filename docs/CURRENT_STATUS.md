@@ -1,7 +1,40 @@
-# Current status — 2026-09-05
+# Current status — 2026-09-13
 
-This is the one current-state page. The long reports and execution log are evidence
-and history; older entries in them are intentionally not rewritten.
+This is the current-state page; the phase narratives below are historical evidence.
+
+## Latest verification — 2026-09-13
+
+Current checkout: `main` at `879e645`, plus the offline reread repairs described here.
+
+- The requested v4.2 statistics/budget addendum, 404-row schedule, offline rehearsal,
+  freeze and live development comparison are complete. The executed freeze is
+  `results/frozen/v4.2-development-20260912e/`; earlier freezes are aborted/superseded.
+- Live run: 404 rows, 426 attempts, 646,599 observed tokens, two failed attempts.
+  Gate 0 passed; the registered outcome is `not_promoted`. The frozen conclusion's
+  23 analysis fields reproduce exactly and its source/data/artifact hashes verify.
+- Across the three abandoned journals plus the final journal: 447 attempts and
+  675,012 tokens. The final preflight's ten attempts are already in the final journal.
+- Original count majority scores: control 4/30, candidate 5/30. A provisional model-made
+  gold overlay changes these to 12/30 and 7/30; the descriptive clustered p is .125.
+  This does not prove harm or replace the registered conclusion.
+- Equal unnamed-member totals (47 versus 47) do not prove identical member selection:
+  only 50/90 paired count cells match the same members under the existing matcher.
+  The old claims of certain falsification and zero effect have been qualified.
+- Gold correction remains provisional: 38 model decisions, zero human decisions.
+  Development totals are 149→118 memory members over 30 probes, not the old 271→240
+  figure that included held-out probes. The reread now rejects incomplete repeats,
+  changed evidence and corrections outside development, and binds its inputs by hash.
+- A 38-entry human review packet and blank decision template are ready. Next, review
+  membership rules and build a separately versioned entity-counting generator; preserve
+  the original probe file and held-out split. No new provider call was made in this audit.
+- REST credential-derived identity, export and erasure are implemented. Production
+  operations, account budgets and independent final-test data remain unfinished.
+- v2 remains 72% / 86% / 65%; v3 dev60 remains 55.0% versus 46.7%, with eight
+  meaningful gates out of nine originally reported. No historical benchmark was reopened.
+
+See [v4.2 result](../results/v4.2-result.md),
+[gold correction](../results/count-gold-correction.md), and
+[human review packet](../results/review/count-gold-review-20260913.md).
 
 ## Experiment
 
@@ -27,7 +60,25 @@ and history; older entries in them are intentionally not rewritten.
 | v3 phase 4 archive | complete: 109-file exact source snapshot plus 14 checksum-bound evidence files verify independently |
 | v3 phase 5 | **complete; tune gate passed**: v3.3 retained 73.8% accuracy and every registered slice while reducing median context from 1,476.5 to 1,124 tokens (1.92x v2) |
 | v3 phase 5 archive | complete: 111-file exact source snapshot plus 17 checksum-bound evidence files verify independently |
-| v3 dev60 candidate | **re-frozen after an aborted first execution**: the 2026-09-04T19:06:09Z start hung on its first answerer request and produced zero rows; the provider client now has a request timeout, the freeze was re-captured, and no ledger or result row exists |
+| v3 dev60 | **complete, one shot spent**: 360/360 rows, ledger `complete`, nine registered gates recorded as passing of which eight carry evidence; v3.3 55.0% against v2's 46.7% majority accuracy at 1.95x context |
+| v3 dev60 archive | complete: 112-file exact source snapshot plus a 23-file evidence inventory; `tools/verify_v3_dev60.py` reports `PASS` and eight tests pin that it fails on tampering |
+| v4.0 answerer | **implemented and measured on development probes**: timeline rendering for supersession chains, an operation-first verdict, and deterministic count/duration in Python. Runs as variant `two_stage_synthesis`, which keeps v3.3's retrieval and hydration so the registered comparison differs only in the answerer. Three defects were found and fixed after it first looked finished: the policy no variant could select, the derivation nothing recorded, and a count answer format the probe grader misread |
+| v3 verdict-schema defect | **found and fixed**: `_complete` sent the base schema while parsing with the subclass, so every v3 extended field held its default. `answer_confidence` read `medium` on 100% of v3 rows in every phase, which made the registered dev60 `no_new_confident_errors` gate pass without testing anything — 8 of 9 gates were meaningful. Accuracy is unaffected; recorded in `results/audit/v3-verdict-schema-never-sent-20260906.json` and the archive is not rewritten |
+| v4 probe holdout | **split and locked before any v4 measurement**: 188 of 229 probes had never been answered, so 87 are held out (count 30, duration 30, comparison 27) and 142 are development. `current_state` had only 13 untouched and stays whole rather than yielding a 6-probe stratum. The tool refuses to re-draw |
+| relation routing probe | **complete, zero provider calls**: templated upper bound 80.0%, and **every error is `owns` vs `acquired`** — a vocabulary defect, not a routing one. On 72 real questions, 31 route at a margin below 0.05, and the confident routes are confidently wrong about what is being counted. Exhaustive scan may only be wired behind a router that can abstain |
+| relation router | **built and measured, zero provider calls**: `owns` merged into `acquired` at the routing layer so the probe set and its held-out split stay valid; templated upper bound 80% → **100%** with no confusions left. Abstains below a 0.15 margin. On the routed slice scan completeness is **100% against top-k's 69%**; overall completeness 50.0% → 66.7%. The residue is concentrated in the abstained slice, so **coverage, not routing, is now the binding constraint** |
+| v4 run safety | **two quota-wasting defects found by rehearsal, before paying**: the probe runner had no way to answer only the development half, so the first v4 measurement would have spent all 87 held-out probes; and its rows dropped the v4 derivation, so a paid run would have produced answers indistinguishable from the model's own. Both fixed, both pinned by tests; checklist in [`QUOTA_DISCIPLINE.md`](QUOTA_DISCIPLINE.md) |
+| v4.0 attempt 1 | **void by contamination, sealed as a negative result**: Gate 0 passed, but 55 of 142 candidate rows reached the grader as raw JSON because the v4 prompt never required `answer`. Headline table unreadable. On the 87 clean rows v4.0 scored 62.1% vs 51.7%, `duration` **+34.6** — a diagnosis, not a result. Cost 329 requests; no held-out probe touched. Archived at `results/archive/v4.0-attempt1/` |
+| v4.0 design fault | **named**: single-variable was enforced against retrieval and proven by Gate 0, but three changes were bundled *inside* the answerer — deterministic arithmetic, operation-first prompt, timeline rendering. The v3.2 failure one layer down. The next attempt must separate them |
+| v4.0 pre-registration | **registered before any provider call**: two arms differing only in `answer_policy`, development half only (142 probes, ~355 requests), four written predictions, and a Gate 0 that voids the run unless retrieval is byte-identical across arms — `tools/check_arm_invariant.py`, already verified PASS on rehearsal rows |
+| v4.0 flat | **candidate selected, sealed**: separating timeline rendering attributed attempt 1's regression to it — `current_state` 87.8 → 55.1 with it, 85.7 without, exactly 89.4% both ways on unleaked rows. Deterministic arithmetic held: `duration` **+30.0**. Overall 54.9% → 61.3%, paired 22W-13L, `p=0.1755`. Stop condition not triggered |
+| v4.0 leak, third pass | **root cause found and closed in code, not prompt**: 9 of 18 real leaks came from the fallback's second call inheriting a system prompt that demands structure it has no schema to parse. The leak flag itself was wrong in both directions (12 reported, 18 real, 4 false positives, 10 misses) and now measures the final answer. Raw structure can no longer reach the reader at all |
+| count enumeration ceiling | **measured before v4.1 runs, and lowers what it may claim**: on the 17 count probes whose evidence was already complete, the model under-enumerated on 7 and over-enumerated on 3 — 10 of 17 wrong with every fact in front of it. Scanning cannot reach a reading failure, and the v4.1 predictions were revised downward in advance |
+| v4.1 pre-registration | **baseline thresholds filled on 2026-09-06; later run needs audit closure**. Gated on the routed slice — declared in advance, because the router abstains precisely where top-k is worst and the favourable denominator must not be chosen after seeing it. Gate 0 inverts for v4.1: retrieval must be identical on *abstained* questions |
+| missing_field guard | **found to be a third write-only field and wired**: defined in the schema, named in the prompt, read by nothing. It now blocks computation when a verdict names an absent operand and supplies operands anyway. The v4.0 pre-registration claimed this guard existed before it did, and says so |
+| v4 data protocol | **registered**: LongMemEval-S is exhausted — 0 unused questions — so `dev100` becomes `v4-dev` under a three-decision cap, synthesis probes with SQL ground truth become the development instrument, and a fresh final set is registered as a dependency that must be acquired |
+| failure taxonomy | complete: 222 failures over 63 questions from three readable pools, zero provider calls; abstention-with-source is the largest bucket in every pool at 44-50%, retrieval misses 0-6% |
+| predicate vocabulary | offline proposal complete, zero provider calls: 38 relation types grouped by arity, 62.3% of memories mapped, singleton keys down 63% on the covered subset |
 
 The exact sealed order remains in [`results/v2-runbook.md`](../results/v2-runbook.md).
 All 15 dev100 repeats and all three final arms contain exactly 100 rows. Each aggregate
@@ -75,12 +126,12 @@ flat memory-plus-raw-fallback product. The report-only `naive_rag` baseline reac
 majority accuracy but used 13,416 median context tokens and was not allowed to rewrite the
 pre-registered product decision.
 
-### Completed phase-boundary checks
+### Historical phase-boundary checks
 
 - `load_dev_decision` now validates all 30 sealed row/usage artifacts while keeping the
   product decision limited to the three pre-registered decision arms. A five-arm
   regression test and the real dev100 decision both pass.
-- The complete offline suite has 597 passing tests, Ruff reports no violations, and core
+- At that phase boundary the offline suite had 597 passing tests, Ruff reports no violations, and core
   package line coverage remains 83%. Including one-off research scripts lowers the
   combined number to 62%; this is not treated as a reason to write low-value tests for
   retired analyses.
@@ -90,7 +141,7 @@ pre-registered product decision.
 
 ## Product code
 
-The post-freeze repair branch at `06b567e` fixes the default REST/MCP write composition, uses the
+The repairs from branch commit `06b567e`, integrated into this workspace on 2026-09-12, fix the default REST/MCP write composition, uses the
 real batch extractor through a single-turn adapter, serializes access to the shared
 SQLite/index resources, avoids mutating a shared answer runner, externalizes session
 ids consistently, and makes `/healthz` a readiness check. The public playground now
@@ -118,14 +169,33 @@ its exact seven-file checksums are recorded under `public-demo/deployments/`.
 
 ## Still not a production service
 
-The current API has no trusted tenant identity: `user_id` is supplied by the caller.
-Main-service deletion is a provenance-preserving soft delete, not a data-subject hard
-delete. PostgreSQL/pgvector, OIDC/JWT, export, backup/restore drills, quotas, alerts and
-SLOs require deployment and policy choices and remain the P0–P5 productization work in
+The REST API now derives the namespace from a bearer token rather than from the request
+(`api/identity.py`), refuses a namespace that does not match the credential with 403, and
+offers `GET /v1/export` and `DELETE /v1/data` — a real erasure, distinct from `forget`,
+which stays a soft delete because provenance is the product. Cross-tenant read, write,
+raw-conversation search and erasure are each pinned by a test written as the attack.
+
+What that does **not** amount to:
+
+- **Bearer tokens are the weaker scheme, chosen so it could land and be tested now.**
+  They do not expire, carry no claims, and cannot be revoked without an environment
+  change. `principal_from_token` is the seam an OIDC/JWT verifier replaces.
+- **Open mode still exists**, because the research CLI, the inspector and the offline
+  suite all drive the service without credentials. With no tokens configured any caller
+  may name any namespace. It is now reported by `/healthz` as
+  `authenticated_access: false` rather than being an unexamined default.
+- **The MCP HTTP transport has no equivalent** and must not be exposed beyond localhost.
+- **Erasure is not transactional across resources.** SQLite rows go before vectors, so a
+  crash between them leaves an orphan vector rather than a searchable memory whose row is
+  gone — the safer direction, but not an atomic one.
+- **Erasure covers the online data plane only.** Backups, if any exist, are untouched.
+
+PostgreSQL/pgvector, OIDC/JWT, backup/restore drills, quotas, alerts and SLOs require
+deployment and policy choices and remain the productization work in
 [`PRODUCTIZATION_V2_PLAN.md`](PRODUCTIZATION_V2_PLAN.md). They must not be represented
 as complete merely because the local prototype passes tests.
 
-## Current action and remaining plan
+## Historical v3 execution sequence
 
 | order | work | current state | completion standard |
 |---:|---|---|---|
@@ -135,7 +205,10 @@ as complete merely because the local prototype passes tests.
 | 4 | Add adaptive context | **tune2 done; v3.2 stopped on cost** | Accuracy and all safety checks improved or held, but median context was 2.52x v2 against a fixed 2x ceiling |
 | 5 | Compress v3 evidence | **done** | Exact source sentences are deduplicated and allocated round-robin across sessions; observed median is 1,124 tokens (1.92x v2) |
 | 6 | Run final tune42 iteration | **done; PASS** | Exactly 42 v3.3 rows retained v3.2's 73.8% accuracy and passed all 11 registered checks |
-| 7 | Use sealed dev60 once | **candidate frozen; awaiting separate API consent** | Run the untouched 60-question set exactly once as two arms x three repeats (360 rows), then report only aggregate results |
+| 7 | Use sealed dev60 once | **done; one shot spent** | 360/360 rows, ledger `complete`, nine gates recorded as passing but only eight carry evidence; +8.3 points at `p=0.1797` |
+| 7a | Widen the failure sample | **done, zero provider calls** | 222 failures over 63 questions; abstention-with-source 44-50% in every pool, retrieval misses 0-6% |
+| 7b | Propose a controlled relation vocabulary | **done, zero provider calls** | 38 relation types by arity; 62.3% of memories mapped; singleton keys down 63% where it applies |
+| 7c | Test the fallback-depth hypothesis | **done: hypothesis falsified** | 17 of 18 abstentions already had a gold turn among the three shown; raising `max_turns` would reach one question |
 | 8 | Create a new hidden final set | pending | Freeze genuinely unseen data and run the final v3 only once after all choices are fixed |
 | 9 | Add product safety basics | pending | Trusted login, tenant isolation, hard deletion, export and permission checks |
 | 10 | Improve data reliability | pending | Automated backup, successful restore drill, safe concurrency and migrations |
@@ -221,6 +294,50 @@ interruptions, forbids a completed rerun, and exposes only aggregate output. The
 offline preflight passes and the expanded full suite has 606 passing tests. Starting
 the 360-row API run still requires explicit permission to send the 60 dev questions
 and their retrieved context to Google Gemini.
+
+### dev60 result
+
+The registered one-shot run completed on 2026-09-05: 360 rows, three repeats per arm,
+ledger `complete`, and a hash-bound aggregate. Nine gates were recorded as passing.
+Eight of them tested something: `no_new_confident_errors` compared a field that was
+structurally constant, so it passed without measuring anything
+([audit record](../results/audit/v3-verdict-schema-never-sent-20260906.json)). The
+accuracy figures below do not read that field and are unaffected. `tools/verify_v3_dev60.py`
+still prints "nine gates passed" because the verifier hashes itself into the conclusion
+it protects, so its text cannot be corrected without invalidating the archive.
+
+| | `v2-control` | `v3.3-compact` |
+|---|---:|---:|
+| majority accuracy | 46.7% | **55.0%** |
+| mean accuracy over three runs | 49.4% | 55.6% |
+| standard deviation across runs | 1.9pp | 2.5pp |
+| unanimous agreement across runs | 85% | **95%** |
+| median context tokens | 573 | 1,115 — **1.95x** |
+| fallback trigger rate | 30.6% | 22.8% |
+| selected source recall | 98.3% | 98.3% |
+
+Every pre-declared slice improved and none regressed: temporal 44.4% to 55.6%,
+multi-session 33.3% to 38.9%, knowledge-update 70.0% to 80.0%, ordinary 50.0% to
+57.1%, and high-confidence-wrong stayed at zero for both arms.
+
+Three things belong next to that table rather than under it. The paired result is
+**+8.3 points at `p=0.1797`** — seven wins against two losses on sixty questions,
+which is not statistically conclusive, and the gate was written to be passed by
+consistency across slices rather than by that p-value. Both arms score far below
+their `tune42` numbers because `dev60` is deliberately the hard slice: eighteen
+temporal and eighteen multi-session questions out of sixty. And v3.3 reached the
+better score while triggering the raw fallback *less* often, 22.8% against 30.6%,
+so the gain is not bought with extra second passes.
+
+**The aggregate independently corroborates the failure taxonomy without reading a
+single row.** Selected source recall is 98.3% for both arms while accuracy is 55.0%
+— a 43-point gap between finding the evidence and answering from it. That is the same
+conclusion the 222-failure taxonomy reached on other data, now visible in a validation
+aggregate the protocol permits reporting.
+
+Per that protocol, individual `dev60` rows are not read and no parameter may be tuned
+after its first provider call. The candidate is fixed. What this permits is a new
+hidden final set; it does not authorise one.
 
 ### The first dev60 execution was aborted with zero rows
 

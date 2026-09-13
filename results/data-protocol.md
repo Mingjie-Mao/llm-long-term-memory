@@ -77,3 +77,16 @@ historical result and does not get restated with a v2 system.
 
 `test100` is the last unseen data this project will ever have. When it is spent
 there is no more.
+
+## That has now happened
+
+`test100` was spent on 2026-09-02 and `dev60` — the last sealed slice inside
+`train150` — on 2026-09-05. The five sets are disjoint and their union is all 500
+questions, so **zero unused questions remain**. `longmemeval_oracle.json` carries the
+same 500 question ids and is a different haystack over identical questions, not a
+reserve.
+
+What each set may still be used for, and the fact that a fresh final test now requires
+data from outside this dataset, is registered in
+[`prereg-v4-data-protocol.md`](prereg-v4-data-protocol.md). Until such a set exists,
+**every v4 number is a development number.**

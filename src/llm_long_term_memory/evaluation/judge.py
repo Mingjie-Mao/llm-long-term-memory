@@ -32,10 +32,12 @@ Judge reliability is measured against hand labels rather than assumed; see
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import TYPE_CHECKING
 
 from pydantic import BaseModel, Field
 
-from llm_long_term_memory.llm.client import GeminiClient
+if TYPE_CHECKING:
+    from llm_long_term_memory.llm.client import GeminiClient
 
 #   reference-v1     one reference-answer prompt plus an abstention prompt
 #   lme-type-aware-v2  2026-08-14: routed by question type, so a preference gold is

@@ -1,479 +1,399 @@
-import { SCENARIOS } from "./content.js";
+import { WALKTHROUGH, PATTERNS, SUGGESTIONS, COPY } from "./content.js";
 
-const LOCAL = location.hostname === "localhost" || location.hostname === "127.0.0.1";
+const LOCAL = ["localhost", "127.0.0.1"].includes(location.hostname);
 const API = LOCAL ? "http://127.0.0.1:8100" : "https://lltm-playground.onrender.com";
-const COLD_START_MS = 90_000;
 
-let lang = /^zh\b/i.test(navigator.language || "") ? "zh" : "en";
-let currentTour = "changed";
-let tourRan = false;
-let token = null;
-let liveReady = false;
-let liveBusy = false;
-let wakingTimer = null;
-let lastLive = null;
-let releaseData = null;
-let liveHealth = null;
-let currentEngineMessage = {
-  zh: "正在连接真实引擎…",
-  en: "Connecting to the live engine…",
-};
+let lang = "en";
+let ready = false;
+// The demo session is carried by a header, not a cookie: the backend reads
+// `x-demo-token` and namespaces every write under it. Nothing is stored across reloads,
+// so closing the tab is enough to abandon a session.
+//
+// Two sessions, because the page has two independent demos. Sharing one namespace meant
+// the walkthrough's facts appeared in the visitor's own state panel, and re-running the
+// walkthrough wiped whatever the visitor had just typed.
+const session = { walk: null, try: null };
 
 const $ = (id) => document.getElementById(id);
-const T = (zh, en) => (lang === "zh" ? zh : en);
-const esc = (value) => String(value ?? "").replace(
-  /[&<>"]/g,
-  (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[char],
-);
+const t = (pair) => pair[lang] ?? pair.en;
 
-function setText(id, text) {
-  $(id).textContent = text;
-}
+// ----------------------------------------------------------------- language
 
-function setStep(journeyId, step) {
-  $(journeyId).dataset.step = String(step);
-  document.querySelectorAll(`[data-step-nav="${journeyId}"]`).forEach((button) => {
-    button.setAttribute("aria-pressed", String(Number(button.dataset.step) === step));
-  });
-}
-
-function renderTourStep(step) {
-  let body = `<p>${esc(step.lead)}</p>`;
-  if (step.quote) body += `<blockquote class="quote">${esc(step.quote)}</blockquote>`;
-  if (step.memories) {
-    body += `<div class="memory-mini">${step.memories.map((memory) => `
-      <div class="${memory.old ? "old" : ""}">
-        <strong>${esc(memory.value)}</strong><small>${esc(memory.state)}</small>
-      </div>`).join("")}</div>`;
-  }
-  if (step.reason) body += `<p class="reason">${esc(step.reason)}</p>`;
-  return body;
-}
-
-function renderTour() {
-  const copy = SCENARIOS[currentTour].tour[lang];
-  copy.steps.forEach((step, index) => {
-    setText(`tourStep${index + 1}Title`, step.title);
-    const body = $(`tourStep${index + 1}Body`);
-    body.innerHTML = index === 0 || tourRan
-      ? renderTourStep(step)
-      : `<p class="empty">${esc(T("运行演示后显示。", "Run the tour to reveal this step."))}</p>`;
-  });
-  [$("tourCard2"), $("tourCard3")].forEach((card) => {
-    card.classList.toggle("revealed", tourRan);
-  });
-  setText("runTour", tourRan ? T("重新运行演示", "Run the tour again") : T("运行 30 秒演示", "Run the 30-second tour"));
-}
-
-function runTour() {
-  tourRan = true;
-  $("tourJourney").setAttribute("aria-busy", "true");
-  renderTour();
-  setStep("tourJourney", 1);
-  $("tourJourney").setAttribute("aria-busy", "false");
-  setText("tourAnnounce", SCENARIOS[currentTour].tour[lang].announce);
-  $("tour").scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
-}
-
-function selectTour(name) {
-  currentTour = name;
-  tourRan = false;
-  document.querySelectorAll("[data-tour]").forEach((button) => {
-    button.setAttribute("aria-pressed", String(button.dataset.tour === name));
-  });
-  setText("tourAnnounce", "");
-  setStep("tourJourney", 1);
-  renderTour();
-}
-
-function renderMetrics() {
-  if (!releaseData) return;
-  const release = releaseData;
-  const heldout = release.heldout;
-  const engineering = release.engineering;
-  setText("metricAccuracy", `${heldout.accuracy.toFixed(1)}%`);
-  setText(
-    "metricAccuracySource",
-    T(`${heldout.dataset} · 冻结后单次运行`, `${heldout.dataset} · one frozen run`),
-  );
-  setText("metricContext", heldout.median_context_tokens.toLocaleString("en-US"));
-  setText(
-    "metricContextSource",
-    T(
-      `整段对话中位数 ${heldout.whole_transcript_median_tokens.toLocaleString("en-US")}`,
-      `whole-transcript median ${heldout.whole_transcript_median_tokens.toLocaleString("en-US")}`,
-    ),
-  );
-  setText("metricArchive", `+${heldout.raw_archive_recovery_pp}pp`);
-  setText(
-    "metricArchiveSource",
-    T(
-      `结构化记忆 ${heldout.structured_memory_accuracy.toFixed(1)}% → 最终 ${heldout.accuracy.toFixed(1)}%`,
-      `structured memory ${heldout.structured_memory_accuracy.toFixed(1)}% → final ${heldout.accuracy.toFixed(1)}%`,
-    ),
-  );
-  setText("metricTests", engineering.tests.toLocaleString("en-US"));
-  setText(
-    "metricTestsSource",
-    T(`行覆盖率 ${engineering.line_coverage}%`, `${engineering.line_coverage}% line coverage`),
-  );
-  setText(
-    "releaseMeta",
-    T(
-      `${release.release} 指标 · 工程验证于 ${engineering.verified_at}`,
-      `${release.release} metrics · engineering verified ${engineering.verified_at}`,
-    ),
-  );
-  setText("releaseCommit", engineering.source_commit);
-  $("releaseCommit").href = `https://github.com/Mingjie-Mao/llm-long-term-memory/commit/${engineering.source_commit}`;
-}
-
-async function loadMetrics() {
-  try {
-    const response = await fetch("./release.json", { cache: "no-store" });
-    if (!response.ok) throw new Error(`release manifest returned ${response.status}`);
-    releaseData = await response.json();
-    renderMetrics();
-  } catch (error) {
-    console.warn("release metrics unavailable", error);
-    setText("releaseMeta", T("指标清单暂时无法读取。", "Metric manifest unavailable."));
-  }
-}
-
-function showTrace(method, path, body, response, status, elapsed) {
-  setText(
-    "api",
-    `${method} ${path}  →  ${status}   ${elapsed}ms\n`
-      + (body ? `\nrequest\n${JSON.stringify(body, null, 2)}\n` : "")
-      + `\nresponse\n${JSON.stringify(response, null, 2)}`,
-  );
-}
-
-function errorMessage(payload, fallback) {
-  const detail = payload?.detail;
-  if (typeof detail === "string") return detail;
-  if (detail && typeof detail.message === "string") return detail.message;
-  // FastAPI reports request-validation failures as a list of per-field errors.
-  if (Array.isArray(detail) && detail.length) {
-    const field = detail[0].loc?.filter((part) => part !== "body").join(".");
-    const reason = detail[0].msg || fallback;
-    return field ? `${field}: ${reason}` : reason;
-  }
-  return fallback;
-}
-
-async function api(method, path, body, { cold = false } = {}) {
-  const started = performance.now();
-  const headers = { "content-type": "application/json" };
-  if (token) headers["x-demo-token"] = token;
-  let response;
-  let payload;
-  try {
-    response = await fetch(API + path, {
-      method,
-      headers,
-      body: body ? JSON.stringify(body) : undefined,
-      signal: AbortSignal.timeout(cold ? COLD_START_MS : 20_000),
-    });
-    payload = await response.json().catch(() => ({}));
-  } catch (error) {
-    showTrace(method, path, body, { error: error.message }, "network error", Math.round(performance.now() - started));
-    throw error;
-  }
-  showTrace(method, path, body, payload, `${response.status} ${response.statusText}`, Math.round(performance.now() - started));
-  if (!response.ok) throw new Error(errorMessage(payload, response.statusText));
-  return payload;
-}
-
-function setLiveControls() {
-  document.querySelectorAll("[data-requires-live]").forEach((element) => {
-    element.disabled = !liveReady || liveBusy;
-  });
-  $("liveJourney").setAttribute("aria-busy", String(liveBusy));
-}
-
-function setEngineState(state, zh, en) {
-  currentEngineMessage = { zh, en };
-  $("engineStatus").setAttribute("aria-busy", String(state === "loading"));
-  $("dot").className = `dot${state === "ready" ? " on" : state === "error" ? " off" : ""}`;
-  setText("statusText", T(zh, en));
-  $("retry").classList.toggle("hidden", state !== "error");
-}
-
-function showReadyState() {
-  if (!liveHealth || !token) return;
-  setEngineState(
-    "ready",
-    `真实引擎在线 · 临时会话 ${token.split(".")[0]} · ${liveHealth.session_ttl_minutes} 分钟后失效`,
-    `Live engine ready · temporary session ${token.split(".")[0]} · expires after ${liveHealth.session_ttl_minutes} min`,
-  );
-}
-
-function beginWakeClock() {
-  let seconds = 0;
-  clearInterval(wakingTimer);
-  wakingTimer = setInterval(() => {
-    seconds += 1;
-    if (seconds >= 3) {
-      setEngineState(
-        "loading",
-        `真实引擎正在唤醒，已等待 ${seconds} 秒。引导体验仍可立即使用。`,
-        `The live engine is waking up (${seconds}s). The guided tour remains available now.`,
-      );
-    }
-  }, 1000);
-}
-
-async function connectEngine() {
-  liveReady = false;
-  liveBusy = false;
-  token = null;
-  setLiveControls();
-  setEngineState("loading", "正在连接真实引擎…", "Connecting to the live engine…");
-  beginWakeClock();
-  try {
-    const health = await api("GET", "/demo/health", null, { cold: true });
-    const session = await api("POST", "/demo/session");
-    clearInterval(wakingTimer);
-    token = session.token;
-    liveHealth = health;
-    liveReady = true;
-    setText("enc", health.encoder);
-    showReadyState();
-    setLiveControls();
-  } catch (error) {
-    clearInterval(wakingTimer);
-    setText("enc", "—");
-    setEngineState(
-      "error",
-      LOCAL ? `本地后端未连接：${error.message}` : `真实引擎暂时不可用：${error.message}`,
-      LOCAL ? `Local backend unavailable: ${error.message}` : `Live engine unavailable: ${error.message}`,
-    );
-  }
-}
-
-async function freshSession() {
-  if (token) {
-    try { await api("DELETE", "/demo/session"); } catch { /* expired or already removed */ }
-  }
-  token = null;
-  const session = await api("POST", "/demo/session");
-  token = session.token;
-}
-
-function renderConversation(name) {
-  const rows = SCENARIOS[name].view[lang].conversation;
-  $("liveConversation").innerHTML = rows.map((row) => `
-    <div class="bubble ${row.role === "assistant" ? "assistant" : ""}">
-      <small>${esc(row.role)}</small>${esc(row.text)}
-      ${row.gloss ? `<p class="gloss">${esc(row.gloss)}</p>` : ""}
-    </div>`).join("");
-}
-
-function memoryCard(memory) {
-  const superseded = memory.status === "superseded";
-  const start = (memory.valid_from || memory.event_time || "").slice(0, 10) || "—";
-  const end = (memory.valid_to || "").slice(0, 10);
-  return `<div class="memory-card ${superseded ? "superseded" : ""}">
-    <span class="key">${esc(memory.predicate || "memory")}</span>
-    <strong>${esc(memory.object || memory.content)}</strong>
-    <small>${esc(superseded
-      ? T(`已取代 · ${start} 至 ${end || "—"}`, `superseded · ${start} to ${end || "—"}`)
-      : T(`当前有效 · ${start} 起`, `current · since ${start}`))}</small>
-  </div>`;
-}
-
-function renderMemories(data) {
-  const rows = [...(data.active || []), ...(data.superseded || [])];
-  $("liveMemory").innerHTML = rows.length
-    ? rows.map(memoryCard).join("")
-    : `<p class="empty">${esc(T("没有结构化记忆。", "No structured memories."))}</p>`;
-}
-
-function renderResult(name, result, mode) {
-  const summary = name ? SCENARIOS[name].view[lang].answer : T("查询已完成。", "Query complete.");
-  let html = `<div class="result-card"><div class="answer">${esc(summary)}</div>`;
-  if (mode === "raw") {
-    html += `<small>${esc(T(`原文命中 ${result.turns.length} 条`, `${result.turns.length} raw turn(s) matched`))}</small></div>`;
-    html += result.turns.map((turn) => `<div class="memory-card"><span class="key">raw turn ${turn.turn_index}</span><strong>${esc(turn.content)}</strong><small>${esc(turn.role)}</small></div>`).join("");
-  } else {
-    html += `<small>${esc(T(`选中 ${result.memories.length} 条，排除 ${result.rejected.length} 条`, `${result.memories.length} selected, ${result.rejected.length} rejected`))}</small></div>`;
-    html += result.memories.map((memory) => `<div class="memory-card"><span class="key">selected · ${Number(memory.score).toFixed(2)}</span><strong>${esc(memory.content)}</strong><small>${esc(memory.predicate || "memory")}</small></div>`).join("");
-    html += result.rejected.map((memory) => `<div class="reject-card"><strong>${esc(memory.content)}</strong><small>${esc(memory.reason)}${memory.superseded_by ? ` → ${esc(memory.superseded_by)}` : ""}</small></div>`).join("");
-  }
-  $("liveResult").innerHTML = html;
-}
-
-async function runLiveScenario(name) {
-  if (!liveReady || liveBusy) return;
-  liveBusy = true;
-  setLiveControls();
-  document.querySelectorAll("[data-live]").forEach((button) => {
-    button.setAttribute("aria-pressed", String(button.dataset.live === name));
-  });
-  setEngineState(
-    "loading",
-    "正在清理临时会话并运行场景…",
-    "Clearing the temporary session and running the scenario…",
-  );
-  setText("liveAnnounce", T("场景运行中。", "Scenario running."));
-  setStep("liveJourney", 1);
-  renderConversation(name);
-  setText("liveMemory", "…");
-  setText("liveResult", "…");
-  const scenario = SCENARIOS[name];
-  try {
-    // Every preset starts from a newly minted namespace. A partially failed run can
-    // therefore never contaminate the next scenario or a repeated click.
-    await freshSession();
-    for (const fact of scenario.engine.facts || []) await api("POST", "/demo/facts", fact);
-    for (const turn of scenario.engine.turns || []) await api("POST", "/demo/turns", turn);
-    const memories = await api("GET", "/demo/memories");
-    const result = scenario.engine.searchMode === "raw"
-      ? await api("POST", "/demo/raw/search", { query: scenario.engine.query, limit: 3 })
-      : await api("POST", "/demo/search", { query: scenario.engine.query, limit: 5 });
-    renderMemories(memories);
-    renderResult(name, result, scenario.engine.searchMode);
-    lastLive = { name, memories, result, mode: scenario.engine.searchMode };
-    setStep("liveJourney", 3);
-    setText("liveAnnounce", T("真实引擎场景运行完成，已跳到第三步结果。", "Live engine scenario complete; moved to step three, the result."));
-  } catch (error) {
-    $("liveResult").innerHTML = `<p class="message error" role="alert">${esc(error.message)}</p>`;
-    setText("liveAnnounce", T(`场景失败：${error.message}`, `Scenario failed: ${error.message}`));
-    if (!token) {
-      liveReady = false;
-      setEngineState(
-        "error",
-        `无法创建干净的临时会话：${error.message}`,
-        `Could not create a clean temporary session: ${error.message}`,
-      );
-    }
-  } finally {
-    if (liveReady && token) showReadyState();
-    liveBusy = false;
-    setLiveControls();
-  }
-}
-
-function advancedMessage(text, error = false) {
-  setText("advancedMessage", text);
-  $("advancedMessage").classList.toggle("error", error);
-}
-
-async function refreshAdvancedMemory() {
-  const memories = await api("GET", "/demo/memories");
-  renderMemories(memories);
-  return memories;
-}
-
-async function writeFact() {
-  const body = {
-    predicate: $("predicate").value.trim(),
-    object: $("object").value.trim(),
-    content: $("content").value.trim(),
-    event_time: $("when").value.trim() || null,
-    replaces_previous: $("replaces").checked,
-  };
-  if (!body.predicate || !body.object || !body.content) {
-    advancedMessage(T("原始表述、时间键和值都必须填写。", "Source wording, temporal key, and value are required."), true);
-    return;
-  }
-  liveBusy = true;
-  setLiveControls();
-  try {
-    const result = await api("POST", "/demo/facts", body);
-    await refreshAdvancedMemory();
-    advancedMessage(T(`写入成功；关闭 ${result.changed_by_this_write.length} 条旧值。`, `Written; ${result.changed_by_this_write.length} old value(s) closed.`));
-  } catch (error) {
-    advancedMessage(error.message, true);
-  } finally {
-    liveBusy = false;
-    setLiveControls();
-  }
-}
-
-async function writeTurn() {
-  const content = $("turn").value.trim();
-  if (!content) return advancedMessage(T("请先填写原始对话。", "Enter a raw turn first."), true);
-  liveBusy = true;
-  setLiveControls();
-  try {
-    await api("POST", "/demo/turns", { role: "assistant", content });
-    advancedMessage(T("已存入原文档案。", "Stored in the raw archive."));
-  } catch (error) {
-    advancedMessage(error.message, true);
-  } finally {
-    liveBusy = false;
-    setLiveControls();
-  }
-}
-
-async function customSearch(mode) {
-  const query = $("query").value.trim();
-  if (!query) return advancedMessage(T("请先填写查询。", "Enter a query first."), true);
-  liveBusy = true;
-  setLiveControls();
-  try {
-    const path = mode === "raw" ? "/demo/raw/search" : "/demo/search";
-    const result = await api("POST", path, { query, limit: mode === "raw" ? 3 : 5 });
-    renderResult(null, result, mode);
-    setStep("liveJourney", 3);
-    advancedMessage(T("查询完成，结果显示在上方第三步。", "Query complete; the result is shown in step three above."));
-  } catch (error) {
-    advancedMessage(error.message, true);
-  } finally {
-    liveBusy = false;
-    setLiveControls();
-  }
-}
-
-function applyLanguage(next) {
-  lang = next;
+function applyLanguage() {
   document.documentElement.lang = lang === "zh" ? "zh-CN" : "en";
-  document.body.dataset.lang = lang;
-  document.querySelectorAll("[data-zh]").forEach((element) => {
-    const value = element.getAttribute(lang === "zh" ? "data-zh" : "data-en");
-    if (value !== null) element.textContent = value;
-  });
-  document.querySelectorAll("[data-placeholder-zh]").forEach((element) => {
-    element.placeholder = element.getAttribute(lang === "zh" ? "data-placeholder-zh" : "data-placeholder-en");
-  });
-  document.querySelectorAll("[data-aria-zh]").forEach((element) => {
-    element.setAttribute("aria-label", element.getAttribute(lang === "zh" ? "data-aria-zh" : "data-aria-en"));
-  });
+  for (const el of document.querySelectorAll("[data-zh][data-en]")) {
+    el.textContent = el.dataset[lang];
+  }
+  for (const el of document.querySelectorAll("[data-placeholder-zh][data-placeholder-en]")) {
+    el.placeholder = el.dataset[`placeholder${lang === "zh" ? "Zh" : "En"}`];
+  }
+  for (const el of document.querySelectorAll("[data-aria-zh][data-aria-en]")) {
+    el.setAttribute("aria-label", el.dataset[`aria${lang === "zh" ? "Zh" : "En"}`]);
+  }
   $("bzh").setAttribute("aria-pressed", String(lang === "zh"));
   $("ben").setAttribute("aria-pressed", String(lang === "en"));
-  setText("statusText", T(currentEngineMessage.zh, currentEngineMessage.en));
+  // Manifest copy is built from data, so it has to be rebuilt rather than swapped.
   renderMetrics();
-  try { localStorage.setItem("lltm.demo.lang", lang); } catch { /* private mode */ }
-  renderTour();
-  if (lastLive) {
-    renderConversation(lastLive.name);
-    renderMemories(lastLive.memories);
-    renderResult(lastLive.name, lastLive.result, lastLive.mode);
+  renderSuggestions();
+  const status = statusText();
+  if (status) $("statusText").textContent = status;
+}
+
+// ----------------------------------------------------------------- manifest
+
+let manifest = null;
+
+function renderMetrics() {
+  if (!manifest) return;
+  const { result, engineering, release } = manifest;
+  const acc = result.accuracy;
+  const ctx = result.median_context_tokens;
+  const rag = result.naive_rag_accuracy;
+  const ragCtx = result.naive_rag_median_context_tokens;
+
+  // One sentence. Everything that qualifies it goes in the footnote below, and
+  // everything else lives in the repository.
+  $("headline").textContent = lang === "zh"
+    ? `在 LongMemEval-S 的 100 题终测上准确率 ${acc}%，上下文中位数 ${ctx.toLocaleString()} token；naive RAG 为 ${rag}%，用 ${ragCtx.toLocaleString()} token。`
+    : `${acc}% accuracy on LongMemEval-S test100 with ${ctx.toLocaleString()} median context tokens, versus ${rag}% for naive RAG using ${ragCtx.toLocaleString()} tokens.`;
+
+  $("footnote").textContent = result.significant_vs_naive_rag
+    ? (lang === "zh"
+        ? `在这 ${result.questions} 题上，${acc}% 与 ${rag}% 的差距达到统计显著。`
+        : `The ${acc}% vs ${rag}% difference was statistically significant on this ${result.questions}-question test.`)
+    : (lang === "zh"
+        ? `在这 ${result.questions} 题上，${acc}% 与 ${rag}% 的差距未达统计显著。`
+        : `The ${acc}% vs ${rag}% difference was not statistically significant on this ${result.questions}-question test.`);
+
+  $("releaseMeta").textContent = lang === "zh"
+    ? `发布 ${release} · ${engineering.tests} 项测试 · ${engineering.verified_at} 核验`
+    : `Release ${release} · ${engineering.tests} tests · verified ${engineering.verified_at}`;
+  // The reference commit is a convenience and may not survive a history rewrite, so the
+  // link degrades to the repository rather than to a 404 when it is absent.
+  const commit = engineering.source_commit_for_reference;
+  const link = $("releaseCommit");
+  link.textContent = commit ? commit.slice(0, 7) : "source";
+  link.href = commit
+    ? `https://github.com/Mingjie-Mao/llm-long-term-memory/commit/${commit}`
+    : "https://github.com/Mingjie-Mao/llm-long-term-memory";
+}
+
+async function loadManifest() {
+  try {
+    const response = await fetch("./release.json", { cache: "no-store" });
+    manifest = await response.json();
+    renderMetrics();
+  } catch {
+    $("releaseMeta").textContent = "Release manifest unavailable.";
   }
 }
 
-$("runTour").addEventListener("click", runTour);
-document.querySelectorAll("[data-tour]").forEach((button) => button.addEventListener("click", () => selectTour(button.dataset.tour)));
-document.querySelectorAll("[data-live]").forEach((button) => button.addEventListener("click", () => runLiveScenario(button.dataset.live)));
-document.querySelectorAll("[data-step-nav]").forEach((button) => {
-  button.addEventListener("click", () => setStep(button.dataset.stepNav, Number(button.dataset.step)));
+// ----------------------------------------------------------------- transport
+
+async function api(method, path, body, { cold = false, as = null } = {}) {
+  // No `credentials`: the session travels in a header, and asking for credentials mode
+  // makes a wildcard CORS origin fail the preflight for no benefit.
+  const options = { method, headers: {} };
+  const held = as ? session[as] : null;
+  if (held) options.headers["x-demo-token"] = held;
+  if (body !== undefined && body !== null) {
+    options.headers["content-type"] = "application/json";
+    options.body = JSON.stringify(body);
+  }
+  // The free tier sleeps. A cold call can take most of a minute, and a short timeout
+  // would report the engine as broken when it is only waking up.
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), cold ? 90000 : 25000);
+  options.signal = controller.signal;
+  try {
+    const response = await fetch(API + path, options);
+    const text = await response.text();
+    const data = text ? JSON.parse(text) : null;
+    if (!response.ok) {
+      // FastAPI reports validation failures as a list of per-field errors.
+      const detail = data?.detail;
+      throw new Error(
+        Array.isArray(detail) ? detail.map((d) => d.msg).join("; ") : detail || response.statusText,
+      );
+    }
+    return data;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+// Remembered so a language switch can re-render it. The status is written once when the
+// engine answers, and without this it stayed in whichever language was active then.
+let statusKey = null;
+
+function statusText() {
+  if (!statusKey) return null;
+  const { kind, value } = statusKey;
+  if (kind === "waking") return lang === "zh" ? "正在唤醒引擎…" : "Waking the live engine…";
+  if (kind === "up") {
+    return lang === "zh" ? `引擎就绪 · 编码器 ${value}` : `Engine ready · encoder ${value}`;
+  }
+  return lang === "zh" ? `引擎不可用：${value}` : `Engine unavailable: ${value}`;
+}
+
+function setStatus(state, message) {
+  $("engineStatus").dataset.state = state;
+  $("engineStatus").setAttribute("aria-busy", String(state === "waking"));
+  $("statusText").textContent = message;
+  $("retry").classList.toggle("hidden", state !== "down");
+}
+
+function setReady(value) {
+  ready = value;
+  for (const el of document.querySelectorAll("[data-requires-live]")) el.disabled = !value;
+}
+
+async function freshSession(which = "walk") {
+  // Every run starts in its own namespace, so one visitor's facts can never appear in
+  // another's state panel, and a re-run never reads what the previous run wrote.
+  if (session[which]) {
+    try {
+      await api("DELETE", "/demo/session", null, { as: which });
+    } catch { /* expired or never issued */ }
+  }
+  session[which] = null;
+  const issued = await api("POST", "/demo/session");
+  session[which] = issued.token;
+  return issued;
+}
+
+async function sessionFor(which) {
+  if (!session[which]) await freshSession(which);
+  return session[which];
+}
+
+async function connect() {
+  statusKey = { kind: "waking", value: "" };
+  setStatus("waking", statusText());
+  setReady(false);
+  try {
+    const health = await api("GET", "/demo/health", null, { cold: true });
+    statusKey = { kind: "up", value: health.encoder };
+    setStatus("up", statusText());
+    setReady(true);
+  } catch (error) {
+    statusKey = { kind: "down", value: error.message };
+    setStatus("down", statusText());
+  }
+}
+
+// ----------------------------------------------------------------- rendering
+
+function stateRow(memory) {
+  const li = document.createElement("li");
+  const superseded = memory.status === "superseded";
+  const plan = memory.scope === "plan";
+  li.className = `row${superseded ? " superseded" : ""}${plan ? " plan" : ""}`;
+  const key = document.createElement("code");
+  key.textContent = `${memory.predicate} = ${memory.object ?? memory.content}`;
+  const tag = document.createElement("span");
+  tag.className = "tag";
+  tag.textContent = superseded ? "superseded" : plan ? "plan" : "active";
+  li.append(key, tag);
+  return li;
+}
+
+function renderState(target, memories) {
+  const list = $(target);
+  list.replaceChildren();
+  if (!memories.length) {
+    const li = document.createElement("li");
+    li.className = "empty";
+    li.textContent = lang === "zh" ? "还没有事实。" : "No facts yet.";
+    list.append(li);
+    return;
+  }
+  // Superseded first, so the change reads top to bottom the way it happened.
+  const order = (m) => (m.status === "superseded" ? 0 : m.scope === "plan" ? 2 : 1);
+  for (const memory of [...memories].sort((a, b) => order(a) - order(b))) {
+    list.append(stateRow(memory));
+  }
+}
+
+function bubble(role, text, gloss, note) {
+  const li = document.createElement("li");
+  li.className = `bubble ${role}`;
+  const line = document.createElement("span");
+  line.textContent = text;
+  li.append(line);
+  if (gloss && lang === "zh") {
+    const g = document.createElement("small");
+    g.className = "gloss";
+    g.textContent = gloss;
+    li.append(g);
+  }
+  if (note) {
+    const n = document.createElement("small");
+    n.className = "note";
+    n.textContent = t(note);
+    li.append(n);
+  }
+  return li;
+}
+
+// ----------------------------------------------------------------- walkthrough
+
+async function runLiveScenario(name) {
+  const button = $("walkRun");
+  button.disabled = true;
+  button.setAttribute("aria-pressed", "true");
+  $("walkChat").replaceChildren();
+  $("walkAsk").hidden = true;
+  $("walkAnnounce").textContent = lang === "zh" ? "正在运行…" : "Running…";
+
+  try {
+    await freshSession("walk");
+    for (const turn of WALKTHROUGH.turns) {
+      $("walkChat").append(bubble("user", turn.text, turn.gloss, turn.note));
+      const result = await api("POST", "/demo/facts", turn.fact, { as: "walk" });
+      renderState("walkState", result.memories);
+      await new Promise((r) => setTimeout(r, 650));
+    }
+
+    const question = WALKTHROUGH.question;
+    $("walkQuestion").textContent = question.text
+      + (lang === "zh" ? `  （${question.gloss}）` : "");
+    const found = await api("POST", "/demo/search", { query: question.text, limit: 5 },
+                           { as: "walk" });
+    const hit = (found.memories || []).find((m) => m.predicate === "lives_in");
+    $("walkAnswer").textContent = hit ? (hit.object ?? hit.content) : t(COPY.noMatch);
+    $("walkAsk").hidden = false;
+    $("walkAnnounce").textContent = lang === "zh" ? "完成。" : "Done.";
+    $("walkReset").hidden = false;
+  } catch (error) {
+    $("walkAnnounce").textContent = error.message;
+    setStatus("down", lang === "zh" ? `运行失败：${error.message}` : `Run failed: ${error.message}`);
+  } finally {
+    button.disabled = !ready;
+    button.setAttribute("aria-pressed", "false");
+  }
+}
+
+function walkPlaceholder() {
+  const li = document.createElement("li");
+  li.className = "empty";
+  li.dataset.zh = "点下面的按钮，看三轮对话如何改变记忆。";
+  li.dataset.en = "Press the button below to watch three turns change the memory.";
+  li.textContent = li.dataset[lang];
+  return li;
+}
+
+function resetWalkthrough() {
+  $("walkChat").replaceChildren(walkPlaceholder());
+  $("walkAsk").hidden = true;
+  $("walkReset").hidden = true;
+  renderState("walkState", []);
+  $("walkAnnounce").textContent = "";
+}
+
+// ----------------------------------------------------------------- try it
+
+const looksLikeQuestion = (text) =>
+  /\?\s*$/.test(text) || /^(where|what|which|who|when|do i|am i)\b/i.test(text.trim());
+
+function parse(text) {
+  for (const pattern of PATTERNS) {
+    const match = pattern.re.exec(text);
+    if (!match) continue;
+    const object = match[1].trim().replace(/[.!,;]+$/, "");
+    if (!object) continue;
+    return {
+      subject: "user",
+      predicate: pattern.predicate,
+      object,
+      content: pattern.say(object),
+      replaces_previous: pattern.replaces,
+      ...(pattern.scope ? { scope: pattern.scope } : {}),
+    };
+  }
+  return null;
+}
+
+function say(role, text, note) {
+  const list = $("tryChat");
+  list.querySelector(".empty")?.remove();
+  list.append(bubble(role, text, null, note));
+  list.scrollTop = list.scrollHeight;
+}
+
+async function handleTurn(text) {
+  say("user", text);
+  try {
+    await sessionFor("try");
+    if (looksLikeQuestion(text)) {
+      const found = await api("POST", "/demo/search", { query: text, limit: 5 },
+                             { as: "try" });
+      const memories = found.memories || [];
+      if (!memories.length) {
+        say("answer", t(COPY.askedNothing));
+        return;
+      }
+      // The answer is the top retrieved memory's value, read out. No model runs here,
+      // and the page says so rather than letting the shape imply otherwise.
+      const top = memories[0];
+      say("answer", top.object ?? top.content);
+      return;
+    }
+
+    const fact = parse(text);
+    if (!fact) {
+      say("answer", t(COPY.parseFailed));
+      return;
+    }
+    const result = await api("POST", "/demo/facts", fact, { as: "try" });
+    renderState("tryState", result.memories);
+    const retired = (result.changed_by_this_write || []).filter((m) => m.status === "superseded");
+    say("answer", retired.length
+      ? (lang === "zh"
+          ? `已记住，并取代了：${retired.map((m) => `${m.predicate} = ${m.object ?? m.content}`).join("、")}`
+          : `Remembered, superseding ${retired.map((m) => `${m.predicate} = ${m.object ?? m.content}`).join(", ")}`)
+      : (lang === "zh" ? "已记住。" : "Remembered."));
+    $("tryAnnounce").textContent = lang === "zh" ? "记忆已更新。" : "Memory updated.";
+  } catch (error) {
+    say("answer", error.message);
+  }
+}
+
+function renderSuggestions() {
+  const box = $("trySuggestions");
+  box.replaceChildren();
+  for (const text of SUGGESTIONS) {
+    const chip = document.createElement("button");
+    chip.type = "button";
+    chip.className = "chip";
+    chip.textContent = text;
+    chip.disabled = !ready;
+    chip.addEventListener("click", () => {
+      $("tryInput").value = text;
+      $("tryInput").focus();
+    });
+    box.append(chip);
+  }
+}
+
+// ----------------------------------------------------------------- wiring
+
+$("bzh").addEventListener("click", () => { lang = "zh"; applyLanguage(); });
+$("ben").addEventListener("click", () => { lang = "en"; applyLanguage(); });
+$("retry").addEventListener("click", connect);
+$("walkRun").addEventListener("click", () => runLiveScenario("walkthrough"));
+$("walkReset").addEventListener("click", resetWalkthrough);
+$("tryForm").addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const input = $("tryInput");
+  const text = input.value.trim();
+  if (!text || !ready) return;
+  input.value = "";
+  $("trySend").disabled = true;
+  await handleTurn(text);
+  $("trySend").disabled = !ready;
 });
-$("retry").addEventListener("click", connectEngine);
-$("save").addEventListener("click", writeFact);
-$("saveTurn").addEventListener("click", writeTurn);
-$("ask").addEventListener("click", () => customSearch("memory"));
-$("askRaw").addEventListener("click", () => customSearch("raw"));
-$("query").addEventListener("keydown", (event) => { if (event.key === "Enter") customSearch("memory"); });
-$("bzh").addEventListener("click", () => applyLanguage("zh"));
-$("ben").addEventListener("click", () => applyLanguage("en"));
 
-try {
-  const saved = localStorage.getItem("lltm.demo.lang");
-  if (saved === "zh" || saved === "en") lang = saved;
-} catch { /* private mode */ }
-
-applyLanguage(lang);
-loadMetrics();
-connectEngine();
+applyLanguage();
+loadManifest();
+connect().then(renderSuggestions);

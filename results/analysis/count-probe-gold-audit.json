@@ -1,0 +1,313 @@
+{
+  "schema_version": 1,
+  "provider_calls": 0,
+  "not_a_verdict": "A memory in one of these scopes is not automatically excluded from the set a question asks about; the question's wording decides. This measures exposure and lists what a human has to read.",
+  "half": "development",
+  "intention_scopes": [
+    "plan",
+    "preference"
+  ],
+  "count_probes": 30,
+  "probes_affected": 19,
+  "share_affected": 0.6333,
+  "gold_members_total": 149,
+  "intention_members": 38,
+  "share_of_members": 0.255,
+  "by_scope": {
+    "plan": 22,
+    "preference": 16
+  },
+  "per_probe": [
+    {
+      "probe_id": "count_0012",
+      "gold_answer": 5,
+      "intention_members": 4,
+      "gold_without_them": 1
+    },
+    {
+      "probe_id": "count_0039",
+      "gold_answer": 5,
+      "intention_members": 4,
+      "gold_without_them": 1
+    },
+    {
+      "probe_id": "count_0016",
+      "gold_answer": 6,
+      "intention_members": 3,
+      "gold_without_them": 3
+    },
+    {
+      "probe_id": "count_0024",
+      "gold_answer": 3,
+      "intention_members": 3,
+      "gold_without_them": 0
+    },
+    {
+      "probe_id": "count_0032",
+      "gold_answer": 5,
+      "intention_members": 3,
+      "gold_without_them": 2
+    },
+    {
+      "probe_id": "count_0048",
+      "gold_answer": 4,
+      "intention_members": 3,
+      "gold_without_them": 1
+    },
+    {
+      "probe_id": "count_0005",
+      "gold_answer": 3,
+      "intention_members": 2,
+      "gold_without_them": 1
+    },
+    {
+      "probe_id": "count_0011",
+      "gold_answer": 4,
+      "intention_members": 2,
+      "gold_without_them": 2
+    },
+    {
+      "probe_id": "count_0022",
+      "gold_answer": 3,
+      "intention_members": 2,
+      "gold_without_them": 1
+    },
+    {
+      "probe_id": "count_0025",
+      "gold_answer": 3,
+      "intention_members": 2,
+      "gold_without_them": 1
+    },
+    {
+      "probe_id": "count_0030",
+      "gold_answer": 3,
+      "intention_members": 2,
+      "gold_without_them": 1
+    },
+    {
+      "probe_id": "count_0007",
+      "gold_answer": 9,
+      "intention_members": 1,
+      "gold_without_them": 8
+    },
+    {
+      "probe_id": "count_0015",
+      "gold_answer": 3,
+      "intention_members": 1,
+      "gold_without_them": 2
+    },
+    {
+      "probe_id": "count_0018",
+      "gold_answer": 3,
+      "intention_members": 1,
+      "gold_without_them": 2
+    },
+    {
+      "probe_id": "count_0026",
+      "gold_answer": 7,
+      "intention_members": 1,
+      "gold_without_them": 6
+    },
+    {
+      "probe_id": "count_0035",
+      "gold_answer": 3,
+      "intention_members": 1,
+      "gold_without_them": 2
+    },
+    {
+      "probe_id": "count_0044",
+      "gold_answer": 9,
+      "intention_members": 1,
+      "gold_without_them": 8
+    },
+    {
+      "probe_id": "count_0052",
+      "gold_answer": 3,
+      "intention_members": 1,
+      "gold_without_them": 2
+    },
+    {
+      "probe_id": "count_0056",
+      "gold_answer": 4,
+      "intention_members": 1,
+      "gold_without_them": 3
+    }
+  ],
+  "examples": [
+    {
+      "probe_id": "count_0005",
+      "question": "How many distinct dishes has the user cooked? Count only facts recorded under: cooking ingredients, cooking skills, recipe modifications.",
+      "gold_answer": 3,
+      "scope": "plan",
+      "memory": "The user decided to add cherry tomatoes and mushrooms to their Spaghetti Carbonara."
+    },
+    {
+      "probe_id": "count_0005",
+      "question": "How many distinct dishes has the user cooked? Count only facts recorded under: cooking ingredients, cooking skills, recipe modifications.",
+      "gold_answer": 3,
+      "scope": "preference",
+      "memory": "The user plans to use avocado oil for roasting asparagus."
+    },
+    {
+      "probe_id": "count_0007",
+      "question": "How many distinct possessions does the user have on record? Count only facts recorded under: owned items, photography gear, stamp collection.",
+      "gold_answer": 9,
+      "scope": "plan",
+      "memory": "The user plans to use an Epson Perfection V550 scanner and Adobe Lightroom software to digitize negatives."
+    },
+    {
+      "probe_id": "count_0011",
+      "question": "How many distinct financial activities are on record for the user? Count only facts recorded under: expense tracking fields, expense tracking method, interests, renovation budget.",
+      "gold_answer": 4,
+      "scope": "preference",
+      "memory": "The user is interested in exploring gender identity and expression through stream-of-consciousness writing."
+    },
+    {
+      "probe_id": "count_0011",
+      "question": "How many distinct financial activities are on record for the user? Count only facts recorded under: expense tracking fields, expense tracking method, interests, renovation budget.",
+      "gold_answer": 4,
+      "scope": "preference",
+      "memory": "The user wants to track date of purchase, item description, cost, and store/website for their expenses."
+    },
+    {
+      "probe_id": "count_0012",
+      "question": "How many distinct films or shows has the user watched? Count only facts recorded under: tv shows.",
+      "gold_answer": 5,
+      "scope": "plan",
+      "memory": "The user plans to watch Breaking Bad."
+    },
+    {
+      "probe_id": "count_0012",
+      "question": "How many distinct films or shows has the user watched? Count only facts recorded under: tv shows.",
+      "gold_answer": 5,
+      "scope": "plan",
+      "memory": "The user plans to watch Ozark."
+    },
+    {
+      "probe_id": "count_0012",
+      "question": "How many distinct films or shows has the user watched? Count only facts recorded under: tv shows.",
+      "gold_answer": 5,
+      "scope": "preference",
+      "memory": "The user watches the Daily Dose of Laughter playlist on Peacock."
+    },
+    {
+      "probe_id": "count_0012",
+      "question": "How many distinct films or shows has the user watched? Count only facts recorded under: tv shows.",
+      "gold_answer": 5,
+      "scope": "plan",
+      "memory": "The user plans to watch Narcos: Mexico."
+    },
+    {
+      "probe_id": "count_0015",
+      "question": "How many distinct hobbies or activities does the user practise? Count only facts recorded under: business activities, current activities.",
+      "gold_answer": 3,
+      "scope": "plan",
+      "memory": "The user is planning to participate in the Summer Fest event in June 2023."
+    },
+    {
+      "probe_id": "count_0016",
+      "question": "How many distinct books or articles has the user read? Count only facts recorded under: beta reading, book club reading, books read, reading interests, reading tracker.",
+      "gold_answer": 6,
+      "scope": "plan",
+      "memory": "The user's book club is reading 'The Power' by Naomi Alderman."
+    },
+    {
+      "probe_id": "count_0016",
+      "question": "How many distinct books or articles has the user read? Count only facts recorded under: beta reading, book club reading, books read, reading interests, reading tracker.",
+      "gold_answer": 6,
+      "scope": "preference",
+      "memory": "The user wants recommendations for thrillers and mysteries by authors from diverse backgrounds."
+    },
+    {
+      "probe_id": "count_0016",
+      "question": "How many distinct books or articles has the user read? Count only facts recorded under: beta reading, book club reading, books read, reading interests, reading tracker.",
+      "gold_answer": 6,
+      "scope": "preference",
+      "memory": "The user is looking for thriller and mystery book recommendations."
+    },
+    {
+      "probe_id": "count_0018",
+      "question": "How many distinct plants does the user grow? Count only facts recorded under: garden plants, gardening tasks.",
+      "gold_answer": 3,
+      "scope": "plan",
+      "memory": "The user is hardening off seedlings 7-10 days before transplanting them into a raised bed."
+    },
+    {
+      "probe_id": "count_0022",
+      "question": "How many distinct books or articles has the user read? Count only facts recorded under: books read, books reading, reading interests.",
+      "gold_answer": 3,
+      "scope": "preference",
+      "memory": "The user is interested in historical fiction, specifically World War II stories focusing on women's experiences."
+    },
+    {
+      "probe_id": "count_0022",
+      "question": "How many distinct books or articles has the user read? Count only facts recorded under: books read, books reading, reading interests.",
+      "gold_answer": 3,
+      "scope": "preference",
+      "memory": "The user is reading The Seven Husbands of Evelyn Hugo by Taylor Jenkins Reid."
+    },
+    {
+      "probe_id": "count_0024",
+      "question": "How many distinct tasks or projects has the user completed? Count only facts recorded under: project development, projects, task.",
+      "gold_answer": 3,
+      "scope": "plan",
+      "memory": "The user is planning a community garden project in their neighborhood."
+    },
+    {
+      "probe_id": "count_0024",
+      "question": "How many distinct tasks or projects has the user completed? Count only facts recorded under: project development, projects, task.",
+      "gold_answer": 3,
+      "scope": "plan",
+      "memory": "The user is creating an AI-generated mind map tool for their website."
+    },
+    {
+      "probe_id": "count_0024",
+      "question": "How many distinct tasks or projects has the user completed? Count only facts recorded under: project development, projects, task.",
+      "gold_answer": 3,
+      "scope": "plan",
+      "memory": "The user needs to reorder Luna's medication tomorrow during their lunch break."
+    },
+    {
+      "probe_id": "count_0025",
+      "question": "How many distinct hobbies or activities does the user practise? Count only facts recorded under: hobbies, volunteering interests.",
+      "gold_answer": 3,
+      "scope": "preference",
+      "memory": "The user is interested in protecting marine ecosystems."
+    },
+    {
+      "probe_id": "count_0025",
+      "question": "How many distinct hobbies or activities does the user practise? Count only facts recorded under: hobbies, volunteering interests.",
+      "gold_answer": 3,
+      "scope": "preference",
+      "memory": "The user is interested in volunteering for conservation projects or wildlife conservation efforts."
+    },
+    {
+      "probe_id": "count_0026",
+      "question": "How many distinct possessions does the user have on record? Count only facts recorded under: birding equipment, camera gear, home ownership.",
+      "gold_answer": 7,
+      "scope": "plan",
+      "memory": "The user listed a Canon Powershot G7 X Mark II on Craigslist for $400."
+    },
+    {
+      "probe_id": "count_0030",
+      "question": "How many distinct books or articles has the user read? Count only facts recorded under: books read, reading material, reading speed.",
+      "gold_answer": 3,
+      "scope": "preference",
+      "memory": "The user averages 55 pages of reading per day."
+    },
+    {
+      "probe_id": "count_0030",
+      "question": "How many distinct books or articles has the user read? Count only facts recorded under: books read, reading material, reading speed.",
+      "gold_answer": 3,
+      "scope": "preference",
+      "memory": "The user has been reading The Huffington Post and Politico during their lunch break for the last three months."
+    },
+    {
+      "probe_id": "count_0032",
+      "question": "How many distinct hobbies or activities does the user practise? Count only facts recorded under: personal projects, physical activities, religious activity, volunteer interests, volunteering interests.",
+      "gold_answer": 5,
+      "scope": "plan",
+      "memory": "The user is considering volunteering at a local charity event."
+    }
+  ]
+}

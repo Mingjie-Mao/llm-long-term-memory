@@ -34,6 +34,20 @@ def test_persists_across_instances(tmp_path):
     assert b.search(np.array([0, 1], dtype=np.float32), limit=1)[0][0] == "x"
 
 
+def test_remove_deletes_ids_and_vectors_and_persists(tmp_path):
+    path = tmp_path / "idx"
+    idx = NumpyFlatIndex(path, dim=2)
+    idx.add(["keep", "drop"], np.array([[1, 0], [0, 1]], dtype=np.float32))
+
+    assert idx.remove(["drop", "missing"]) == 1
+    assert idx.search(np.array([0, 1], dtype=np.float32), limit=2) == [("keep", 0.0)]
+    idx.save()
+
+    loaded = NumpyFlatIndex(path, dim=2)
+    assert len(loaded) == 1
+    assert loaded.search(np.array([1, 0], dtype=np.float32), limit=2)[0][0] == "keep"
+
+
 def test_empty_index_returns_nothing(tmp_path):
     idx = NumpyFlatIndex(tmp_path / "idx", dim=4)
     assert idx.search(np.zeros(4, dtype=np.float32), limit=5) == []

@@ -1,0 +1,224 @@
+{
+  "arms": [
+    {
+      "arm": "v2-control",
+      "correct_with_raw_fallback_rate": 0.05,
+      "fallback_trigger_rate": 0.3055555555555556,
+      "majority_accuracy": 0.4666666666666667,
+      "majority_accuracy_by_type": {
+        "knowledge-update": 0.7,
+        "multi-session": 0.3333333333333333,
+        "single-session-assistant": 0.2,
+        "single-session-preference": 0.5,
+        "single-session-user": 0.8,
+        "temporal-reasoning": 0.4444444444444444
+      },
+      "majority_failure_types": {
+        "no_gold_session_in_candidates": 1,
+        "wrong_after_raw_fallback": 16,
+        "wrong_despite_gold_session_context": 15
+      },
+      "mean_accuracy": 0.49444444444444446,
+      "median_context_tokens": 573.0,
+      "questions": 60,
+      "recall_by_stage": {
+        "candidates": 0.9833333333333333,
+        "ranked": 0.9833333333333333,
+        "selected": 0.9833333333333333
+      },
+      "run_accuracies": [
+        0.48333333333333334,
+        0.5166666666666667,
+        0.48333333333333334
+      ],
+      "runs": 3,
+      "spread_accuracy": 0.03333333333333338,
+      "stdev_accuracy": 0.019245008972987553,
+      "unanimous_agreement": 0.85,
+      "usage": {
+        "by_role": {
+          "answerer": {
+            "failed_requests": 5,
+            "input_tokens": 230573,
+            "output_tokens": 11043,
+            "requests": 240
+          },
+          "judge": {
+            "failed_requests": 0,
+            "input_tokens": 39365,
+            "output_tokens": 6073,
+            "requests": 180
+          }
+        },
+        "failed_requests": 5,
+        "input_tokens": 269938,
+        "output_tokens": 17116,
+        "requests": 420
+      }
+    },
+    {
+      "arm": "v3.3-compact",
+      "correct_with_raw_fallback_rate": 0.05555555555555555,
+      "fallback_trigger_rate": 0.22777777777777777,
+      "majority_accuracy": 0.55,
+      "majority_accuracy_by_type": {
+        "knowledge-update": 0.8,
+        "multi-session": 0.3888888888888889,
+        "single-session-assistant": 0.2,
+        "single-session-preference": 0.75,
+        "single-session-user": 0.8,
+        "temporal-reasoning": 0.5555555555555556
+      },
+      "majority_failure_types": {
+        "no_gold_session_in_candidates": 1,
+        "wrong_after_raw_fallback": 9,
+        "wrong_despite_gold_session_context": 17
+      },
+      "mean_accuracy": 0.5555555555555556,
+      "median_context_tokens": 1115.0,
+      "questions": 60,
+      "recall_by_stage": {
+        "candidates": 0.9833333333333333,
+        "ranked": 0.9833333333333333,
+        "selected": 0.9833333333333333
+      },
+      "run_accuracies": [
+        0.5833333333333334,
+        0.5333333333333333,
+        0.55
+      ],
+      "runs": 3,
+      "spread_accuracy": 0.050000000000000044,
+      "stdev_accuracy": 0.025458753860865796,
+      "unanimous_agreement": 0.95,
+      "usage": {
+        "by_role": {
+          "answerer": {
+            "failed_requests": 5,
+            "input_tokens": 418797,
+            "output_tokens": 11399,
+            "requests": 226
+          },
+          "judge": {
+            "failed_requests": 0,
+            "input_tokens": 40018,
+            "output_tokens": 5958,
+            "requests": 180
+          }
+        },
+        "failed_requests": 5,
+        "input_tokens": 458815,
+        "output_tokens": 17357,
+        "requests": 406
+      }
+    }
+  ],
+  "gate": {
+    "answer_output_ratio": 1.032237616589695,
+    "baseline_slices": {
+      "high_confidence_majority_wrong": 0,
+      "knowledge_update_accuracy": 0.7,
+      "multi_session_accuracy": 0.3333333333333333,
+      "ordinary_accuracy": 0.5,
+      "target_accuracy": 0.3888888888888889,
+      "temporal_accuracy": 0.4444444444444444
+    },
+    "candidate_slices": {
+      "high_confidence_majority_wrong": 0,
+      "knowledge_update_accuracy": 0.8,
+      "multi_session_accuracy": 0.3888888888888889,
+      "ordinary_accuracy": 0.5714285714285714,
+      "target_accuracy": 0.4722222222222222,
+      "temporal_accuracy": 0.5555555555555556
+    },
+    "checks": {
+      "context_within_2x_v2": true,
+      "generation_cost": true,
+      "knowledge_update_no_regression": true,
+      "multi_session_no_regression": true,
+      "no_new_confident_errors": true,
+      "ordinary_no_regression": true,
+      "selected_recall_no_regression": true,
+      "target_gain": true,
+      "temporal_no_regression": true
+    },
+    "context_ratio": 1.9458987783595114,
+    "passed": true,
+    "target_accuracy_delta": 0.08333333333333331
+  },
+  "manifest": {
+    "name": "v3-reasoning-dev60",
+    "questions": 60
+  },
+  "paired_majority": {
+    "accuracy_delta": 0.08333333333333333,
+    "baseline": "v2-control",
+    "both_right": 26,
+    "both_wrong": 25,
+    "candidate": "v3.3-compact",
+    "candidate_losses": 2,
+    "candidate_wins": 7,
+    "p_value": 0.1796875,
+    "questions": 60
+  },
+  "privacy": {
+    "aggregate_only": true,
+    "contains_question_ids_or_text": false
+  },
+  "protocol": "one frozen dev60 execution; two arms x three repeats",
+  "schema_version": 1,
+  "sealed_artifacts": {
+    "v2-control.rep1.jsonl": {
+      "bytes": 405493,
+      "sha256": "3d59759376792e63f24bd17e42c107e958c3d7023a5609ddd3f20cb8b4ab65f0"
+    },
+    "v2-control.rep1.usage.json": {
+      "bytes": 29525,
+      "sha256": "82349e634941c73c30bb77029989ed3fcd5f35aef861c62ebcf4e28bab8bdfa0"
+    },
+    "v2-control.rep2.jsonl": {
+      "bytes": 405025,
+      "sha256": "4df15fb33896f6a31a5820926b82ceeef4b2ed759fcf52d792a03a9fee5a0afe"
+    },
+    "v2-control.rep2.usage.json": {
+      "bytes": 30137,
+      "sha256": "58c97e474cdcba7d7fc5de071a42d42133c377de61418abec68fdf2aef33f437"
+    },
+    "v2-control.rep3.jsonl": {
+      "bytes": 405510,
+      "sha256": "86e2e58a73a75a43687bf48c4f93123eff521e652d4498b925293d94a0c90c7b"
+    },
+    "v2-control.rep3.usage.json": {
+      "bytes": 29859,
+      "sha256": "e4bae4ba3e97b1742626f8fa78361524088308dffaebb98221b1ac9f2aa3263e"
+    },
+    "v3.3-compact.rep1.jsonl": {
+      "bytes": 418930,
+      "sha256": "6e3618c0da8abfb86ff641f01369688d9babc447e99e5da99fcdb9ca61d22bef"
+    },
+    "v3.3-compact.rep1.usage.json": {
+      "bytes": 29012,
+      "sha256": "19fc1296fa7b08d1fd4ae14018d81165ece618c42791373b93fd68b9d4d0121b"
+    },
+    "v3.3-compact.rep2.jsonl": {
+      "bytes": 418516,
+      "sha256": "7dc1a3b5d0526b80fae0ce9d6b6c896c5d92205fc14315b5ab3e48c416c566c5"
+    },
+    "v3.3-compact.rep2.usage.json": {
+      "bytes": 28730,
+      "sha256": "f5d74931f969bf4dd5103d8e65fb732e82d3f8cdef000e5bea2b7f75628949dd"
+    },
+    "v3.3-compact.rep3.jsonl": {
+      "bytes": 419360,
+      "sha256": "a1ed98d97db2a7bb4ffa8aab544670e4e19d5598d28b59925ea36f6c1d3da625"
+    },
+    "v3.3-compact.rep3.usage.json": {
+      "bytes": 28745,
+      "sha256": "d5450e617b833f8b08b0e295fd34364b1714fc489b16b426605de2cf6ce81add"
+    }
+  },
+  "shared_store": {
+    "ingestion_reused": true,
+    "name": "train150"
+  }
+}

@@ -1,0 +1,92 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1010" viewBox="0 0 1200 1010" role="img" aria-labelledby="title desc">
+<title id="title">Retrieve memory first; recover raw evidence on demand</title>
+<desc id="desc">Architecture verified against the repository on 2026-09-07. See docs/ARCHITECTURE.md for the detailed figure caption and source mapping. Solid arrows show flow; dashed arrows show conditional paths.</desc>
+<rect x="0" y="0" width="1200" height="1010" rx="7" fill="#FFFFFF" stroke="none" stroke-width="1.3"/>
+<text x="40" y="42" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#345E80" text-anchor="start">FIGURE 04</text>
+<text x="40" y="82" font-family="Georgia, Times New Roman, serif" font-size="31" font-weight="400" fill="#203247" text-anchor="start">Retrieve memory first; recover raw evidence on demand</text>
+<text x="40" y="113" font-family="Helvetica, Arial, sans-serif" font-size="17" font-weight="400" fill="#586775" text-anchor="start">Default memory-first route with raw_fallback enabled. Dashed paths run only when source recovery is needed.</text>
+<polyline points="40,133 1160,133" fill="none" stroke="#CED6DC" stroke-width="1" stroke-linejoin="round"/>
+<rect x="40" y="193" width="190" height="125" rx="7" fill="#EEF4F8" stroke="#345E80" stroke-width="1.3"/>
+<text x="56" y="222" font-family="Helvetica, Arial, sans-serif" font-size="19" font-weight="700" fill="#345E80" text-anchor="start">Question</text>
+<text x="56" y="250" font-family="Helvetica, Arial, sans-serif" font-size="17" font-weight="400" fill="#203247" text-anchor="start">user_id + query</text>
+<text x="56" y="274" font-family="Helvetica, Arial, sans-serif" font-size="17" font-weight="400" fill="#203247" text-anchor="start">MiniLM embedding</text>
+<rect x="285" y="167" width="280" height="100" rx="7" fill="#EEF4F8" stroke="#345E80" stroke-width="1.3"/>
+<text x="301" y="196" font-family="Helvetica, Arial, sans-serif" font-size="19" font-weight="700" fill="#345E80" text-anchor="start">Semantic candidates</text>
+<text x="301" y="224" font-family="Helvetica, Arial, sans-serif" font-size="17" font-weight="400" fill="#203247" text-anchor="start">Scan index, then scope/status</text>
+<text x="301" y="248" font-family="Helvetica, Arial, sans-serif" font-size="17" font-weight="400" fill="#203247" text-anchor="start">Keep up to 50</text>
+<rect x="285" y="294" width="280" height="100" rx="7" fill="#EFF6F3" stroke="#32766D" stroke-width="1.3"/>
+<text x="301" y="323" font-family="Helvetica, Arial, sans-serif" font-size="19" font-weight="700" fill="#32766D" text-anchor="start">Lexical candidates</text>
+<text x="301" y="351" font-family="Helvetica, Arial, sans-serif" font-size="17" font-weight="400" fill="#203247" text-anchor="start">FTS5 + SQL scope/status</text>
+<text x="301" y="375" font-family="Helvetica, Arial, sans-serif" font-size="17" font-weight="400" fill="#203247" text-anchor="start">Keep up to 50</text>
+<polyline points="230,236 255,236 255,217 285,217" fill="none" stroke="#8795A1" stroke-width="1.7" stroke-linejoin="round"/>
+<polygon points="285,217 277.0,213.3 277.0,220.7" fill="#8795A1"/>
+<polyline points="230,281 255,281 255,344 285,344" fill="none" stroke="#32766D" stroke-width="1.7" stroke-linejoin="round"/>
+<polygon points="285,344 277.0,340.3 277.0,347.7" fill="#32766D"/>
+<rect x="620" y="193" width="250" height="151" rx="7" fill="#EEF4F8" stroke="#345E80" stroke-width="1.3"/>
+<text x="636" y="222" font-family="Helvetica, Arial, sans-serif" font-size="19" font-weight="700" fill="#345E80" text-anchor="start">Union and score</text>
+<text x="636" y="250" font-family="Helvetica, Arial, sans-serif" font-size="17" font-weight="400" fill="#203247" text-anchor="start">Deduplicate memory IDs</text>
+<text x="636" y="274" font-family="Helvetica, Arial, sans-serif" font-size="17" font-weight="400" fill="#203247" text-anchor="start">Up to 100 candidates</text>
+<text x="636" y="298" font-family="Helvetica, Arial, sans-serif" font-size="17" font-weight="400" fill="#203247" text-anchor="start">Default weight: semantic 1</text>
+<polyline points="565,217 620,217" fill="none" stroke="#8795A1" stroke-width="1.7" stroke-linejoin="round"/>
+<polygon points="620,217 612.0,213.3 612.0,220.7" fill="#8795A1"/>
+<polyline points="565,344 592,344 592,313 620,313" fill="none" stroke="#32766D" stroke-width="1.7" stroke-linejoin="round"/>
+<polygon points="620,313 612.0,309.3 612.0,316.7" fill="#32766D"/>
+<rect x="915" y="193" width="245" height="151" rx="7" fill="#EEF4F8" stroke="#345E80" stroke-width="1.3"/>
+<text x="931" y="222" font-family="Helvetica, Arial, sans-serif" font-size="19" font-weight="700" fill="#345E80" text-anchor="start">Select and render</text>
+<text x="931" y="250" font-family="Helvetica, Arial, sans-serif" font-size="17" font-weight="400" fill="#203247" text-anchor="start">Top-k ranked memories</text>
+<text x="931" y="274" font-family="Helvetica, Arial, sans-serif" font-size="17" font-weight="400" fill="#203247" text-anchor="start">Group by scope / time</text>
+<text x="931" y="298" font-family="Helvetica, Arial, sans-serif" font-size="17" font-weight="400" fill="#203247" text-anchor="start">Build answer context</text>
+<polyline points="870,267 915,267" fill="none" stroke="#8795A1" stroke-width="1.7" stroke-linejoin="round"/>
+<polygon points="915,267 907.0,263.3 907.0,270.7" fill="#8795A1"/>
+<text x="630" y="373" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="400" fill="#586775" text-anchor="start">Other four score weights: 0</text>
+<text x="926" y="373" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="400" fill="#586775" text-anchor="start">Service k=10; v2 eval k=20</text>
+<polyline points="1140,344 1140,424 177,424 177,480" fill="none" stroke="#8795A1" stroke-width="1.7" stroke-linejoin="round"/>
+<polygon points="177,480 180.7,472.0 173.3,472.0" fill="#8795A1"/>
+<rect x="40" y="480" width="275" height="296" rx="7" fill="#EEF4F8" stroke="#345E80" stroke-width="1.3"/>
+<text x="56" y="509" font-family="Helvetica, Arial, sans-serif" font-size="19" font-weight="700" fill="#345E80" text-anchor="start">First LLM pass</text>
+<text x="56" y="537" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="400" fill="#203247" text-anchor="start">Parse AnswerVerdict</text>
+<text x="60" y="590" font-family="Courier New, monospace" font-size="18" font-weight="400" fill="#345E80" text-anchor="start">answer</text>
+<text x="60" y="661" font-family="Courier New, monospace" font-size="18" font-weight="400" fill="#96662D" text-anchor="start">need_source</text>
+<text x="60" y="735" font-family="Courier New, monospace" font-size="18" font-weight="400" fill="#96662D" text-anchor="start">no_evidence</text>
+<rect x="405" y="474" width="325" height="90" rx="7" fill="#EFF6F3" stroke="#32766D" stroke-width="1.3"/>
+<text x="421" y="503" font-family="Helvetica, Arial, sans-serif" font-size="19" font-weight="700" fill="#32766D" text-anchor="start">Return answer</text>
+<text x="421" y="531" font-family="Helvetica, Arial, sans-serif" font-size="17" font-weight="400" fill="#203247" text-anchor="start">No raw retrieval or second pass</text>
+<polyline points="315,581 360,581 360,519 405,519" fill="none" stroke="#32766D" stroke-width="1.7" stroke-linejoin="round"/>
+<polygon points="405,519 397.0,515.3 397.0,522.7" fill="#32766D"/>
+<rect x="405" y="601" width="325" height="113" rx="7" fill="#FBF5EB" stroke="#96662D" stroke-width="1.3"/>
+<text x="421" y="630" font-family="Helvetica, Arial, sans-serif" font-size="19" font-weight="700" fill="#96662D" text-anchor="start">Source-aware recovery</text>
+<text x="421" y="658" font-family="Helvetica, Arial, sans-serif" font-size="17" font-weight="400" fill="#203247" text-anchor="start">Rank archive turns with BM25</text>
+<text x="421" y="682" font-family="Helvetica, Arial, sans-serif" font-size="17" font-weight="400" fill="#203247" text-anchor="start">Choose local or archive-wide</text>
+<polyline points="315,654 405,654" fill="none" stroke="#96662D" stroke-width="1.7" stroke-linejoin="round" stroke-dasharray="7 5"/>
+<polygon points="405,654 397.0,650.3 397.0,657.7" fill="#96662D"/>
+<rect x="405" y="751" width="325" height="90" rx="7" fill="#FBF5EB" stroke="#96662D" stroke-width="1.3"/>
+<text x="421" y="780" font-family="Helvetica, Arial, sans-serif" font-size="19" font-weight="700" fill="#96662D" text-anchor="start">Archive-wide recovery</text>
+<text x="421" y="808" font-family="Helvetica, Arial, sans-serif" font-size="17" font-weight="400" fill="#203247" text-anchor="start">Search without selected anchors</text>
+<polyline points="315,730 362,730 362,796 405,796" fill="none" stroke="#96662D" stroke-width="1.7" stroke-linejoin="round" stroke-dasharray="7 5"/>
+<polygon points="405,796 397.0,792.3 397.0,799.7" fill="#96662D"/>
+<rect x="840" y="601" width="320" height="113" rx="7" fill="#FBF5EB" stroke="#96662D" stroke-width="1.3"/>
+<text x="856" y="630" font-family="Helvetica, Arial, sans-serif" font-size="19" font-weight="700" fill="#96662D" text-anchor="start">Any raw turns recovered?</text>
+<text x="856" y="658" font-family="Helvetica, Arial, sans-serif" font-size="17" font-weight="400" fill="#203247" text-anchor="start">At most 3 turns</text>
+<text x="856" y="682" font-family="Helvetica, Arial, sans-serif" font-size="17" font-weight="400" fill="#203247" text-anchor="start">2,400 source characters</text>
+<polyline points="730,654 840,654" fill="none" stroke="#96662D" stroke-width="1.7" stroke-linejoin="round" stroke-dasharray="7 5"/>
+<polygon points="840,654 832.0,650.3 832.0,657.7" fill="#96662D"/>
+<polyline points="730,796 785,796 785,688 840,688" fill="none" stroke="#96662D" stroke-width="1.7" stroke-linejoin="round" stroke-dasharray="7 5"/>
+<polygon points="840,688 832.0,684.3 832.0,691.7" fill="#96662D"/>
+<rect x="840" y="474" width="320" height="90" rx="7" fill="#EFF6F3" stroke="#32766D" stroke-width="1.3"/>
+<text x="856" y="503" font-family="Helvetica, Arial, sans-serif" font-size="19" font-weight="700" fill="#32766D" text-anchor="start">No evidence found</text>
+<text x="856" y="531" font-family="Helvetica, Arial, sans-serif" font-size="17" font-weight="400" fill="#203247" text-anchor="start">Return verdict text / abstain</text>
+<polyline points="1000,601 1000,564" fill="none" stroke="#96662D" stroke-width="1.7" stroke-linejoin="round" stroke-dasharray="7 5"/>
+<polygon points="1000,564 996.3,572.0 1003.7,572.0" fill="#96662D"/>
+<text x="1015" y="586" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="400" fill="#96662D" text-anchor="start">no</text>
+<rect x="840" y="783" width="320" height="103" rx="7" fill="#EFF6F3" stroke="#32766D" stroke-width="1.3"/>
+<text x="856" y="812" font-family="Helvetica, Arial, sans-serif" font-size="19" font-weight="700" fill="#32766D" text-anchor="start">Second LLM pass</text>
+<text x="856" y="840" font-family="Helvetica, Arial, sans-serif" font-size="17" font-weight="400" fill="#203247" text-anchor="start">Answer from recovered source</text>
+<text x="856" y="864" font-family="Helvetica, Arial, sans-serif" font-size="17" font-weight="400" fill="#203247" text-anchor="start">Return final prose</text>
+<polyline points="1000,714 1000,783" fill="none" stroke="#96662D" stroke-width="1.7" stroke-linejoin="round" stroke-dasharray="7 5"/>
+<polygon points="1000,783 1003.7,775.0 996.3,775.0" fill="#96662D"/>
+<text x="1015" y="752" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="400" fill="#96662D" text-anchor="start">yes</text>
+<polyline points="40,910 1160,910" fill="none" stroke="#CED6DC" stroke-width="1" stroke-linejoin="round"/>
+<text x="40" y="933" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="400" fill="#586775" text-anchor="start">A need_source verdict can still choose archive-wide recovery if the best BM25 hit is outside local source sessions.</text>
+<text x="40" y="956" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="400" fill="#586775" text-anchor="start">Reranking, session-coherent context, packing, decay and adaptive hydration are optional branches; see the atlas captions.</text>
+<text x="40" y="979" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="400" fill="#586775" text-anchor="start">Limits shown are from the checked-in default configurations. A malformed first verdict has a separate parse-failure return.</text>
+</svg>

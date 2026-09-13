@@ -1,0 +1,74 @@
+{
+  "freeze_id": "34807e6d6f6c86c938c434d9b7342f9a763a2e469a74d0026839fc9926192b61",
+  "mode": "rehearsal",
+  "outcome": "rehearsal_complete",
+  "not_a_benchmark": true,
+  "rows": 404,
+  "gate_0": "PASS",
+  "count_probes": 30,
+  "namespaces": 29,
+  "majority_correct": {
+    "control": 13,
+    "candidate": 13
+  },
+  "net_count": 0,
+  "wins": 0,
+  "losses": 0,
+  "paired_table": {
+    "both_correct": 13,
+    "candidate_only_correct": 0,
+    "control_only_correct": 0,
+    "both_incorrect": 17
+  },
+  "paired_cluster_p_two_sided": 1.0,
+  "probe_level_mcnemar_p_descriptive": 1.0,
+  "namespace_bootstrap_95_percentile_delta": [
+    0.0,
+    0.0
+  ],
+  "safety": {
+    "duration": {
+      "control": 0,
+      "candidate": 0,
+      "net": 0
+    },
+    "comparison": {
+      "control": 16,
+      "candidate": 16,
+      "net": 0
+    },
+    "current_state": {
+      "control": 0,
+      "candidate": 0,
+      "net": 0
+    }
+  },
+  "safety_pass": true,
+  "candidate_count_cited": 90,
+  "candidate_count_rows": 90,
+  "mechanism_observed": true,
+  "limitations": [
+    "Development SQL-derived probes, not new independent benchmark questions.",
+    "Cluster sign-flip assumes exchangeable arm outcomes between independent namespaces.",
+    "Three repeats do not create 90 independent count questions."
+  ],
+  "usage": {
+    "attempts": 404,
+    "observed_tokens": 0,
+    "failed_attempts": 0
+  },
+  "artifacts": [
+    {
+      "path": "rehearsal/rows.jsonl",
+      "sha256": "a4f1c89009556d56484989d847619529655d6fc410b99d340329787fab9ad3e4"
+    },
+    {
+      "path": "rehearsal/requests.jsonl",
+      "sha256": "0b272fc1966ed13674b2235190aee284211eda067e34c6154207c21454f71cbb"
+    },
+    {
+      "path": "rehearsal/completions.jsonl",
+      "sha256": "b36a197665391dedc1b141560a9eea12296d45c81abdedfb736e91acf42ec9ab"
+    }
+  ]
+}

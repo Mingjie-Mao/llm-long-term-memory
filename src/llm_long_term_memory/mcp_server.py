@@ -15,8 +15,16 @@ Run it:
     lltm mcp --transport http     # streamable HTTP
 
 Every tool takes an explicit `user_id`. There is no ambient session identity: an
-agent serving several people must say which one it is acting for, and the store
-enforces the boundary rather than trusting the caller to keep them apart.
+agent serving several people must say which one it is acting for.
+
+**That is addressing, not authorization, and the distinction matters here.** The store
+scopes every read and write to the namespace it is given; it has no way to check that the
+caller was entitled to name it. Over stdio that is sound, because the server is a local
+process the user launched and the trust boundary is the process itself. Over
+`--transport http` it is not: any client that can reach the port can name any namespace.
+The REST API grew a credential-derived principal for exactly this reason
+(`api/identity.py`); the MCP HTTP transport has no equivalent yet and must not be exposed
+beyond localhost.
 """
 
 from __future__ import annotations
@@ -24,6 +32,7 @@ from __future__ import annotations
 from typing import Any
 
 from llm_long_term_memory.api.service import MemoryNotFound, MemoryService, NamespaceRequired
+from llm_long_term_memory.store import external_session_id
 
 INSTRUCTIONS = """\
 Long-term memory for a user, across conversations.
@@ -62,7 +71,7 @@ def _memory_dict(memory: Any) -> dict[str, Any]:
         "valid_from": memory.valid_from.isoformat() if memory.valid_from else None,
         "valid_to": memory.valid_to.isoformat() if memory.valid_to else None,
         "source": {
-            "session_id": memory.source_session_id,
+            "session_id": external_session_id(memory.source_session_id),
             "turn_index": memory.source_turn_index,
         },
     }
@@ -145,7 +154,7 @@ def build_server(service: MemoryService | None = None, name: str = "llm-long-ter
         return {
             "turns": [
                 {
-                    "session_id": t.session_id,
+                    "session_id": external_session_id(t.session_id),
                     "turn_index": t.turn_index,
                     "speaker": t.role,
                     "text": t.content,

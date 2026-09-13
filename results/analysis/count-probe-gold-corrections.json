@@ -1,0 +1,426 @@
+{
+  "schema_version": 1,
+  "adjudicated_by": "model (Claude), rule-tagged for human review — NOT a human adjudication",
+  "adjudicated_before_any_corrected_score_was_computed": true,
+  "provider_calls": 0,
+  "what_this_is": "A correction overlay. `synthesis-probes.json` is hashed into `v4-probe-split.json`, the only unseen check v4 has, so the probe set itself is never edited. This records, per gold member, whether the question's wording admits it as a member of the set.",
+  "why_scope_is_not_the_rule": "The audit found the exposure by `scope`, but `scope` does not decide membership: 'has already tried the vegan cheesecake recipe' and 'has been reading X and Y for three months' are both scope=preference and both assert a completed act. Each member is judged on what it asserts against what the question asks.",
+  "rules": {
+    "R1": "asserts an intention or plan; the question asks for a completed act",
+    "R2": "asserts an interest or taste; names no member of the set",
+    "R3": "not an instance of the asked-for type at all (a rate, a task, another domain)",
+    "R4": "KEEP - asserts the act happened or is ongoing",
+    "R5": "KEEP - asserts the thing is currently held"
+  },
+  "counts": {
+    "adjudicated": 38,
+    "keep": 7,
+    "exclude": 31,
+    "medium_confidence": 1,
+    "disputed": 2,
+    "high_confidence": 35
+  },
+  "members": [
+    {
+      "probe_id": "count_0005",
+      "memory_id": "mem_c6c3e5ed8012c3be",
+      "scope": "plan",
+      "question": "How many distinct dishes has the user cooked? Count only facts recorded under: cooking ingredients, cooking skills, recipe modifications.",
+      "memory": "The user decided to add cherry tomatoes and mushrooms to their Spaghetti Carbonara.",
+      "verdict": "exclude",
+      "rule": "R3",
+      "confidence": "high"
+    },
+    {
+      "probe_id": "count_0005",
+      "memory_id": "mem_e47b0804100a5c57",
+      "scope": "preference",
+      "question": "How many distinct dishes has the user cooked? Count only facts recorded under: cooking ingredients, cooking skills, recipe modifications.",
+      "memory": "The user plans to use avocado oil for roasting asparagus.",
+      "verdict": "exclude",
+      "rule": "R1",
+      "confidence": "high"
+    },
+    {
+      "probe_id": "count_0007",
+      "memory_id": "mem_dd8eab07beb913d4",
+      "scope": "plan",
+      "question": "How many distinct possessions does the user have on record? Count only facts recorded under: owned items, photography gear, stamp collection.",
+      "memory": "The user plans to use an Epson Perfection V550 scanner and Adobe Lightroom software to digitize negatives.",
+      "verdict": "exclude",
+      "rule": "R1",
+      "confidence": "high"
+    },
+    {
+      "probe_id": "count_0011",
+      "memory_id": "mem_6bd7f8c08d2d72cf",
+      "scope": "preference",
+      "question": "How many distinct financial activities are on record for the user? Count only facts recorded under: expense tracking fields, expense tracking method, interests, renovation budget.",
+      "memory": "The user is interested in exploring gender identity and expression through stream-of-consciousness writing.",
+      "verdict": "exclude",
+      "rule": "R3",
+      "confidence": "high"
+    },
+    {
+      "probe_id": "count_0011",
+      "memory_id": "mem_9567d36ae03780a0",
+      "scope": "preference",
+      "question": "How many distinct financial activities are on record for the user? Count only facts recorded under: expense tracking fields, expense tracking method, interests, renovation budget.",
+      "memory": "The user wants to track date of purchase, item description, cost, and store/website for their expenses.",
+      "verdict": "exclude",
+      "rule": "R1",
+      "confidence": "disputed",
+      "review_note": "两个方向都成立。问题措辞是 `are on record for the user`，是全部题目里最宽松的一种，且范围明确含 `expense tracking fields`；但记忆本身是意图（`wants to track`）。维持 exclude 不改数字，标为争议交人裁定。反转后 control 12→11，臂间差值不变。"
+    },
+    {
+      "probe_id": "count_0012",
+      "memory_id": "mem_100a159f47e3286a",
+      "scope": "plan",
+      "question": "How many distinct films or shows has the user watched? Count only facts recorded under: tv shows.",
+      "memory": "The user plans to watch Breaking Bad.",
+      "verdict": "exclude",
+      "rule": "R1",
+      "confidence": "high"
+    },
+    {
+      "probe_id": "count_0012",
+      "memory_id": "mem_4593f716b042d96f",
+      "scope": "plan",
+      "question": "How many distinct films or shows has the user watched? Count only facts recorded under: tv shows.",
+      "memory": "The user plans to watch Ozark.",
+      "verdict": "exclude",
+      "rule": "R1",
+      "confidence": "high"
+    },
+    {
+      "probe_id": "count_0012",
+      "memory_id": "mem_c4d5417b8c50a3f1",
+      "scope": "preference",
+      "question": "How many distinct films or shows has the user watched? Count only facts recorded under: tv shows.",
+      "memory": "The user watches the Daily Dose of Laughter playlist on Peacock.",
+      "verdict": "keep",
+      "rule": "R4",
+      "confidence": "high"
+    },
+    {
+      "probe_id": "count_0012",
+      "memory_id": "mem_fa51858f617410ba",
+      "scope": "plan",
+      "question": "How many distinct films or shows has the user watched? Count only facts recorded under: tv shows.",
+      "memory": "The user plans to watch Narcos: Mexico.",
+      "verdict": "exclude",
+      "rule": "R1",
+      "confidence": "high"
+    },
+    {
+      "probe_id": "count_0015",
+      "memory_id": "mem_2bf4d65c6a390121",
+      "scope": "plan",
+      "question": "How many distinct hobbies or activities does the user practise? Count only facts recorded under: business activities, current activities.",
+      "memory": "The user is planning to participate in the Summer Fest event in June 2023.",
+      "verdict": "exclude",
+      "rule": "R1",
+      "confidence": "high"
+    },
+    {
+      "probe_id": "count_0016",
+      "memory_id": "mem_0950c5aa6a7994e6",
+      "scope": "plan",
+      "question": "How many distinct books or articles has the user read? Count only facts recorded under: beta reading, book club reading, books read, reading interests, reading tracker.",
+      "memory": "The user's book club is reading 'The Power' by Naomi Alderman.",
+      "verdict": "keep",
+      "rule": "R4",
+      "confidence": "high",
+      "review_note": "问题范围明确含 `book club reading`，所以范围声明本身把书友会在读的书纳入成员。原判 keep 依据动词，现在有范围声明这一独立依据。"
+    },
+    {
+      "probe_id": "count_0016",
+      "memory_id": "mem_724d251d6c2c0cc3",
+      "scope": "preference",
+      "question": "How many distinct books or articles has the user read? Count only facts recorded under: beta reading, book club reading, books read, reading interests, reading tracker.",
+      "memory": "The user wants recommendations for thrillers and mysteries by authors from diverse backgrounds.",
+      "verdict": "exclude",
+      "rule": "R2",
+      "confidence": "high"
+    },
+    {
+      "probe_id": "count_0016",
+      "memory_id": "mem_a3ba4ae3193da343",
+      "scope": "preference",
+      "question": "How many distinct books or articles has the user read? Count only facts recorded under: beta reading, book club reading, books read, reading interests, reading tracker.",
+      "memory": "The user is looking for thriller and mystery book recommendations.",
+      "verdict": "exclude",
+      "rule": "R2",
+      "confidence": "high"
+    },
+    {
+      "probe_id": "count_0018",
+      "memory_id": "mem_fc8c00f5a7db4811",
+      "scope": "plan",
+      "question": "How many distinct plants does the user grow? Count only facts recorded under: garden plants, gardening tasks.",
+      "memory": "The user is hardening off seedlings 7-10 days before transplanting them into a raised bed.",
+      "verdict": "exclude",
+      "rule": "R3",
+      "confidence": "high"
+    },
+    {
+      "probe_id": "count_0022",
+      "memory_id": "mem_38bc79b0f37a9b67",
+      "scope": "preference",
+      "question": "How many distinct books or articles has the user read? Count only facts recorded under: books read, books reading, reading interests.",
+      "memory": "The user is interested in historical fiction, specifically World War II stories focusing on women's experiences.",
+      "verdict": "exclude",
+      "rule": "R2",
+      "confidence": "high"
+    },
+    {
+      "probe_id": "count_0022",
+      "memory_id": "mem_a7b311f7b3a3f085",
+      "scope": "preference",
+      "question": "How many distinct books or articles has the user read? Count only facts recorded under: books read, books reading, reading interests.",
+      "memory": "The user is reading The Seven Husbands of Evelyn Hugo by Taylor Jenkins Reid.",
+      "verdict": "keep",
+      "rule": "R4",
+      "confidence": "high",
+      "review_note": "问题范围明确含 `books reading`，即正在读的书。范围声明独立支持 keep。"
+    },
+    {
+      "probe_id": "count_0024",
+      "memory_id": "mem_0822e99c062b1730",
+      "scope": "plan",
+      "question": "How many distinct tasks or projects has the user completed? Count only facts recorded under: project development, projects, task.",
+      "memory": "The user is planning a community garden project in their neighborhood.",
+      "verdict": "exclude",
+      "rule": "R1",
+      "confidence": "high"
+    },
+    {
+      "probe_id": "count_0024",
+      "memory_id": "mem_0970283ff75f8606",
+      "scope": "plan",
+      "question": "How many distinct tasks or projects has the user completed? Count only facts recorded under: project development, projects, task.",
+      "memory": "The user is creating an AI-generated mind map tool for their website.",
+      "verdict": "exclude",
+      "rule": "R1",
+      "confidence": "high"
+    },
+    {
+      "probe_id": "count_0024",
+      "memory_id": "mem_4f028e5f132df883",
+      "scope": "plan",
+      "question": "How many distinct tasks or projects has the user completed? Count only facts recorded under: project development, projects, task.",
+      "memory": "The user needs to reorder Luna's medication tomorrow during their lunch break.",
+      "verdict": "exclude",
+      "rule": "R1",
+      "confidence": "high"
+    },
+    {
+      "probe_id": "count_0025",
+      "memory_id": "mem_5b7eb955bbb3888c",
+      "scope": "preference",
+      "question": "How many distinct hobbies or activities does the user practise? Count only facts recorded under: hobbies, volunteering interests.",
+      "memory": "The user is interested in protecting marine ecosystems.",
+      "verdict": "exclude",
+      "rule": "R2",
+      "confidence": "high"
+    },
+    {
+      "probe_id": "count_0025",
+      "memory_id": "mem_d2571c170df1890d",
+      "scope": "preference",
+      "question": "How many distinct hobbies or activities does the user practise? Count only facts recorded under: hobbies, volunteering interests.",
+      "memory": "The user is interested in volunteering for conservation projects or wildlife conservation efforts.",
+      "verdict": "exclude",
+      "rule": "R2",
+      "confidence": "high"
+    },
+    {
+      "probe_id": "count_0026",
+      "memory_id": "mem_b04bd195cda70394",
+      "scope": "plan",
+      "question": "How many distinct possessions does the user have on record? Count only facts recorded under: birding equipment, camera gear, home ownership.",
+      "memory": "The user listed a Canon Powershot G7 X Mark II on Craigslist for $400.",
+      "verdict": "keep",
+      "rule": "R5",
+      "confidence": "high"
+    },
+    {
+      "probe_id": "count_0030",
+      "memory_id": "mem_0c15f854c875f544",
+      "scope": "preference",
+      "question": "How many distinct books or articles has the user read? Count only facts recorded under: books read, reading material, reading speed.",
+      "memory": "The user averages 55 pages of reading per day.",
+      "verdict": "exclude",
+      "rule": "R3",
+      "confidence": "high"
+    },
+    {
+      "probe_id": "count_0030",
+      "memory_id": "mem_9077370dd750ac1a",
+      "scope": "preference",
+      "question": "How many distinct books or articles has the user read? Count only facts recorded under: books read, reading material, reading speed.",
+      "memory": "The user has been reading The Huffington Post and Politico during their lunch break for the last three months.",
+      "verdict": "keep",
+      "rule": "R4",
+      "confidence": "high"
+    },
+    {
+      "probe_id": "count_0032",
+      "memory_id": "mem_07eb659cca3861c6",
+      "scope": "plan",
+      "question": "How many distinct hobbies or activities does the user practise? Count only facts recorded under: personal projects, physical activities, religious activity, volunteer interests, volunteering interests.",
+      "memory": "The user is considering volunteering at a local charity event.",
+      "verdict": "exclude",
+      "rule": "R1",
+      "confidence": "high"
+    },
+    {
+      "probe_id": "count_0032",
+      "memory_id": "mem_318f016f3e9f49c4",
+      "scope": "plan",
+      "question": "How many distinct hobbies or activities does the user practise? Count only facts recorded under: personal projects, physical activities, religious activity, volunteer interests, volunteering interests.",
+      "memory": "The user is interested in volunteering as a legal observer for the ACLU.",
+      "verdict": "exclude",
+      "rule": "R2",
+      "confidence": "high"
+    },
+    {
+      "probe_id": "count_0032",
+      "memory_id": "mem_9cd6c5d077811c0c",
+      "scope": "plan",
+      "question": "How many distinct hobbies or activities does the user practise? Count only facts recorded under: personal projects, physical activities, religious activity, volunteer interests, volunteering interests.",
+      "memory": "The user plans to build a web scraper or a chatbot as personal projects.",
+      "verdict": "exclude",
+      "rule": "R1",
+      "confidence": "high"
+    },
+    {
+      "probe_id": "count_0035",
+      "memory_id": "mem_c756f3abc723123a",
+      "scope": "plan",
+      "question": "How many distinct events has the user attended? Count only facts recorded under: events attended, medical appointment, photography workshop.",
+      "memory": "The user has a dental crown procedure scheduled for Friday, May 26, 2023.",
+      "verdict": "exclude",
+      "rule": "R1",
+      "confidence": "high"
+    },
+    {
+      "probe_id": "count_0039",
+      "memory_id": "mem_26ccf38f83833ce2",
+      "scope": "preference",
+      "question": "How many distinct dishes has the user cooked? Count only facts recorded under: recipe interest, recipe to make, recipes tried.",
+      "memory": "The user is interested in vegan dessert recipes.",
+      "verdict": "exclude",
+      "rule": "R2",
+      "confidence": "high"
+    },
+    {
+      "probe_id": "count_0039",
+      "memory_id": "mem_28238b261bfdcaba",
+      "scope": "plan",
+      "question": "How many distinct dishes has the user cooked? Count only facts recorded under: recipe interest, recipe to make, recipes tried.",
+      "memory": "The user decided to make the Chocolate Chia Pudding.",
+      "verdict": "exclude",
+      "rule": "R1",
+      "confidence": "medium"
+    },
+    {
+      "probe_id": "count_0039",
+      "memory_id": "mem_3b88ea2468932982",
+      "scope": "preference",
+      "question": "How many distinct dishes has the user cooked? Count only facts recorded under: recipe interest, recipe to make, recipes tried.",
+      "memory": "The user is interested in brisket recipes.",
+      "verdict": "exclude",
+      "rule": "R2",
+      "confidence": "high"
+    },
+    {
+      "probe_id": "count_0039",
+      "memory_id": "mem_886cbee092d96877",
+      "scope": "preference",
+      "question": "How many distinct dishes has the user cooked? Count only facts recorded under: recipe interest, recipe to make, recipes tried.",
+      "memory": "The user has already tried the vegan cheesecake recipe.",
+      "verdict": "keep",
+      "rule": "R4",
+      "confidence": "high"
+    },
+    {
+      "probe_id": "count_0044",
+      "memory_id": "mem_990ce959d4425acd",
+      "scope": "plan",
+      "question": "How many distinct possessions does the user have on record? Count only facts recorded under: baseball collection, bike accessories, bikes owned, camera collection, coin collection, motorcycles owned, watch collection.",
+      "memory": "The user decided to purchase the Pro Bike Tool Waterproof Bike Cover.",
+      "verdict": "exclude",
+      "rule": "R1",
+      "confidence": "high"
+    },
+    {
+      "probe_id": "count_0048",
+      "memory_id": "mem_0c5c366b6e325e6f",
+      "scope": "plan",
+      "question": "How many distinct places has the user visited? Count only facts recorded under: commute route, past travel, travel destination, travel interests.",
+      "memory": "The user is planning to stay in Kailua-Kona.",
+      "verdict": "exclude",
+      "rule": "R1",
+      "confidence": "high"
+    },
+    {
+      "probe_id": "count_0048",
+      "memory_id": "mem_80e30da43d28c645",
+      "scope": "plan",
+      "question": "How many distinct places has the user visited? Count only facts recorded under: commute route, past travel, travel destination, travel interests.",
+      "memory": "The user needs to sort through photos from a family trip to Maui in April 2022.",
+      "verdict": "keep",
+      "rule": "R4",
+      "confidence": "high"
+    },
+    {
+      "probe_id": "count_0048",
+      "memory_id": "mem_ecf50bd17e05d185",
+      "scope": "preference",
+      "question": "How many distinct places has the user visited? Count only facts recorded under: commute route, past travel, travel destination, travel interests.",
+      "memory": "The user is interested in visiting Taiwan and Vietnam.",
+      "verdict": "exclude",
+      "rule": "R2",
+      "confidence": "high"
+    },
+    {
+      "probe_id": "count_0052",
+      "memory_id": "mem_641b61c027628568",
+      "scope": "plan",
+      "question": "How many distinct financial activities are on record for the user? Count only facts recorded under: car expenses, home budget.",
+      "memory": "The user is aiming for a home budget of $320,000 with a 20% down payment.",
+      "verdict": "exclude",
+      "rule": "R1",
+      "confidence": "disputed",
+      "review_note": "同上：措辞 `on record` 且范围明确含 `home budget`，但 `aiming for` 是意图。维持 exclude。反转后 control 12→13，臂间差值 -5→-6，即结论更强 —— 正因为反转会让结论更好看，这里不自行改判。"
+    },
+    {
+      "probe_id": "count_0056",
+      "memory_id": "mem_d42bd370e9171a14",
+      "scope": "plan",
+      "question": "How many distinct events has the user attended? Count only facts recorded under: church attendance, medical appointments.",
+      "memory": "The user is scheduled for an endoscopy on April 15th.",
+      "verdict": "exclude",
+      "rule": "R1",
+      "confidence": "high"
+    }
+  ],
+  "reviewed": {
+    "reviewed_by": "the same model that made the calls — NOT an independent human review",
+    "verdicts_changed": 0,
+    "what_the_review_added": [
+      "问题的 `Count only facts recorded under: ...` 范围声明本身界定成员资格，原裁定主要依据动词。两条 keep 因此获得独立依据，置信度升为 high。",
+      "两条改标为 disputed 而非改判：改判其中一条会让结论更强，所以选择不动数字。"
+    ],
+    "deeper_defects_found": [
+      "一条记忆可以承载多个成员：'has been reading The Huffington Post and Politico' 是两个刊物，SQL 按记忆条数计为 1。逐条剔除修不了这个，需要按成员而非按行计数。",
+      "问题的范围声明可以与它自己的动词矛盾：'How many distinct dishes has the user cooked? Count only facts recorded under: recipe interest, recipe to make, recipes tried.' —— 动词要求已做，范围却要求数`有兴趣的`和`要做的`菜谱。这是问题生成器的缺陷，不是答题器的，也不是逐条裁定能修的。"
+    ],
+    "leverage": {
+      "no_single_call_flips_the_sign": true,
+      "largest_single_effect_on_arm_difference": "+2 (count_0022 keep -> exclude: -5 becomes -3)",
+      "calls_with_no_effect_at_all": 11
+    }
+  }
+}

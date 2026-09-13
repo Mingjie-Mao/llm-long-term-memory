@@ -4,9 +4,9 @@ Run before deploying: `.venv/bin/python demo-api/check_imports.py`
 Takes about a minute and needs network — it creates a virtualenv and installs into it.
 
 **Why this exists.** The first Render deploy failed on line 55 of `app.py`, importing
-`llm_long_term_memory.ingest.schemas` for a list of four predicate names. That module
-needs `re`, `typing` and `pydantic` — but importing it runs `ingest/__init__.py`, which
-reaches the extractor and its provider SDK, which `requirements.txt` did not declare.
+`llm_long_term_memory.ingest.schemas` for a list of four predicate names. The package
+initializer used to reach the extractor and its provider SDK. The initializer is now
+lazy, so this check also proves the LLM-free service does not need `google-genai`.
 
 The defect was not the missing line. It was that `smoke.py` ran in a development
 checkout with every optional extra installed, so all 27 of its assertions passed
@@ -35,8 +35,10 @@ import sys
 sys.path.insert(0, {demo!r})
 sys.path.insert(0, {src!r})
 import app
+assert "google.genai" not in sys.modules, "demo import unexpectedly loaded Google SDK"
 print("imported app.py")
 print("  routes:", len([r for r in app.app.routes if getattr(r, "methods", None)]))
+print("  Google SDK loaded: no")
 """
 
 

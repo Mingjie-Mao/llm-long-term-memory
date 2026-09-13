@@ -1,30 +1,32 @@
 {
   "$schema": "./release.schema.json",
   "schema_version": 1,
-  "release": "v1-heldout100",
-  "measured_at": "2026-08-19",
-  "heldout": {
-    "dataset": "heldout100",
-    "accuracy": 70.0,
-    "structured_memory_accuracy": 50.0,
-    "raw_archive_recovery_pp": 20.0,
-    "median_context_tokens": 1468,
-    "whole_transcript_median_tokens": 109260,
-    "repeats": [
-      71,
-      73
-    ],
+  "release": "v2-test100",
+  "measured_at": "2026-09-01",
+  "result": {
+    "dataset": "LongMemEval-S test100",
+    "questions": 100,
+    "accuracy": 72.0,
+    "median_context_tokens": 574,
+    "naive_rag_accuracy": 65.0,
+    "naive_rag_median_context_tokens": 12763,
+    "full_context_accuracy": 86.0,
+    "full_context_median_context_tokens": 109059,
+    "vs_naive_rag_p_value": 0.3368,
+    "significant_vs_naive_rag": false,
+    "one_shot": true,
     "baseline_run_on_heldout": false
   },
   "engineering": {
-    "verified_at": "2026-09-04",
-    "source_commit": "45c9ee17c7",
-    "tests": 606,
-    "line_coverage": 83,
+    "verified_at": "2026-09-13",
+    "tests": 869,
+    "line_coverage": 84,
     "ci_platforms": [
       "ubuntu",
       "windows",
       "macos"
-    ]
+    ],
+    "measured_tree_sha256": "dcb095e8a74e0d95a06e6f8b540c685075278835e7594519dbff0fffd357da83",
+    "source_commit_for_reference": "6b3603cc87"
   }
 }

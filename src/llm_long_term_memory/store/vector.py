@@ -65,6 +65,19 @@ class NumpyFlatIndex:
         top = top[np.argsort(-scores[top])]
         return [(self._ids[i], float(scores[i])) for i in top]
 
+    def remove(self, ids: list[str]) -> int:
+        """Physically remove ids and their derived vectors, preserving order."""
+        if not ids:
+            return 0
+        doomed = set(ids)
+        keep = [i for i, memory_id in enumerate(self._ids) if memory_id not in doomed]
+        removed = len(self._ids) - len(keep)
+        if not removed:
+            return 0
+        self._vectors = self._vectors[keep] if keep else np.zeros((0, self.dim), dtype=np.float32)
+        self._ids = [self._ids[i] for i in keep]
+        return removed
+
     def save(self) -> None:
         self.path.parent.mkdir(parents=True, exist_ok=True)
         np.save(self._vec_path, self._vectors)

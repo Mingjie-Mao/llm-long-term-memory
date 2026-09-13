@@ -77,6 +77,9 @@ class ResolutionStats:
     predicate is no longer treated as single-valued. A nonzero count on a re-run
     means an earlier arity call was wrong and this store had true facts hidden."""
     skipped_undated: int = 0
+    skipped_ambiguous: int = 0
+    """Replacement signals that had more than one live predecessor. Choosing one by
+    row order would hide a potentially true fact, so the resolver abstained."""
     changes: list[TimelineChange] = field(default_factory=list)
 
     @property
@@ -241,27 +244,35 @@ class TemporalResolver:
             else:
                 runs.append([m])
 
-        for i, run in enumerate(runs):
-            owner, repeats = run[0], run[1:]
-            nxt = runs[i + 1][0] if i + 1 < len(runs) else None
+        # Work from successors rather than blindly closing each row with the next
+        # row in event order. If coexisting facts have accumulated, a later
+        # `replaces_previous` signal does not say which one it replaces. Row order is
+        # not evidence: choosing the immediately preceding Walmart trip once hid the
+        # still-relevant weekly grocery average. The safe direction is to abstain and
+        # leave both visible until extraction supplies a less ambiguous key.
+        owners = [run[0] for run in runs]
+        active: list[Memory] = []
+        successor: dict[str, Memory] = {}
+        for owner in owners:
+            if owner.replaces_previous and active:
+                if len(active) == 1:
+                    previous = active.pop()
+                    successor[previous.id] = owner
+                else:
+                    stats.skipped_ambiguous += 1
+            active.append(owner)
 
-            # Resolvability is decided per key, but *closing* a fact is decided per
-            # successor. Without this check a single `replaces` anywhere on a key
-            # made the whole chain resolvable and then retired every consecutive
-            # pair on it — including successors that explicitly said `coexists`.
-            # Observed live: "averaging $100 per week on groceries" was retired by
-            # "spent $75 at Walmart last Saturday", two facts that are both true,
-            # because some third fact on `grocery_spending` had signalled a change.
-            #
-            # Stage B's gate scores 0% false supersede in isolation; the loss was
-            # entirely in the integration, which is why the per-fact verdict has to
-            # be honoured here rather than summarised into a per-key one.
-            if nxt is None or not nxt.replaces_previous:
+        for owner in owners:
+            winner = successor.get(owner.id)
+            if winner is None:
                 self._make_current(owner, stats)
             else:
-                self._supersede(owner, nxt, stats)
+                self._supersede(owner, winner, stats)
 
-            for repeat in repeats:
+        # Fold only after the owner's final interval is known, so a restatement gets
+        # the same valid_to as the value it repeats.
+        for owner, run in zip(owners, runs, strict=True):
+            for repeat in run[1:]:
                 self._fold(repeat, owner, stats)
 
     # --------------------------------------------------------------- writes

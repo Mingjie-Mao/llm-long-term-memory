@@ -185,12 +185,36 @@ def _default_store_name(variant: str) -> str:
     return "two-stage" if variant.startswith("two_stage") else "memories"
 
 
+def _relation_scanner(store, encoder):
+    """Build the v4.1 routed scanner, or fail loudly if its mapping is absent.
+
+    Returning None on a missing map would silently produce an arm identical to the one
+    it is meant to be compared against, and the comparison would report no difference for
+    the wrong reason.
+    """
+    import csv
+
+    from llm_long_term_memory.retrieve.relation_router import RelationRouter
+    from llm_long_term_memory.retrieve.scan import RelationScanner
+
+    mapping = Path(__file__).resolve().parents[2] / "results/analysis/predicate-map.csv"
+    if not mapping.is_file():
+        raise typer.BadParameter(f"two_stage_synthesis_scan needs {mapping}, which does not exist")
+    with open(mapping, encoding="utf-8") as handle:
+        relation_of = {r["predicate_raw"]: r["relation_type"] for r in csv.DictReader(handle)}
+    return RelationScanner(store, RelationRouter(encoder), relation_of)
+
+
 def _build(
     variant: str,
     cfg_path: str,
     store_name: str | None = None,
     top_k: int | None = None,
     rerank: bool | None = None,
+    *,
+    client_override=None,
+    settings_override=None,
+    read_only_store: bool = False,
 ):
     """Wire up client, judge, and runner for one variant.
 
@@ -207,7 +231,7 @@ def _build(
     from llm_long_term_memory.llm import Limits, QuotaManager, UsageTracker
     from llm_long_term_memory.llm.client import GeminiClient
 
-    settings = Settings()
+    settings = settings_override or Settings()
     cfg = ExperimentConfig.from_yaml(cfg_path)
     if top_k is not None:
         cfg.retrieval.top_k = top_k
@@ -226,7 +250,7 @@ def _build(
             + "[/dim]"
         )
     usage = UsageTracker()
-    client = GeminiClient(settings.require_api_key(), quota=quota, usage=usage)
+    client = client_override or GeminiClient(settings.require_api_key(), quota=quota, usage=usage)
     judge = Judge(client, model=cfg.models.judge)
 
     if variant == "full_context":
@@ -265,6 +289,24 @@ def _build(
         # v3.2: hydrate compact source spans only for time, aggregation and current-
         # state reasoning. Direct lookups keep the short v2 context.
         "two_stage_reasoned_evidence",
+        # v4.0: everything v3.3 does on the retrieval side, unchanged, plus an
+        # answerer that names its operation before deciding whether it can answer
+        # and hands count/duration arithmetic to Python. The registered comparison
+        # is against `two_stage_reasoned_evidence`, so nothing else may differ.
+        "two_stage_synthesis",
+        # v4.0 attempt 2: the same answerer minus the timeline rendering, so that
+        # `current_state` — which deterministic arithmetic never touches — attributes
+        # its movement to the prompt alone.
+        "two_stage_synthesis_flat",
+        # v4.1: the flat v4 answerer plus a routed exhaustive relation scan. Registered
+        # separately because it changes *retrieval*, which inverts Gate 0 — retrieval
+        # must now be identical only on the questions the router declined.
+        "two_stage_synthesis_scan",
+        # v4.2: v4.0-flat's answerer, with count members cited by the label of the
+        # memory they come from instead of written as free text. The registered
+        # comparison is against `two_stage_synthesis_flat`, so retrieval, hydration and
+        # every other operation are unchanged.
+        "two_stage_synthesis_enumerate",
     ):
         from llm_long_term_memory.retrieve import SessionBudget
         from llm_long_term_memory.store import NumpyFlatIndex, SQLiteMemoryStore
@@ -276,7 +318,7 @@ def _build(
             utility_model = UtilityPredictor.load(cfg.pack.utility_model_path)
 
         stem = store_name or _default_store_name(variant)
-        store = SQLiteMemoryStore(settings.store_dir / f"{stem}.db")
+        store = SQLiteMemoryStore(settings.store_dir / f"{stem}.db", read_only=read_only_store)
         store.initialize()
         index = NumpyFlatIndex(settings.store_dir / f"{stem}-index", dim=cfg.models.embedding_dim)
         if not len(index):
@@ -293,10 +335,16 @@ def _build(
                 candidates=cfg.retrieval.rerank.candidates,
                 batch_size=cfg.retrieval.rerank.batch_size,
             )
+        # One encoder for the whole arm. The scanner's router embeds its class glosses
+        # with the same model the retriever embeds questions with, so handing it a second
+        # instance loaded a second copy of MiniLM onto the device for no behavioural
+        # difference — and on a routed arm that is the difference between one model in
+        # memory and two.
+        encoder = Encoder()
         runner = MemoryRunner(
             client,
             model=cfg.models.answerer,
-            encoder=Encoder(),
+            encoder=encoder,
             store=store,
             index=index,
             top_k=cfg.retrieval.top_k,
@@ -308,7 +356,14 @@ def _build(
             decay_halflife_days=cfg.decay.halflife_days,
             reinforcement=cfg.decay.reinforcement,
             evidence_hydration="_hydrated" in variant,
-            adaptive_reasoning_hydration=variant == "two_stage_reasoned_evidence",
+            adaptive_reasoning_hydration=variant
+            in {
+                "two_stage_reasoned_evidence",
+                "two_stage_synthesis",
+                "two_stage_synthesis_flat",
+                "two_stage_synthesis_scan",
+                "two_stage_synthesis_enumerate",
+            },
             hydration_neighbouring_sentences=cfg.hydration.neighbouring_sentences,
             hydration_max_tokens=cfg.hydration.max_tokens,
             hydration_allocation=cfg.hydration.allocation,
@@ -332,9 +387,23 @@ def _build(
             if variant in {"two_stage_coherent", "two_stage_coherent_oracle"}
             else None,
             oracle_session_context=variant == "two_stage_coherent_oracle",
-            answer_policy="reasoned_v3"
-            if variant in {"two_stage_reasoned", "two_stage_reasoned_evidence"}
-            else "v2",
+            answer_policy={
+                "two_stage_reasoned": "reasoned_v3",
+                "two_stage_reasoned_evidence": "reasoned_v3",
+                "two_stage_synthesis": "synthesis_v4",
+                "two_stage_synthesis_flat": "synthesis_v4",
+                "two_stage_synthesis_scan": "synthesis_v4",
+                "two_stage_synthesis_enumerate": "synthesis_v4_enumerate",
+            }.get(variant, "v2"),
+            timeline_rendering=variant
+            not in {
+                "two_stage_synthesis_flat",
+                "two_stage_synthesis_scan",
+                "two_stage_synthesis_enumerate",
+            },
+            scanner=_relation_scanner(store, encoder)
+            if variant == "two_stage_synthesis_scan"
+            else None,
         )
         runner.name = variant
     else:
@@ -350,7 +419,7 @@ def eval_run(
             "full_context | naive_rag | two_stage | two_stage_no_temporal | "
             "two_stage_hydrated | two_stage_hydrated_no_temporal | two_stage_coherent | "
             "two_stage_coherent_oracle | two_stage_memory_only | two_stage_reasoned | "
-            "two_stage_reasoned_evidence. "
+            "two_stage_reasoned_evidence | two_stage_synthesis. "
             "The chronomem* names belong to the frozen v1 run and are kept so its "
             "rows are not overwritten by a re-measurement of a different pipeline."
         ),

@@ -1,0 +1,46 @@
+# Files whose exact bytes are hashed somewhere else. Git must not rewrite them.
+#
+# Line-ending translation is normally invisible and correct. For these it is
+# destructive, and destructive in the worst way: every line stays identical, the diff
+# shows nothing, and a recorded sha256 silently stops matching.
+#
+# Caught twice, both times by a test rather than by review:
+#
+#   * `predicate-map.csv` — a `git stash -u` round-trip under `core.autocrlf=input`
+#     rewrote CRLF to LF. Its digest is recorded in `synthesis-probes.json` as
+#     `relation_map_sha256`, which is hashed into `v4-probe-split.json`, so the probe
+#     set stopped reproducing from its own seed.
+#   * `synthesis-probes.json` — the Windows CI job checks out with `core.autocrlf=true`,
+#     which rewrote LF to CRLF and moved the probe-set digest the held-out split names.
+#     Linux and macOS passed; only the Windows matrix saw it. That matrix exists for
+#     exactly this, and this time it earned its keep.
+#
+# So the rule is stated once over everything that carries a recorded digest, rather than
+# per file after each incident. 238 files are bound this way: 122 under `results/`, 85
+# under `src/`, 24 under `tools/`, 5 configs, and the two lockfiles — the frozen source
+# snapshots and archived conclusions hash them all.
+#
+# `-text` disables translation in both directions on every platform. It does not mark the
+# files binary for diffing; `diff` below keeps them readable in review.
+
+# Evidence: probe sets, archived runs, freezes, manifests, audit records.
+results/** -text
+
+# Source, tests and configuration. The freeze manifests record a digest per source file
+# and `verify` refuses a run whose frozen source no longer matches; `tests/**` is here
+# because `release.json`'s `measured_tree_sha256` covers it, and a Windows checkout that
+# rewrote the test files would move that digest. Caught by simulating such a checkout
+# rather than by another red CI run.
+src/**/*.py -text
+tests/**/*.py -text
+tools/*.py -text
+configs/*.yaml -text
+pyproject.toml -text
+uv.lock -text
+
+# Keep them reviewable: `-text` stops translation, not diffing.
+*.py diff
+*.json diff
+*.csv diff
+*.md diff
+*.yaml diff

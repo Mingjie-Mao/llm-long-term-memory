@@ -107,30 +107,11 @@ each was diagnosed.
 
 ## 3. System architecture
 
-```
-                     Conversation
-                          │
-              ┌───────────┴───────────┐
-              ↓                       ↓
-      Raw conversation            Extractor
-         archive                 (2 LLM calls
-      (turns + FTS5)              per batch)
-              │                       ↓
-              │              Structured memory
-              │             (typed, bi-temporal,
-              │              provenance-anchored)
-              │                       │
-  Query ──────┼───────────────────────┘
-              │       hybrid retrieval (5 built, 1 weighted)
-              │                       ↓
-              │               sufficient to answer?
-              │              ┌────────┴────────┐
-              │             yes                no
-              │              ↓                  ↓
-              └──────────> answer      raw-source recovery
-                                                ↓
-                                       source-cited answer
-```
+![System overview: structured memory and recoverable source evidence](figures/overview.svg)
+
+The figure has been redrawn against the current working-tree implementation. See the
+[architecture atlas](ARCHITECTURE.md) for all six figures and entry-point differences;
+the research narrative below retains its historical context.
 
 **The raw archive is a storage decision, not a retrieval algorithm.** This
 distinction matters and was initially blurred in our own notes: keeping original

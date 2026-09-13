@@ -216,6 +216,29 @@ def test_sessions_and_turns(store):
     assert [turn.content for turn in store.turns_for_session("s1")] == ["hi", "hello"]
 
 
+def test_hard_delete_user_removes_rows_and_fts_without_touching_another_user(store):
+    store.add_session(
+        Session(
+            id="s1",
+            user_id="u1",
+            started_at=NOW,
+            turns=[Turn("t1", "s1", 0, "user", "private phrase", NOW)],
+        )
+    )
+    store.add_memories([mem("m1", "private phrase", source_session_id="s1")])
+    store.add_memories(
+        [Memory("m2", "u2", "semantic", "another private phrase", 3, ingested_at=NOW)]
+    )
+
+    removed = store.hard_delete_user("u1")
+
+    assert removed == {"sessions": 1, "memories": 1, "turns": 1, "ids": ["m1"]}
+    assert store.count("u1") == 0
+    assert store.search_lexical("u1", "private", 10) == []
+    assert store.search_turns("u1", "private", 10) == []
+    assert store.get("m2") is not None
+
+
 def test_count_by_type(store):
     store.add_memories(
         [

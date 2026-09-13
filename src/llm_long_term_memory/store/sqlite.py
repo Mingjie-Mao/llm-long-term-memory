@@ -53,13 +53,22 @@ def _fts_match(query: str) -> str:
 
 
 class SQLiteMemoryStore:
-    def __init__(self, path: str | Path) -> None:
+    def __init__(self, path: str | Path, *, read_only: bool = False) -> None:
         self.path = Path(path)
-        self.path.parent.mkdir(parents=True, exist_ok=True)
-        self._conn = sqlite3.connect(self.path, check_same_thread=False)
+        self.read_only = read_only
+        if read_only:
+            self._conn = sqlite3.connect(
+                self.path.resolve().as_uri() + "?mode=ro", uri=True, check_same_thread=False
+            )
+        else:
+            self.path.parent.mkdir(parents=True, exist_ok=True)
+            self._conn = sqlite3.connect(self.path, check_same_thread=False)
         self._conn.row_factory = sqlite3.Row
 
     def initialize(self) -> None:
+        if self.read_only:
+            self._conn.execute("SELECT id FROM memories LIMIT 0")
+            return
         self._conn.executescript(_SCHEMA.read_text(encoding="utf-8"))
         self._migrate()
         self._conn.commit()
@@ -142,6 +151,44 @@ class SQLiteMemoryStore:
                     for t in session.turns
                 ],
             )
+
+    def count_turns(self, user_id: str) -> int:
+        row = self._conn.execute(
+            "SELECT count(*) FROM turns WHERE session_id IN "
+            "(SELECT id FROM sessions WHERE user_id = ?)",
+            (user_id,),
+        ).fetchone()
+        return int(row[0])
+
+    def hard_delete_user(self, user_id: str) -> dict[str, int | list[str]]:
+        """Physically remove one namespace from every SQLite-backed data plane.
+
+        Vector deletion remains the caller's responsibility because the vector
+        index is a separate resource; the removed memory ids are returned for it.
+        """
+        session_ids = [
+            row[0]
+            for row in self._conn.execute("SELECT id FROM sessions WHERE user_id = ?", (user_id,))
+        ]
+        memory_ids = [
+            row[0]
+            for row in self._conn.execute("SELECT id FROM memories WHERE user_id = ?", (user_id,))
+        ]
+        turns = self.count_turns(user_id)
+        with self._conn:
+            self._conn.execute("DELETE FROM memories WHERE user_id = ?", (user_id,))
+            self._conn.execute(
+                "DELETE FROM turns WHERE session_id IN (SELECT id FROM sessions WHERE user_id = ?)",
+                (user_id,),
+            )
+            self._conn.execute("DELETE FROM sessions WHERE user_id = ?", (user_id,))
+            self._conn.execute("DELETE FROM entities WHERE user_id = ?", (user_id,))
+        return {
+            "sessions": len(session_ids),
+            "memories": len(memory_ids),
+            "turns": turns,
+            "ids": memory_ids,
+        }
 
     # ---------------------------------------------------------------- memories
 
@@ -560,6 +607,15 @@ class SQLiteMemoryStore:
 
     def session_ids(self) -> set[str]:
         return {row["id"] for row in self._conn.execute("SELECT id FROM sessions")}
+
+    def session_ids_for_user(self, user_id: str) -> set[str]:
+        """One namespace's sessions. Scoped in SQL rather than filtered afterwards, so
+        an export cannot be made to walk every tenant's sessions to build one tenant's
+        document."""
+        return {
+            row["id"]
+            for row in self._conn.execute("SELECT id FROM sessions WHERE user_id = ?", (user_id,))
+        }
 
     def zero_yield_sessions(
         self,

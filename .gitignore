@@ -57,3 +57,8 @@ demo-api/onnx-encoder/
 # The rows themselves are kept locally and are committed once the arm decision is on
 # record — at which point reading them costs nothing, exactly as with heldout100.
 results/sealed/**/*.jsonl
+
+# Vector PDF export of the architecture atlas. Rebuilt with
+# `python3 docs/figures/generate.py --pdf`; the SVGs it is derived from are
+# committed because the docs embed them.
+output/

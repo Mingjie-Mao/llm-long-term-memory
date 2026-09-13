@@ -1,45 +1,51 @@
-from .dedup import Deduplicator, DedupOutcome
-from .extract import ExtractionOutcome, Extractor, memory_id
-from .extract_facts import FactExtractor
-from .pipeline import (
-    IngestionPipeline,
-    IngestOutcome,
-    IngestProgress,
-    group_by_namespace,
-    namespace_batch_count,
-    namespaced_sessions,
-)
-from .provenance import attach_source_span, source_span_for
-from .schemas import (
-    SINGLE_VALUED_PREDICATES,
-    DedupDecision,
-    ExtractedMemory,
-    ExtractionResult,
-    is_single_valued,
-    normalize_predicate,
-)
-from .two_stage import TwoStageExtractor
+"""Ingestion public API, loaded on demand.
 
-__all__ = [
-    "SINGLE_VALUED_PREDICATES",
-    "DedupDecision",
-    "DedupOutcome",
-    "Deduplicator",
-    "ExtractedMemory",
-    "ExtractionOutcome",
-    "ExtractionResult",
-    "Extractor",
-    "FactExtractor",
-    "IngestOutcome",
-    "IngestProgress",
-    "IngestionPipeline",
-    "TwoStageExtractor",
-    "attach_source_span",
-    "group_by_namespace",
-    "is_single_valued",
-    "memory_id",
-    "namespace_batch_count",
-    "namespaced_sessions",
-    "normalize_predicate",
-    "source_span_for",
-]
+Importing ``ingest.schemas`` is needed by the temporal resolver and the lightweight
+ONNX playground. The old eager re-exports pulled in the provider SDK and every
+pipeline module just to read four predicate names. Keep the convenient package API
+without making unrelated consumers install the LLM stack.
+"""
+
+from __future__ import annotations
+
+from importlib import import_module
+from typing import Any
+
+_EXPORTS = {
+    "Deduplicator": (".dedup", "Deduplicator"),
+    "DedupOutcome": (".dedup", "DedupOutcome"),
+    "ExtractionOutcome": (".extract", "ExtractionOutcome"),
+    "Extractor": (".extract", "Extractor"),
+    "memory_id": (".extract", "memory_id"),
+    "FactExtractor": (".extract_facts", "FactExtractor"),
+    "IngestionPipeline": (".pipeline", "IngestionPipeline"),
+    "IngestOutcome": (".pipeline", "IngestOutcome"),
+    "IngestProgress": (".pipeline", "IngestProgress"),
+    "group_by_namespace": (".pipeline", "group_by_namespace"),
+    "namespace_batch_count": (".pipeline", "namespace_batch_count"),
+    "namespaced_sessions": (".pipeline", "namespaced_sessions"),
+    "attach_source_span": (".provenance", "attach_source_span"),
+    "source_span_for": (".provenance", "source_span_for"),
+    "SINGLE_VALUED_PREDICATES": (".schemas", "SINGLE_VALUED_PREDICATES"),
+    "DedupDecision": (".schemas", "DedupDecision"),
+    "ExtractedMemory": (".schemas", "ExtractedMemory"),
+    "ExtractionResult": (".schemas", "ExtractionResult"),
+    "is_single_valued": (".schemas", "is_single_valued"),
+    "normalize_predicate": (".schemas", "normalize_predicate"),
+    "TwoStageExtractor": (".two_stage", "TwoStageExtractor"),
+}
+
+__all__ = [*_EXPORTS, "fingerprint"]
+
+
+def __getattr__(name: str) -> Any:
+    if name == "fingerprint":
+        value = import_module(".fingerprint", __name__)
+    else:
+        try:
+            module_name, attribute = _EXPORTS[name]
+        except KeyError as exc:  # pragma: no cover - normal Python attribute semantics
+            raise AttributeError(name) from exc
+        value = getattr(import_module(module_name, __name__), attribute)
+    globals()[name] = value
+    return value

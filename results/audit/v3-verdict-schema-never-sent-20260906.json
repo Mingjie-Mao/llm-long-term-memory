@@ -1,0 +1,30 @@
+{
+  "archive_not_rewritten": "results/archive/v3-dev60/conclusion.json still records 'passed_all_nine_preregistered_gates', which is literally what happened. Editing a captured conclusion after seeing a later finding is the exact move the freeze protocol exists to prevent, so the qualification lives here instead and the archive verifies unchanged.",
+  "consequence_for_dev60": {
+    "accuracy_result_affected": false,
+    "gate": "no_new_confident_errors",
+    "gates_that_remain_meaningful": 8,
+    "how_it_was_computed": "high_confidence_majority_wrong, compared between arms",
+    "reason_accuracy_is_unaffected": "Accuracy, slice scores, context tokens and the paired comparison are all derived from the answer text and the derived grading, none of which read these fields.",
+    "why_it_was_vacuous": "Confidence was structurally always 'medium' for the candidate and absent for the control, so high_confidence_majority_wrong was 0 for both arms by construction. The check passed without testing anything."
+  },
+  "decision": "Fix `_complete` to send `self.verdict_schema`, and add a test that pins the schema sent to the provider against the schema used to parse. Archived v3 results keep their own source snapshot and are not re-run; their confidence and audit-trail fields must be read as absent, not as measurements.",
+  "defect": {
+    "detail": "`_complete(structured=True)` passed the literal `AnswerVerdict` to the provider while the caller validated the reply with `self.verdict_schema`, which is `ReasonedAnswerVerdict` for answer_policy='reasoned_v3'. The extra fields all carry defaults, so validation succeeded and nothing raised.",
+    "location": "src/llm_long_term_memory/evaluation/runners/memory.py, _complete()",
+    "silent_because": "A default-valued field is indistinguishable from a field the model chose to leave empty."
+  },
+  "evidence": {
+    "answer_calculation": "empty on 42/42 v3.3 tune42 rows",
+    "answer_confidence": "'medium' \u2014 the schema default \u2014 on 100% of v3 rows in every phase",
+    "answer_evidence_summary": "empty on 42/42 v3.3 tune42 rows",
+    "phases_affected": [
+      "v3-answer-pilot",
+      "v3-phase3-tune1",
+      "v3-phase4-tune2",
+      "v3-phase5-tune3",
+      "v3-dev60"
+    ]
+  },
+  "reason": "The v3 answer policy never received the schema it was parsed with, so its extended verdict fields were never populated."
+}

@@ -48,6 +48,16 @@ from .reasoning import (
     reasoning_kind,
     render_reasoned_prompt,
 )
+from .synthesis import (
+    SYNTHESIS_ANSWER_PROMPT_VERSION,
+    SYNTHESIS_ANSWER_SYSTEM,
+    SYNTHESIS_ENUMERATE_ANSWER_SYSTEM,
+    SYNTHESIS_ENUMERATE_PROMPT_VERSION,
+    EnumeratingSynthesisVerdict,
+    SynthesisVerdict,
+    compute,
+    missing_field_is_narration,
+)
 
 _TEMPLATE = """\
 Here is what is known about the user, drawn from their chat history.
@@ -100,14 +110,37 @@ _SCOPE_HEADINGS: tuple[tuple[str, str], ...] = (
 _UNSCOPED_HEADING = "Other things known about the user"
 
 
-def render_grouped(memories: list[Memory], temporal: bool) -> str:
+def label_memories(memories: list[Memory]) -> dict[str, str]:
+    """Stable citation handles in rank order: M1, M2, ... one per memory in context.
+
+    Positional rather than derived from `memory.id`: the model has to copy these, and a
+    sixteen-character hex id is a transcription error waiting to happen, while the
+    position is also the reading order the prompt asks it to work through.
+    """
+    return {memory.id: f"M{i}" for i, memory in enumerate(memories, start=1)}
+
+
+def render_grouped(
+    memories: list[Memory],
+    temporal: bool,
+    timelines_enabled: bool = True,
+    labels: dict[str, str] | None = None,
+) -> str:
     """Group memories by scope under headings, preserving rank order within a group.
 
     Falls back to a plain list when nothing carries a scope, so a store built before
     P10 renders exactly as it did before.
     """
+    # Chains first, so a superseded value is never also listed flat under a scope
+    # heading — seeing it twice, once marked "no longer current" and once not, is
+    # worse than either rendering alone.
+    timelines, memories = render_timelines(memories, temporal and timelines_enabled, labels)
+    tag = (lambda m: labels.get(m.id, "")) if labels else (lambda m: "")
+    prefix = [timelines] if timelines else []
+
     if not any(memory.scope for memory in memories):
-        return "\n".join(render_memory(memory, temporal) for memory in memories)
+        flat = "\n".join(render_memory(memory, temporal, tag(memory)) for memory in memories)
+        return "\n\n".join([*prefix, flat]) if flat else "\n\n".join(prefix)
 
     by_scope: dict[str, list[Memory]] = {}
     for memory in memories:
@@ -117,20 +150,79 @@ def render_grouped(memories: list[Memory], temporal: bool) -> str:
     for scope, heading in _SCOPE_HEADINGS:
         group = by_scope.pop(scope, None)
         if group:
-            lines = "\n".join(render_memory(m, temporal) for m in group)
+            lines = "\n".join(render_memory(m, temporal, tag(m)) for m in group)
             blocks.append(f"{heading}:\n{lines}")
     # Anything left: unscoped memories, plus any scope the model invented that the
     # validator let through.
     leftovers = [m for group in by_scope.values() for m in group]
     if leftovers:
-        lines = "\n".join(render_memory(m, temporal) for m in leftovers)
+        lines = "\n".join(render_memory(m, temporal, tag(m)) for m in leftovers)
         blocks.append(f"{_UNSCOPED_HEADING}:\n{lines}")
-    return "\n\n".join(blocks)
+    return "\n\n".join([*prefix, *blocks])
 
 
-def render_memory(memory: Memory, temporal: bool) -> str:
+def render_timelines(
+    memories: list[Memory], temporal: bool, labels: dict[str, str] | None = None
+) -> tuple[str, list[Memory]]:
+    """Render supersession chains as chains, and return what was not part of one.
+
+    The store has already decided which value of a key is current: it closed the old
+    one's validity window and set its status. Flat rendering throws that away and asks
+    the model to rediscover it from two adjacent bullet points that differ only in a
+    parenthesised date — and on `train150` it does not: a question about where a guitar
+    was serviced was answered "you *plan* to send it", with both the plan and the
+    completion in context.
+
+    So a key with more than one value is rendered as one block, in event order, with
+    the current value marked. No new memory is fetched and no new field is computed;
+    this is the same data the flat renderer already had.
+
+    Only for `temporal=True`. Without dates there is no order to show, and grouping
+    undated values would assert a sequence the store never established.
+    """
     if not temporal:
-        return f"- {memory.content}"
+        return "", list(memories)
+
+    chains: dict[tuple[str, str], list[Memory]] = {}
+    for memory in memories:
+        if memory.subject and memory.predicate:
+            chains.setdefault((memory.subject, memory.predicate), []).append(memory)
+
+    blocks: list[str] = []
+    claimed: set[str] = set()
+    for (subject, predicate), group in chains.items():
+        # One value is not a timeline. Rendering it as one would add a heading and a
+        # "current" label to a fact nothing ever contradicted.
+        if len(group) < 2:
+            continue
+        ordered = sorted(
+            group,
+            key=lambda m: (m.valid_from or m.event_time or datetime.max, m.id),
+        )
+        lines = []
+        for memory in ordered:
+            when = memory.valid_from or memory.event_time
+            stamp = f"{when:%Y-%m-%d}" if when else "date unknown"
+            mark = "[CURRENT]" if memory.status == "active" and not memory.valid_to else "[was]"
+            # Chain members are labelled too. A count question can have a member that is
+            # also part of a supersession chain, and an unlabelled one would be a member
+            # the answerer has no way to cite.
+            tag = f"[{labels[memory.id]}] " if labels and memory.id in labels else ""
+            lines.append(f"    {stamp}  {tag}{memory.content} {mark}")
+            claimed.add(memory.id)
+        label = f"{subject} {predicate}".replace("_", " ").strip()
+        blocks.append(f"{label} — how this changed over time:\n" + "\n".join(lines))
+
+    remaining = [memory for memory in memories if memory.id not in claimed]
+    return "\n\n".join(blocks), remaining
+
+
+def render_memory(memory: Memory, temporal: bool, label: str = "") -> str:
+    # The label is a citation handle, not content. It goes first so that a model working
+    # through the context in order reads it before the sentence it belongs to.
+    tag = f"[{label}] " if label else ""
+    if not temporal:
+        return f"- {tag}{memory.content}"
 
     start = memory.valid_from or memory.event_time
     if start and memory.valid_to:
@@ -139,7 +231,7 @@ def render_memory(memory: Memory, temporal: bool) -> str:
         window = f"(since {start:%Y-%m-%d})"
     else:
         window = "(date unknown)"
-    return f"- {memory.content} {window}"
+    return f"- {tag}{memory.content} {window}"
 
 
 class MemoryRunner:
@@ -175,6 +267,8 @@ class MemoryRunner:
         session_budget: SessionBudget | None = None,
         oracle_session_context: bool = False,
         answer_policy: str = "v2",
+        timeline_rendering: bool = True,
+        scanner=None,
     ) -> None:
         self.client = client
         self.model = model
@@ -196,20 +290,44 @@ class MemoryRunner:
         if oracle_session_context and session_budget is None:
             raise ValueError("oracle_session_context requires a session_budget")
         self.oracle_session_context = oracle_session_context
-        if answer_policy not in {"v2", "reasoned_v3"}:
+        if answer_policy not in {"v2", "reasoned_v3", "synthesis_v4", "synthesis_v4_enumerate"}:
             raise ValueError(f"unknown answer policy {answer_policy!r}")
         self.answer_policy = answer_policy
-        self.answer_system = (
-            REASONED_ANSWER_SYSTEM if answer_policy == "reasoned_v3" else ANSWER_SYSTEM
-        )
-        self.answer_prompt_version = (
-            REASONED_ANSWER_PROMPT_VERSION
-            if answer_policy == "reasoned_v3"
-            else ANSWER_PROMPT_VERSION
-        )
-        self.verdict_schema = (
-            ReasonedAnswerVerdict if answer_policy == "reasoned_v3" else AnswerVerdict
-        )
+        # Attempt 1 bundled three answerer changes and moved in two directions.
+        # `current_state` is the one operation deterministic arithmetic never touches —
+        # `compute` returns computed=False for it — so its -6.1 points on clean rows can
+        # only come from the prompt or from this rendering. Making it switchable is what
+        # separates them, and costs one arm rather than three.
+        self.timeline_rendering = timeline_rendering
+        # v4.1. Injected rather than constructed here so this module stays free of the
+        # encoder the router needs, and so an arm without it is byte-identical.
+        self.scanner = scanner
+        self._scan_route = None
+        # One table rather than three parallel conditionals: the previous shape let the
+        # schema drift away from the parser without anything noticing.
+        self.answer_system, self.answer_prompt_version, self.verdict_schema = {
+            "v2": (ANSWER_SYSTEM, ANSWER_PROMPT_VERSION, AnswerVerdict),
+            "reasoned_v3": (
+                REASONED_ANSWER_SYSTEM,
+                REASONED_ANSWER_PROMPT_VERSION,
+                ReasonedAnswerVerdict,
+            ),
+            "synthesis_v4": (
+                SYNTHESIS_ANSWER_SYSTEM,
+                SYNTHESIS_ANSWER_PROMPT_VERSION,
+                SynthesisVerdict,
+            ),
+            "synthesis_v4_enumerate": (
+                SYNTHESIS_ENUMERATE_ANSWER_SYSTEM,
+                SYNTHESIS_ENUMERATE_PROMPT_VERSION,
+                EnumeratingSynthesisVerdict,
+            ),
+        }[answer_policy]
+        # Labels are rendered only for the arm that cites them. An arm that carries them
+        # without using them would differ from its control by a changed context and
+        # nothing else, which is a second variable bought for no mechanism.
+        self.label_context = answer_policy == "synthesis_v4_enumerate"
+        self._context_labels: set[str] = set()
         self.retriever = HybridRetriever(
             store,
             index,
@@ -273,14 +391,30 @@ class MemoryRunner:
     def _retrieve(self, query: np.ndarray, question: str, namespace: str) -> list[RetrievedMemory]:
         return self._retrieve_with_trace(query, question, namespace)[0]
 
-    def _retrieve_with_trace(self, query: np.ndarray, question: str, namespace: str):
-        return self.retriever.retrieve_with_trace(
+    def _retrieve_with_trace(
+        self, query: np.ndarray, question: str, namespace: str, limit: int | None = None
+    ):
+        ranked, trace = self.retriever.retrieve_with_trace(
             query,
             question,
             namespace,
             temporal=self.temporal,
-            limit=self.top_k,
+            limit=limit or self.top_k,
         )
+        if self.scanner is None:
+            return ranked, trace
+        # The scan runs after ranking and truncation on purpose: it enumerates a set the
+        # ranking was never going to complete, and letting it compete inside the ranking
+        # would mean scoring enumerated members against retrieved ones on a similarity
+        # they do not have.
+        outcome = self.scanner.expand(question, namespace, ranked)
+        self._scan_route = {
+            "routed": outcome.route.routed,
+            "predicted_class": outcome.route.predicted_class,
+            "margin": round(outcome.route.margin, 4),
+            "added": outcome.added,
+        }
+        return outcome.memories, trace
 
     def retrieve(self, instance: Instance) -> list[RetrievedMemory]:
         """Retrieve exactly the candidates used by normal answering."""
@@ -318,7 +452,12 @@ class MemoryRunner:
 
         return pack(candidates, utilities, self.token_budget, type_floors=self.type_floors)
 
-    def answer(self, instance: Instance) -> Answer:
+    def answer(self, instance: Instance, *, limit: int | None = None) -> Answer:
+        # Reset per question, not per runner. A derivation left over from the previous
+        # question would be recorded against this one, and it would look plausible.
+        self._computation: dict | None = None
+        self._answer_was_raw_structure = False
+        self._scan_route = None
         now = datetime.now()
         if self.decay_enabled:
             from llm_long_term_memory.lifecycle import apply_decay
@@ -332,7 +471,7 @@ class MemoryRunner:
         retrieval_started = perf_counter()
         query_vector = self.encoder.encode_one(instance.question)
         retrieved, trace = self._retrieve_with_trace(
-            query_vector, instance.question, instance.question_id
+            query_vector, instance.question, instance.question_id, limit=limit
         )
         retrieval_latency_ms = (perf_counter() - retrieval_started) * 1000
         selected = [hit.memory for hit in retrieved]
@@ -424,7 +563,7 @@ class MemoryRunner:
             latency_ms=completion.api_latency_ms,
             retrieved_ids=[m.id for m in selected],
             notes={
-                "top_k": self.top_k,
+                "top_k": limit or self.top_k,
                 "temporal": self.temporal,
                 "retrieval_weights": self.retriever.weights,
                 "retrieval": [
@@ -518,6 +657,26 @@ class MemoryRunner:
                 "answer_confidence": getattr(verdict, "confidence", None),
                 "answer_evidence_summary": getattr(verdict, "evidence_summary", None),
                 "answer_calculation": getattr(verdict, "calculation", None),
+                # What the code computed, and from which operands. Without this a
+                # v4 row cannot be audited: "3 items" and "3 items after folding two
+                # spellings" are the same answer with different reasons to trust it.
+                "synthesis_operation": getattr(verdict, "operation", None),
+                "synthesis_computation": self._computation,
+                # Recorded because a stop condition depends on it: an abstention that
+                # became a computed number is the failure v4.0 is most likely to cause,
+                # and it cannot be counted from a field nothing writes down.
+                "synthesis_missing_field": getattr(verdict, "missing_field", None) or None,
+                # Separates "the model named an absent operand" from "the model wrote its
+                # deliberation into the field". Three of five populated values were the
+                # second kind on v4.0-flat, and they blocked computations that should
+                # have run — one signal covering two behaviours cannot be judged.
+                "missing_field_was_narration": missing_field_is_narration(
+                    getattr(verdict, "missing_field", "") or ""
+                ),
+                "answer_was_raw_structure": self._answer_was_raw_structure,
+                # Present only for the v4.1 arm. `routed: false` is the expected value on
+                # roughly three questions in four and is not a failure.
+                "scan_route": self._scan_route,
                 "fallback_level": raw_evidence.level if raw_evidence else "none",
                 "fallback_reason": (
                     raw_evidence.reason if raw_evidence and raw_evidence.used else None
@@ -541,7 +700,11 @@ class MemoryRunner:
     def _assemble_context(
         self, memories: list[Memory], *, force_hydration: bool = False
     ) -> tuple[str, HydrationResult]:
-        body = render_grouped(memories, self.temporal)
+        labels = label_memories(memories) if self.label_context else None
+        # Recorded per question so `_apply_computation` can resolve citations against the
+        # context this answer actually saw, rather than against whatever is in scope now.
+        self._context_labels = set(labels.values()) if labels else set()
+        body = render_grouped(memories, self.temporal, self.timeline_rendering, labels)
         context = f"{TEMPORAL_NOTE}\n\n{body}" if self.temporal else body
         hydration = HydrationResult()
         if self.evidence_hydration or force_hydration:
@@ -583,7 +746,34 @@ Question: {question}
             return first, first.text.strip(), None, None
 
         if verdict.status == "answer" or self.fallback is None:
-            return first, verdict.answer.strip() or first.text.strip(), verdict, None
+            text = verdict.answer.strip() or first.text.strip()
+            final = self._apply_computation(verdict, text)
+            # Last resort, and a guarantee rather than a request. The prompt now asks for
+            # `answer` on every operation, but a prompt is not a contract: when it is
+            # empty and nothing was computed, the fallback text is the structure itself,
+            # and emitting that is never the right answer to anything. An honest "I do
+            # not know" is the truthful rendering of "the model produced no reply", and
+            # it is scored as the abstention it is instead of as a wrong answer.
+            # Two different questions, and conflating them cost 11 correct answers.
+            #
+            # The flag asks "did the model emit a structure at any point" — a diagnostic,
+            # true even when `compute` or a populated `answer` produced a perfectly good
+            # reply afterwards. The repair must ask something narrower: "is the text
+            # about to be returned a structure". Driving a destructive action from the
+            # diagnostic replaced 16 replies with an abstention on v4.0-flat2, and 11 of
+            # them had been scored correct the run before — prose like "The user taking
+            # painting classes came first."
+            self._answer_was_raw_structure = text.lstrip().startswith(("{", "```"))
+            if final.lstrip().startswith(("{", "```")):
+                final = "I do not know."
+            # Measured on the *final* answer, not on the intermediate. The first version
+            # of this flag asked "was `answer` empty and the raw text JSON", which is a
+            # different question: `compute` then replaced that text with "5 days" and the
+            # row was flagged as leaked while reading perfectly. On v4.0-flat it reported
+            # 12 where 18 rows actually leaked — 4 false positives and 10 misses, wrong
+            # in both directions. A model can also put JSON inside `answer` itself, which
+            # the old check could not see at all.
+            return first, final, verdict, None
 
         evidence = self.fallback.recover(
             instance.question_id,
@@ -615,12 +805,43 @@ Question: {question}
             role="answerer",
             model=self.model,
             prompt=prompt,
-            system=self.answer_system,
+            # The fallback call carries no schema, so a system prompt that demands a
+            # structured verdict has nothing to parse it back out: under `synthesis_v4`
+            # the model dutifully emitted JSON and it became the answer text on 9 of the
+            # 18 leaked rows. The second pass only ever needs prose.
+            system=(
+                ANSWER_SYSTEM
+                if self.answer_policy in {"synthesis_v4", "synthesis_v4_enumerate"}
+                else self.answer_system
+            ),
             temperature=0.0,
             max_output_tokens=self.max_output_tokens,
             est_input_tokens=int(len(prompt) / self.chars_per_token),
         )
         return second, second.text.strip(), verdict, evidence
+
+    def _apply_computation(self, verdict, text: str) -> str:
+        """Let the code overwrite the model's arithmetic, where there is arithmetic.
+
+        Only under `synthesis_v4`, and only when the operands were actually supplied.
+        `compute` returns `computed=False` for a missing or malformed operand, and the
+        model's own prose is kept in that case: a number derived from nothing would be
+        worse than a guess, because it would arrive looking checked.
+
+        `comparison` is computed but has no sentence of its own — knowing which date is
+        earlier does not say which described event it belongs to — so its derivation is
+        recorded and the wording is left alone.
+        """
+        if self.answer_policy not in {"synthesis_v4", "synthesis_v4_enumerate"}:
+            return text
+        result = compute(
+            verdict,
+            self._context_labels if self.answer_policy == "synthesis_v4_enumerate" else None,
+        )
+        self._computation = result.detail
+        if result.computed and result.answer:
+            return result.answer
+        return text
 
     def _complete(self, instance: Instance, context: str, structured: bool = False):
         prompt = (
@@ -640,6 +861,13 @@ Question: {question}
             temperature=0.0,
             max_output_tokens=self.max_output_tokens,
             est_input_tokens=int(len(prompt) / self.chars_per_token),
-            **({"schema": AnswerVerdict} if structured else {}),
+            # `self.verdict_schema`, not the base class. Sending the base schema while
+            # parsing with the subclass is silent: every extra field carries a default,
+            # so validation succeeds and the model is simply never asked. That is what
+            # happened to the whole v3 line — `confidence` read 'medium' on 100% of rows
+            # in every phase because it was the default, which made the registered
+            # `no_new_confident_errors` gate pass without testing anything
+            # (results/audit/v3-verdict-schema-never-sent-20260906.json).
+            **({"schema": self.verdict_schema} if structured else {}),
         )
         return completion

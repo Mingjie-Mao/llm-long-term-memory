@@ -1,0 +1,87 @@
+{
+  "freeze_id": "19f741bd9ee56923e695661d50a692ca4eea0f2a5b13013f752b36036b4e272a",
+  "mode": "rehearsal",
+  "outcome": "rehearsal_complete",
+  "not_a_benchmark": true,
+  "rows": 404,
+  "gate_0": "PASS",
+  "count_probes": 30,
+  "namespaces": 29,
+  "majority_correct": {
+    "control": 13,
+    "candidate": 13
+  },
+  "net_count": 0,
+  "wins": 0,
+  "losses": 0,
+  "paired_table": {
+    "both_correct": 13,
+    "candidate_only_correct": 0,
+    "control_only_correct": 0,
+    "both_incorrect": 17
+  },
+  "paired_cluster_p_two_sided": 1.0,
+  "probe_level_mcnemar_p_descriptive": 1.0,
+  "namespace_bootstrap_95_percentile_delta": [
+    0.0,
+    0.0
+  ],
+  "safety": {
+    "duration": {
+      "control": 0,
+      "candidate": 0,
+      "net": 0
+    },
+    "comparison": {
+      "control": 16,
+      "candidate": 16,
+      "net": 0
+    },
+    "current_state": {
+      "control": 0,
+      "candidate": 0,
+      "net": 0
+    }
+  },
+  "safety_pass": true,
+  "candidate_count_cited": 90,
+  "candidate_count_rows": 90,
+  "mechanism_observed": true,
+  "enumeration_completeness": {
+    "probes": 30,
+    "control_unnamed": 127.0,
+    "candidate_unnamed": 127.0,
+    "difference": 0.0,
+    "standard_error_of_total": 0.0,
+    "sigma": null,
+    "registered_threshold_facts": -10,
+    "cleared": false,
+    "reading_rule": "Paired difference only. The absolute level inherits the token matcher's error; the matcher is identical across arms, so the difference does not."
+  },
+  "limitations": [
+    "Development SQL-derived probes, not new independent benchmark questions.",
+    "Cluster sign-flip assumes exchangeable arm outcomes between independent namespaces.",
+    "Three repeats do not create 90 independent count questions.",
+    "The binary gate promotes a true six-probe gain about 31% of the time against the measured pair churn; 'inconclusive' is the expected outcome, not a surprise, and enumeration_completeness is the reading that resolves at this sample size.",
+    "enumeration_completeness decides nothing on its own. It is evidence about the mechanism, not a promotion criterion."
+  ],
+  "usage": {
+    "attempts": 404,
+    "observed_tokens": 0,
+    "failed_attempts": 0
+  },
+  "artifacts": [
+    {
+      "path": "rehearsal/rows.jsonl",
+      "sha256": "596887ec510cddcc10ed1416a1eec12cc25530858af1c52b0089e9c0c04e290c"
+    },
+    {
+      "path": "rehearsal/requests.jsonl",
+      "sha256": "567f215b8a02e08994ab3a88e6bc91d5d90cea1283d9fc7a81d95a7a4b11fadf"
+    },
+    {
+      "path": "rehearsal/completions.jsonl",
+      "sha256": "b36a197665391dedc1b141560a9eea12296d45c81abdedfb736e91acf42ec9ab"
+    }
+  ]
+}

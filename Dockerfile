@@ -38,6 +38,7 @@ ARG EXTRAS="api,llm,embed"
 # Dependency layer first: source changes must not re-resolve the whole tree.
 COPY pyproject.toml uv.lock README.md ./
 COPY src/ ./src/
+COPY configs/ ./configs/
 # The ARG is expanded here rather than hard-coded, or overriding it silently does
 # nothing — which is what it did.
 #

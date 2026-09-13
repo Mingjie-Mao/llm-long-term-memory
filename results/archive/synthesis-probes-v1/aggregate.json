@@ -1,0 +1,161 @@
+{
+ "schema_version": 1,
+ "not_a_benchmark": "Synthesis probes measure operations over stored facts. Ground truth is derived by SQL and inherits any extraction loss, so this is not accuracy and must not be reported beside a LongMemEval figure.",
+ "store_fingerprint": "7eca3a49e37c28e19e7972dfc5e93b29fadfcb96cb00b3aae582df6a0061ab12",
+ "variant": "two_stage_reasoned_evidence",
+ "coverage": {
+  "count": {
+   "run": 60,
+   "planned": 60
+  },
+  "duration": {
+   "run": 60,
+   "planned": 60
+  },
+  "comparison": {
+   "run": 60,
+   "planned": 60
+  },
+  "current_state": {
+   "run": 36,
+   "planned": 49
+  }
+ },
+ "median_context_tokens": 1120.0,
+ "strata": {
+  "interpretable": {
+   "count": {
+    "n": 25,
+    "correct": 1,
+    "wrong": 18,
+    "abstained": 2,
+    "unparseable": 4,
+    "accuracy": 0.04,
+    "abstention_rate": 0.08
+   },
+   "duration": {
+    "n": 47,
+    "correct": 20,
+    "wrong": 25,
+    "abstained": 2,
+    "unparseable": 0,
+    "accuracy": 0.4255,
+    "abstention_rate": 0.0426
+   },
+   "comparison": {
+    "n": 46,
+    "correct": 27,
+    "wrong": 17,
+    "abstained": 0,
+    "unparseable": 2,
+    "accuracy": 0.587,
+    "abstention_rate": 0.0
+   },
+   "current_state": {
+    "n": 30,
+    "correct": 26,
+    "wrong": 3,
+    "abstained": 1,
+    "unparseable": 0,
+    "accuracy": 0.8667,
+    "abstention_rate": 0.0333
+   }
+  },
+  "context_incomplete": {
+   "count": {
+    "n": 26,
+    "correct": 3,
+    "wrong": 22,
+    "abstained": 1,
+    "unparseable": 0,
+    "accuracy": 0.1154,
+    "abstention_rate": 0.0385
+   }
+  },
+  "anchor_conflict": {
+   "count": {
+    "n": 19,
+    "correct": 3,
+    "wrong": 16,
+    "abstained": 0,
+    "unparseable": 0,
+    "accuracy": 0.1579,
+    "abstention_rate": 0.0
+   },
+   "duration": {
+    "n": 13,
+    "correct": 1,
+    "wrong": 12,
+    "abstained": 0,
+    "unparseable": 0,
+    "accuracy": 0.0769,
+    "abstention_rate": 0.0
+   },
+   "comparison": {
+    "n": 14,
+    "correct": 9,
+    "wrong": 5,
+    "abstained": 0,
+    "unparseable": 0,
+    "accuracy": 0.6429,
+    "abstention_rate": 0.0
+   },
+   "current_state": {
+    "n": 6,
+    "correct": 6,
+    "wrong": 0,
+    "abstained": 0,
+    "unparseable": 0,
+    "accuracy": 1.0,
+    "abstention_rate": 0.0
+   }
+  },
+  "all_rows_pooled": {
+   "count": {
+    "n": 60,
+    "correct": 5,
+    "wrong": 48,
+    "abstained": 3,
+    "unparseable": 4,
+    "accuracy": 0.0833,
+    "abstention_rate": 0.05
+   },
+   "duration": {
+    "n": 60,
+    "correct": 21,
+    "wrong": 37,
+    "abstained": 2,
+    "unparseable": 0,
+    "accuracy": 0.35,
+    "abstention_rate": 0.0333
+   },
+   "comparison": {
+    "n": 60,
+    "correct": 36,
+    "wrong": 22,
+    "abstained": 0,
+    "unparseable": 2,
+    "accuracy": 0.6,
+    "abstention_rate": 0.0
+   },
+   "current_state": {
+    "n": 36,
+    "correct": 32,
+    "wrong": 3,
+    "abstained": 1,
+    "unparseable": 0,
+    "accuracy": 0.8889,
+    "abstention_rate": 0.0278
+   }
+  }
+ },
+ "duration_graded_on_visible_dates": 11,
+ "current_state_wrong_kind": {
+  "other": 3
+ },
+ "fallback_level": {
+  "none": 163,
+  "archive_wide": 29,
+  "source_local": 24
+ }
+}

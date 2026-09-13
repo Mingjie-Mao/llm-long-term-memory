@@ -6,8 +6,8 @@ reading it you should be able to say what happens to a conversation as it moves 
 the system, why each component is built the way it is, and which experiment supports
 each decision.
 
-**Every implementation detail here comes from the current code and the frozen
-configuration.** Where the code cannot establish something, this report says *not
+**This report records the code and frozen configuration at the time of writing.**
+For the current implementation, use the [architecture atlas](ARCHITECTURE.md). Where the code cannot establish something, this report says *not
 established from the current material*. Two distinctions run through the whole
 document: *what the architecture supports* is not *what production runs*, and
 *correlation* is not *causation*.
@@ -227,56 +227,15 @@ Full comparison in §6.3.
 
 ## 2. System architecture
 
-```
-                          ┌──────────────────────┐
-                          │      Conversation     │
-                          └───────────┬──────────┘
-                                      │
-        ┌─────────────────────────────┴─────────────────────────────┐
-        │                     WRITE PATH                            │
-        │                                                           │
-        │   turns (raw archive)          Stage A: bare facts        │
-        │   sessions                             ↓                  │
-        │   turns_fts (BM25 index)       Stage B: key + update_op   │
-        │        │                               ↓                  │
-        │        │                        memories table            │
-        │        │                    (bi-temporal + provenance)     │
-        │        │                               ↓                  │
-        │        │                     temporal resolution           │
-        │        │                               ↓                  │
-        │        │                embedding → NumpyFlatIndex (.npy) │
-        └────────┼──────────────────────────────┬───────────────────┘
-                 │                              │
-        ┌────────┼──────────────────────────────┼───────────────────┐
-        │        │          READ PATH           │                   │
-        │        │                              │                   │
-        │  Query ─────────────────────────→ hybrid retrieval        │
-        │        │                     (5 signals, weighted fusion)  │
-        │        │                              ↓                   │
-        │        │                  filtering + top_k truncation     │
-        │        │                              ↓                   │
-        │        │                      context assembly             │
-        │        │                 (v1 flat / v2 session-coherent)   │
-        │        │                              ↓                   │
-        │        │                    answerer (1 call)              │
-        │        │                              ↓                   │
-        │        │                 status ∈ {answer,                │
-        │        │                  need_source, no_evidence}       │
-        │        │                     ┌────────┴────────┐          │
-        │        │                  answer          need_source     │
-        │        │                     ↓                 ↓          │
-        │        └──────────────────→  │        raw-archive search   │
-        │                              │        (BM25 over turns)    │
-        │                              │                 ↓          │
-        │                              │       answerer (2nd call)   │
-        │                              └────────┬────────┘          │
-        │                                       ↓                   │
-        │                       answer + provenance + rejections     │
-        └───────────────────────────────────────────────────────────┘
-```
+![System overview: structured memory and recoverable source evidence](figures/overview.svg)
 
-**Write path** (§3): raw archive → two-stage extraction → temporal resolution → storage
-and index. It runs offline in batches, two LLM calls per 15 sessions.
+The figure has been redrawn against the current working-tree implementation. See the
+[architecture atlas](ARCHITECTURE.md) for all six figures and entry-point differences;
+the research narrative below retains its historical context.
+
+**Write path** (§3): two-stage extraction → source registration → deduplication →
+memory/index insertion → temporal resolution → checkpoint. Nonempty extraction
+normally needs two LLM requests per batch; dedup adjudication can add requests.
 
 **Read path** (§4 retrieval, §5 answering): retrieval → context assembly → answer →
 fallback when needed. A question costs **one** answerer call by default; a second is paid

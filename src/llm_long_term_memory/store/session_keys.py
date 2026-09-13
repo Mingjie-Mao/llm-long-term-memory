@@ -5,9 +5,9 @@ from __future__ import annotations
 _PREFIX = "scoped-session-v1:"
 
 
-def split_scoped_session_id(value: str) -> tuple[str, str] | None:
+def split_scoped_session_id(value: str | None) -> tuple[str, str] | None:
     """Return ``(user_id, external_id)`` or ``None`` for a legacy/raw id."""
-    if not value.startswith(_PREFIX):
+    if value is None or not value.startswith(_PREFIX):
         return None
     length_text, separator, payload = value[len(_PREFIX) :].partition(":")
     if not separator or not length_text.isdigit():
@@ -28,7 +28,7 @@ def scoped_session_id(user_id: str, external_id: str) -> str:
     return f"{_PREFIX}{len(user_id)}:{user_id}{external_id}"
 
 
-def external_session_id(value: str) -> str:
+def external_session_id(value: str | None) -> str | None:
     """Return the client/dataset id, hiding the internal namespace prefix."""
     parsed = split_scoped_session_id(value)
     return parsed[1] if parsed is not None else value

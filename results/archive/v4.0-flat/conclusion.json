@@ -1,0 +1,47 @@
+{
+  "cost": {
+    "answerer_requests": 152,
+    "control_reused_from": "v4.0-attempt1",
+    "held_out_probes_touched": 0,
+    "probes": 142
+  },
+  "experiment_id": "v4.0-flat",
+  "files": [
+    {
+      "bytes": 2975,
+      "path": "results/archive/v4.0-flat/README.md",
+      "sha256": "6531c6c3a868ba11dc9cf67d3b976c58c9cc387f40f05cbfaa2e516c9bd0e049"
+    },
+    {
+      "bytes": 195555,
+      "path": "results/archive/v4.0-flat/probes.v3.3-dev.jsonl",
+      "sha256": "2aa883445336d507cdf68a0f907b4cfb3ef8e2c1b25cc0948ba616fbfdf60eb8"
+    },
+    {
+      "bytes": 206162,
+      "path": "results/archive/v4.0-flat/probes.v4.0-flat.jsonl",
+      "sha256": "93be07ee9a533f0d9a669f07ac56c83d2ee4c1abd143c67fa9e3b6a411b79eed"
+    },
+    {
+      "bytes": 6241,
+      "path": "results/prereg-v4-synthesis.md",
+      "sha256": "9563ca000df69a36e77e11263fc3461ff321d5c09efcc68df004230ec494b2c8"
+    }
+  ],
+  "gate_0": "PASS \u2014 retrieval identical across both arms on all 142 probes",
+  "not_a_benchmark": "Probe ground truth is derived by SQL over stored facts and inherits extraction loss. Not accuracy; never to be quoted beside a LongMemEval figure.",
+  "outcome": "candidate_selected",
+  "outcome_reason": "Separating timeline rendering from the other two answerer changes attributed attempt 1's regression to it: current_state 87.8 -> 55.1 with rendering, 85.7 without, and exactly 89.4% both ways on unleaked rows. Deterministic arithmetic held at +31.0 on duration. Overall 54.9% -> 61.3%, paired 22W-13L, p=0.1755 \u2014 consistent in direction, uncertain in size.",
+  "schema_version": 1,
+  "stop_condition": {
+    "new_confident_wrong": 7,
+    "triggered": false,
+    "wrong_to_right": 22
+  },
+  "verdicts": {
+    "deterministic_arithmetic": "keep \u2014 duration +31.0 on clean rows",
+    "missing_field": "unresolved \u2014 fired on 5 rows, 40% -> 0%, too few to settle",
+    "operation_first_prompt": "keep \u2014 comparison +10.7 on clean rows",
+    "timeline_rendering": "remove \u2014 caused the -32.7 regression in attempt 1"
+  }
+}

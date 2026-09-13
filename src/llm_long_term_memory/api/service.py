@@ -21,7 +21,9 @@ from __future__ import annotations
 import uuid
 from dataclasses import dataclass
 from datetime import datetime
+from functools import wraps
 from pathlib import Path
+from threading import RLock
 from time import perf_counter
 from typing import Any
 
@@ -86,6 +88,78 @@ class SearchResult:
     candidates_considered: int
 
 
+@dataclass(slots=True)
+class TurnExtractionOutcome:
+    memories: list[Memory]
+    usage: dict[str, Any]
+
+
+class LiveTurnExtractor:
+    """Adapt the frozen batch extractor to one live conversation turn.
+
+    The REST and MCP surfaces accept one turn, while the research extractor accepts
+    a list of sessions. Keeping this adapter explicit prevents tests from inventing
+    an ``extract_turn`` method that no production class implements.
+    """
+
+    def __init__(self, batch_extractor, deduplicator, encoder, usage) -> None:
+        self.batch_extractor = batch_extractor
+        self.deduplicator = deduplicator
+        self.encoder = encoder
+        self.usage = usage
+
+    def extract_turn(
+        self, *, user_id: str, session_id: str, role: str, content: str, now: datetime
+    ) -> TurnExtractionOutcome:
+        from llm_long_term_memory.evaluation.datasets.longmemeval import (
+            HaystackSession,
+            HaystackTurn,
+        )
+        from llm_long_term_memory.llm import UsageTracker
+
+        started = len(self.usage.records)
+        self.batch_extractor.user_id = user_id
+        extracted = self.batch_extractor.extract(
+            [
+                HaystackSession(
+                    session_id=session_id,
+                    date=now.strftime("%Y-%m-%d %H:%M"),
+                    turns=[HaystackTurn(role=role, content=content)],
+                )
+            ]
+        )
+        vectors = self.encoder.encode([memory.content for memory in extracted.memories])
+        deduped = self.deduplicator.process(extracted.memories, vectors)
+        for current, _previous in deduped.updates:
+            current.replaces_previous = True
+            current.update_op = "replaces"
+
+        per_turn = UsageTracker(records=list(self.usage.records[started:]))
+        summary = per_turn.summary()
+        summary.update(
+            {
+                "duplicates_dropped": deduped.duplicates,
+                "updates_detected": len(deduped.updates),
+                "bad_session_index": extracted.dropped_bad_index,
+            }
+        )
+        return TurnExtractionOutcome(deduped.kept, summary)
+
+
+def _synchronised(method):
+    """Serialize access to the process-owned SQLite connection and numpy index."""
+
+    @wraps(method)
+    def wrapped(self, *args, **kwargs):
+        lock = getattr(self, "_lock", None)
+        if lock is None:  # legacy/minimal injected fixtures built with __new__
+            return method(self, *args, **kwargs)
+        with lock:
+            return method(self, *args, **kwargs)
+
+    return wrapped
+
+
 class MemoryService:
     """Owns the store, index, encoder and retriever for the lifetime of a process."""
 
@@ -105,6 +179,7 @@ class MemoryService:
         encoder=None,
         extractor=None,
     ) -> None:
+        self._lock = RLock()
         self.settings = settings or Settings()
         self.config = ExperimentConfig.from_yaml(config_path)
         self.store_name = store_name
@@ -119,6 +194,7 @@ class MemoryService:
         # Injected in tests. Left lazy in production so that importing the app does
         # not pull torch.
         self._encoder = encoder
+        self._encoder_error: str | None = None
         # An injected encoder dictates the index width, because the two must agree
         # and the injected one is the concrete fact. Reading `.dim` off the lazy
         # production encoder would defeat the laziness by loading the model here.
@@ -130,6 +206,9 @@ class MemoryService:
         # Only the write path needs this, and it needs an API key. Read-only
         # deployments and the whole test suite work without one.
         self.extractor = extractor
+        self._live_client_instance = None
+        self._live_usage = None
+        self._live_quota = None
         # Live answering is opt-in for the same reason the write path is: it needs a
         # credential, and the read-only service must work without one. Built on first
         # use rather than here, so constructing the service neither requires a key nor
@@ -160,9 +239,18 @@ class MemoryService:
             neighbouring_sentences=self.config.hydration.neighbouring_sentences,
             allocation=self.config.hydration.allocation,
         )
+        if self.config.temporal_resolution:
+            from llm_long_term_memory.temporal import TemporalResolver
+
+            self.resolver = TemporalResolver(self.store)
+        else:
+            self.resolver = None
 
     @property
     def encoder(self):
+        encoder_error = getattr(self, "_encoder_error", None)
+        if encoder_error is not None:
+            raise EncoderUnavailable(encoder_error)
         if self._encoder is None:
             try:
                 from llm_long_term_memory.embed import Encoder
@@ -183,11 +271,74 @@ class MemoryService:
         Checked without constructing the model: importing is enough to know, and
         loading it here would undo the laziness the property exists for.
         """
+        if getattr(self, "_encoder_error", None) is not None:
+            return False
         if self._encoder is not None:
             return True
         import importlib.util
 
         return importlib.util.find_spec("sentence_transformers") is not None
+
+    def mark_encoder_unavailable(self, detail: str) -> None:
+        self._encoder_error = f"semantic search unavailable: {detail}"
+
+    @property
+    def encoder_error(self) -> str | None:
+        return self._encoder_error
+
+    @property
+    def write_available(self) -> bool:
+        settings = getattr(self, "settings", None)
+        return self.extractor is not None or bool(settings and settings.has_api_key)
+
+    @property
+    def live_answer_available(self) -> bool:
+        settings = getattr(self, "settings", None)
+        return self._answerer is not None or bool(settings and settings.has_api_key)
+
+    def _get_live_client(self):
+        if self._live_client_instance is None:
+            from llm_long_term_memory.llm import Limits, QuotaManager, UsageTracker
+            from llm_long_term_memory.llm.client import GeminiClient
+
+            self._live_quota = QuotaManager(
+                state_dir=self.settings.store_dir / "quota",
+                default=Limits(
+                    rpm=self.config.quota.rpm,
+                    tpm=self.config.quota.tpm,
+                    rpd=self.config.quota.rpd,
+                ),
+            )
+            self._live_quota.load_learned()
+            self._live_usage = UsageTracker()
+            self._live_client_instance = GeminiClient(
+                self.settings.require_api_key(), quota=self._live_quota, usage=self._live_usage
+            )
+        return self._live_client_instance
+
+    def _build_live_extractor(self) -> LiveTurnExtractor:
+        try:
+            from llm_long_term_memory.ingest import Deduplicator, Extractor, TwoStageExtractor
+        except ImportError as exc:
+            raise RuntimeError(
+                "the write path needs the `llm` extra: uv sync --extra llm --extra embed"
+            ) from exc
+
+        client = self._get_live_client()
+        batch_extractor = (
+            TwoStageExtractor(client, self.config.models.extractor)
+            if self.config.ingest.two_stage
+            else Extractor(client, self.config.models.extractor)
+        )
+        deduplicator = Deduplicator(
+            client,
+            self.config.models.extractor,
+            self.encoder,
+            store=self.store,
+            index=self.index,
+            threshold=self.config.ingest.dedupe_similarity_threshold,
+        )
+        return LiveTurnExtractor(batch_extractor, deduplicator, self.encoder, self._live_usage)
 
     @property
     def answerer(self):
@@ -200,21 +351,8 @@ class MemoryService:
         """
         if self._answerer is None and self.settings.has_api_key:
             from llm_long_term_memory.evaluation.runners.memory import MemoryRunner
-            from llm_long_term_memory.llm import Limits, QuotaManager, UsageTracker
-            from llm_long_term_memory.llm.client import GeminiClient
 
-            quota = QuotaManager(
-                state_dir=self.settings.store_dir / "quota",
-                default=Limits(
-                    rpm=self.config.quota.rpm,
-                    tpm=self.config.quota.tpm,
-                    rpd=self.config.quota.rpd,
-                ),
-            )
-            quota.load_learned()
-            client = GeminiClient(
-                self.settings.require_api_key(), quota=quota, usage=UsageTracker()
-            )
+            client = self._get_live_client()
             self._answerer = MemoryRunner(
                 client,
                 model=self.config.models.answerer,
@@ -234,6 +372,7 @@ class MemoryService:
 
     # ------------------------------------------------------------------ reads
 
+    @_synchronised
     def search(
         self,
         user_id: str,
@@ -249,6 +388,7 @@ class MemoryService:
         `rejected` rather than vanishing.
         """
         self._require_namespace(user_id)
+        self._require_limit(limit, maximum=100)
         vector = self.encoder.encode_one(query)
         hits, trace = self.retriever.retrieve_with_trace(
             vector,
@@ -314,6 +454,7 @@ class MemoryService:
             candidates_considered=len(trace.candidate_ids),
         )
 
+    @_synchronised
     def golden_run(self, name: str) -> tuple[Any, bool]:
         """A recorded run plus whether it still describes this process.
 
@@ -339,6 +480,7 @@ class MemoryService:
         )
         return run, current == run.fingerprint
 
+    @_synchronised
     def answer(self, user_id: str, query: str, limit: int | None = None) -> dict[str, Any]:
         """Run the full answer path live. Requires an answerer, so requires a key.
 
@@ -347,6 +489,7 @@ class MemoryService:
         every refresh is a demo nobody can leave running.
         """
         self._require_namespace(user_id)
+        self._require_limit(limit, maximum=100)
         if self.answerer is None:
             raise RuntimeError(
                 "no answerer configured; set GEMINI_API_KEY to enable live answering"
@@ -367,13 +510,7 @@ class MemoryService:
         # then reporting a count computed under a different k is how the inspector
         # ended up explaining a memory set the answerer never saw.
         runner = self.answerer
-        previous_k = runner.top_k
-        if limit and limit != previous_k:
-            runner.top_k = limit
-        try:
-            result = runner.answer(instance)
-        finally:
-            runner.top_k = previous_k
+        result = runner.answer(instance, limit=limit)
 
         notes = result.notes
         # The memories the answerer actually received, returned so the inspector can
@@ -390,7 +527,7 @@ class MemoryService:
         ]
         return {
             "answer": result.text,
-            "top_k": limit or previous_k,
+            "top_k": limit or runner.top_k,
             "selected": selected,
             "answer_status": notes.get("answer_status"),
             "fallback_level": notes.get("fallback_level", "none"),
@@ -403,6 +540,7 @@ class MemoryService:
             "answerer_calls": 2 if notes.get("fallback_level", "none") != "none" else 1,
         }
 
+    @_synchronised
     def raw_search(self, user_id: str, query: str, limit: int = 3) -> list[Any]:
         """BM25 over the raw conversation archive for one namespace.
 
@@ -411,8 +549,10 @@ class MemoryService:
         reached only when structured memory reports itself insufficient.
         """
         self._require_namespace(user_id)
+        self._require_limit(limit, maximum=100)
         return self.store.search_turns(user_id, query, limit=limit)
 
+    @_synchronised
     def get(self, user_id: str, memory_id: str) -> Memory:
         self._require_namespace(user_id)
         memory = self.store.get(memory_id)
@@ -422,6 +562,7 @@ class MemoryService:
             raise MemoryNotFound(memory_id)
         return memory
 
+    @_synchronised
     def list_memories(
         self,
         user_id: str,
@@ -444,6 +585,7 @@ class MemoryService:
         memories.sort(key=lambda m: (m.valid_from or m.ingested_at or datetime.min, m.id))
         return memories[offset : offset + limit], len(memories)
 
+    @_synchronised
     def timeline(self, user_id: str, subject: str, predicate: str) -> list[Memory]:
         """The supersession chain for one key, oldest first.
 
@@ -454,6 +596,7 @@ class MemoryService:
         chain = self.store.find_by_predicate(user_id, subject, predicate, include_superseded=True)
         return sorted(chain, key=lambda m: (m.valid_from or m.ingested_at or datetime.min, m.id))
 
+    @_synchronised
     def evidence(self, user_id: str, memory_id: str) -> dict[str, Any] | None:
         """The source turn a memory was extracted from, with its span."""
         memory = self.get(user_id, memory_id)
@@ -472,6 +615,7 @@ class MemoryService:
 
     # ----------------------------------------------------------------- writes
 
+    @_synchronised
     def add_message(
         self, user_id: str, role: str, content: str, session_id: str | None = None
     ) -> dict[str, Any]:
@@ -482,9 +626,11 @@ class MemoryService:
         """
         self._require_namespace(user_id)
         if self.extractor is None:
-            raise RuntimeError(
-                "no extractor configured; set GEMINI_API_KEY to enable the write path"
-            )
+            if not self.settings.has_api_key:
+                raise RuntimeError(
+                    "no extractor configured; set GEMINI_API_KEY to enable the write path"
+                )
+            self.extractor = self._build_live_extractor()
 
         now = datetime.now()
         external_id = session_id or f"s_{uuid.uuid4().hex[:12]}"
@@ -516,12 +662,20 @@ class MemoryService:
             user_id=user_id, session_id=session_id, role=role, content=content, now=now
         )
         if outcome.memories:
+            for memory in outcome.memories:
+                memory.user_id = user_id
+                memory.source_session_id = session_id
+                memory.source_turn_index = turn_index
             self.store.add_memories(outcome.memories)
             self.index.add(
                 [m.id for m in outcome.memories],
                 self.encoder.encode([m.content for m in outcome.memories]),
             )
             self.index.save()
+            if self.resolver is not None:
+                resolution = self.resolver.resolve_memories(outcome.memories)
+                outcome.usage["superseded"] = resolution.superseded
+                outcome.usage["ambiguous_replacements"] = resolution.skipped_ambiguous
         return {
             "session_id": external_id,
             "turn_index": turn_index,
@@ -529,6 +683,97 @@ class MemoryService:
             "usage": outcome.usage,
         }
 
+    @_synchronised
+    def export_user(self, user_id: str) -> dict[str, Any]:
+        """Everything held for one namespace, in one document.
+
+        A data-subject export has to be complete to mean anything, so this reads the
+        three planes that actually hold user content — memories including evicted and
+        superseded ones, the raw conversation turns memories were extracted from, and the
+        evidence links between them — rather than the retrievable subset the product
+        normally shows. A memory the caller can no longer retrieve is still their data.
+        """
+        self._require_namespace(user_id)
+        memories = self.store.iter_all(user_id)
+        sessions = []
+        for session_id in sorted(self.store.session_ids_for_user(user_id)):
+            turns = self.store.turns_for_session(session_id)
+            sessions.append(
+                {
+                    "session_id": external_session_id(session_id),
+                    "turns": [
+                        {
+                            "turn_index": turn.turn_index,
+                            "role": turn.role,
+                            "content": turn.content,
+                            "ts": turn.ts.isoformat() if turn.ts else None,
+                        }
+                        for turn in turns
+                    ],
+                }
+            )
+        return {
+            "user_id": user_id,
+            "exported_at": datetime.now().isoformat(),
+            "store_fingerprint": self.fingerprint(),
+            "counts": {
+                "memories": len(memories),
+                "sessions": len(sessions),
+                "turns": sum(len(s["turns"]) for s in sessions),
+            },
+            "memories": [
+                {
+                    "id": m.id,
+                    "type": m.type,
+                    "content": m.content,
+                    "subject": m.subject,
+                    "predicate": m.predicate,
+                    "object": m.object,
+                    "scope": m.scope,
+                    "status": m.status,
+                    "source_role": m.source_role,
+                    "event_time": m.event_time.isoformat() if m.event_time else None,
+                    "valid_from": m.valid_from.isoformat() if m.valid_from else None,
+                    "valid_to": m.valid_to.isoformat() if m.valid_to else None,
+                    "superseded_by": m.superseded_by,
+                    "ingested_at": m.ingested_at.isoformat() if m.ingested_at else None,
+                    "source_session_id": (
+                        external_session_id(m.source_session_id) if m.source_session_id else None
+                    ),
+                    "source_turn_index": m.source_turn_index,
+                    "evidence_memory_ids": self.store.evidence_for(m.id),
+                }
+                for m in memories
+            ],
+            "sessions": sessions,
+        }
+
+    @_synchronised
+    def erase_user(self, user_id: str) -> dict[str, Any]:
+        """Physically remove a namespace from every online data plane.
+
+        Distinct from `forget`, and the distinction is the product's: `forget` is a soft
+        delete because provenance is the point and a removed row cannot explain why it is
+        gone. That reasoning does not survive a data-subject erasure request, where the
+        requirement is that the data stop existing. So this is a second operation rather
+        than a flag, and the two are named for what they do.
+
+        The vector index is a separate resource from SQLite and cannot join the same
+        transaction. Rows go first: a vector with no memory is an orphan the loader
+        already tolerates and the next save removes, while a memory whose vector is gone
+        would still be listed and still be searchable by id. Failing in the safer
+        direction is the most this can offer without a distributed transaction, and it is
+        recorded here rather than implied.
+        """
+        self._require_namespace(user_id)
+        removed = self.store.hard_delete_user(user_id)
+        memory_ids = list(removed.pop("ids", []))
+        vectors = self.index.remove(memory_ids)
+        if vectors:
+            self.index.save()
+        return {"user_id": user_id, **removed, "vectors": vectors}
+
+    @_synchronised
     def forget(self, user_id: str, memory_id: str) -> None:
         """Mark a memory evicted. Never a hard delete: provenance is the product,
         and a removed row cannot explain why it is gone."""
@@ -542,12 +787,23 @@ class MemoryService:
         if not user_id or not user_id.strip():
             raise NamespaceRequired("user_id is required on every stateful call")
 
+    @staticmethod
+    def _require_limit(limit: int | None, *, maximum: int) -> None:
+        if limit is not None and not 1 <= limit <= maximum:
+            raise ValueError(f"limit must be between 1 and {maximum}")
+
+    @_synchronised
     def manifest(self) -> dict[str, Any]:
         """What this process is actually running. Read-only, and safe to expose:
         model ids and weights, never credentials."""
         return {
             "store": self.store_name,
             "memories": self.store.count(),
+            "capabilities": {
+                "search": self.encoder_available,
+                "write": self.write_available,
+                "live_answer": self.live_answer_available,
+            },
             "config": {
                 "name": self.config.name,
                 "answerer": self.config.models.answerer,
@@ -577,5 +833,6 @@ class MemoryService:
             f"/temporal={'on' if self.config.temporal_resolution else 'off'}"
         )
 
+    @_synchronised
     def close(self) -> None:
         self.store.close()

@@ -1,0 +1,90 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1055" viewBox="0 0 1200 1055" role="img" aria-labelledby="title desc">
+<title id="title">Runtime entry points and the research evaluation boundary</title>
+<desc id="desc">Architecture verified against the repository on 2026-09-07. See docs/ARCHITECTURE.md for the detailed figure caption and source mapping. Solid arrows show flow; dashed arrows show conditional paths.</desc>
+<rect x="0" y="0" width="1200" height="1055" rx="7" fill="#FFFFFF" stroke="none" stroke-width="1.3"/>
+<text x="40" y="42" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#345E80" text-anchor="start">FIGURE 06</text>
+<text x="40" y="82" font-family="Georgia, Times New Roman, serif" font-size="31" font-weight="400" fill="#203247" text-anchor="start">Runtime entry points and the research evaluation boundary</text>
+<text x="40" y="113" font-family="Helvetica, Arial, sans-serif" font-size="17" font-weight="400" fill="#586775" text-anchor="start">Three adapters share components, but they do not execute the same write path or expose the same capabilities.</text>
+<polyline points="40,133 1160,133" fill="none" stroke="#CED6DC" stroke-width="1" stroke-linejoin="round"/>
+<text x="40" y="175" font-family="Helvetica, Arial, sans-serif" font-size="17" font-weight="700" fill="#586775" text-anchor="start">A. CURRENT ENTRY POINTS</text>
+<rect x="40" y="201" width="350" height="99" rx="7" fill="#EEF4F8" stroke="#345E80" stroke-width="1.3"/>
+<text x="56" y="230" font-family="Helvetica, Arial, sans-serif" font-size="19" font-weight="700" fill="#345E80" text-anchor="start">CLI / Python batch pipeline</text>
+<text x="56" y="258" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="400" fill="#203247" text-anchor="start">lltm ingest run</text>
+<text x="56" y="282" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="400" fill="#203247" text-anchor="start">IngestionPipeline</text>
+<rect x="425" y="201" width="350" height="99" rx="7" fill="#EEF4F8" stroke="#345E80" stroke-width="1.3"/>
+<text x="441" y="230" font-family="Helvetica, Arial, sans-serif" font-size="19" font-weight="700" fill="#345E80" text-anchor="start">REST + Inspector + MCP</text>
+<text x="441" y="258" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="400" fill="#203247" text-anchor="start">api.app / mcp_server</text>
+<text x="441" y="282" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="400" fill="#203247" text-anchor="start">MemoryService</text>
+<rect x="810" y="201" width="350" height="99" rx="7" fill="#FBF5EB" stroke="#96662D" stroke-width="1.3"/>
+<text x="826" y="230" font-family="Helvetica, Arial, sans-serif" font-size="19" font-weight="700" fill="#96662D" text-anchor="start">Public playground</text>
+<text x="826" y="258" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="400" fill="#203247" text-anchor="start">public-demo/site -&gt; demo-api</text>
+<text x="826" y="282" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="400" fill="#203247" text-anchor="start">Playground</text>
+<rect x="40" y="341" width="350" height="165" rx="7" fill="#EEF4F8" stroke="#345E80" stroke-width="1.3"/>
+<text x="56" y="370" font-family="Helvetica, Arial, sans-serif" font-size="19" font-weight="700" fill="#345E80" text-anchor="start">Full batch write path</text>
+<text x="56" y="398" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="400" fill="#203247" text-anchor="start">TwoStageExtractor + dedup</text>
+<text x="56" y="422" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="400" fill="#203247" text-anchor="start">Archive + store + vectors</text>
+<text x="56" y="446" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="400" fill="#203247" text-anchor="start">TemporalResolver + checkpoint</text>
+<text x="56" y="470" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="400" fill="#203247" text-anchor="start">Uses provider for extraction</text>
+<rect x="425" y="341" width="350" height="165" rx="7" fill="#EEF4F8" stroke="#345E80" stroke-width="1.3"/>
+<text x="441" y="370" font-family="Helvetica, Arial, sans-serif" font-size="19" font-weight="700" fill="#345E80" text-anchor="start">Service read / write path</text>
+<text x="441" y="398" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="400" fill="#203247" text-anchor="start">Search, raw lookup, timeline</text>
+<text x="441" y="422" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="400" fill="#203247" text-anchor="start">Answer via MemoryRunner</text>
+<text x="441" y="446" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="400" fill="#203247" text-anchor="start">Lazy batch-extractor adapter</text>
+<text x="441" y="470" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="400" fill="#203247" text-anchor="start">Dedup + temporal resolution</text>
+<rect x="810" y="341" width="350" height="165" rx="7" fill="#FBF5EB" stroke="#96662D" stroke-width="1.3"/>
+<text x="826" y="370" font-family="Helvetica, Arial, sans-serif" font-size="19" font-weight="700" fill="#96662D" text-anchor="start">Direct structured facts</text>
+<text x="826" y="398" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="400" fill="#203247" text-anchor="start">Typed facts + raw turns</text>
+<text x="826" y="422" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="400" fill="#203247" text-anchor="start">Local embedder + resolver</text>
+<text x="826" y="446" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="400" fill="#203247" text-anchor="start">Signed temporary namespace</text>
+<text x="826" y="470" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="400" fill="#203247" text-anchor="start">No LLM extraction or answering</text>
+<polyline points="215,300 215,341" fill="none" stroke="#8795A1" stroke-width="1.7" stroke-linejoin="round"/>
+<polygon points="215,341 218.7,333.0 211.3,333.0" fill="#8795A1"/>
+<polyline points="600,300 600,341" fill="none" stroke="#8795A1" stroke-width="1.7" stroke-linejoin="round"/>
+<polygon points="600,341 603.7,333.0 596.3,333.0" fill="#8795A1"/>
+<polyline points="985,300 985,341" fill="none" stroke="#8795A1" stroke-width="1.7" stroke-linejoin="round"/>
+<polygon points="985,341 988.7,333.0 981.3,333.0" fill="#8795A1"/>
+<rect x="40" y="550" width="1120" height="72" rx="7" fill="#EFF6F3" stroke="#32766D" stroke-width="1.3"/>
+<text x="60" y="580" font-family="Helvetica, Arial, sans-serif" font-size="19" font-weight="700" fill="#32766D" text-anchor="start">Shared primitives</text>
+<text x="60" y="607" font-family="Helvetica, Arial, sans-serif" font-size="19" font-weight="400" fill="#203247" text-anchor="start">MemoryStore / SQLite   |   NumpyFlatIndex   |   Encoder   |   HybridRetriever   |   TemporalResolver</text>
+<polyline points="215,506 215,550" fill="none" stroke="#32766D" stroke-width="1.7" stroke-linejoin="round"/>
+<polygon points="215,550 218.7,542.0 211.3,542.0" fill="#32766D"/>
+<polyline points="600,506 600,550" fill="none" stroke="#32766D" stroke-width="1.7" stroke-linejoin="round"/>
+<polygon points="600,550 603.7,542.0 596.3,542.0" fill="#32766D"/>
+<polyline points="985,506 985,550" fill="none" stroke="#32766D" stroke-width="1.7" stroke-linejoin="round"/>
+<polygon points="985,550 988.7,542.0 981.3,542.0" fill="#32766D"/>
+<text x="40" y="678" font-family="Helvetica, Arial, sans-serif" font-size="17" font-weight="700" fill="#586775" text-anchor="start">B. EVALUATION  /  EXPLICIT RUNNERS, FROZEN INPUTS AND AUDITABLE OUTPUTS</text>
+<rect x="40" y="712" width="200" height="132" rx="7" fill="#EEF4F8" stroke="#345E80" stroke-width="1.3"/>
+<text x="56" y="741" font-family="Helvetica, Arial, sans-serif" font-size="19" font-weight="700" fill="#345E80" text-anchor="start">Freeze inputs</text>
+<text x="56" y="769" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="400" fill="#203247" text-anchor="start">Config + source hashes</text>
+<text x="56" y="793" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="400" fill="#203247" text-anchor="start">Manifests + store state</text>
+<rect x="270" y="712" width="200" height="132" rx="7" fill="#EEF4F8" stroke="#345E80" stroke-width="1.3"/>
+<text x="286" y="741" font-family="Helvetica, Arial, sans-serif" font-size="19" font-weight="700" fill="#345E80" text-anchor="start">Run arms</text>
+<text x="286" y="769" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="400" fill="#203247" text-anchor="start">Memory / full context</text>
+<text x="286" y="793" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="400" fill="#203247" text-anchor="start">Naive RAG baselines</text>
+<rect x="500" y="712" width="200" height="132" rx="7" fill="#EEF4F8" stroke="#345E80" stroke-width="1.3"/>
+<text x="516" y="741" font-family="Helvetica, Arial, sans-serif" font-size="19" font-weight="700" fill="#345E80" text-anchor="start">Grade answers</text>
+<text x="516" y="769" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="400" fill="#203247" text-anchor="start">Independent judge role</text>
+<text x="516" y="793" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="400" fill="#203247" text-anchor="start">Answer + reference</text>
+<rect x="730" y="712" width="200" height="132" rx="7" fill="#EEF4F8" stroke="#345E80" stroke-width="1.3"/>
+<text x="746" y="741" font-family="Helvetica, Arial, sans-serif" font-size="19" font-weight="700" fill="#345E80" text-anchor="start">Record evidence</text>
+<text x="746" y="769" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="400" fill="#203247" text-anchor="start">JSONL rows + usage</text>
+<text x="746" y="793" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="400" fill="#203247" text-anchor="start">Lock + resume ledger</text>
+<rect x="960" y="712" width="200" height="132" rx="7" fill="#EEF4F8" stroke="#345E80" stroke-width="1.3"/>
+<text x="976" y="741" font-family="Helvetica, Arial, sans-serif" font-size="19" font-weight="700" fill="#345E80" text-anchor="start">Aggregate</text>
+<text x="976" y="769" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="400" fill="#203247" text-anchor="start">Accuracy + cost + recall</text>
+<text x="976" y="793" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="400" fill="#203247" text-anchor="start">Paired checks + gates</text>
+<polyline points="240,778 270,778" fill="none" stroke="#8795A1" stroke-width="1.7" stroke-linejoin="round"/>
+<polygon points="270,778 262.0,774.3 262.0,781.7" fill="#8795A1"/>
+<polyline points="470,778 500,778" fill="none" stroke="#8795A1" stroke-width="1.7" stroke-linejoin="round"/>
+<polygon points="500,778 492.0,774.3 492.0,781.7" fill="#8795A1"/>
+<polyline points="700,778 730,778" fill="none" stroke="#8795A1" stroke-width="1.7" stroke-linejoin="round"/>
+<polygon points="730,778 722.0,774.3 722.0,781.7" fill="#8795A1"/>
+<polyline points="930,778 960,778" fill="none" stroke="#8795A1" stroke-width="1.7" stroke-linejoin="round"/>
+<polygon points="960,778 952.0,774.3 952.0,781.7" fill="#8795A1"/>
+<rect x="40" y="880" width="1120" height="72" rx="7" fill="#F6F7F8" stroke="#CED6DC" stroke-width="1.3"/>
+<text x="59" y="909" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="700" fill="#203247" text-anchor="start">Research extensions selected by the runner</text>
+<text x="59" y="936" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="400" fill="#203247" text-anchor="start">Coherent context / oracle   |   v3 evidence hydration   |   v4 arithmetic + relation scan   |   influence / packing</text>
+<polyline points="40,978 1160,978" fill="none" stroke="#CED6DC" stroke-width="1" stroke-linejoin="round"/>
+<text x="40" y="1001" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="400" fill="#586775" text-anchor="start">Current dependency: MemoryService imports MemoryRunner and Instance from evaluation/. The proposed split is not built.</text>
+<text x="40" y="1024" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="400" fill="#586775" text-anchor="start">Evaluation gold labels belong to grading and explicit oracle diagnostics; ordinary retrieval does not use them.</text>
+</svg>

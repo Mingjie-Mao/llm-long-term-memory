@@ -1,0 +1,16 @@
+# Direct dependencies for the standalone, LLM-free public playground.
+#
+# Compile with:
+#   uv pip compile demo-api/requirements.in -o demo-api/requirements.txt --generate-hashes
+#
+# `requirements.txt` is the deployable lock. Keeping intent here and exact versions
+# there prevents an unrelated upstream release from changing the Render build.
+fastapi==0.141.1
+uvicorn[standard]==0.52.3
+pydantic==2.13.4
+pydantic-settings==2.15.0
+numpy==2.5.2
+pyyaml==6.0.3
+structlog==26.1.0
+onnxruntime==1.29.0
+tokenizers==0.22.2

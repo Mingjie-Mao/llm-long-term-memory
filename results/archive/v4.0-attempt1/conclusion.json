@@ -1,0 +1,40 @@
+{
+  "cost": {
+    "answerer_requests": 329,
+    "held_out_probes_touched": 0,
+    "probes_per_arm": 142
+  },
+  "design_fault": "Single-variable was enforced against retrieval and proven by Gate 0, but three changes were bundled inside the answerer: deterministic arithmetic, an operation-first prompt, and timeline rendering. The v3.2 failure one layer down.",
+  "experiment_id": "v4.0-attempt1",
+  "files": [
+    {
+      "bytes": 4547,
+      "path": "results/archive/v4.0-attempt1/README.md",
+      "sha256": "e4217773654395cccaf750e216c976f9df585d61f22d24f266b54203738361fe"
+    },
+    {
+      "bytes": 195555,
+      "path": "results/archive/v4.0-attempt1/probes.v3.3-dev.jsonl",
+      "sha256": "2aa883445336d507cdf68a0f907b4cfb3ef8e2c1b25cc0948ba616fbfdf60eb8"
+    },
+    {
+      "bytes": 195868,
+      "path": "results/archive/v4.0-attempt1/probes.v4.0-dev.jsonl",
+      "sha256": "9560fb6e969539a3cb84830d5b07d876f2f0e5758b2ac3b72f6300aa4e3314d0"
+    },
+    {
+      "bytes": 6241,
+      "path": "results/prereg-v4-synthesis.md",
+      "sha256": "9563ca000df69a36e77e11263fc3461ff321d5c09efcc68df004230ec494b2c8"
+    }
+  ],
+  "gate_0": "PASS \u2014 retrieval identical across both arms on all 142 probes",
+  "outcome": "void_by_contamination",
+  "outcome_reason": "55 of 142 candidate rows reached the grader as raw JSON because the v4 prompt never required `answer`, so the headline table is not interpretable. On the 87 clean rows v4.0 scored 62.1% against 51.7%, with duration +34.6 points \u2014 a diagnosis, since the subgroup is defined by an outcome of the run, not a result.",
+  "schema_version": 1,
+  "what_it_established": [
+    "deterministic arithmetic moves duration substantially",
+    "Gate 0 detects nothing because retrieval genuinely did not move",
+    "missing_field is populated by the real model (8/142) and is not dead code"
+  ]
+}

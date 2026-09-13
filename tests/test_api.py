@@ -12,6 +12,10 @@ like a retrieval miss.
 
 from __future__ import annotations
 
+import json
+import threading
+import time
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 from types import SimpleNamespace
 
@@ -24,7 +28,7 @@ from fastapi.testclient import TestClient
 
 from llm_long_term_memory.api.app import app, set_service
 from llm_long_term_memory.api.service import MemoryService
-from llm_long_term_memory.store import Memory, Session, Turn
+from llm_long_term_memory.store import Memory, Session, Turn, scoped_session_id
 
 NOW = datetime(2026, 8, 14)
 EARLIER = datetime(2026, 3, 2)
@@ -164,6 +168,7 @@ def test_config_exposes_the_manifest_and_no_credentials(client):
 
     assert body["config"]["answerer"]
     assert "retrieval" in body["config"]
+    assert body["capabilities"] == {"search": True, "write": False, "live_answer": False}
     serialised = str(body).lower()
     assert "api_key" not in serialised and "gemini_api_key" not in serialised
 
@@ -602,8 +607,9 @@ def test_health_reports_degraded_when_search_cannot_run(client, monkeypatch):
     assert body["status"] == "degraded"
     assert body["search_available"] is False
     assert "embed" in body["detail"]
-    # Still 200: the process is alive and browse/timeline work.
-    assert client.get("/healthz").status_code == 200
+    # Readiness is non-200; liveness remains independently available.
+    assert client.get("/healthz").status_code == 503
+    assert client.get("/livez").status_code == 200
 
 
 def test_a_missing_encoder_is_503_with_a_remedy_not_a_bare_500(client, monkeypatch):
@@ -622,16 +628,17 @@ def test_a_missing_encoder_is_503_with_a_remedy_not_a_bare_500(client, monkeypat
     assert "embed" in response.json()["detail"]
 
 
-def test_live_answer_uses_the_requested_limit_and_restores_the_shared_runner(client):
+def test_live_answer_uses_the_requested_limit_without_mutating_the_shared_runner(client):
     from llm_long_term_memory.api.app import get_service
 
     class StubAnswerer:
         top_k = 10
 
-        def answer(self, instance):
+        def answer(self, instance, *, limit=None):
             assert instance.question_id == "alice"
             assert instance.question == "where do I live?"
-            assert self.top_k == 3
+            assert limit == 3
+            assert self.top_k == 10
             return SimpleNamespace(
                 text="Sydney",
                 context_tokens=42,
@@ -715,6 +722,104 @@ def test_write_path_persists_a_turn_and_indexes_extracted_memories(client):
     from llm_long_term_memory.store import external_session_id
 
     assert external_session_id(service.get("alice", "m_cat").source_session_id) == "cat-chat"
+
+
+def test_api_key_auto_composes_the_real_batch_extractor_adapter(client, monkeypatch):
+    """The default composition must not rely on the test-only `extract_turn` stub."""
+    from llm_long_term_memory.api.app import get_service
+    from llm_long_term_memory.api.service import LiveTurnExtractor
+    from llm_long_term_memory.llm import UsageTracker
+
+    class ScriptedClient:
+        def __init__(self):
+            self.payloads = [
+                {
+                    "sessions": [
+                        {
+                            "session_index": 0,
+                            "facts": [{"content": "The user adopted a cat."}],
+                        }
+                    ]
+                },
+                {
+                    "facts": [
+                        {
+                            "index": 0,
+                            "temporal_key": "pets",
+                            "update_op": "coexists",
+                            "object": "cat",
+                        }
+                    ]
+                },
+                {"verdict": "DISTINCT", "reason": "Different from the recommendation."},
+            ]
+
+        def generate(self, **_kwargs):
+            payload = self.payloads.pop(0)
+            return SimpleNamespace(
+                text=json.dumps(payload),
+                input_tokens=10,
+                output_tokens=5,
+                thinking_tokens=0,
+                api_latency_ms=1.0,
+            )
+
+    service = get_service()
+    service.settings.gemini_api_key = "test-key"
+    service._live_usage = UsageTracker()
+    scripted = ScriptedClient()
+    monkeypatch.setattr(service, "_get_live_client", lambda: scripted)
+
+    response = client.post(
+        "/v1/messages",
+        json={
+            "user_id": "alice",
+            "role": "user",
+            "content": "I adopted a cat.",
+            "session_id": "real-adapter",
+        },
+    )
+
+    assert response.status_code == 200, response.text
+    assert isinstance(service.extractor, LiveTurnExtractor)
+    assert response.json()["memories"][0]["source"]["session_id"] == "real-adapter"
+    assert service.timeline("alice", "user", "pets")[0].object == "cat"
+
+
+def test_shared_service_serializes_concurrent_writes(client):
+    from llm_long_term_memory.api.app import get_service
+
+    class ConcurrentExtractor:
+        def __init__(self):
+            self.guard = threading.Lock()
+            self.active = 0
+            self.max_active = 0
+
+        def extract_turn(self, **_kwargs):
+            with self.guard:
+                self.active += 1
+                self.max_active = max(self.max_active, self.active)
+            time.sleep(0.01)
+            with self.guard:
+                self.active -= 1
+            return SimpleNamespace(memories=[], usage={"total_requests": 0})
+
+    service = get_service()
+    extractor = ConcurrentExtractor()
+    service.extractor = extractor
+    with ThreadPoolExecutor(max_workers=8) as pool:
+        outcomes = list(
+            pool.map(
+                lambda i: service.add_message(
+                    "alice", "user", f"message {i}", session_id="concurrent-chat"
+                ),
+                range(8),
+            )
+        )
+
+    assert extractor.max_active == 1
+    assert sorted(result["turn_index"] for result in outcomes) == list(range(8))
+    assert len(service.store.get_session(scoped_session_id("alice", "concurrent-chat")).turns) == 8
 
 
 def test_evidence_is_none_when_a_memory_has_no_source_anchor(client):

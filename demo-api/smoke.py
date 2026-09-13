@@ -11,6 +11,7 @@ from __future__ import annotations
 import os
 import sys
 import tempfile
+from datetime import datetime, timedelta
 from pathlib import Path
 
 scratch = Path(tempfile.mkdtemp())
@@ -171,6 +172,7 @@ with TestClient(app) as c:
     ).fetchone()[0]
     check("no memory rows survive in SQLite", left == 0, f"{left} left")
     check("no turn rows survive either", turns_left == 0, f"{turns_left} left")
+    db.close()
 
     print("\n— guards —")
     h2 = {"x-demo-token": c.post("/demo/session").json()["token"]}
@@ -190,9 +192,90 @@ with TestClient(app) as c:
             headers=h2,
             json={"predicate": "note", "object": "x", "content": "z" * 5000},
         ).status_code
-        == 413,
+        == 422,
     )
+    check(
+        "an invalid event time is refused",
+        c.post(
+            "/demo/facts",
+            headers=h2,
+            json={
+                "predicate": "note",
+                "object": "x",
+                "content": "dated note",
+                "event_time": "definitely-not-a-date",
+            },
+        ).status_code
+        == 422,
+    )
+    check(
+        "a negative retrieval limit is refused",
+        c.post("/demo/raw/search", headers=h2, json={"query": "x", "limit": -1}).status_code == 422,
+    )
+    cap_ip = {"x-forwarded-for": "203.0.113.77"}
+    cap_token = c.post("/demo/session", headers=cap_ip).json()["token"]
+    cap_namespace = cap_token.split(".")[0]
+    cap_headers = {**cap_ip, "x-demo-token": cap_token}
+    accepted = [
+        c.post(
+            "/demo/turns",
+            headers=cap_headers,
+            json={"content": f"turn {i}", "session_id": f"chat-{i}"},
+        ).status_code
+        for i in range(30)
+    ]
+    check("the namespace accepts its 30-turn allowance", all(code == 200 for code in accepted))
+    check(
+        "changing session_id cannot bypass the namespace turn cap",
+        c.post(
+            "/demo/turns",
+            headers=cap_headers,
+            json={"content": "overflow", "session_id": "chat-overflow"},
+        ).status_code
+        == 429,
+    )
+    # Leave one row behind, then age its durable registry entry after shutdown. The
+    # next startup must recover the registry and hard-delete the namespace.
+    c.post(
+        "/demo/facts",
+        headers=h2,
+        json={"predicate": "restart_test", "object": "x", "content": "Delete after restart."},
+    )
+    restart_token = h2["x-demo-token"]
+    restart_namespace = restart_token.split(".")[0]
     check("health says no LLM is required", c.get("/demo/health").json()["llm_required"] is False)
+
+db = sqlite3.connect(Path(os.environ["LLTM_DEMO_STORE"]).with_suffix(".db"))
+db.execute(
+    "UPDATE demo_sessions SET created_at = ? WHERE namespace = ?",
+    ((datetime.now() - timedelta(hours=2)).isoformat(), restart_namespace),
+)
+db.execute("DELETE FROM demo_sessions WHERE namespace = ?", (cap_namespace,))
+db.commit()
+db.close()
+
+print("\n— restart-safe expiry —")
+with TestClient(app) as c:
+    check(
+        "an expired token stays dead after restart",
+        c.get("/demo/memories", headers={"x-demo-token": restart_token}).status_code == 410,
+    )
+    db = sqlite3.connect(Path(os.environ["LLTM_DEMO_STORE"]).with_suffix(".db"))
+    left = db.execute(
+        "SELECT count(*) FROM memories WHERE user_id = ?", (restart_namespace,)
+    ).fetchone()[0]
+    registry = db.execute(
+        "SELECT count(*) FROM demo_sessions WHERE namespace = ?", (restart_namespace,)
+    ).fetchone()[0]
+    orphan_turns = db.execute(
+        "SELECT count(*) FROM turns WHERE session_id IN "
+        "(SELECT id FROM sessions WHERE user_id = ?)",
+        (cap_namespace,),
+    ).fetchone()[0]
+    db.close()
+    check("startup sweep deletes expired rows", left == 0, f"{left} left")
+    check("startup sweep deletes the registry row", registry == 0, f"{registry} left")
+    check("startup sweep deletes legacy orphan rows", orphan_turns == 0, f"{orphan_turns} left")
 
 print(f"\n{ok} passed, {failed} failed")
 sys.exit(1 if failed else 0)

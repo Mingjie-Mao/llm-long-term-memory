@@ -422,14 +422,12 @@ def test_a_coexisting_successor_does_not_close_its_predecessor(store):
     assert store.get("avg").status == "active", "a coexisting successor must not retire it"
     assert store.get("moved").status == "active"
 
-    # `trip` *is* closed, by `moved`, which did say replaces. Correct as far as the
-    # per-successor rule goes — and it exposes the residual limitation: a
-    # replacement closes whatever immediately precedes it in event order, which
-    # here is the one-off Walmart trip rather than the weekly average it actually
-    # supersedes. Interleaved coexisting facts make "the previous value" ambiguous,
-    # and the chain model cannot express that yet.
-    assert store.get("trip").status == "superseded"
-    assert store.get("trip").superseded_by == "moved"
+    # There are two live predecessors and the replacement signal does not identify
+    # which one it means. Event order is not a valid tie-breaker, so the resolver
+    # abstains rather than hiding the Walmart trip or the weekly average.
+    assert store.get("trip").status == "active"
+    assert store.get("trip").superseded_by is None
+    assert TemporalResolver(store).resolve_all("u1").skipped_ambiguous == 1
 
 
 def test_a_replacing_successor_still_closes_its_predecessor(store):

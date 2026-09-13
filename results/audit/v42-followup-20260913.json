@@ -1,0 +1,115 @@
+{
+  "date": "2026-09-13",
+  "checkout": "879e6459882ff4ed9f10c6d7718f161d2a3536ec",
+  "executed_freeze_id": "2d302c0924ae73fcf7a7f7b2d304b8b25854b437ae685c2b59be50b08415ad8d",
+  "registered_conclusion_reproduced_fields": 23,
+  "registered_outcome": "not_promoted",
+  "frozen_source_files_verified": 117,
+  "frozen_data_files_verified": 14,
+  "validation": {
+    "tests_passed": 863,
+    "core_line_coverage_percent": 84,
+    "ruff_passed": true,
+    "format_python_files": 333,
+    "public_site_passed": true
+  },
+  "new_provider_attempts_this_followup": 0,
+  "request_ledgers": [
+    {
+      "path": "results/archive/v4.2-aborted-20260912/live/requests.jsonl",
+      "sha256": "4cc961280305ccd9a018b6a8f217398680aae833af44ee8941c97f3f828cc6a0",
+      "attempts": 3,
+      "observed_tokens": 3188
+    },
+    {
+      "path": "results/archive/v4.2-aborted-20260912/preflight-c/requests.jsonl",
+      "sha256": "85cf789b66ff945b8873171b6173eb2bc9a621975a5d145cf6f06161b0643d19",
+      "attempts": 9,
+      "observed_tokens": 12827
+    },
+    {
+      "path": "results/archive/v4.2-aborted-20260912/preflight-d/requests.jsonl",
+      "sha256": "fe25ae15f2a0d49e10b77a69b6dfa9b1243b0bd529f57d578324ac0458b0fbae",
+      "attempts": 9,
+      "observed_tokens": 12398
+    },
+    {
+      "path": "results/frozen/v4.2-development-20260912e/live/requests.jsonl",
+      "sha256": "4237c6f0ff3499d5b55a95e951ea86ec0314db3b9bc0813db71fef020ed8b679",
+      "attempts": 426,
+      "observed_tokens": 646599
+    }
+  ],
+  "all_recorded_attempts": 447,
+  "all_observed_tokens": 675012,
+  "original_gold_matched_member_sets": {
+    "paired_cells": 90,
+    "identical_sets": 50,
+    "different_sets": 40,
+    "method": "Existing token-overlap matcher, original frozen development gold; not human membership proof."
+  },
+  "provisional_corrected_comparison": {
+    "net": -5,
+    "candidate_only_correct": 1,
+    "control_only_correct": 6,
+    "both_correct": 6,
+    "both_incorrect": 17,
+    "namespaces": 29,
+    "cluster_p_two_sided_descriptive": 0.125,
+    "registered_conclusion_recomputed": false
+  },
+  "corrected_development_gold": {
+    "count_probes": 30,
+    "probes_changed": 18,
+    "members_excluded": 31,
+    "members_before": 149,
+    "members_after": 118
+  },
+  "human_review": {
+    "entries": 38,
+    "completed_human_decisions": 0,
+    "status": "pending"
+  },
+  "files": [
+    {
+      "path": "results/v4.2-result.md",
+      "sha256": "da0ab4bfda0227d09933f8aac5727e1a610067949f89258a712f8d5b5b5445a2"
+    },
+    {
+      "path": "results/count-gold-correction.md",
+      "sha256": "d94b967e6f816b332f7047318cff4576e67739c238cf0005dc063c3bb8a49a04"
+    },
+    {
+      "path": "docs/CURRENT_STATUS.md",
+      "sha256": "5e892d08e6a534657a8693e0755ed9438519a25506505352e1c9d08c5cefaf14"
+    },
+    {
+      "path": "docs/V42_EXECUTION_2026-09-12.zh-CN.md",
+      "sha256": "1658a264230032d35e918162e04ec7d212d63b77251cbe00e7597be7d9b9318b"
+    },
+    {
+      "path": "tools/apply_gold_corrections.py",
+      "sha256": "f39c61c713135e5ed681029f572441042c255ed847ed5820b3700c92e99cf886"
+    },
+    {
+      "path": "tests/test_gold_corrections.py",
+      "sha256": "b4665994a76e3c402132814d0c6d1efc1d977c1782d8e14f6655a3e303c035ab"
+    },
+    {
+      "path": "results/analysis/count-gold-corrected-reread-20260913.json",
+      "sha256": "62b7ca7ce696cbcfc261156ef7cea347ae51db540313f0aded30deb53e71c60f"
+    },
+    {
+      "path": "results/review/count-gold-review-20260913.md",
+      "sha256": "75ca5523e1ba7e8ab178b43c1be90d6e2a57c5a3ff000a4c034cf86ec482821b"
+    },
+    {
+      "path": "results/review/count-gold-review-20260913.decisions.json",
+      "sha256": "50953e49d8bcd46cb4e2bd315621301202955fe07460cc93a4de17be61d4a3ff"
+    },
+    {
+      "path": "public-demo/site/release.json",
+      "sha256": "0d302486b860bf5164bc3ef89d80bf0a60d25f0aeb6e0ae505f71731a87db723"
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "aggregate_sha256": "a771235b0aa500e7430c70c778b17b125e3e6f8335d492d59c799f3406d7b9f6",
+  "arms": [
+    {
+      "name": "v2-control",
+      "variant": "two_stage_fallback"
+    },
+    {
+      "name": "v3.3-compact",
+      "variant": "two_stage_reasoned_evidence"
+    }
+  ],
+  "completed_at_utc": "2026-09-05T13:36:42.039926+00:00",
+  "expected_rows": 360,
+  "freeze_sha256": "58df0a087433b8a89b50cdfb6c0f98f58ec970e47545fad1ae9ba856c8ed23bc",
+  "questions": 60,
+  "rows": {
+    "v2-control.rep1": 60,
+    "v2-control.rep2": 60,
+    "v2-control.rep3": 60,
+    "v3.3-compact.rep1": 60,
+    "v3.3-compact.rep2": 60,
+    "v3.3-compact.rep3": 60
+  },
+  "rule": "one resumable dev60 execution; never fresh, repeated, or tuned",
+  "runs_per_arm": 3,
+  "schema_version": 1,
+  "started_at_utc": "2026-09-04T19:56:00.156874+00:00",
+  "status": "complete"
+}

@@ -1,0 +1,3429 @@
+{
+  "not_a_benchmark": "Synthesis probes measure operations over stored facts. Ground truth is derived by SQL and inherits any extraction loss, so this is not accuracy and must not be reported beside a LongMemEval figure.",
+  "per_kind": 60,
+  "probes": [
+    {
+      "answer": 4,
+      "answer_kind": "integer",
+      "derivation": "COUNT of active memories where subject='user' and the mapped relation_type is 'visited'; scope stated in the question as ['museum visits', 'past trips', 'store visits']",
+      "evidence_memory_ids": [
+        "mem_26de43145d0055b2",
+        "mem_6b05bba3ea0363c1",
+        "mem_6eddb46eedfcf84d",
+        "mem_8ac97839e54b07d2"
+      ],
+      "kind": "count",
+      "namespace": "8550ddae",
+      "probe_id": "count_0000",
+      "question": "How many distinct places has the user visited? Count only facts recorded under: museum visits, past trips, store visits.",
+      "scope_predicates": [
+        "museum visits",
+        "past trips",
+        "store visits"
+      ]
+    },
+    {
+      "answer": 4,
+      "answer_kind": "integer",
+      "derivation": "COUNT of active memories where subject='user' and the mapped relation_type is 'attended'; scope stated in the question as ['concerts attended', 'event attendance', 'museum membership']",
+      "evidence_memory_ids": [
+        "mem_17d2d6d2a6897036",
+        "mem_20cdbd2ac17bb341",
+        "mem_3e3bc5143c4b3b42",
+        "mem_f9c441a92c34c1f6"
+      ],
+      "kind": "count",
+      "namespace": "10e09553",
+      "probe_id": "count_0001",
+      "question": "How many distinct events has the user attended? Count only facts recorded under: concerts attended, event attendance, museum membership.",
+      "scope_predicates": [
+        "concerts attended",
+        "event attendance",
+        "museum membership"
+      ]
+    },
+    {
+      "answer": 4,
+      "answer_kind": "integer",
+      "derivation": "COUNT of active memories where subject='user' and the mapped relation_type is 'attended'; scope stated in the question as ['events attended', 'workshops attended']",
+      "evidence_memory_ids": [
+        "mem_056a31384b97b527",
+        "mem_72e77f428a126369",
+        "mem_c9c27b1e25b8abd6",
+        "mem_e290ed8bd7f34d9a"
+      ],
+      "kind": "count",
+      "namespace": "e01b8e2f",
+      "probe_id": "count_0002",
+      "question": "How many distinct events has the user attended? Count only facts recorded under: events attended, workshops attended.",
+      "scope_predicates": [
+        "events attended",
+        "workshops attended"
+      ]
+    },
+    {
+      "answer": 3,
+      "answer_kind": "integer",
+      "derivation": "COUNT of active memories where subject='user' and the mapped relation_type is 'grows'; scope stated in the question as ['gardening']",
+      "evidence_memory_ids": [
+        "mem_32e1208e9699fee5",
+        "mem_b384fba1d7cde98e",
+        "mem_c7b7d90b68af826c"
+      ],
+      "kind": "count",
+      "namespace": "6aeb4375",
+      "probe_id": "count_0003",
+      "question": "How many distinct plants does the user grow? Count only facts recorded under: gardening.",
+      "scope_predicates": [
+        "gardening"
+      ]
+    },
+    {
+      "answer": 10,
+      "answer_kind": "integer",
+      "derivation": "COUNT of active memories where subject='user' and the mapped relation_type is 'grows'; scope stated in the question as ['garden plants', 'houseplants', 'plant care tool']",
+      "evidence_memory_ids": [
+        "mem_110f98ed37b1cdc8",
+        "mem_70e5a2e0514c6c95",
+        "mem_7a35dcdfbc617481",
+        "mem_aa94bf2c57de96a2",
+        "mem_bdf860518a4c90b2",
+        "mem_d2d7cbad1517518c",
+        "mem_d3001837a35eea93",
+        "mem_d4e2f34ba0a0aaa1",
+        "mem_e5e9807b681228c0",
+        "mem_e79396b5f44a3155"
+      ],
+      "kind": "count",
+      "namespace": "3a704032",
+      "probe_id": "count_0004",
+      "question": "How many distinct plants does the user grow? Count only facts recorded under: garden plants, houseplants, plant care tool.",
+      "scope_predicates": [
+        "garden plants",
+        "houseplants",
+        "plant care tool"
+      ]
+    },
+    {
+      "answer": 3,
+      "answer_kind": "integer",
+      "derivation": "COUNT of active memories where subject='user' and the mapped relation_type is 'cooked'; scope stated in the question as ['cooking ingredients', 'cooking skills', 'recipe modifications']",
+      "evidence_memory_ids": [
+        "mem_a80986ddccd2b351",
+        "mem_c6c3e5ed8012c3be",
+        "mem_e47b0804100a5c57"
+      ],
+      "kind": "count",
+      "namespace": "gpt4_a2d1d1f6",
+      "probe_id": "count_0005",
+      "question": "How many distinct dishes has the user cooked? Count only facts recorded under: cooking ingredients, cooking skills, recipe modifications.",
+      "scope_predicates": [
+        "cooking ingredients",
+        "cooking skills",
+        "recipe modifications"
+      ]
+    },
+    {
+      "answer": 7,
+      "answer_kind": "integer",
+      "derivation": "COUNT of active memories where subject='user' and the mapped relation_type is 'attended'; scope stated in the question as ['charity event', 'event attendance']",
+      "evidence_memory_ids": [
+        "mem_100250f599389739",
+        "mem_2a12c3def1e2bec0",
+        "mem_4a54c9ded97586d1",
+        "mem_935725facb37f4a8",
+        "mem_a746176e6d4f0730",
+        "mem_a96a47a1f2b6bf52",
+        "mem_b83bd3f520552915"
+      ],
+      "kind": "count",
+      "namespace": "8a2466db",
+      "probe_id": "count_0006",
+      "question": "How many distinct events has the user attended? Count only facts recorded under: charity event, event attendance.",
+      "scope_predicates": [
+        "charity event",
+        "event attendance"
+      ]
+    },
+    {
+      "answer": 9,
+      "answer_kind": "integer",
+      "derivation": "COUNT of active memories where subject='user' and the mapped relation_type is 'owns'; scope stated in the question as ['owned items', 'photography gear', 'stamp collection']",
+      "evidence_memory_ids": [
+        "mem_308379a11c34a64b",
+        "mem_47617fc75a0eca65",
+        "mem_5017edfba5047a1a",
+        "mem_63b7cacc4620a674",
+        "mem_94e677ae7adb1edc",
+        "mem_a3f0ca83c03b7383",
+        "mem_bc5a4498f1159383",
+        "mem_c34ead5f511687e0",
+        "mem_dd8eab07beb913d4"
+      ],
+      "kind": "count",
+      "namespace": "gpt4_a2d1d1f6",
+      "probe_id": "count_0007",
+      "question": "How many distinct possessions does the user have on record? Count only facts recorded under: owned items, photography gear, stamp collection.",
+      "scope_predicates": [
+        "owned items",
+        "photography gear",
+        "stamp collection"
+      ]
+    },
+    {
+      "answer": 3,
+      "answer_kind": "integer",
+      "derivation": "COUNT of active memories where subject='user' and the mapped relation_type is 'practises_hobby'; scope stated in the question as ['hiking activities', 'hobbies']",
+      "evidence_memory_ids": [
+        "mem_0e8ca1e9a4afaf11",
+        "mem_159df5f92a83b841",
+        "mem_3b6ac3365d0ec9f7"
+      ],
+      "kind": "count",
+      "namespace": "gpt4_c27434e8",
+      "probe_id": "count_0008",
+      "question": "How many distinct hobbies or activities does the user practise? Count only facts recorded under: hiking activities, hobbies.",
+      "scope_predicates": [
+        "hiking activities",
+        "hobbies"
+      ]
+    },
+    {
+      "answer": 5,
+      "answer_kind": "integer",
+      "derivation": "COUNT of active memories where subject='user' and the mapped relation_type is 'financial_activity'; scope stated in the question as ['grocery spending', 'interest', 'spending']",
+      "evidence_memory_ids": [
+        "mem_0073074f6fb1d0df",
+        "mem_54024c416d1cf98f",
+        "mem_5626094a1e94503c",
+        "mem_93c8e1ca4849454b",
+        "mem_a839cce1fed7d11f"
+      ],
+      "kind": "count",
+      "namespace": "1192316e",
+      "probe_id": "count_0009",
+      "question": "How many distinct financial activities are on record for the user? Count only facts recorded under: grocery spending, interest, spending.",
+      "scope_predicates": [
+        "grocery spending",
+        "interest",
+        "spending"
+      ]
+    },
+    {
+      "answer": 3,
+      "answer_kind": "integer",
+      "derivation": "COUNT of active memories where subject='user' and the mapped relation_type is 'owns'; scope stated in the question as ['clothing owned']",
+      "evidence_memory_ids": [
+        "mem_0f3b9b179b5d7705",
+        "mem_3439cf217a7cecc3",
+        "mem_ff9d174e2afd0f74"
+      ],
+      "kind": "count",
+      "namespace": "6cb6f249",
+      "probe_id": "count_0010",
+      "question": "How many distinct possessions does the user have on record? Count only facts recorded under: clothing owned.",
+      "scope_predicates": [
+        "clothing owned"
+      ]
+    },
+    {
+      "answer": 4,
+      "answer_kind": "integer",
+      "derivation": "COUNT of active memories where subject='user' and the mapped relation_type is 'financial_activity'; scope stated in the question as ['expense tracking fields', 'expense tracking method', 'interests', 'renovation budget']",
+      "evidence_memory_ids": [
+        "mem_6bd7f8c08d2d72cf",
+        "mem_9567d36ae03780a0",
+        "mem_b9987abfacbe1818",
+        "mem_e3a84a67eb4f9db0"
+      ],
+      "kind": "count",
+      "namespace": "8ebdbe50",
+      "probe_id": "count_0011",
+      "question": "How many distinct financial activities are on record for the user? Count only facts recorded under: expense tracking fields, expense tracking method, interests, renovation budget.",
+      "scope_predicates": [
+        "expense tracking fields",
+        "expense tracking method",
+        "interests",
+        "renovation budget"
+      ]
+    },
+    {
+      "answer": 5,
+      "answer_kind": "integer",
+      "derivation": "COUNT of active memories where subject='user' and the mapped relation_type is 'watched'; scope stated in the question as ['tv shows']",
+      "evidence_memory_ids": [
+        "mem_0109e3b09cff13a0",
+        "mem_100a159f47e3286a",
+        "mem_4593f716b042d96f",
+        "mem_c4d5417b8c50a3f1",
+        "mem_fa51858f617410ba"
+      ],
+      "kind": "count",
+      "namespace": "gpt4_8e165409",
+      "probe_id": "count_0012",
+      "question": "How many distinct films or shows has the user watched? Count only facts recorded under: tv shows.",
+      "scope_predicates": [
+        "tv shows"
+      ]
+    },
+    {
+      "answer": 4,
+      "answer_kind": "integer",
+      "derivation": "COUNT of active memories where subject='user' and the mapped relation_type is 'financial_activity'; scope stated in the question as ['annual income', 'car budget', 'retirement savings', 'shipping savings']",
+      "evidence_memory_ids": [
+        "mem_0b4900f7f04963e3",
+        "mem_198d9c12eb2de21e",
+        "mem_31880fa6979b3389",
+        "mem_b75a8d71802bf185"
+      ],
+      "kind": "count",
+      "namespace": "a1cc6108",
+      "probe_id": "count_0013",
+      "question": "How many distinct financial activities are on record for the user? Count only facts recorded under: annual income, car budget, retirement savings, shipping savings.",
+      "scope_predicates": [
+        "annual income",
+        "car budget",
+        "retirement savings",
+        "shipping savings"
+      ]
+    },
+    {
+      "answer": 9,
+      "answer_kind": "integer",
+      "derivation": "COUNT of active memories where subject='user' and the mapped relation_type is 'owns'; scope stated in the question as ['books owned', 'business ownership', 'camera gear', 'postcard collection', 'rugs owned']",
+      "evidence_memory_ids": [
+        "mem_50742a57131e25f9",
+        "mem_511005671159c378",
+        "mem_6e690b294d17e936",
+        "mem_704baf11812f514f",
+        "mem_905ad0bdf273ea6b",
+        "mem_d5257ede54a52755",
+        "mem_e69b2f688de7c3b6",
+        "mem_f133f1a35d413b5b",
+        "mem_ff708930412f1d11"
+      ],
+      "kind": "count",
+      "namespace": "09ba9854",
+      "probe_id": "count_0014",
+      "question": "How many distinct possessions does the user have on record? Count only facts recorded under: books owned, business ownership, camera gear, postcard collection, rugs owned.",
+      "scope_predicates": [
+        "books owned",
+        "business ownership",
+        "camera gear",
+        "postcard collection",
+        "rugs owned"
+      ]
+    },
+    {
+      "answer": 3,
+      "answer_kind": "integer",
+      "derivation": "COUNT of active memories where subject='user' and the mapped relation_type is 'practises_hobby'; scope stated in the question as ['business activities', 'current activities']",
+      "evidence_memory_ids": [
+        "mem_2bf4d65c6a390121",
+        "mem_42a34612889672f9",
+        "mem_80bdd755693603f6"
+      ],
+      "kind": "count",
+      "namespace": "561fabcd",
+      "probe_id": "count_0015",
+      "question": "How many distinct hobbies or activities does the user practise? Count only facts recorded under: business activities, current activities.",
+      "scope_predicates": [
+        "business activities",
+        "current activities"
+      ]
+    },
+    {
+      "answer": 6,
+      "answer_kind": "integer",
+      "derivation": "COUNT of active memories where subject='user' and the mapped relation_type is 'read'; scope stated in the question as ['beta reading', 'book club reading', 'books read', 'reading interests', 'reading tracker']",
+      "evidence_memory_ids": [
+        "mem_0950c5aa6a7994e6",
+        "mem_3984dc419c6d18a1",
+        "mem_724d251d6c2c0cc3",
+        "mem_a1c278efd3f037f5",
+        "mem_a3ba4ae3193da343",
+        "mem_a822358491b96620"
+      ],
+      "kind": "count",
+      "namespace": "gpt4_78cf46a3",
+      "probe_id": "count_0016",
+      "question": "How many distinct books or articles has the user read? Count only facts recorded under: beta reading, book club reading, books read, reading interests, reading tracker.",
+      "scope_predicates": [
+        "beta reading",
+        "book club reading",
+        "books read",
+        "reading interests",
+        "reading tracker"
+      ]
+    },
+    {
+      "answer": 3,
+      "answer_kind": "integer",
+      "derivation": "COUNT of active memories where subject='user' and the mapped relation_type is 'owns'; scope stated in the question as ['books owned', 'donated items', 'instruments owned']",
+      "evidence_memory_ids": [
+        "mem_6eb19ca193fc0050",
+        "mem_d1dd35f37d95818e",
+        "mem_f33e23a9b3f4c41f"
+      ],
+      "kind": "count",
+      "namespace": "cc539528",
+      "probe_id": "count_0017",
+      "question": "How many distinct possessions does the user have on record? Count only facts recorded under: books owned, donated items, instruments owned.",
+      "scope_predicates": [
+        "books owned",
+        "donated items",
+        "instruments owned"
+      ]
+    },
+    {
+      "answer": 3,
+      "answer_kind": "integer",
+      "derivation": "COUNT of active memories where subject='user' and the mapped relation_type is 'grows'; scope stated in the question as ['garden plants', 'gardening tasks']",
+      "evidence_memory_ids": [
+        "mem_43045f98f775d3b8",
+        "mem_bc9c4c830847d32a",
+        "mem_fc8c00f5a7db4811"
+      ],
+      "kind": "count",
+      "namespace": "6456829e",
+      "probe_id": "count_0018",
+      "question": "How many distinct plants does the user grow? Count only facts recorded under: garden plants, gardening tasks.",
+      "scope_predicates": [
+        "garden plants",
+        "gardening tasks"
+      ]
+    },
+    {
+      "answer": 3,
+      "answer_kind": "integer",
+      "derivation": "COUNT of active memories where subject='user' and the mapped relation_type is 'practises_hobby'; scope stated in the question as ['hobbies', 'volunteer work']",
+      "evidence_memory_ids": [
+        "mem_36534b993737a90f",
+        "mem_7049fd239662374d",
+        "mem_b22197ffaf2388c0"
+      ],
+      "kind": "count",
+      "namespace": "ccb36322",
+      "probe_id": "count_0019",
+      "question": "How many distinct hobbies or activities does the user practise? Count only facts recorded under: hobbies, volunteer work.",
+      "scope_predicates": [
+        "hobbies",
+        "volunteer work"
+      ]
+    },
+    {
+      "answer": 5,
+      "answer_kind": "integer",
+      "derivation": "COUNT of active memories where subject='user' and the mapped relation_type is 'practises_hobby'; scope stated in the question as ['hiking activity', 'hobbies', 'photography activity']",
+      "evidence_memory_ids": [
+        "mem_0cd50d35e31cbba4",
+        "mem_20de19157a85995b",
+        "mem_47611b93afff42e6",
+        "mem_c4c854b3e2e91614",
+        "mem_e50be0cb0c8bb7b3"
+      ],
+      "kind": "count",
+      "namespace": "gpt4_6ed717ea",
+      "probe_id": "count_0020",
+      "question": "How many distinct hobbies or activities does the user practise? Count only facts recorded under: hiking activity, hobbies, photography activity.",
+      "scope_predicates": [
+        "hiking activity",
+        "hobbies",
+        "photography activity"
+      ]
+    },
+    {
+      "answer": 3,
+      "answer_kind": "integer",
+      "derivation": "COUNT of active memories where subject='user' and the mapped relation_type is 'practises_hobby'; scope stated in the question as ['hobbies', 'video games']",
+      "evidence_memory_ids": [
+        "mem_59feec2af1858c3a",
+        "mem_8aa367761fa3d62a",
+        "mem_eb3b342ad2843533"
+      ],
+      "kind": "count",
+      "namespace": "778164c6",
+      "probe_id": "count_0021",
+      "question": "How many distinct hobbies or activities does the user practise? Count only facts recorded under: hobbies, video games.",
+      "scope_predicates": [
+        "hobbies",
+        "video games"
+      ]
+    },
+    {
+      "answer": 3,
+      "answer_kind": "integer",
+      "derivation": "COUNT of active memories where subject='user' and the mapped relation_type is 'read'; scope stated in the question as ['books read', 'books reading', 'reading interests']",
+      "evidence_memory_ids": [
+        "mem_38bc79b0f37a9b67",
+        "mem_a7b311f7b3a3f085",
+        "mem_bc2c44db5309a6e2"
+      ],
+      "kind": "count",
+      "namespace": "gpt4_7a0daae1",
+      "probe_id": "count_0022",
+      "question": "How many distinct books or articles has the user read? Count only facts recorded under: books read, books reading, reading interests.",
+      "scope_predicates": [
+        "books read",
+        "books reading",
+        "reading interests"
+      ]
+    },
+    {
+      "answer": 3,
+      "answer_kind": "integer",
+      "derivation": "COUNT of active memories where subject='user' and the mapped relation_type is 'owns'; scope stated in the question as ['bike accessories', 'clothing usage', 'hardware owned']",
+      "evidence_memory_ids": [
+        "mem_52962e65aadd7b37",
+        "mem_de03aad08150909a",
+        "mem_ede22e9d826de15a"
+      ],
+      "kind": "count",
+      "namespace": "b46e15ed",
+      "probe_id": "count_0023",
+      "question": "How many distinct possessions does the user have on record? Count only facts recorded under: bike accessories, clothing usage, hardware owned.",
+      "scope_predicates": [
+        "bike accessories",
+        "clothing usage",
+        "hardware owned"
+      ]
+    },
+    {
+      "answer": 3,
+      "answer_kind": "integer",
+      "derivation": "COUNT of active memories where subject='user' and the mapped relation_type is 'completed'; scope stated in the question as ['project development', 'projects', 'task']",
+      "evidence_memory_ids": [
+        "mem_0822e99c062b1730",
+        "mem_0970283ff75f8606",
+        "mem_4f028e5f132df883"
+      ],
+      "kind": "count",
+      "namespace": "7527f7e2",
+      "probe_id": "count_0024",
+      "question": "How many distinct tasks or projects has the user completed? Count only facts recorded under: project development, projects, task.",
+      "scope_predicates": [
+        "project development",
+        "projects",
+        "task"
+      ]
+    },
+    {
+      "answer": 3,
+      "answer_kind": "integer",
+      "derivation": "COUNT of active memories where subject='user' and the mapped relation_type is 'practises_hobby'; scope stated in the question as ['hobbies', 'volunteering interests']",
+      "evidence_memory_ids": [
+        "mem_5b7eb955bbb3888c",
+        "mem_c6501dd937cfd599",
+        "mem_d2571c170df1890d"
+      ],
+      "kind": "count",
+      "namespace": "0bc8ad92",
+      "probe_id": "count_0025",
+      "question": "How many distinct hobbies or activities does the user practise? Count only facts recorded under: hobbies, volunteering interests.",
+      "scope_predicates": [
+        "hobbies",
+        "volunteering interests"
+      ]
+    },
+    {
+      "answer": 7,
+      "answer_kind": "integer",
+      "derivation": "COUNT of active memories where subject='user' and the mapped relation_type is 'owns'; scope stated in the question as ['birding equipment', 'camera gear', 'home ownership']",
+      "evidence_memory_ids": [
+        "mem_5cc49d9c45c78066",
+        "mem_90df0bf7509ad683",
+        "mem_b04bd195cda70394",
+        "mem_b6fbbf0420b35bbe",
+        "mem_d215aa930ce9b91f",
+        "mem_f9236fd47e2a203d",
+        "mem_fbc7885ef8f5038d"
+      ],
+      "kind": "count",
+      "namespace": "1a1907b4",
+      "probe_id": "count_0026",
+      "question": "How many distinct possessions does the user have on record? Count only facts recorded under: birding equipment, camera gear, home ownership.",
+      "scope_predicates": [
+        "birding equipment",
+        "camera gear",
+        "home ownership"
+      ]
+    },
+    {
+      "answer": 5,
+      "answer_kind": "integer",
+      "derivation": "COUNT of active memories where subject='user' and the mapped relation_type is 'attended'; scope stated in the question as ['medical appointments', 'social meetings', 'theater attendance', 'workshops attended']",
+      "evidence_memory_ids": [
+        "mem_253b5895da037a69",
+        "mem_269e465831368969",
+        "mem_4702619485303038",
+        "mem_5e189f725bc3fb41",
+        "mem_94ff6d72ce1dff4f"
+      ],
+      "kind": "count",
+      "namespace": "dd2973ad",
+      "probe_id": "count_0027",
+      "question": "How many distinct events has the user attended? Count only facts recorded under: medical appointments, social meetings, theater attendance, workshops attended.",
+      "scope_predicates": [
+        "medical appointments",
+        "social meetings",
+        "theater attendance",
+        "workshops attended"
+      ]
+    },
+    {
+      "answer": 8,
+      "answer_kind": "integer",
+      "derivation": "COUNT of active memories where subject='user' and the mapped relation_type is 'attended'; scope stated in the question as ['events attended']",
+      "evidence_memory_ids": [
+        "mem_019b412177fcaa62",
+        "mem_180b29d00c461982",
+        "mem_211373d33e9243a7",
+        "mem_51a46d919bcd1c59",
+        "mem_7b435d170590ad76",
+        "mem_af9e78f38962f374",
+        "mem_bf68b980b1761616",
+        "mem_db762c9669f504af"
+      ],
+      "kind": "count",
+      "namespace": "7a8d0b71",
+      "probe_id": "count_0028",
+      "question": "How many distinct events has the user attended? Count only facts recorded under: events attended.",
+      "scope_predicates": [
+        "events attended"
+      ]
+    },
+    {
+      "answer": 8,
+      "answer_kind": "integer",
+      "derivation": "COUNT of active memories where subject='user' and the mapped relation_type is 'attended'; scope stated in the question as ['concert attendance', 'concert attended', 'concert companion', 'racing events attended', 'workshops attended']",
+      "evidence_memory_ids": [
+        "mem_19c720cd47e09782",
+        "mem_445f4e31cfb47050",
+        "mem_5bcf6f086405a593",
+        "mem_63105ba3913d3fc8",
+        "mem_a37e5cfc01b22c1a",
+        "mem_b3b8431f7c085f63",
+        "mem_ddd618ba5f5f62ce",
+        "mem_fb5b4e3b70f453ec"
+      ],
+      "kind": "count",
+      "namespace": "gpt4_d6585ce9",
+      "probe_id": "count_0029",
+      "question": "How many distinct events has the user attended? Count only facts recorded under: concert attendance, concert attended, concert companion, racing events attended, workshops attended.",
+      "scope_predicates": [
+        "concert attendance",
+        "concert attended",
+        "concert companion",
+        "racing events attended",
+        "workshops attended"
+      ]
+    },
+    {
+      "answer": 3,
+      "answer_kind": "integer",
+      "derivation": "COUNT of active memories where subject='user' and the mapped relation_type is 'read'; scope stated in the question as ['books read', 'reading material', 'reading speed']",
+      "evidence_memory_ids": [
+        "mem_0c15f854c875f544",
+        "mem_9077370dd750ac1a",
+        "mem_d705e33064933097"
+      ],
+      "kind": "count",
+      "namespace": "8a2466db",
+      "probe_id": "count_0030",
+      "question": "How many distinct books or articles has the user read? Count only facts recorded under: books read, reading material, reading speed.",
+      "scope_predicates": [
+        "books read",
+        "reading material",
+        "reading speed"
+      ]
+    },
+    {
+      "answer": 3,
+      "answer_kind": "integer",
+      "derivation": "COUNT of active memories where subject='user' and the mapped relation_type is 'owns'; scope stated in the question as ['art collection', 'vinyl collection item']",
+      "evidence_memory_ids": [
+        "mem_8e0f5b287d779b8e",
+        "mem_9ebe48e319100eb9",
+        "mem_c7cd0137a154d634"
+      ],
+      "kind": "count",
+      "namespace": "gpt4_78cf46a3",
+      "probe_id": "count_0031",
+      "question": "How many distinct possessions does the user have on record? Count only facts recorded under: art collection, vinyl collection item.",
+      "scope_predicates": [
+        "art collection",
+        "vinyl collection item"
+      ]
+    },
+    {
+      "answer": 5,
+      "answer_kind": "integer",
+      "derivation": "COUNT of active memories where subject='user' and the mapped relation_type is 'practises_hobby'; scope stated in the question as ['personal projects', 'physical activities', 'religious activity', 'volunteer interests', 'volunteering interests']",
+      "evidence_memory_ids": [
+        "mem_07eb659cca3861c6",
+        "mem_1c5e53d20f74fe96",
+        "mem_318f016f3e9f49c4",
+        "mem_3653cdb56bfe1c58",
+        "mem_9cd6c5d077811c0c"
+      ],
+      "kind": "count",
+      "namespace": "cc5ded98",
+      "probe_id": "count_0032",
+      "question": "How many distinct hobbies or activities does the user practise? Count only facts recorded under: personal projects, physical activities, religious activity, volunteer interests, volunteering interests.",
+      "scope_predicates": [
+        "personal projects",
+        "physical activities",
+        "religious activity",
+        "volunteer interests",
+        "volunteering interests"
+      ]
+    },
+    {
+      "answer": 6,
+      "answer_kind": "integer",
+      "derivation": "COUNT of active memories where subject='user' and the mapped relation_type is 'acquired'; scope stated in the question as ['fashion purchases', 'gifts purchased', 'luxury purchases']",
+      "evidence_memory_ids": [
+        "mem_57f697daa67fc1c5",
+        "mem_6df659f5c0afa85e",
+        "mem_803a7eb606043824",
+        "mem_9affa4150be0c2ba",
+        "mem_bb5a10fe189a5fda",
+        "mem_e40666399814c369"
+      ],
+      "kind": "count",
+      "namespace": "afdc33df",
+      "probe_id": "count_0033",
+      "question": "How many distinct things has the user acquired? Count only facts recorded under: fashion purchases, gifts purchased, luxury purchases.",
+      "scope_predicates": [
+        "fashion purchases",
+        "gifts purchased",
+        "luxury purchases"
+      ]
+    },
+    {
+      "answer": 3,
+      "answer_kind": "integer",
+      "derivation": "COUNT of active memories where subject='user' and the mapped relation_type is 'practises_hobby'; scope stated in the question as ['hobbies', 'physical activity', 'social activity']",
+      "evidence_memory_ids": [
+        "mem_181d01ed1ee41c72",
+        "mem_a2fb2b3e8ce4fe76",
+        "mem_c7ffc8ae7e71b56d"
+      ],
+      "kind": "count",
+      "namespace": "5809eb10",
+      "probe_id": "count_0034",
+      "question": "How many distinct hobbies or activities does the user practise? Count only facts recorded under: hobbies, physical activity, social activity.",
+      "scope_predicates": [
+        "hobbies",
+        "physical activity",
+        "social activity"
+      ]
+    },
+    {
+      "answer": 3,
+      "answer_kind": "integer",
+      "derivation": "COUNT of active memories where subject='user' and the mapped relation_type is 'attended'; scope stated in the question as ['events attended', 'medical appointment', 'photography workshop']",
+      "evidence_memory_ids": [
+        "mem_64b313bc0351160f",
+        "mem_c06fe5931a5f96fe",
+        "mem_c756f3abc723123a"
+      ],
+      "kind": "count",
+      "namespace": "3b6f954b",
+      "probe_id": "count_0035",
+      "question": "How many distinct events has the user attended? Count only facts recorded under: events attended, medical appointment, photography workshop.",
+      "scope_predicates": [
+        "events attended",
+        "medical appointment",
+        "photography workshop"
+      ]
+    },
+    {
+      "answer": 3,
+      "answer_kind": "integer",
+      "derivation": "COUNT of active memories where subject='user' and the mapped relation_type is 'practises_hobby'; scope stated in the question as ['hobbies', 'volunteering']",
+      "evidence_memory_ids": [
+        "mem_962823ccb10169e0",
+        "mem_9e50ff3164e36936",
+        "mem_fb989d9cbdc6b0ec"
+      ],
+      "kind": "count",
+      "namespace": "6071bd76",
+      "probe_id": "count_0036",
+      "question": "How many distinct hobbies or activities does the user practise? Count only facts recorded under: hobbies, volunteering.",
+      "scope_predicates": [
+        "hobbies",
+        "volunteering"
+      ]
+    },
+    {
+      "answer": 9,
+      "answer_kind": "integer",
+      "derivation": "COUNT of active memories where subject='user' and the mapped relation_type is 'acquired'; scope stated in the question as ['purchased item', 'purchases']",
+      "evidence_memory_ids": [
+        "mem_23d354061184af49",
+        "mem_4eec0185b6255cfd",
+        "mem_566890edd9c6026a",
+        "mem_63906ee08658017e",
+        "mem_7d449a59e111187e",
+        "mem_bca519cad91a98fa",
+        "mem_db3c1316b691f7e8",
+        "mem_ee4ca05b3ccc4aaa",
+        "mem_f2ca1d3f29d84974"
+      ],
+      "kind": "count",
+      "namespace": "c7cf7dfd",
+      "probe_id": "count_0037",
+      "question": "How many distinct things has the user acquired? Count only facts recorded under: purchased item, purchases.",
+      "scope_predicates": [
+        "purchased item",
+        "purchases"
+      ]
+    },
+    {
+      "answer": 3,
+      "answer_kind": "integer",
+      "derivation": "COUNT of active memories where subject='user' and the mapped relation_type is 'financial_activity'; scope stated in the question as ['dining budget', 'grocery spending']",
+      "evidence_memory_ids": [
+        "mem_c0749818d4aa8349",
+        "mem_ce4c56e3f18d7a22",
+        "mem_ee7e68c3c1a87d03"
+      ],
+      "kind": "count",
+      "namespace": "9a707b82",
+      "probe_id": "count_0038",
+      "question": "How many distinct financial activities are on record for the user? Count only facts recorded under: dining budget, grocery spending.",
+      "scope_predicates": [
+        "dining budget",
+        "grocery spending"
+      ]
+    },
+    {
+      "answer": 5,
+      "answer_kind": "integer",
+      "derivation": "COUNT of active memories where subject='user' and the mapped relation_type is 'cooked'; scope stated in the question as ['recipe interest', 'recipe to make', 'recipes tried']",
+      "evidence_memory_ids": [
+        "mem_1e27e63480e16dbc",
+        "mem_26ccf38f83833ce2",
+        "mem_28238b261bfdcaba",
+        "mem_3b88ea2468932982",
+        "mem_886cbee092d96877"
+      ],
+      "kind": "count",
+      "namespace": "45dc21b6",
+      "probe_id": "count_0039",
+      "question": "How many distinct dishes has the user cooked? Count only facts recorded under: recipe interest, recipe to make, recipes tried.",
+      "scope_predicates": [
+        "recipe interest",
+        "recipe to make",
+        "recipes tried"
+      ]
+    },
+    {
+      "answer": 7,
+      "answer_kind": "integer",
+      "derivation": "COUNT of active memories where subject='user' and the mapped relation_type is 'owns'; scope stated in the question as ['clothing owned', 'cycling equipment', 'furniture owned', 'hiking boots owned', 'tools owned']",
+      "evidence_memory_ids": [
+        "mem_2023460d93418586",
+        "mem_21758dc6d2e5a403",
+        "mem_51a61938d459ee34",
+        "mem_bd4bcc9207600aee",
+        "mem_c5977c3651e5c344",
+        "mem_cdfe54180d6e0e88",
+        "mem_daf313bfa9624208"
+      ],
+      "kind": "count",
+      "namespace": "gpt4_c27434e8",
+      "probe_id": "count_0040",
+      "question": "How many distinct possessions does the user have on record? Count only facts recorded under: clothing owned, cycling equipment, furniture owned, hiking boots owned, tools owned.",
+      "scope_predicates": [
+        "clothing owned",
+        "cycling equipment",
+        "furniture owned",
+        "hiking boots owned",
+        "tools owned"
+      ]
+    },
+    {
+      "answer": 5,
+      "answer_kind": "integer",
+      "derivation": "COUNT of active memories where subject='user' and the mapped relation_type is 'practises_hobby'; scope stated in the question as ['birding activity', 'craft projects', 'hobbies', 'photography activity']",
+      "evidence_memory_ids": [
+        "mem_31d795a4caaa39e5",
+        "mem_3cea1a158b7da8e1",
+        "mem_76e92d1cbb34de5e",
+        "mem_810fcffd076759cc",
+        "mem_c9b583f479c0f2cd"
+      ],
+      "kind": "count",
+      "namespace": "1a1907b4",
+      "probe_id": "count_0041",
+      "question": "How many distinct hobbies or activities does the user practise? Count only facts recorded under: birding activity, craft projects, hobbies, photography activity.",
+      "scope_predicates": [
+        "birding activity",
+        "craft projects",
+        "hobbies",
+        "photography activity"
+      ]
+    },
+    {
+      "answer": 6,
+      "answer_kind": "integer",
+      "derivation": "COUNT of active memories where subject='user' and the mapped relation_type is 'financial_activity'; scope stated in the question as ['spending', 'trip budget']",
+      "evidence_memory_ids": [
+        "mem_019fe8e4fcfeea72",
+        "mem_1b43274e7fdf3b37",
+        "mem_45be5497522c8da1",
+        "mem_5dec9fb3542de330",
+        "mem_64e406df47c8784f",
+        "mem_c937932fbc48622c"
+      ],
+      "kind": "count",
+      "namespace": "726462e0",
+      "probe_id": "count_0042",
+      "question": "How many distinct financial activities are on record for the user? Count only facts recorded under: spending, trip budget.",
+      "scope_predicates": [
+        "spending",
+        "trip budget"
+      ]
+    },
+    {
+      "answer": 7,
+      "answer_kind": "integer",
+      "derivation": "COUNT of active memories where subject='user' and the mapped relation_type is 'financial_activity'; scope stated in the question as ['average grocery spend', 'expense tracking method', 'grocery spending', 'real estate interest', 'snack budget', 'travel expenses']",
+      "evidence_memory_ids": [
+        "mem_02dd26b27bba12bd",
+        "mem_03aca524cd570a4a",
+        "mem_046bf0d6c309876a",
+        "mem_08c098c82fb52086",
+        "mem_4e15e49f2f79dba5",
+        "mem_5a66a2d3b7263454",
+        "mem_7ff724b640be6de2"
+      ],
+      "kind": "count",
+      "namespace": "157a136e",
+      "probe_id": "count_0043",
+      "question": "How many distinct financial activities are on record for the user? Count only facts recorded under: average grocery spend, expense tracking method, grocery spending, real estate interest, snack budget, travel expenses.",
+      "scope_predicates": [
+        "average grocery spend",
+        "expense tracking method",
+        "grocery spending",
+        "real estate interest",
+        "snack budget",
+        "travel expenses"
+      ]
+    },
+    {
+      "answer": 9,
+      "answer_kind": "integer",
+      "derivation": "COUNT of active memories where subject='user' and the mapped relation_type is 'owns'; scope stated in the question as ['baseball collection', 'bike accessories', 'bikes owned', 'camera collection', 'coin collection', 'motorcycles owned', 'watch collection']",
+      "evidence_memory_ids": [
+        "mem_10ad3264937619ac",
+        "mem_1273c0b193575201",
+        "mem_300fb2ffac763887",
+        "mem_6354cd3ad58ae4dc",
+        "mem_990ce959d4425acd",
+        "mem_b4b39e30c4170d88",
+        "mem_d0d6690d4dce66c3",
+        "mem_fb9d75e370026fd7",
+        "mem_fc2000da52fc205b"
+      ],
+      "kind": "count",
+      "namespace": "0ddfec37_abs",
+      "probe_id": "count_0044",
+      "question": "How many distinct possessions does the user have on record? Count only facts recorded under: baseball collection, bike accessories, bikes owned, camera collection, coin collection, motorcycles owned, watch collection.",
+      "scope_predicates": [
+        "baseball collection",
+        "bike accessories",
+        "bikes owned",
+        "camera collection",
+        "coin collection",
+        "motorcycles owned",
+        "watch collection"
+      ]
+    },
+    {
+      "answer": 3,
+      "answer_kind": "integer",
+      "derivation": "COUNT of active memories where subject='user' and the mapped relation_type is 'watched'; scope stated in the question as ['currently watching', 'viewing time', 'watchlist']",
+      "evidence_memory_ids": [
+        "mem_2f1908312509b5cb",
+        "mem_8022b242ec0c7b89",
+        "mem_ac97117546469246"
+      ],
+      "kind": "count",
+      "namespace": "157a136e",
+      "probe_id": "count_0045",
+      "question": "How many distinct films or shows has the user watched? Count only facts recorded under: currently watching, viewing time, watchlist.",
+      "scope_predicates": [
+        "currently watching",
+        "viewing time",
+        "watchlist"
+      ]
+    },
+    {
+      "answer": 3,
+      "answer_kind": "integer",
+      "derivation": "COUNT of active memories where subject='user' and the mapped relation_type is 'practises_hobby'; scope stated in the question as ['family activities']",
+      "evidence_memory_ids": [
+        "mem_41b6de16e115283e",
+        "mem_78862ddf1ea14719",
+        "mem_af6ceafece0cb1a1"
+      ],
+      "kind": "count",
+      "namespace": "0db4c65d",
+      "probe_id": "count_0046",
+      "question": "How many distinct hobbies or activities does the user practise? Count only facts recorded under: family activities.",
+      "scope_predicates": [
+        "family activities"
+      ]
+    },
+    {
+      "answer": 3,
+      "answer_kind": "integer",
+      "derivation": "COUNT of active memories where subject='user' and the mapped relation_type is 'owns'; scope stated in the question as ['clothing']",
+      "evidence_memory_ids": [
+        "mem_0a73e9654e8305f5",
+        "mem_4187fe110eab6d4d",
+        "mem_750f2f57cdfebded"
+      ],
+      "kind": "count",
+      "namespace": "031748ae",
+      "probe_id": "count_0047",
+      "question": "How many distinct possessions does the user have on record? Count only facts recorded under: clothing.",
+      "scope_predicates": [
+        "clothing"
+      ]
+    },
+    {
+      "answer": 4,
+      "answer_kind": "integer",
+      "derivation": "COUNT of active memories where subject='user' and the mapped relation_type is 'visited'; scope stated in the question as ['commute route', 'past travel', 'travel destination', 'travel interests']",
+      "evidence_memory_ids": [
+        "mem_0c5c366b6e325e6f",
+        "mem_711a7950db7f1123",
+        "mem_80e30da43d28c645",
+        "mem_ecf50bd17e05d185"
+      ],
+      "kind": "count",
+      "namespace": "gpt4_74aed68e",
+      "probe_id": "count_0048",
+      "question": "How many distinct places has the user visited? Count only facts recorded under: commute route, past travel, travel destination, travel interests.",
+      "scope_predicates": [
+        "commute route",
+        "past travel",
+        "travel destination",
+        "travel interests"
+      ]
+    },
+    {
+      "answer": 3,
+      "answer_kind": "integer",
+      "derivation": "COUNT of active memories where subject='user' and the mapped relation_type is 'ate_at'; scope stated in the question as ['dining interest', 'dinner party menu']",
+      "evidence_memory_ids": [
+        "mem_31a405d48f8eec5d",
+        "mem_3d3f6e0e7fe57bc9",
+        "mem_4b6fee4509c5901a"
+      ],
+      "kind": "count",
+      "namespace": "gpt4_8e165409",
+      "probe_id": "count_0049",
+      "question": "How many distinct restaurants or food places has the user eaten at? Count only facts recorded under: dining interest, dinner party menu.",
+      "scope_predicates": [
+        "dining interest",
+        "dinner party menu"
+      ]
+    },
+    {
+      "answer": 4,
+      "answer_kind": "integer",
+      "derivation": "COUNT of active memories where subject='user' and the mapped relation_type is 'financial_activity'; scope stated in the question as ['spending']",
+      "evidence_memory_ids": [
+        "mem_01ebfe35ae6b01ea",
+        "mem_5fde75658b0b8c01",
+        "mem_8a9ab00e5d4cb3e1",
+        "mem_c8d9d163ba8154d4"
+      ],
+      "kind": "count",
+      "namespace": "d905b33f",
+      "probe_id": "count_0050",
+      "question": "How many distinct financial activities are on record for the user? Count only facts recorded under: spending.",
+      "scope_predicates": [
+        "spending"
+      ]
+    },
+    {
+      "answer": 6,
+      "answer_kind": "integer",
+      "derivation": "COUNT of active memories where subject='user' and the mapped relation_type is 'financial_activity'; scope stated in the question as ['bike expenses', 'car expenses']",
+      "evidence_memory_ids": [
+        "mem_04edcbdd312593dd",
+        "mem_168988bf6a03c4c3",
+        "mem_3831b454b31cca42",
+        "mem_463ec3241096f9da",
+        "mem_5b874f088caa73ef",
+        "mem_d75bdbb1ec254749"
+      ],
+      "kind": "count",
+      "namespace": "60bf93ed_abs",
+      "probe_id": "count_0051",
+      "question": "How many distinct financial activities are on record for the user? Count only facts recorded under: bike expenses, car expenses.",
+      "scope_predicates": [
+        "bike expenses",
+        "car expenses"
+      ]
+    },
+    {
+      "answer": 3,
+      "answer_kind": "integer",
+      "derivation": "COUNT of active memories where subject='user' and the mapped relation_type is 'financial_activity'; scope stated in the question as ['car expenses', 'home budget']",
+      "evidence_memory_ids": [
+        "mem_1b0b568ba68060f4",
+        "mem_590d010f1b394e4c",
+        "mem_641b61c027628568"
+      ],
+      "kind": "count",
+      "namespace": "a3838d2b",
+      "probe_id": "count_0052",
+      "question": "How many distinct financial activities are on record for the user? Count only facts recorded under: car expenses, home budget.",
+      "scope_predicates": [
+        "car expenses",
+        "home budget"
+      ]
+    },
+    {
+      "answer": 3,
+      "answer_kind": "integer",
+      "derivation": "COUNT of active memories where subject='user' and the mapped relation_type is 'practises_hobby'; scope stated in the question as ['hhn activities', 'physical activity']",
+      "evidence_memory_ids": [
+        "mem_6e29f391b41c8c1a",
+        "mem_7c2e5206afaf3829",
+        "mem_aff5b6e733efea5c"
+      ],
+      "kind": "count",
+      "namespace": "6456829e",
+      "probe_id": "count_0053",
+      "question": "How many distinct hobbies or activities does the user practise? Count only facts recorded under: hhn activities, physical activity.",
+      "scope_predicates": [
+        "hhn activities",
+        "physical activity"
+      ]
+    },
+    {
+      "answer": 3,
+      "answer_kind": "integer",
+      "derivation": "COUNT of active memories where subject='user' and the mapped relation_type is 'knows_person'; scope stated in the question as ['people met']",
+      "evidence_memory_ids": [
+        "mem_33b7da06b0713790",
+        "mem_3a66248b74d4f880",
+        "mem_c5e220c7248bd3c0"
+      ],
+      "kind": "count",
+      "namespace": "gpt4_0a05b494",
+      "probe_id": "count_0054",
+      "question": "How many distinct people does the user know? Count only facts recorded under: people met.",
+      "scope_predicates": [
+        "people met"
+      ]
+    },
+    {
+      "answer": 3,
+      "answer_kind": "integer",
+      "derivation": "COUNT of active memories where subject='user' and the mapped relation_type is 'attended'; scope stated in the question as ['events attended', 'workshops attended']",
+      "evidence_memory_ids": [
+        "mem_b3fafa721f803af5",
+        "mem_e29b2f1248a88b6a",
+        "mem_f5a19912f512e18e"
+      ],
+      "kind": "count",
+      "namespace": "58ef2f1c",
+      "probe_id": "count_0055",
+      "question": "How many distinct events has the user attended? Count only facts recorded under: events attended, workshops attended.",
+      "scope_predicates": [
+        "events attended",
+        "workshops attended"
+      ]
+    },
+    {
+      "answer": 4,
+      "answer_kind": "integer",
+      "derivation": "COUNT of active memories where subject='user' and the mapped relation_type is 'attended'; scope stated in the question as ['church attendance', 'medical appointments']",
+      "evidence_memory_ids": [
+        "mem_71710feaa8b4f040",
+        "mem_7bd728082dac2938",
+        "mem_a0ac1117e6e5f97c",
+        "mem_d42bd370e9171a14"
+      ],
+      "kind": "count",
+      "namespace": "gpt4_4edbafa2",
+      "probe_id": "count_0056",
+      "question": "How many distinct events has the user attended? Count only facts recorded under: church attendance, medical appointments.",
+      "scope_predicates": [
+        "church attendance",
+        "medical appointments"
+      ]
+    },
+    {
+      "answer": 3,
+      "answer_kind": "integer",
+      "derivation": "COUNT of active memories where subject='user' and the mapped relation_type is 'practises_hobby'; scope stated in the question as ['physical activity', 'sports activity']",
+      "evidence_memory_ids": [
+        "mem_365bcbdb91e2cdd6",
+        "mem_6625570232778c2f",
+        "mem_8c8f7b1763faf2f2"
+      ],
+      "kind": "count",
+      "namespace": "eaca4986",
+      "probe_id": "count_0057",
+      "question": "How many distinct hobbies or activities does the user practise? Count only facts recorded under: physical activity, sports activity.",
+      "scope_predicates": [
+        "physical activity",
+        "sports activity"
+      ]
+    },
+    {
+      "answer": 3,
+      "answer_kind": "integer",
+      "derivation": "COUNT of active memories where subject='user' and the mapped relation_type is 'grows'; scope stated in the question as ['herb sales', 'houseplants']",
+      "evidence_memory_ids": [
+        "mem_11e4aa52565b532d",
+        "mem_260b2ea6d2d7515d",
+        "mem_76bc8aefc9f794d1"
+      ],
+      "kind": "count",
+      "namespace": "1f2b8d4f",
+      "probe_id": "count_0058",
+      "question": "How many distinct plants does the user grow? Count only facts recorded under: herb sales, houseplants.",
+      "scope_predicates": [
+        "herb sales",
+        "houseplants"
+      ]
+    },
+    {
+      "answer": 3,
+      "answer_kind": "integer",
+      "derivation": "COUNT of active memories where subject='user' and the mapped relation_type is 'read'; scope stated in the question as ['book tracking app', 'books read', 'magazine subscription']",
+      "evidence_memory_ids": [
+        "mem_16507e6a371563f0",
+        "mem_3007d0f80b5c4da4",
+        "mem_aecf1c83230eb0c5"
+      ],
+      "kind": "count",
+      "namespace": "gpt4_6ed717ea",
+      "probe_id": "count_0059",
+      "question": "How many distinct books or articles has the user read? Count only facts recorded under: book tracking app, books read, magazine subscription.",
+      "scope_predicates": [
+        "book tracking app",
+        "books read",
+        "magazine subscription"
+      ]
+    },
+    {
+      "answer": 59,
+      "answer_kind": "integer",
+      "derivation": "(2022-03-01 - 2022-01-01).days over dates, times dropped",
+      "evidence_memory_ids": [
+        "mem_a0858f51cc6a0807",
+        "mem_e12ee507f325f272"
+      ],
+      "kind": "duration",
+      "namespace": "gpt4_a1b77f9c",
+      "probe_id": "duration_0000",
+      "question": "How many days passed between these two events? A: The user started reading 'The Nightingale' by Kristin Hannah on January 1, 2022. B: The user finished listening to 'Sapiens: A Brief History of Humankind' by Yuval Noah Harari."
+    },
+    {
+      "answer": 4,
+      "answer_kind": "integer",
+      "derivation": "(2023-05-24 - 2023-05-20).days over dates, times dropped",
+      "evidence_memory_ids": [
+        "mem_5a996d4d819d331a",
+        "mem_d0202df420b797f5"
+      ],
+      "kind": "duration",
+      "namespace": "e3fc4d6e",
+      "probe_id": "duration_0001",
+      "question": "How many days passed between these two events? A: The user bought a pair of sneakers from Amazon on a Sunday afternoon. B: Whiskers had a follow-up appointment for an ear infection about a month before 2023-05-24."
+    },
+    {
+      "answer": 8,
+      "answer_kind": "integer",
+      "derivation": "(2023-05-29 - 2023-05-21).days over dates, times dropped",
+      "evidence_memory_ids": [
+        "mem_383425ffaaef3f4e",
+        "mem_c0378c05153f5e32"
+      ],
+      "kind": "duration",
+      "namespace": "d682f1a2",
+      "probe_id": "duration_0002",
+      "question": "How many days passed between these two events? A: The user plans to purchase the IKEA Not Lamp. B: The user owns Adobe Illustrator."
+    },
+    {
+      "answer": 4,
+      "answer_kind": "integer",
+      "derivation": "(2023-05-24 - 2023-05-20).days over dates, times dropped",
+      "evidence_memory_ids": [
+        "mem_0ab57bf53b23967f",
+        "mem_e976050f3a70f464"
+      ],
+      "kind": "duration",
+      "namespace": "1c549ce4",
+      "probe_id": "duration_0003",
+      "question": "How many days passed between these two events? A: The user bought a new coffee table from IKEA. B: The user has been using Netflix for about 6 months as of May 2023."
+    },
+    {
+      "answer": 4,
+      "answer_kind": "integer",
+      "derivation": "(2023-05-24 - 2023-05-20).days over dates, times dropped",
+      "evidence_memory_ids": [
+        "mem_38fd90ea29e37b25",
+        "mem_aff5b6e733efea5c"
+      ],
+      "kind": "duration",
+      "namespace": "6456829e",
+      "probe_id": "duration_0004",
+      "question": "How many days passed between these two events? A: The user had gallbladder surgery. B: The user walked 5 miles on Saturday, May 20, 2023."
+    },
+    {
+      "answer": 6,
+      "answer_kind": "integer",
+      "derivation": "(2023-05-30 - 2023-05-24).days over dates, times dropped",
+      "evidence_memory_ids": [
+        "mem_6d6fb24f96db80d3",
+        "mem_93714d5d136b8c3c"
+      ],
+      "kind": "duration",
+      "namespace": "d23cf73b",
+      "probe_id": "duration_0005",
+      "question": "How many days passed between these two events? A: The user visited a new Ethiopian restaurant in town last week (around 2023-05-17). B: The user found a lost favorite scarf in a box of winter clothes."
+    },
+    {
+      "answer": 6,
+      "answer_kind": "integer",
+      "derivation": "(2023-04-15 - 2023-04-09).days over dates, times dropped",
+      "evidence_memory_ids": [
+        "mem_c34ead5f511687e0",
+        "mem_ecd7dfcb065a7df8"
+      ],
+      "kind": "duration",
+      "namespace": "gpt4_a2d1d1f6",
+      "probe_id": "duration_0006",
+      "question": "How many days passed between these two events? A: The user owns a pair of limited edition Nike Air Jordan \"Black Toe\" sneakers. B: The user plans to start practicing yoga one or two sessions a week."
+    },
+    {
+      "answer": 3,
+      "answer_kind": "integer",
+      "derivation": "(2023-05-29 - 2023-05-26).days over dates, times dropped",
+      "evidence_memory_ids": [
+        "mem_a73099f2ec541a53",
+        "mem_f121867cdae9c62e"
+      ],
+      "kind": "duration",
+      "namespace": "a4996e51",
+      "probe_id": "duration_0007",
+      "question": "How many days passed between these two events? A: The user purchased boots from Zappos during a Cyber Monday sale. B: The user grows basil, mint, and parsley."
+    },
+    {
+      "answer": 1,
+      "answer_kind": "integer",
+      "derivation": "(2023-05-30 - 2023-05-29).days over dates, times dropped",
+      "evidence_memory_ids": [
+        "mem_315d28f6e7bdc910",
+        "mem_7c7da3ca41e94295"
+      ],
+      "kind": "duration",
+      "namespace": "25e5aa4f",
+      "probe_id": "duration_0008",
+      "question": "How many days passed between these two events? A: The user completed an undergraduate degree in Computer Science from UCLA. B: The user has been using Netflix for three years."
+    },
+    {
+      "answer": 1,
+      "answer_kind": "integer",
+      "derivation": "(2023-05-27 - 2023-05-26).days over dates, times dropped",
+      "evidence_memory_ids": [
+        "mem_e8b57f23e2abfb45",
+        "mem_f848ae8c00114923"
+      ],
+      "kind": "duration",
+      "namespace": "1c0ddc50",
+      "probe_id": "duration_0009",
+      "question": "How many days passed between these two events? A: The user is planning to make breakfast burritos for on-the-go meals. B: The user is planning a trip to Tokyo in November."
+    },
+    {
+      "answer": 2,
+      "answer_kind": "integer",
+      "derivation": "(2023-05-25 - 2023-05-23).days over dates, times dropped",
+      "evidence_memory_ids": [
+        "mem_4cf67acb32506389",
+        "mem_c95046e27c781005"
+      ],
+      "kind": "duration",
+      "namespace": "gpt4_2f91af09",
+      "probe_id": "duration_0010",
+      "question": "How many days passed between these two events? A: The user made pizza with prosciutto and arugula toppings. B: The user is interested in Halloween Horror Nights at Universal Studios Florida."
+    },
+    {
+      "answer": 6,
+      "answer_kind": "integer",
+      "derivation": "(2023-05-26 - 2023-05-20).days over dates, times dropped",
+      "evidence_memory_ids": [
+        "mem_a68ca94fcdf76db4",
+        "mem_e12273cc674de1a5"
+      ],
+      "kind": "duration",
+      "namespace": "95228167",
+      "probe_id": "duration_0011",
+      "question": "How many days passed between these two events? A: The user helped at a children's theater production of The Wizard of Oz about a month before May 20th, 2023. B: The user is interested in attending the AFI Fest in 2023."
+    },
+    {
+      "answer": 2,
+      "answer_kind": "integer",
+      "derivation": "(2023-05-22 - 2023-05-20).days over dates, times dropped",
+      "evidence_memory_ids": [
+        "mem_3e74bde37584b303",
+        "mem_dd4deab1c8009822"
+      ],
+      "kind": "duration",
+      "namespace": "cc539528",
+      "probe_id": "duration_0012",
+      "question": "How many days passed between these two events? A: The user previously had their leather jacket cleaned at a dry cleaner on Main St. B: The user plans to order brisket, baked beans, and coleslaw at Smokey's."
+    },
+    {
+      "answer": 6,
+      "answer_kind": "integer",
+      "derivation": "(2023-05-26 - 2023-05-20).days over dates, times dropped",
+      "evidence_memory_ids": [
+        "mem_90e9c38eeb1ebf8b",
+        "mem_db94b476713036f4"
+      ],
+      "kind": "duration",
+      "namespace": "a82c026e",
+      "probe_id": "duration_0013",
+      "question": "How many days passed between these two events? A: The user owns 13 Funko Pop figures. B: The user owns a Shimano Curado fishing reel that has a crack in the guide."
+    },
+    {
+      "answer": 52,
+      "answer_kind": "integer",
+      "derivation": "(2023-10-02 - 2023-08-11).days over dates, times dropped",
+      "evidence_memory_ids": [
+        "mem_2b7a58d576743759",
+        "mem_9b4db2963b7a3256"
+      ],
+      "kind": "duration",
+      "namespace": "603deb26",
+      "probe_id": "duration_0014",
+      "question": "How many days passed between these two events? A: The user purchased Hendrick's gin last week (around 2023-08-04). B: The user lived in Germany and Hawaii."
+    },
+    {
+      "answer": 7,
+      "answer_kind": "integer",
+      "derivation": "(2023-05-28 - 2023-05-21).days over dates, times dropped",
+      "evidence_memory_ids": [
+        "mem_7c9d882b533f922f",
+        "mem_92bdf95ac8fb9309"
+      ],
+      "kind": "duration",
+      "namespace": "1e043500",
+      "probe_id": "duration_0015",
+      "question": "How many days passed between these two events? A: The user plans to make Bolognese-Style Tomato Sauce using avocado oil. B: The user attended a half-day writing workshop at the Los Angeles Public Library led by Julia Torres."
+    },
+    {
+      "answer": 5,
+      "answer_kind": "integer",
+      "derivation": "(2023-05-25 - 2023-05-20).days over dates, times dropped",
+      "evidence_memory_ids": [
+        "mem_36534b993737a90f",
+        "mem_b22197ffaf2388c0"
+      ],
+      "kind": "duration",
+      "namespace": "ccb36322",
+      "probe_id": "duration_0016",
+      "question": "How many days passed between these two events? A: The user started baking bread from scratch about 2 months before May 20, 2023. B: The user volunteers at a local wildlife rehabilitation center."
+    },
+    {
+      "answer": 39,
+      "answer_kind": "integer",
+      "derivation": "(2023-09-12 - 2023-08-04).days over dates, times dropped",
+      "evidence_memory_ids": [
+        "mem_27edb69b895cdffc",
+        "mem_ed93e1ca773c6d8b"
+      ],
+      "kind": "duration",
+      "namespace": "5831f84d",
+      "probe_id": "duration_0017",
+      "question": "How many days passed between these two events? A: The user rode Twisted Colossus at Six Flags Magic Mountain five times in a row. B: The user plans to purchase a sisal rug for their living room."
+    },
+    {
+      "answer": 40,
+      "answer_kind": "integer",
+      "derivation": "(2023-03-01 - 2023-01-20).days over dates, times dropped",
+      "evidence_memory_ids": [
+        "mem_08a7cfae95f4f86a",
+        "mem_57b2681f7afe9700"
+      ],
+      "kind": "duration",
+      "namespace": "ed4ddc30",
+      "probe_id": "duration_0018",
+      "question": "How many days passed between these two events? A: The user is preparing for a Harvest Market on September 18th. B: The user volunteered at a charity auction organized by the local museum in May that raised over $20,000 for art education."
+    },
+    {
+      "answer": 7,
+      "answer_kind": "integer",
+      "derivation": "(2023-05-27 - 2023-05-20).days over dates, times dropped",
+      "evidence_memory_ids": [
+        "mem_bf50f424abd295f1",
+        "mem_dc11d40c9031dfd0"
+      ],
+      "kind": "duration",
+      "namespace": "58470ed2",
+      "probe_id": "duration_0019",
+      "question": "How many days passed between these two events? A: The user attended a dance festival on March 4th. B: The user committed to volunteering at least 2 hours every weekend for 6 months starting May 2023."
+    },
+    {
+      "answer": 2,
+      "answer_kind": "integer",
+      "derivation": "(2023-05-25 - 2023-05-23).days over dates, times dropped",
+      "evidence_memory_ids": [
+        "mem_623399e021ad849f",
+        "mem_da77e565e7ed6642"
+      ],
+      "kind": "duration",
+      "namespace": "6b168ec8",
+      "probe_id": "duration_0020",
+      "question": "How many days passed between these two events? A: The user incorporates spin classes into their marathon training plan. B: The user decided to read 'The 7 Habits of Highly Effective People' by Stephen Covey."
+    },
+    {
+      "answer": 1,
+      "answer_kind": "integer",
+      "derivation": "(2023-05-23 - 2023-05-22).days over dates, times dropped",
+      "evidence_memory_ids": [
+        "mem_05451c0c84a40f8f",
+        "mem_cba2f8661b8b0da9"
+      ],
+      "kind": "duration",
+      "namespace": "a1cc6108",
+      "probe_id": "duration_0021",
+      "question": "How many days passed between these two events? A: The user binge-watched 7 episodes of Stranger Things on Saturday (2023-05-20) and 5 episodes on Sunday (2023-05-21). B: The user is planning a trip to Japan in March for the Cherry Blossom season."
+    },
+    {
+      "answer": 7,
+      "answer_kind": "integer",
+      "derivation": "(2023-05-29 - 2023-05-22).days over dates, times dropped",
+      "evidence_memory_ids": [
+        "mem_a9235b52601c99fd",
+        "mem_e416e69a48716d77"
+      ],
+      "kind": "duration",
+      "namespace": "51a45a95",
+      "probe_id": "duration_0022",
+      "question": "How many days passed between these two events? A: The user attended a digital marketing workshop at a co-working space on May 22, 2023. B: The user is planning a road trip to Los Angeles next month."
+    },
+    {
+      "answer": 2,
+      "answer_kind": "integer",
+      "derivation": "(2023-05-22 - 2023-05-20).days over dates, times dropped",
+      "evidence_memory_ids": [
+        "mem_300fb2ffac763887",
+        "mem_b4b39e30c4170d88"
+      ],
+      "kind": "duration",
+      "namespace": "0ddfec37_abs",
+      "probe_id": "duration_0023",
+      "question": "How many days passed between these two events? A: The user owns a signed Mike Trout baseball. B: The user added 20 autographed baseballs to their collection in the past few months."
+    },
+    {
+      "answer": 10,
+      "answer_kind": "integer",
+      "derivation": "(2023-05-30 - 2023-05-20).days over dates, times dropped",
+      "evidence_memory_ids": [
+        "mem_00283a56cc627611",
+        "mem_a63b03c448591b29"
+      ],
+      "kind": "duration",
+      "namespace": "d905b33f",
+      "probe_id": "duration_0024",
+      "question": "How many days passed between these two events? A: The user owns an antique desk purchased from their parents. B: The user plans to try regrowing green onions and celery from scraps."
+    },
+    {
+      "answer": 1,
+      "answer_kind": "integer",
+      "derivation": "(2023-02-15 - 2023-02-14).days over dates, times dropped",
+      "evidence_memory_ids": [
+        "mem_d50c9e5cd1f25ef0",
+        "mem_ede22e9d826de15a"
+      ],
+      "kind": "duration",
+      "namespace": "b46e15ed",
+      "probe_id": "duration_0025",
+      "question": "How many days passed between these two events? A: The user is planning a 4-day road trip from San Francisco to Lake Tahoe with their road bike. B: The user decided to purchase an OnGuard Pitbull U-lock."
+    },
+    {
+      "answer": 5,
+      "answer_kind": "integer",
+      "derivation": "(2023-05-27 - 2023-05-22).days over dates, times dropped",
+      "evidence_memory_ids": [
+        "mem_e696b0f5e1c4a496",
+        "mem_ed35d8a4f9e18d61"
+      ],
+      "kind": "duration",
+      "namespace": "ef66a6e5",
+      "probe_id": "duration_0026",
+      "question": "How many days passed between these two events? A: The user aims to cook at home at least 4-5 times a week. B: The user finished reading \"The Seven Husbands of Evelyn Hugo\" in three days."
+    },
+    {
+      "answer": 3,
+      "answer_kind": "integer",
+      "derivation": "(2023-05-26 - 2023-05-23).days over dates, times dropped",
+      "evidence_memory_ids": [
+        "mem_0970283ff75f8606",
+        "mem_c8f6472c50edb536"
+      ],
+      "kind": "duration",
+      "namespace": "7527f7e2",
+      "probe_id": "duration_0027",
+      "question": "How many days passed between these two events? A: The user is creating an AI-generated mind map tool for their website. B: The user is planning a sunrise photo shoot at a lake this weekend."
+    },
+    {
+      "answer": 5,
+      "answer_kind": "integer",
+      "derivation": "(2023-05-29 - 2023-05-24).days over dates, times dropped",
+      "evidence_memory_ids": [
+        "mem_8b8754940c5f5c5b",
+        "mem_f6f9e47e1a47b2b0"
+      ],
+      "kind": "duration",
+      "namespace": "311778f1",
+      "probe_id": "duration_0028",
+      "question": "How many days passed between these two events? A: The user intends to create a hedgehog-friendly garden in their backyard and encourage neighbors to do the same. B: The user plans to bring medium roast coffee and herbal tea (peppermint or chamomile) to Rachel."
+    },
+    {
+      "answer": 22,
+      "answer_kind": "integer",
+      "derivation": "(2022-12-25 - 2022-12-03).days over dates, times dropped",
+      "evidence_memory_ids": [
+        "mem_46c9dbb5928c1c33",
+        "mem_e4ee182c0bec2167"
+      ],
+      "kind": "duration",
+      "namespace": "0db4c65d",
+      "probe_id": "duration_0029",
+      "question": "How many days passed between these two events? A: The user plans to categorize and group closet items together and implement a color-coded system. B: The user reorganized their bookshelf on February 10th."
+    },
+    {
+      "answer": 4,
+      "answer_kind": "integer",
+      "derivation": "(2023-01-15 - 2023-01-11).days over dates, times dropped",
+      "evidence_memory_ids": [
+        "mem_a02ea53af93c9576",
+        "mem_acb65e90a46b2e16"
+      ],
+      "kind": "duration",
+      "namespace": "gpt4_59149c77",
+      "probe_id": "duration_0030",
+      "question": "How many days passed between these two events? A: The user is writing a story about a character named Jack who finds a mirror in a museum that shows deceased loved ones. B: The user has a budget of $50-$75 for the personalized cutting board."
+    },
+    {
+      "answer": 2,
+      "answer_kind": "integer",
+      "derivation": "(2023-05-29 - 2023-05-27).days over dates, times dropped",
+      "evidence_memory_ids": [
+        "mem_a15c2d8d20a417ed",
+        "mem_fc65aa72c9b7bd5c"
+      ],
+      "kind": "duration",
+      "namespace": "af8d2e46",
+      "probe_id": "duration_0031",
+      "question": "How many days passed between these two events? A: The user plans to close on their new townhouse in about 4 weeks. B: The user has a niece and nephew aged 6 and 8."
+    },
+    {
+      "answer": 113,
+      "answer_kind": "integer",
+      "derivation": "(2023-07-02 - 2023-03-11).days over dates, times dropped",
+      "evidence_memory_ids": [
+        "mem_7c84e8c597bd8303",
+        "mem_f37e74f55874f0d1"
+      ],
+      "kind": "duration",
+      "namespace": "f685340e",
+      "probe_id": "duration_0032",
+      "question": "How many days passed between these two events? A: The user plays tennis weekly with friends. B: The user has been relying on dark chocolate or dried fruits for afternoon snacks."
+    },
+    {
+      "answer": 2,
+      "answer_kind": "integer",
+      "derivation": "(2023-06-06 - 2023-06-04).days over dates, times dropped",
+      "evidence_memory_ids": [
+        "mem_12a3f4eb1a352407",
+        "mem_9df454517cd3e8b1"
+      ],
+      "kind": "duration",
+      "namespace": "cc5ded98",
+      "probe_id": "duration_0033",
+      "question": "How many days passed between these two events? A: The user plans to deep clean their refrigerator and microwave this weekend. B: The user attended a Holy Thursday service at St. Mary's Church where they participated in the washing of the feet ceremony."
+    },
+    {
+      "answer": 8,
+      "answer_kind": "integer",
+      "derivation": "(2023-05-30 - 2023-05-22).days over dates, times dropped",
+      "evidence_memory_ids": [
+        "mem_236bdfb32d6f24e6",
+        "mem_f88acc227159a199"
+      ],
+      "kind": "duration",
+      "namespace": "7e00a6cb",
+      "probe_id": "duration_0034",
+      "question": "How many days passed between these two events? A: The user finished a clay figurine of their cat, Luna. B: The user recently finished reading The 7 Habits of Highly Effective People by Stephen Covey."
+    },
+    {
+      "answer": 4,
+      "answer_kind": "integer",
+      "derivation": "(2023-05-24 - 2023-05-20).days over dates, times dropped",
+      "evidence_memory_ids": [
+        "mem_0ab6ebdff0bbfb5d",
+        "mem_9bea1409ec2a55c1"
+      ],
+      "kind": "duration",
+      "namespace": "16c90bf4",
+      "probe_id": "duration_0035",
+      "question": "How many days passed between these two events? A: The user was on page 320 of 400 of \"The Seven Husbands of Evelyn Hugo\" as of May 20, 2023. B: The user finished reading \"The Power\" by Naomi Alderman on May 24, 2023."
+    },
+    {
+      "answer": 3,
+      "answer_kind": "integer",
+      "derivation": "(2023-05-25 - 2023-05-22).days over dates, times dropped",
+      "evidence_memory_ids": [
+        "mem_291025a9c2e4e99e",
+        "mem_d5be52cb8af9baca"
+      ],
+      "kind": "duration",
+      "namespace": "9d25d4e0",
+      "probe_id": "duration_0036",
+      "question": "How many days passed between these two events? A: The user plans to organize a bake sale to raise funds for their next charity walk. B: The user plans to start a compost bin in their backyard."
+    },
+    {
+      "answer": 6,
+      "answer_kind": "integer",
+      "derivation": "(2023-05-28 - 2023-05-22).days over dates, times dropped",
+      "evidence_memory_ids": [
+        "mem_a746176e6d4f0730",
+        "mem_d705e33064933097"
+      ],
+      "kind": "duration",
+      "namespace": "8a2466db",
+      "probe_id": "duration_0037",
+      "question": "How many days passed between these two events? A: The user finished reading \"The Seven Husbands of Evelyn Hugo\" which is a 384-page book. B: The user participated in a charity yoga event on May 28, 2023, which raised over $1,000 for a mental health organization."
+    },
+    {
+      "answer": 2,
+      "answer_kind": "integer",
+      "derivation": "(2023-05-30 - 2023-05-28).days over dates, times dropped",
+      "evidence_memory_ids": [
+        "mem_6e1884dc404694bc",
+        "mem_8420ef8f17b8e7cb"
+      ],
+      "kind": "duration",
+      "namespace": "35a27287",
+      "probe_id": "duration_0038",
+      "question": "How many days passed between these two events? A: The user traveled solo to Japan last year. B: The user plans to stay in Medell\u00edn for a few weeks."
+    },
+    {
+      "answer": 5,
+      "answer_kind": "integer",
+      "derivation": "(2023-05-25 - 2023-05-20).days over dates, times dropped",
+      "evidence_memory_ids": [
+        "mem_56d5b8b79a208df8",
+        "mem_e0a0149dc28c29e0"
+      ],
+      "kind": "duration",
+      "namespace": "3fdac837",
+      "probe_id": "duration_0039",
+      "question": "How many days passed between these two events? A: The user is hosting a dinner party this weekend. B: The user plans to use Mixbook to create a photo album for their mother."
+    },
+    {
+      "answer": 2,
+      "answer_kind": "integer",
+      "derivation": "(2023-05-25 - 2023-05-23).days over dates, times dropped",
+      "evidence_memory_ids": [
+        "mem_e980a513b59ae31f",
+        "mem_e9bc48b064fbc94b"
+      ],
+      "kind": "duration",
+      "namespace": "726462e0",
+      "probe_id": "duration_0040",
+      "question": "How many days passed between these two events? A: The user tweeted about the book The Nightingale around May 16, 2023. B: The user is watching the new season of Stranger Things."
+    },
+    {
+      "answer": 14,
+      "answer_kind": "integer",
+      "derivation": "(2023-03-19 - 2023-03-05).days over dates, times dropped",
+      "evidence_memory_ids": [
+        "mem_5a30a1ce720d1070",
+        "mem_deb3aee1687919f7"
+      ],
+      "kind": "duration",
+      "namespace": "gpt4_b0863698",
+      "probe_id": "duration_0041",
+      "question": "How many days passed between these two events? A: The user attended Emma's high school graduation ceremony at her school's auditorium on June 15th. B: The user finished a 5K charity run in 27 minutes and 12 seconds on March 19, 2023."
+    },
+    {
+      "answer": 31,
+      "answer_kind": "integer",
+      "derivation": "(2023-05-28 - 2023-04-27).days over dates, times dropped",
+      "evidence_memory_ids": [
+        "mem_9537ad444866055f",
+        "mem_b9db1c65a6f5b6ad"
+      ],
+      "kind": "duration",
+      "namespace": "6a1eabeb",
+      "probe_id": "duration_0042",
+      "question": "How many days passed between these two events? A: The user tried Spaghetti Carbonara at Bella Vita. B: The user is planning a 3-4 day trip to Greenville, South Carolina."
+    },
+    {
+      "answer": 1,
+      "answer_kind": "integer",
+      "derivation": "(2023-05-28 - 2023-05-27).days over dates, times dropped",
+      "evidence_memory_ids": [
+        "mem_200957c51a96c19f",
+        "mem_bd67ac389f90e784"
+      ],
+      "kind": "duration",
+      "namespace": "1568498a",
+      "probe_id": "duration_0043",
+      "question": "How many days passed between these two events? A: The user is writing an article about Deeds of Novation as an expert construction lawyer in Australia. B: The user visited Yosemite National Park for a solo camping trip on 2023-05-28."
+    },
+    {
+      "answer": 14,
+      "answer_kind": "integer",
+      "derivation": "(2023-04-15 - 2023-04-01).days over dates, times dropped",
+      "evidence_memory_ids": [
+        "mem_a37e5cfc01b22c1a",
+        "mem_e3de3a6520ede9f9"
+      ],
+      "kind": "duration",
+      "namespace": "gpt4_d6585ce9",
+      "probe_id": "duration_0044",
+      "question": "How many days passed between these two events? A: The user saw Glass Animals perform live at the Brooklyn music festival. B: The user owns a Maltese dog."
+    },
+    {
+      "answer": 1,
+      "answer_kind": "integer",
+      "derivation": "(2023-05-29 - 2023-05-28).days over dates, times dropped",
+      "evidence_memory_ids": [
+        "mem_2f74006ea2069395",
+        "mem_896623e6cea6891c"
+      ],
+      "kind": "duration",
+      "namespace": "1192316e",
+      "probe_id": "duration_0045",
+      "question": "How many days passed between these two events? A: The user attended the Impressionist Masters exhibition at the City Art Museum. B: The user bought a handmade candle and artisanal soaps at a holiday market on December 15th."
+    },
+    {
+      "answer": 45,
+      "answer_kind": "integer",
+      "derivation": "(2023-03-15 - 2023-01-29).days over dates, times dropped",
+      "evidence_memory_ids": [
+        "mem_6c290c3c71af305d",
+        "mem_cefccb1924a2a855"
+      ],
+      "kind": "duration",
+      "namespace": "gpt4_74aed68e",
+      "probe_id": "duration_0046",
+      "question": "How many days passed between these two events? A: The user hosted 10 friends for a football get-together recently. B: The user previously visited Chicago for a funeral and stayed with Rachel and her family."
+    },
+    {
+      "answer": 1,
+      "answer_kind": "integer",
+      "derivation": "(2023-05-24 - 2023-05-23).days over dates, times dropped",
+      "evidence_memory_ids": [
+        "mem_3eb56b79d98ccd73",
+        "mem_81ceffdc48533922"
+      ],
+      "kind": "duration",
+      "namespace": "afdc33df",
+      "probe_id": "duration_0047",
+      "question": "How many days passed between these two events? A: The user has a 16-year-old cousin named Rachel. B: The user is a rugby player."
+    },
+    {
+      "answer": 30,
+      "answer_kind": "integer",
+      "derivation": "(2023-05-29 - 2023-04-29).days over dates, times dropped",
+      "evidence_memory_ids": [
+        "mem_8eeafd71cc661895",
+        "mem_a5ef28dc403f2d6b"
+      ],
+      "kind": "duration",
+      "namespace": "45dc21b6",
+      "probe_id": "duration_0048",
+      "question": "How many days passed between these two events? A: The user's project is named \"Team Workshop\". B: The user attended a retreat at the Franciscan Center led by Sister Margaret from April 14 to 16, 2023."
+    },
+    {
+      "answer": 5,
+      "answer_kind": "integer",
+      "derivation": "(2023-05-27 - 2023-05-22).days over dates, times dropped",
+      "evidence_memory_ids": [
+        "mem_5847c33376026f1f",
+        "mem_aadaceb7cb879098"
+      ],
+      "kind": "duration",
+      "namespace": "3d86fd0a",
+      "probe_id": "duration_0049",
+      "question": "How many days passed between these two events? A: The user has been taking cooking classes for three months as of May 22, 2023. B: The user decided to purchase individual bottles of Mr. Color 308, 309, and 310."
+    },
+    {
+      "answer": 20,
+      "answer_kind": "integer",
+      "derivation": "(2023-10-03 - 2023-09-13).days over dates, times dropped",
+      "evidence_memory_ids": [
+        "mem_e6d7c67c3f63c47a",
+        "mem_fd634128630581c7"
+      ],
+      "kind": "duration",
+      "namespace": "10e09553",
+      "probe_id": "duration_0050",
+      "question": "How many days passed between these two events? A: The user is writing a book titled The Mirror's Reflection about a mirror showing alternate futures. B: The user won a painting for $500 at the charity gala silent auction."
+    },
+    {
+      "answer": 3,
+      "answer_kind": "integer",
+      "derivation": "(2023-05-25 - 2023-05-22).days over dates, times dropped",
+      "evidence_memory_ids": [
+        "mem_be9263d2f97b99f6",
+        "mem_cdc58672a57ad59a"
+      ],
+      "kind": "duration",
+      "namespace": "gpt4_194be4b3",
+      "probe_id": "duration_0051",
+      "question": "How many days passed between these two events? A: The user read 'The Seven Husbands of Evelyn Hugo' by Taylor Jenkins Reid. B: The user attended an Afro-Cuban rhythm workshop taught by an instructor named Carlos."
+    },
+    {
+      "answer": 1,
+      "answer_kind": "integer",
+      "derivation": "(2023-05-27 - 2023-05-26).days over dates, times dropped",
+      "evidence_memory_ids": [
+        "mem_2f39e9c7b46922b0",
+        "mem_92ab853dc0951f66"
+      ],
+      "kind": "duration",
+      "namespace": "eaca4986",
+      "probe_id": "duration_0052",
+      "question": "How many days passed between these two events? A: The user plans to run an Instagram giveaway featuring a cookbook by their favorite chef and a gift card to a cooking store. B: The user's audiobook is titled The Doer Revolution \u2013 Pursuing Prosperity & Holistic Wealth."
+    },
+    {
+      "answer": 3,
+      "answer_kind": "integer",
+      "derivation": "(2023-05-29 - 2023-05-26).days over dates, times dropped",
+      "evidence_memory_ids": [
+        "mem_5d6b565a2ca3f65b",
+        "mem_ceed8f110d946df3"
+      ],
+      "kind": "duration",
+      "namespace": "f8c5f88b",
+      "probe_id": "duration_0053",
+      "question": "How many days passed between these two events? A: The user is looking for authenticated pre-owned luxury watches. B: The user is interested in trying rock climbing."
+    },
+    {
+      "answer": 9,
+      "answer_kind": "integer",
+      "derivation": "(2023-05-30 - 2023-05-21).days over dates, times dropped",
+      "evidence_memory_ids": [
+        "mem_557c849d8f5fdb27",
+        "mem_c94e533eac18088a"
+      ],
+      "kind": "duration",
+      "namespace": "ef9cf60a",
+      "probe_id": "duration_0054",
+      "question": "How many days passed between these two events? A: The user attends a Bible study group on Thursday evenings focusing on the Gospel of Luke. B: The user decided to buy an essential oil diffuser gift set for their sister."
+    },
+    {
+      "answer": 6,
+      "answer_kind": "integer",
+      "derivation": "(2023-05-29 - 2023-05-23).days over dates, times dropped",
+      "evidence_memory_ids": [
+        "mem_6921af03d5fac84a",
+        "mem_ac2c8759d4a84f6a"
+      ],
+      "kind": "duration",
+      "namespace": "15745da0_abs",
+      "probe_id": "duration_0055",
+      "question": "How many days passed between these two events? A: The user uses refillable shampoo bottles and beeswax wraps. B: The user read \"The Silent Patient\" by Alex Michaelides as an e-book in two weeks."
+    },
+    {
+      "answer": 5,
+      "answer_kind": "integer",
+      "derivation": "(2023-08-11 - 2023-08-06).days over dates, times dropped",
+      "evidence_memory_ids": [
+        "mem_afc8480ae221d5a9",
+        "mem_afd807a85c49b572"
+      ],
+      "kind": "duration",
+      "namespace": "6aeb4375",
+      "probe_id": "duration_0056",
+      "question": "How many days passed between these two events? A: The user is planning a solo trip to Maui. B: The user owns pearl earrings that belonged to their great aunt."
+    },
+    {
+      "answer": 6,
+      "answer_kind": "integer",
+      "derivation": "(2023-05-26 - 2023-05-20).days over dates, times dropped",
+      "evidence_memory_ids": [
+        "mem_a0e263d1e491af61",
+        "mem_df02c6ffa879b56d"
+      ],
+      "kind": "duration",
+      "namespace": "8550ddae",
+      "probe_id": "duration_0057",
+      "question": "How many days passed between these two events? A: The user recently made a vegan quinoa bowl with roasted vegetables. B: The user owns high-waisted jeans from Old Navy."
+    },
+    {
+      "answer": 103,
+      "answer_kind": "integer",
+      "derivation": "(2022-12-27 - 2022-09-15).days over dates, times dropped",
+      "evidence_memory_ids": [
+        "mem_da5a65a36e19aa7d",
+        "mem_f0a6a36c75bc769d"
+      ],
+      "kind": "duration",
+      "namespace": "50635ada",
+      "probe_id": "duration_0058",
+      "question": "How many days passed between these two events? A: The user is planning a trip to New York City. B: The user owns a copy of OK Computer by Radiohead on vinyl."
+    },
+    {
+      "answer": 3,
+      "answer_kind": "integer",
+      "derivation": "(2023-03-14 - 2023-03-11).days over dates, times dropped",
+      "evidence_memory_ids": [
+        "mem_a1e92b34139db0c5",
+        "mem_b566f47280372ff9"
+      ],
+      "kind": "duration",
+      "namespace": "gpt4_8e165409",
+      "probe_id": "duration_0059",
+      "question": "How many days passed between these two events? A: The user finished a 1/48 scale F-16 fighter jet model over two weekends. B: The user bought Charles Shaw wines from Trader Joe's."
+    },
+    {
+      "answer": "B",
+      "answer_kind": "choice",
+      "derivation": "A=2023-08-03T23:29:00 B=2023-07-21T11:09:00; earlier is B",
+      "evidence_memory_ids": [
+        "mem_1b5a520ea246818e",
+        "mem_445c1e4cfea11b14"
+      ],
+      "kind": "comparison",
+      "namespace": "6aeb4375",
+      "probe_id": "comparison_0000",
+      "question": "Which of these happened first? A: The user purchased a Chanel handbag for $5,000. B: The user decided to use a hybrid approach for their content calendar, with a master sheet and separate sheets for each platform."
+    },
+    {
+      "answer": "B",
+      "answer_kind": "choice",
+      "derivation": "A=2023-05-24T21:40:00 B=2023-05-20T01:33:00; earlier is B",
+      "evidence_memory_ids": [
+        "mem_4c19e3d2c387fefa",
+        "mem_c86e55754fd7ea58"
+      ],
+      "kind": "comparison",
+      "namespace": "95228167",
+      "probe_id": "comparison_0001",
+      "question": "Which of these happened first? A: The user plans to wear a yellow sundress with sandals and dangling flower earrings to a summer wedding. B: The user helped at a charity bake sale on May 1st, 2023."
+    },
+    {
+      "answer": "A",
+      "answer_kind": "choice",
+      "derivation": "A=2023-05-22T16:12:00 B=2023-05-23T12:08:00; earlier is A",
+      "evidence_memory_ids": [
+        "mem_043395554fdadff1",
+        "mem_294ddd56e1418497"
+      ],
+      "kind": "comparison",
+      "namespace": "d23cf73b",
+      "probe_id": "comparison_0002",
+      "question": "Which of these happened first? A: The user has a $50 budget for a wedding gift for a coworker. B: The user bought 'The Power of Now' by Eckhart Tolle for their brother for $15."
+    },
+    {
+      "answer": "A",
+      "answer_kind": "choice",
+      "derivation": "A=2023-05-26T16:14:00 B=2023-05-29T11:27:00; earlier is A",
+      "evidence_memory_ids": [
+        "mem_94cb3e8dab02fede",
+        "mem_caae86bec4163a27"
+      ],
+      "kind": "comparison",
+      "namespace": "46a3abf7",
+      "probe_id": "comparison_0003",
+      "question": "Which of these happened first? A: The user is planning a 7-day trip to Paris and Rome with a budget of $2,000. B: The user is planning a weekend getaway to Boston."
+    },
+    {
+      "answer": "B",
+      "answer_kind": "choice",
+      "derivation": "A=2023-10-24T13:53:00 B=2023-08-04T11:32:00; earlier is B",
+      "evidence_memory_ids": [
+        "mem_83ff059b4960a271",
+        "mem_ffe16ff543f82824"
+      ],
+      "kind": "comparison",
+      "namespace": "031748ae",
+      "probe_id": "comparison_0004",
+      "question": "Which of these happened first? A: The user planned a team hike at Mount Tamalpais State Park. B: The user spent about $120 on gifts last month."
+    },
+    {
+      "answer": "A",
+      "answer_kind": "choice",
+      "derivation": "A=2023-05-20T20:28:00 B=2023-05-28T23:44:00; earlier is A",
+      "evidence_memory_ids": [
+        "mem_868a350235278445",
+        "mem_87cddca64da224bf"
+      ],
+      "kind": "comparison",
+      "namespace": "1c0ddc50",
+      "probe_id": "comparison_0005",
+      "question": "Which of these happened first? A: The user is watching the Hawkeye series on Disney+ with their sister. B: The user volunteered at a local animal shelter charity walk on April 17th."
+    },
+    {
+      "answer": "A",
+      "answer_kind": "choice",
+      "derivation": "A=2023-05-26T11:23:00 B=2023-06-20T14:55:00; earlier is A",
+      "evidence_memory_ids": [
+        "mem_76ef29ef2e7333dc",
+        "mem_ced8c7d7f9f41770"
+      ],
+      "kind": "comparison",
+      "namespace": "22d2cb42",
+      "probe_id": "comparison_0006",
+      "question": "Which of these happened first? A: The user decided to visit Gatorland in Orlando, Florida. B: The user recently acquired an antique music box."
+    },
+    {
+      "answer": "A",
+      "answer_kind": "choice",
+      "derivation": "A=2023-05-22T22:06:00 B=2023-05-26T00:52:00; earlier is A",
+      "evidence_memory_ids": [
+        "mem_b007f9b026a6a23c",
+        "mem_e3a84a67eb4f9db0"
+      ],
+      "kind": "comparison",
+      "namespace": "8ebdbe50",
+      "probe_id": "comparison_0007",
+      "question": "Which of these happened first? A: The user tracks expenses using a simple spreadsheet. B: The user has a framed photo of trees against misty mountains hanging in their living room."
+    },
+    {
+      "answer": "B",
+      "answer_kind": "choice",
+      "derivation": "A=2023-05-25T19:44:00 B=2023-05-22T18:41:00; earlier is B",
+      "evidence_memory_ids": [
+        "mem_4a6fb075357f951b",
+        "mem_8e21c522df317cc2"
+      ],
+      "kind": "comparison",
+      "namespace": "1c549ce4",
+      "probe_id": "comparison_0008",
+      "question": "Which of these happened first? A: The user's budget for the Canada fishing trip is $2000 per person. B: The user plans to attend Lollapalooza in Chicago."
+    },
+    {
+      "answer": "A",
+      "answer_kind": "choice",
+      "derivation": "A=2023-05-20T12:34:00 B=2023-05-21T07:30:00; earlier is A",
+      "evidence_memory_ids": [
+        "mem_bf50f424abd295f1",
+        "mem_c9f062a5281b6cfa"
+      ],
+      "kind": "comparison",
+      "namespace": "58470ed2",
+      "probe_id": "comparison_0009",
+      "question": "Which of these happened first? A: The user attended a dance festival on March 4th. B: The user is planning to take a mixed media class at the community center next month."
+    },
+    {
+      "answer": "A",
+      "answer_kind": "choice",
+      "derivation": "A=2023-04-29T15:06:00 B=2023-05-29T03:22:00; earlier is A",
+      "evidence_memory_ids": [
+        "mem_499e4f67d4d0ff47",
+        "mem_6aa4d667a2e8ebf9"
+      ],
+      "kind": "comparison",
+      "namespace": "affe2881",
+      "probe_id": "comparison_0010",
+      "question": "Which of these happened first? A: The user is considering visiting the sanctuary in late April or early May. B: The user is planning a summer vacation involving mountain biking."
+    },
+    {
+      "answer": "B",
+      "answer_kind": "choice",
+      "derivation": "A=2023-05-24T22:36:00 B=2023-05-21T01:23:00; earlier is B",
+      "evidence_memory_ids": [
+        "mem_ee4ca05b3ccc4aaa",
+        "mem_eedb05330d09a815"
+      ],
+      "kind": "comparison",
+      "namespace": "c7cf7dfd",
+      "probe_id": "comparison_0011",
+      "question": "Which of these happened first? A: The user purchased a cozy throw blanket from Target for $10, which was part of a buy one get one free deal on a $20 item. B: The user is looking for a cable management system for their gaming PC with a budget of $100-$200."
+    },
+    {
+      "answer": "B",
+      "answer_kind": "choice",
+      "derivation": "A=2023-05-26T07:10:00 B=2023-05-25T03:55:00; earlier is B",
+      "evidence_memory_ids": [
+        "mem_2183e1384fe43402",
+        "mem_4de5867f2b6c7264"
+      ],
+      "kind": "comparison",
+      "namespace": "7e00a6cb",
+      "probe_id": "comparison_0012",
+      "question": "Which of these happened first? A: The user has bi-weekly leadership meetings with the company's management team. B: The user went on a family road trip to the beach over the Presidents' Day weekend in 2023."
+    },
+    {
+      "answer": "A",
+      "answer_kind": "choice",
+      "derivation": "A=2023-05-06T10:32:00 B=2023-05-29T18:02:00; earlier is A",
+      "evidence_memory_ids": [
+        "mem_904754f4b9915bef",
+        "mem_fa504383a436cf35"
+      ],
+      "kind": "comparison",
+      "namespace": "45dc21b6",
+      "probe_id": "comparison_0013",
+      "question": "Which of these happened first? A: The user has been taking painting classes at a local art studio for three months as of May 2023. B: The user plans to visit the Irish American Museum in New York City next month."
+    },
+    {
+      "answer": "B",
+      "answer_kind": "choice",
+      "derivation": "A=2023-05-28T20:46:00 B=2023-05-27T07:22:00; earlier is B",
+      "evidence_memory_ids": [
+        "mem_265b3da48dec1a21",
+        "mem_85c4d8fa15cfcfce"
+      ],
+      "kind": "comparison",
+      "namespace": "d682f1a2",
+      "probe_id": "comparison_0014",
+      "question": "Which of these happened first? A: The user is planning a trip to Europe next year. B: The user is planning a 3-day trip to Chicago."
+    },
+    {
+      "answer": "A",
+      "answer_kind": "choice",
+      "derivation": "A=2023-05-29T11:09:00 B=2023-05-29T13:51:00; earlier is A",
+      "evidence_memory_ids": [
+        "mem_aecf1c83230eb0c5",
+        "mem_ce8ce1a4f9cbea50"
+      ],
+      "kind": "comparison",
+      "namespace": "gpt4_6ed717ea",
+      "probe_id": "comparison_0015",
+      "question": "Which of these happened first? A: The user won a gift card to Indiebound. B: The user has been a subscriber to The New Yorker for about six months as of May 2023."
+    },
+    {
+      "answer": "A",
+      "answer_kind": "choice",
+      "derivation": "A=2023-05-27T09:59:00 B=2023-05-30T09:32:00; earlier is A",
+      "evidence_memory_ids": [
+        "mem_2c2bf811c3f6ead9",
+        "mem_a12b66bbfba29377"
+      ],
+      "kind": "comparison",
+      "namespace": "311778f1",
+      "probe_id": "comparison_0016",
+      "question": "Which of these happened first? A: The user plans to hike the Crescent Meadow to Hamilton Lakes section of the High Sierra Trail. B: The user is volunteering at the Children's Art Festival at the Local Museum on May 30, 2023."
+    },
+    {
+      "answer": "A",
+      "answer_kind": "choice",
+      "derivation": "A=2023-05-27T01:14:00 B=2023-05-30T03:06:00; earlier is A",
+      "evidence_memory_ids": [
+        "mem_969f32552ecccf92",
+        "mem_db9099667a0e020b"
+      ],
+      "kind": "comparison",
+      "namespace": "25e5aa4f",
+      "probe_id": "comparison_0017",
+      "question": "Which of these happened first? A: The user has a red sweater they have worn 7 times in the last three weeks. B: The user stayed at the Grand Hyatt Incheon on January 20."
+    },
+    {
+      "answer": "B",
+      "answer_kind": "choice",
+      "derivation": "A=2023-03-10T11:33:00 B=2023-02-11T08:24:00; earlier is B",
+      "evidence_memory_ids": [
+        "mem_5f0dd29a04b436ba",
+        "mem_b3bd4da9154f0d4a"
+      ],
+      "kind": "comparison",
+      "namespace": "gpt4_74aed68e",
+      "probe_id": "comparison_0018",
+      "question": "Which of these happened first? A: The user is planning a Summer Fest event in June. B: The user is planning an anniversary trip to Napa Valley."
+    },
+    {
+      "answer": "A",
+      "answer_kind": "choice",
+      "derivation": "A=2023-03-30T18:27:00 B=2023-04-11T10:42:00; earlier is A",
+      "evidence_memory_ids": [
+        "mem_47621eecff7385a8",
+        "mem_c1451a757095ae51"
+      ],
+      "kind": "comparison",
+      "namespace": "f685340e",
+      "probe_id": "comparison_0019",
+      "question": "Which of these happened first? A: The user is planning to expand their product line to include different scents and colors of candles. B: The user plans to create a seasonal line of lavender and lemon candles."
+    },
+    {
+      "answer": "A",
+      "answer_kind": "choice",
+      "derivation": "A=2023-05-26T03:19:00 B=2023-05-26T22:29:00; earlier is A",
+      "evidence_memory_ids": [
+        "mem_0ccec216d1a02c23",
+        "mem_f8d8653ce170bf2d"
+      ],
+      "kind": "comparison",
+      "namespace": "a08a253f",
+      "probe_id": "comparison_0020",
+      "question": "Which of these happened first? A: The user visited Knott's Scary Farm with their sister and her boyfriend. B: The user's mother had unexpected gallbladder surgery last weekend (around 2023-05-20)."
+    },
+    {
+      "answer": "A",
+      "answer_kind": "choice",
+      "derivation": "A=2023-05-22T04:32:00 B=2023-05-26T03:43:00; earlier is A",
+      "evidence_memory_ids": [
+        "mem_b52ec325a5f58ddb",
+        "mem_e34d0e94aa1afbfb"
+      ],
+      "kind": "comparison",
+      "namespace": "gpt4_a56e767c",
+      "probe_id": "comparison_0021",
+      "question": "Which of these happened first? A: The user sells eggs from their chickens to a neighbor for $3 a dozen. B: The user plans to set up a photo booth with Manchester scarves and jerseys and host a Manchester trivia game during halftime."
+    },
+    {
+      "answer": "B",
+      "answer_kind": "choice",
+      "derivation": "A=2023-07-01T12:34:00 B=2023-07-01T01:22:00; earlier is B",
+      "evidence_memory_ids": [
+        "mem_238659841abc64a2",
+        "mem_7bd728082dac2938"
+      ],
+      "kind": "comparison",
+      "namespace": "gpt4_4edbafa2",
+      "probe_id": "comparison_0022",
+      "question": "Which of these happened first? A: The user attended a St. Joseph's Day celebration at their church on March 19th. B: The user is interested in the Honda CR-V EX-L trim."
+    },
+    {
+      "answer": "A",
+      "answer_kind": "choice",
+      "derivation": "A=2023-05-20T10:20:00 B=2023-05-25T19:26:00; earlier is A",
+      "evidence_memory_ids": [
+        "mem_7049fd239662374d",
+        "mem_de7bbd1f926e68f6"
+      ],
+      "kind": "comparison",
+      "namespace": "ccb36322",
+      "probe_id": "comparison_0023",
+      "question": "Which of these happened first? A: The user saw The 1975 live recently. B: The user has been practicing yoga for 6 months."
+    },
+    {
+      "answer": "B",
+      "answer_kind": "choice",
+      "derivation": "A=2023-03-18T11:21:00 B=2023-03-16T07:14:00; earlier is B",
+      "evidence_memory_ids": [
+        "mem_100a159f47e3286a",
+        "mem_f3836c9870d58fe5"
+      ],
+      "kind": "comparison",
+      "namespace": "gpt4_8e165409",
+      "probe_id": "comparison_0024",
+      "question": "Which of these happened first? A: The user plans to watch Breaking Bad. B: The user is planning a trip to Tokyo, Japan."
+    },
+    {
+      "answer": "B",
+      "answer_kind": "choice",
+      "derivation": "A=2023-05-29T01:44:00 B=2023-05-22T02:41:00; earlier is B",
+      "evidence_memory_ids": [
+        "mem_28437dec52245b6b",
+        "mem_eb3f209bb5e94ce3"
+      ],
+      "kind": "comparison",
+      "namespace": "0e5e2d1a",
+      "probe_id": "comparison_0025",
+      "question": "Which of these happened first? A: The user reached 1000 followers on Instagram three weeks before 2023-05-29. B: The user plans to attend the Mother's Day Market on May 8th, 2023."
+    },
+    {
+      "answer": "B",
+      "answer_kind": "choice",
+      "derivation": "A=2022-03-20T08:23:00 B=2021-12-10T11:56:00; earlier is B",
+      "evidence_memory_ids": [
+        "mem_3aa99c2906444f6d",
+        "mem_7d536b04920f40f5"
+      ],
+      "kind": "comparison",
+      "namespace": "gpt4_a1b77f9c",
+      "probe_id": "comparison_0026",
+      "question": "Which of these happened first? A: The user plans to watch a local production of 'Rent'. B: The user plans to watch the TV show \"True Detective\" starting with Season 1."
+    },
+    {
+      "answer": "A",
+      "answer_kind": "choice",
+      "derivation": "A=2023-05-26T05:48:00 B=2023-05-27T06:15:00; earlier is A",
+      "evidence_memory_ids": [
+        "mem_8aadbd381189d953",
+        "mem_90cd2556fd2499d0"
+      ],
+      "kind": "comparison",
+      "namespace": "726462e0",
+      "probe_id": "comparison_0027",
+      "question": "Which of these happened first? A: The user plans to start a gaming YouTube channel. B: The user purchased a modeling tool set, a wire cutter, and a sculpting mat."
+    },
+    {
+      "answer": "B",
+      "answer_kind": "choice",
+      "derivation": "A=2023-05-30T03:48:00 B=2023-05-20T12:05:00; earlier is B",
+      "evidence_memory_ids": [
+        "mem_1ce604ba6732edff",
+        "mem_6eddb46eedfcf84d"
+      ],
+      "kind": "comparison",
+      "namespace": "8550ddae",
+      "probe_id": "comparison_0028",
+      "question": "Which of these happened first? A: The user's sister Emma visited the user last week. B: The user visited a local Modern Art Museum on Saturday, March 12th."
+    },
+    {
+      "answer": "B",
+      "answer_kind": "choice",
+      "derivation": "A=2023-05-29T00:20:00 B=2023-05-25T23:09:00; earlier is B",
+      "evidence_memory_ids": [
+        "mem_51409122add7de0a",
+        "mem_54adb7fa245a6ae5"
+      ],
+      "kind": "comparison",
+      "namespace": "7527f7e2",
+      "probe_id": "comparison_0029",
+      "question": "Which of these happened first? A: The user attended a music festival in Grant Park featuring Billie Eilish, Khalid, and The 1975. B: The user is attending a morning seminar on entrepreneurship at a co-working space near their apartment."
+    },
+    {
+      "answer": "A",
+      "answer_kind": "choice",
+      "derivation": "A=2023-04-15T03:05:00 B=2023-04-15T11:19:00; earlier is A",
+      "evidence_memory_ids": [
+        "mem_f074a07f16332dbb",
+        "mem_f694903f1fa5bb6a"
+      ],
+      "kind": "comparison",
+      "namespace": "gpt4_a2d1d1f6",
+      "probe_id": "comparison_0030",
+      "question": "Which of these happened first? A: The user started a 3-day workshop on data science and machine learning on April 15, 2023. B: The user participated in a tweetchat about sustainable fashion."
+    },
+    {
+      "answer": "B",
+      "answer_kind": "choice",
+      "derivation": "A=2023-03-29T14:37:00 B=2023-03-29T01:17:00; earlier is B",
+      "evidence_memory_ids": [
+        "mem_b58dc69028ffd1f6",
+        "mem_b84e9f41d3e5d972"
+      ],
+      "kind": "comparison",
+      "namespace": "8c18457d",
+      "probe_id": "comparison_0031",
+      "question": "Which of these happened first? A: The user worked on the quilt for 10 hours per week for 3 weeks. B: The user purchased a wireless headphone, books, skincare products, a dress, boots, a laptop bag, an eyeshadow palette, and a fitness tracker."
+    },
+    {
+      "answer": "B",
+      "answer_kind": "choice",
+      "derivation": "A=2022-12-17T05:01:00 B=2022-12-16T06:16:00; earlier is B",
+      "evidence_memory_ids": [
+        "mem_78862ddf1ea14719",
+        "mem_e8e30b04d22b8e70"
+      ],
+      "kind": "comparison",
+      "namespace": "0db4c65d",
+      "probe_id": "comparison_0032",
+      "question": "Which of these happened first? A: The user's cousin's wife is named Rachel. B: The user has been busy with family wedding preparations."
+    },
+    {
+      "answer": "A",
+      "answer_kind": "choice",
+      "derivation": "A=2023-05-26T15:31:00 B=2023-05-28T04:55:00; earlier is A",
+      "evidence_memory_ids": [
+        "mem_6d96796d94b8b7cf",
+        "mem_8f3b4475f1b9d9d1"
+      ],
+      "kind": "comparison",
+      "namespace": "cc539528",
+      "probe_id": "comparison_0033",
+      "question": "Which of these happened first? A: The user visited a new coffee shop near their favorite bookstore two days ago (around 2023-05-24). B: The user's niche is social media marketing."
+    },
+    {
+      "answer": "B",
+      "answer_kind": "choice",
+      "derivation": "A=2023-05-29T11:24:00 B=2023-05-25T17:38:00; earlier is B",
+      "evidence_memory_ids": [
+        "mem_b2d2be117ec535dc",
+        "mem_d215aa930ce9b91f"
+      ],
+      "kind": "comparison",
+      "namespace": "1a1907b4",
+      "probe_id": "comparison_0034",
+      "question": "Which of these happened first? A: The user purchased a 3-bedroom colonial-style home for $400,000. B: The user drove 2,500 miles over 7 days on a road trip to Yellowstone."
+    },
+    {
+      "answer": "A",
+      "answer_kind": "choice",
+      "derivation": "A=2023-05-20T11:56:00 B=2023-05-26T11:00:00; earlier is A",
+      "evidence_memory_ids": [
+        "mem_3e33bdaa07359e8b",
+        "mem_ef529545a06e4a90"
+      ],
+      "kind": "comparison",
+      "namespace": "gpt4_d12ceb0e",
+      "probe_id": "comparison_0035",
+      "question": "Which of these happened first? A: The user prefers a cozy atmosphere for dining. B: The user attended the Consumer Electronics Show (CES), a four-day event."
+    },
+    {
+      "answer": "B",
+      "answer_kind": "choice",
+      "derivation": "A=2023-09-13T00:00:00 B=2023-09-12T22:22:00; earlier is B",
+      "evidence_memory_ids": [
+        "mem_27edb69b895cdffc",
+        "mem_36b94cd14ea300ac"
+      ],
+      "kind": "comparison",
+      "namespace": "5831f84d",
+      "probe_id": "comparison_0036",
+      "question": "Which of these happened first? A: The user visited Harvard University to attend a research conference on AI in education. B: The user plans to purchase a sisal rug for their living room."
+    },
+    {
+      "answer": "A",
+      "answer_kind": "choice",
+      "derivation": "A=2023-05-21T02:53:00 B=2023-05-24T08:29:00; earlier is A",
+      "evidence_memory_ids": [
+        "mem_debe9730bae4ec04",
+        "mem_fccabd3380abd562"
+      ],
+      "kind": "comparison",
+      "namespace": "3fdac837",
+      "probe_id": "comparison_0037",
+      "question": "Which of these happened first? A: The user tried making macarons last weekend. B: The user's best friend moved to a new city for work in early May 2023."
+    },
+    {
+      "answer": "A",
+      "answer_kind": "choice",
+      "derivation": "A=2023-05-29T00:12:00 B=2023-05-29T23:47:00; earlier is A",
+      "evidence_memory_ids": [
+        "mem_76cef5f549878793",
+        "mem_efbee7dab9ea5b8a"
+      ],
+      "kind": "comparison",
+      "namespace": "gpt4_c27434e8",
+      "probe_id": "comparison_0038",
+      "question": "Which of these happened first? A: The user plans to host a sports-themed party. B: The user plans to make trail mix and energy balls for snacks."
+    },
+    {
+      "answer": "B",
+      "answer_kind": "choice",
+      "derivation": "A=2023-05-13T15:58:00 B=2023-05-13T07:51:00; earlier is B",
+      "evidence_memory_ids": [
+        "mem_17017282d035d177",
+        "mem_3f9b59dc0902f0e1"
+      ],
+      "kind": "comparison",
+      "namespace": "2e6d26dc",
+      "probe_id": "comparison_0039",
+      "question": "Which of these happened first? A: The user is planning a 4-day trip to New York City. B: The user's aunt has twins named Ava and Lily born in April."
+    },
+    {
+      "answer": "B",
+      "answer_kind": "choice",
+      "derivation": "A=2023-05-28T04:55:00 B=2023-05-27T21:03:00; earlier is B",
+      "evidence_memory_ids": [
+        "mem_e150db0c69556a6f",
+        "mem_ec5603ba1c5b63b5"
+      ],
+      "kind": "comparison",
+      "namespace": "9ea5eabc",
+      "probe_id": "comparison_0040",
+      "question": "Which of these happened first? A: The user is planning a family-friendly trip to Europe. B: The user returned from a trip to Europe on June 15th."
+    },
+    {
+      "answer": "B",
+      "answer_kind": "choice",
+      "derivation": "A=2022-05-15T09:56:00 B=2022-05-15T02:29:00; earlier is B",
+      "evidence_memory_ids": [
+        "mem_94ca41726021992f",
+        "mem_cafb38f6f97d28ef"
+      ],
+      "kind": "comparison",
+      "namespace": "a3045048",
+      "probe_id": "comparison_0041",
+      "question": "Which of these happened first? A: The user posted a photo of their hike to Mount Everest Base Camp on Facebook. B: The user will start taking shorter showers and fixing leaks to help protect freshwater ecosystems."
+    },
+    {
+      "answer": "A",
+      "answer_kind": "choice",
+      "derivation": "A=2023-06-17T20:56:00 B=2023-06-17T22:20:00; earlier is A",
+      "evidence_memory_ids": [
+        "mem_99182452373d059c",
+        "mem_d17ce45a22db5d99"
+      ],
+      "kind": "comparison",
+      "namespace": "gpt4_7ddcf75f",
+      "probe_id": "comparison_0042",
+      "question": "Which of these happened first? A: The user is currently reading a novel and is on chapter 7. B: The user went to the gym during their lunch break on Monday and Tuesday."
+    },
+    {
+      "answer": "B",
+      "answer_kind": "choice",
+      "derivation": "A=2023-05-27T15:01:00 B=2023-05-24T04:04:00; earlier is B",
+      "evidence_memory_ids": [
+        "mem_a28e90e30d5f0732",
+        "mem_f41d937db499ef00"
+      ],
+      "kind": "comparison",
+      "namespace": "ef66a6e5",
+      "probe_id": "comparison_0043",
+      "question": "Which of these happened first? A: The user pre-ordered a limited edition vinyl record 6 months before May 2023. B: The user plans to visit Bali in September to celebrate their one-year work anniversary."
+    },
+    {
+      "answer": "A",
+      "answer_kind": "choice",
+      "derivation": "A=2024-02-05T10:08:00 B=2024-02-05T18:52:00; earlier is A",
+      "evidence_memory_ids": [
+        "mem_e404988a8ddf2c67",
+        "mem_fc466ddea8f09f28"
+      ],
+      "kind": "comparison",
+      "namespace": "157a136e",
+      "probe_id": "comparison_0044",
+      "question": "Which of these happened first? A: The user booked a round-trip ticket to Tokyo through Expedia on February 10, 2024. B: The user attended a museum gala event last month."
+    },
+    {
+      "answer": "A",
+      "answer_kind": "choice",
+      "derivation": "A=2023-05-23T12:35:00 B=2023-05-23T18:00:00; earlier is A",
+      "evidence_memory_ids": [
+        "mem_6c557736a6e3e95c",
+        "mem_c7f1aa4ea05fbde9"
+      ],
+      "kind": "comparison",
+      "namespace": "gpt4_b4a80587",
+      "probe_id": "comparison_0045",
+      "question": "Which of these happened first? A: The user tried a Dragon Roll with tempura shrimp, avocado, and eel sauce at a sushi spot downtown. B: The user organized a beach cleanup event where 20 volunteers collected over 50 bags of trash in three hours."
+    },
+    {
+      "answer": "A",
+      "answer_kind": "choice",
+      "derivation": "A=2023-08-14T21:57:00 B=2023-10-03T07:29:00; earlier is A",
+      "evidence_memory_ids": [
+        "mem_98da419b4f536a7e",
+        "mem_f877ba08ac9e954e"
+      ],
+      "kind": "comparison",
+      "namespace": "603deb26",
+      "probe_id": "comparison_0046",
+      "question": "Which of these happened first? A: The user plans to ask their cousin to help clear the land on the weekend of 2023-08-19. B: The user acquired an autographed Tom Brady jersey."
+    },
+    {
+      "answer": "A",
+      "answer_kind": "choice",
+      "derivation": "A=2023-05-24T05:21:00 B=2023-05-24T15:22:00; earlier is A",
+      "evidence_memory_ids": [
+        "mem_8e779b0b950277e5",
+        "mem_d38eb3d255fb4259"
+      ],
+      "kind": "comparison",
+      "namespace": "f523d9fe",
+      "probe_id": "comparison_0047",
+      "question": "Which of these happened first? A: The user is planning to create a reading nook with a 1920s velvet-upholstered armchair. B: The user bought a pair of winter boots for $80 during a Black Friday sale."
+    },
+    {
+      "answer": "B",
+      "answer_kind": "choice",
+      "derivation": "A=2023-05-28T17:15:00 B=2023-05-22T20:38:00; earlier is B",
+      "evidence_memory_ids": [
+        "mem_c9fd9b3244cf5330",
+        "mem_f275442c629c7719"
+      ],
+      "kind": "comparison",
+      "namespace": "dd2973ad",
+      "probe_id": "comparison_0048",
+      "question": "Which of these happened first? A: The user bought a clear phone case with a built-in screen protector on February 10th for $25. B: The user is interested in reading \"The Conscious Closet\" by Elizabeth L. Cline."
+    },
+    {
+      "answer": "A",
+      "answer_kind": "choice",
+      "derivation": "A=2023-05-30T07:04:00 B=2023-05-30T10:18:00; earlier is A",
+      "evidence_memory_ids": [
+        "mem_6fe6cc684c6cd316",
+        "mem_ecfda17468b5c2a5"
+      ],
+      "kind": "comparison",
+      "namespace": "c8090214_abs",
+      "probe_id": "comparison_0049",
+      "question": "Which of these happened first? A: The user uses garlic powder as a seasoning for roasted vegetables. B: The user is currently reading The Power of Habit."
+    },
+    {
+      "answer": "B",
+      "answer_kind": "choice",
+      "derivation": "A=2023-10-03T10:52:00 B=2023-07-10T01:51:00; earlier is B",
+      "evidence_memory_ids": [
+        "mem_9fb3002965f724c9",
+        "mem_bf8a8e34a7d13040"
+      ],
+      "kind": "comparison",
+      "namespace": "9bbe84a2",
+      "probe_id": "comparison_0050",
+      "question": "Which of these happened first? A: The user had the flu and took two weeks to recover from the resulting fatigue. B: The user has been taking stand-up comedy classes for 6 weeks."
+    },
+    {
+      "answer": "A",
+      "answer_kind": "choice",
+      "derivation": "A=2023-05-24T23:18:00 B=2023-05-26T00:39:00; earlier is A",
+      "evidence_memory_ids": [
+        "mem_0b6b857e72dbc84b",
+        "mem_f78d40ad35f25b0e"
+      ],
+      "kind": "comparison",
+      "namespace": "eaca4986",
+      "probe_id": "comparison_0051",
+      "question": "Which of these happened first? A: The user plans to visit the Mostar Old Bridge Area and the Ste\u0107ci Medieval Tombstones Graveyards in Bosnia and Herzegovina. B: The user has been listening to the How I Built This podcast by Guy Raz for three weeks as of May 26, 2023."
+    },
+    {
+      "answer": "B",
+      "answer_kind": "choice",
+      "derivation": "A=2023-05-30T00:52:00 B=2023-05-25T04:49:00; earlier is B",
+      "evidence_memory_ids": [
+        "mem_da77e565e7ed6642",
+        "mem_e15b26580ea5be50"
+      ],
+      "kind": "comparison",
+      "namespace": "6b168ec8",
+      "probe_id": "comparison_0052",
+      "question": "Which of these happened first? A: The user is considering watching the documentary series \"When We Left Earth: The NASA Missions\" on Netflix. B: The user decided to read 'The 7 Habits of Highly Effective People' by Stephen Covey."
+    },
+    {
+      "answer": "B",
+      "answer_kind": "choice",
+      "derivation": "A=2023-05-26T21:48:00 B=2023-05-26T07:46:00; earlier is B",
+      "evidence_memory_ids": [
+        "mem_a8edb4b1d7c63b85",
+        "mem_ecbb7d479a9dd3dc"
+      ],
+      "kind": "comparison",
+      "namespace": "993da5e2",
+      "probe_id": "comparison_0053",
+      "question": "Which of these happened first? A: The user plans to get a humidifier for their living room. B: The user plans to use Greek yogurt in the marinade for the gochujang chicken wings."
+    },
+    {
+      "answer": "A",
+      "answer_kind": "choice",
+      "derivation": "A=2023-05-21T02:06:00 B=2023-05-21T18:36:00; earlier is A",
+      "evidence_memory_ids": [
+        "mem_546e3a3cca3fdcb4",
+        "mem_e7eeec278a63f19f"
+      ],
+      "kind": "comparison",
+      "namespace": "982b5123",
+      "probe_id": "comparison_0054",
+      "question": "Which of these happened first? A: The user spent $70 at H&M on distressed denim jeans and a white linen shirt three weeks before May 21, 2023. B: The user's tour at the Modern Art Museum was led by a guide named Rachel."
+    },
+    {
+      "answer": "A",
+      "answer_kind": "choice",
+      "derivation": "A=2023-05-26T00:26:00 B=2023-05-29T04:41:00; earlier is A",
+      "evidence_memory_ids": [
+        "mem_bed121affea24b59",
+        "mem_caca3138b99565b6"
+      ],
+      "kind": "comparison",
+      "namespace": "bc149d6b",
+      "probe_id": "comparison_0055",
+      "question": "Which of these happened first? A: The user is creating a party playlist including The Beatles, Katrina & The Waves, and Booker T. & the M.G.'s. B: The user attended a stage production of The Glass Menagerie about one month before 2023-05-29."
+    },
+    {
+      "answer": "A",
+      "answer_kind": "choice",
+      "derivation": "A=2023-05-25T07:34:00 B=2023-05-26T01:19:00; earlier is A",
+      "evidence_memory_ids": [
+        "mem_6e1c464d9a25149b",
+        "mem_9943fa6a143991a5"
+      ],
+      "kind": "comparison",
+      "namespace": "c18a7dc8",
+      "probe_id": "comparison_0056",
+      "question": "Which of these happened first? A: The user decided to use the Mint app for budgeting. B: The user is interested in cross training exercises."
+    },
+    {
+      "answer": "B",
+      "answer_kind": "choice",
+      "derivation": "A=2023-10-25T06:34:00 B=2023-08-27T14:01:00; earlier is B",
+      "evidence_memory_ids": [
+        "mem_2be8c474678b718c",
+        "mem_7d4a2f25be877b6c"
+      ],
+      "kind": "comparison",
+      "namespace": "06db6396",
+      "probe_id": "comparison_0057",
+      "question": "Which of these happened first? A: The user participated in a Beach Cleanup event organized by the Environmental Conservation Society with 20 other volunteers. B: The user plans to create an atmospheric track using their guitar as a foundation."
+    },
+    {
+      "answer": "B",
+      "answer_kind": "choice",
+      "derivation": "A=2023-05-24T20:54:00 B=2023-05-24T01:42:00; earlier is B",
+      "evidence_memory_ids": [
+        "mem_a025ae6e11c3aa10",
+        "mem_bdbb6b337bc53da5"
+      ],
+      "kind": "comparison",
+      "namespace": "gpt4_2487a7cb",
+      "probe_id": "comparison_0058",
+      "question": "Which of these happened first? A: The user plans to play tennis with Jack this Thursday. B: The user uses the Flipp app to check weekly flyers and plan shopping trips."
+    },
+    {
+      "answer": "B",
+      "answer_kind": "choice",
+      "derivation": "A=2023-05-30T11:11:00 B=2023-05-29T16:07:00; earlier is B",
+      "evidence_memory_ids": [
+        "mem_b79437b49d8f3f58",
+        "mem_bc9c4c830847d32a"
+      ],
+      "kind": "comparison",
+      "namespace": "6456829e",
+      "probe_id": "comparison_0059",
+      "question": "Which of these happened first? A: The user purchased an Express Pass for their third visit to Halloween Horror Nights. B: The user planted 5 tomato plants."
+    },
+    {
+      "answer": "software engineering manager and intelligent automation team manager",
+      "answer_kind": "text",
+      "derivation": "the single active memory on ('user', 'job_title'); 1 superseded value(s) precede it",
+      "evidence_memory_ids": [
+        "mem_1b38aab9f40538d7",
+        "mem_40efa1fd5d044b35"
+      ],
+      "kind": "current_state",
+      "namespace": "a4996e51",
+      "probe_id": "current_state_0000",
+      "question": "What is currently true about user's job title?"
+    },
+    {
+      "answer": "coffee table",
+      "answer_kind": "text",
+      "derivation": "the single active memory on ('user', 'furniture'); 1 superseded value(s) precede it",
+      "evidence_memory_ids": [
+        "mem_3abeb9b4ee074eb9",
+        "mem_a9a7fe7ed00ea806"
+      ],
+      "kind": "current_state",
+      "namespace": "a3045048",
+      "probe_id": "current_state_0001",
+      "question": "What is currently true about user's furniture?"
+    },
+    {
+      "answer": "Sapiens: A Brief History of Humankind",
+      "answer_kind": "text",
+      "derivation": "the single active memory on ('user', 'books_listening_status'); 1 superseded value(s) precede it",
+      "evidence_memory_ids": [
+        "mem_abaf6681e7f69c70",
+        "mem_e12ee507f325f272"
+      ],
+      "kind": "current_state",
+      "namespace": "gpt4_a1b77f9c",
+      "probe_id": "current_state_0002",
+      "question": "What is currently true about user's books listening status?"
+    },
+    {
+      "answer": "Tuesdays and Thursdays",
+      "answer_kind": "text",
+      "derivation": "the single active memory on ('user', 'gym_schedule'); 2 superseded value(s) precede it",
+      "evidence_memory_ids": [
+        "mem_00287075bade4da3",
+        "mem_168f247392fc7723",
+        "mem_5a91a9a48be082f5"
+      ],
+      "kind": "current_state",
+      "namespace": "gpt4_59149c77",
+      "probe_id": "current_state_0003",
+      "question": "What is currently true about user's gym schedule?"
+    },
+    {
+      "answer": "San Francisco",
+      "answer_kind": "text",
+      "derivation": "the single active memory on ('user', 'home_city'); 1 superseded value(s) precede it",
+      "evidence_memory_ids": [
+        "mem_a84223e7f3dad8b4",
+        "mem_fca9a1b4a8a19fd7"
+      ],
+      "kind": "current_state",
+      "namespace": "7527f7e2",
+      "probe_id": "current_state_0004",
+      "question": "What is currently true about user's home city?"
+    },
+    {
+      "answer": "2 hours",
+      "answer_kind": "text",
+      "derivation": "the single active memory on ('user', 'coding_daily_duration'); 1 superseded value(s) precede it",
+      "evidence_memory_ids": [
+        "mem_cc492e156c2c950b",
+        "mem_fe9e8e9a852514b9"
+      ],
+      "kind": "current_state",
+      "namespace": "cc5ded98",
+      "probe_id": "current_state_0005",
+      "question": "What is currently true about user's coding daily duration?"
+    },
+    {
+      "answer": "5 times a week",
+      "answer_kind": "text",
+      "derivation": "the single active memory on ('user', 'gym_frequency'); 1 superseded value(s) precede it",
+      "evidence_memory_ids": [
+        "mem_9999769bbb81a2fb",
+        "mem_f2b053d096b51f35"
+      ],
+      "kind": "current_state",
+      "namespace": "gpt4_a1b77f9c",
+      "probe_id": "current_state_0006",
+      "question": "What is currently true about user's gym frequency?"
+    },
+    {
+      "answer": "5 engineers",
+      "answer_kind": "text",
+      "derivation": "the single active memory on ('user', 'team_size'); 1 superseded value(s) precede it",
+      "evidence_memory_ids": [
+        "mem_86a170a3d333de3a",
+        "mem_f087baf6905e5fdf"
+      ],
+      "kind": "current_state",
+      "namespace": "031748ae",
+      "probe_id": "current_state_0007",
+      "question": "What is currently true about user's team size?"
+    },
+    {
+      "answer": "grandma's old farmhouse",
+      "answer_kind": "text",
+      "derivation": "the single active memory on ('user', 'real_estate'); 1 superseded value(s) precede it",
+      "evidence_memory_ids": [
+        "mem_028ca48c24221bd7",
+        "mem_cebb2c2102e74d94"
+      ],
+      "kind": "current_state",
+      "namespace": "8ebdbe50",
+      "probe_id": "current_state_0008",
+      "question": "What is currently true about user's real estate?"
+    },
+    {
+      "answer": "4-week submissions and grips",
+      "answer_kind": "text",
+      "derivation": "the single active memory on ('assistant', 'bjj_training_program'); 1 superseded value(s) precede it",
+      "evidence_memory_ids": [
+        "mem_907f7e52766e8ba4",
+        "mem_dd15d36a21d5c848"
+      ],
+      "kind": "current_state",
+      "namespace": "1c0ddc50",
+      "probe_id": "current_state_0009",
+      "question": "What is currently true about assistant's bjj training program?"
+    },
+    {
+      "answer": "Badlands National Park",
+      "answer_kind": "text",
+      "derivation": "the single active memory on ('user', 'road_trip_destinations'); 1 superseded value(s) precede it",
+      "evidence_memory_ids": [
+        "mem_138581460fa21877",
+        "mem_939b19ba7e6a56b8"
+      ],
+      "kind": "current_state",
+      "namespace": "cc5ded98",
+      "probe_id": "current_state_0010",
+      "question": "What is currently true about user's road trip destinations?"
+    },
+    {
+      "answer": "12:30 am",
+      "answer_kind": "text",
+      "derivation": "the single active memory on ('user', 'bedtime'); 1 superseded value(s) precede it",
+      "evidence_memory_ids": [
+        "mem_85a4626ffa1fc251",
+        "mem_f71eff67ea287b00"
+      ],
+      "kind": "current_state",
+      "namespace": "86b68151",
+      "probe_id": "current_state_0011",
+      "question": "What is currently true about user's bedtime?"
+    },
+    {
+      "answer": "new TV from Best Buy",
+      "answer_kind": "text",
+      "derivation": "the single active memory on ('user', 'smart_tv'); 1 superseded value(s) precede it",
+      "evidence_memory_ids": [
+        "mem_6973746f1013e661",
+        "mem_ecf769308f4cfc0c"
+      ],
+      "kind": "current_state",
+      "namespace": "gpt4_4edbafa2",
+      "probe_id": "current_state_0012",
+      "question": "What is currently true about user's smart tv?"
+    },
+    {
+      "answer": "Hydro Flask Standard Mouth 24 oz",
+      "answer_kind": "text",
+      "derivation": "the single active memory on ('user', 'water_bottle'); 1 superseded value(s) precede it",
+      "evidence_memory_ids": [
+        "mem_990169026e679ef8",
+        "mem_f18bbafc6102425d"
+      ],
+      "kind": "current_state",
+      "namespace": "28dc39ac",
+      "probe_id": "current_state_0013",
+      "question": "What is currently true about user's water bottle?"
+    },
+    {
+      "answer": "The Song of Achilles by Madeline Miller",
+      "answer_kind": "text",
+      "derivation": "the single active memory on ('user', 'books_reading'); 1 superseded value(s) precede it",
+      "evidence_memory_ids": [
+        "mem_5b0293bc0a34a42e",
+        "mem_9af34dda5c1711a8"
+      ],
+      "kind": "current_state",
+      "namespace": "gpt4_2d58bcd6",
+      "probe_id": "current_state_0014",
+      "question": "What is currently true about user's books reading?"
+    },
+    {
+      "answer": "20 dozen",
+      "answer_kind": "text",
+      "derivation": "the single active memory on ('user', 'egg_stock'); 1 superseded value(s) precede it",
+      "evidence_memory_ids": [
+        "mem_3616d03df16eb76e",
+        "mem_841737b67abacded"
+      ],
+      "kind": "current_state",
+      "namespace": "ed4ddc30",
+      "probe_id": "current_state_0015",
+      "question": "What is currently true about user's egg stock?"
+    },
+    {
+      "answer": "Vancouver",
+      "answer_kind": "text",
+      "derivation": "the single active memory on ('user', 'home_city'); 2 superseded value(s) precede it",
+      "evidence_memory_ids": [
+        "mem_3b89651dc2e061ac",
+        "mem_3cab0c3a064a0d12",
+        "mem_fa360cbd6ddc5f99"
+      ],
+      "kind": "current_state",
+      "namespace": "7401057b",
+      "probe_id": "current_state_0016",
+      "question": "What is currently true about user's home city?"
+    },
+    {
+      "answer": "plans to cut down",
+      "answer_kind": "text",
+      "derivation": "the single active memory on ('user', 'coffee_consumption'); 1 superseded value(s) precede it",
+      "evidence_memory_ids": [
+        "mem_0b87af455fdcbd2b",
+        "mem_b9cd8d65a5b14ac8"
+      ],
+      "kind": "current_state",
+      "namespace": "f9e8c073",
+      "probe_id": "current_state_0017",
+      "question": "What is currently true about user's coffee consumption?"
+    },
+    {
+      "answer": "IKEA sofa bed",
+      "answer_kind": "text",
+      "derivation": "the single active memory on ('user', 'couch'); 1 superseded value(s) precede it",
+      "evidence_memory_ids": [
+        "mem_a6752e64a6829d36",
+        "mem_cad313d20b763faf"
+      ],
+      "kind": "current_state",
+      "namespace": "0bc8ad92",
+      "probe_id": "current_state_0018",
+      "question": "What is currently true about user's couch?"
+    },
+    {
+      "answer": "7",
+      "answer_kind": "text",
+      "derivation": "the single active memory on ('user', 'books_read_count'); 1 superseded value(s) precede it",
+      "evidence_memory_ids": [
+        "mem_66c7f9a64b215a58",
+        "mem_f71fc601ceb186bf"
+      ],
+      "kind": "current_state",
+      "namespace": "e3038f8c",
+      "probe_id": "current_state_0019",
+      "question": "What is currently true about user's books read count?"
+    },
+    {
+      "answer": "Emily Rose Thompson",
+      "answer_kind": "text",
+      "derivation": "the single active memory on ('user', 'user_name'); 1 superseded value(s) precede it",
+      "evidence_memory_ids": [
+        "mem_5f225e36e7c9e0c5",
+        "mem_f82a6d1d92c87e23"
+      ],
+      "kind": "current_state",
+      "namespace": "1e043500",
+      "probe_id": "current_state_0020",
+      "question": "What is currently true about user's user name?"
+    },
+    {
+      "answer": "1000 dollars for St. Jude Walk/Run",
+      "answer_kind": "text",
+      "derivation": "the single active memory on ('user', 'fundraising_goal'); 1 superseded value(s) precede it",
+      "evidence_memory_ids": [
+        "mem_17b82cc12cedaec2",
+        "mem_998c2508595b919c"
+      ],
+      "kind": "current_state",
+      "namespace": "b5ef892d",
+      "probe_id": "current_state_0021",
+      "question": "What is currently true about user's fundraising goal?"
+    },
+    {
+      "answer": "bass guitar",
+      "answer_kind": "text",
+      "derivation": "the single active memory on ('user', 'musical_instruments'); 1 superseded value(s) precede it",
+      "evidence_memory_ids": [
+        "mem_c448038d418733fc",
+        "mem_f0c243a96ab0d307"
+      ],
+      "kind": "current_state",
+      "namespace": "031748ae",
+      "probe_id": "current_state_0022",
+      "question": "What is currently true about user's musical instruments?"
+    },
+    {
+      "answer": "1 hour per day",
+      "answer_kind": "text",
+      "derivation": "the single active memory on ('user', 'social_media_usage'); 1 superseded value(s) precede it",
+      "evidence_memory_ids": [
+        "mem_18842a17a7b8c019",
+        "mem_814a9572bb80dde2"
+      ],
+      "kind": "current_state",
+      "namespace": "06db6396",
+      "probe_id": "current_state_0023",
+      "question": "What is currently true about user's social media usage?"
+    },
+    {
+      "answer": "black and brown dog bed",
+      "answer_kind": "text",
+      "derivation": "the single active memory on ('max', 'pet_supplies'); 1 superseded value(s) precede it",
+      "evidence_memory_ids": [
+        "mem_2f01d64eb0c7b430",
+        "mem_8ac73ffdb33a0575"
+      ],
+      "kind": "current_state",
+      "namespace": "bc149d6b",
+      "probe_id": "current_state_0024",
+      "question": "What is currently true about max's pet supplies?"
+    },
+    {
+      "answer": "new graphics card",
+      "answer_kind": "text",
+      "derivation": "the single active memory on ('user', 'graphics_card'); 1 superseded value(s) precede it",
+      "evidence_memory_ids": [
+        "mem_6b59fc18d27a3fa8",
+        "mem_76fde0218f41a833"
+      ],
+      "kind": "current_state",
+      "namespace": "60bf93ed_abs",
+      "probe_id": "current_state_0025",
+      "question": "What is currently true about user's graphics card?"
+    },
+    {
+      "answer": "spinning class",
+      "answer_kind": "text",
+      "derivation": "the single active memory on ('user', 'fitness_classes'); 1 superseded value(s) precede it",
+      "evidence_memory_ids": [
+        "mem_a3cc0d1bd24f8c5f",
+        "mem_f467a3a41a4f78c3"
+      ],
+      "kind": "current_state",
+      "namespace": "1cea1afa",
+      "probe_id": "current_state_0026",
+      "question": "What is currently true about user's fitness classes?"
+    },
+    {
+      "answer": "swapped dresser and nightstand",
+      "answer_kind": "text",
+      "derivation": "the single active memory on ('user', 'bedroom_layout'); 1 superseded value(s) precede it",
+      "evidence_memory_ids": [
+        "mem_2637ecb564f4562b",
+        "mem_6d6e1648bbcd099d"
+      ],
+      "kind": "current_state",
+      "namespace": "a3045048",
+      "probe_id": "current_state_0027",
+      "question": "What is currently true about user's bedroom layout?"
+    },
+    {
+      "answer": "Yamaha PSR-E263 keyboard",
+      "answer_kind": "text",
+      "derivation": "the single active memory on ('user', 'musical_instruments'); 2 superseded value(s) precede it",
+      "evidence_memory_ids": [
+        "mem_c5b0c882fcf08b86",
+        "mem_d57214359ebde1c2",
+        "mem_fe18cd520cefe16d"
+      ],
+      "kind": "current_state",
+      "namespace": "3a704032",
+      "probe_id": "current_state_0028",
+      "question": "What is currently true about user's musical instruments?"
+    },
+    {
+      "answer": "Phoebe Bridgers Punisher",
+      "answer_kind": "text",
+      "derivation": "the single active memory on ('user', 'music_listening'); 1 superseded value(s) precede it",
+      "evidence_memory_ids": [
+        "mem_a43a865842d1353a",
+        "mem_b927102f80453048"
+      ],
+      "kind": "current_state",
+      "namespace": "gpt4_4929293b",
+      "probe_id": "current_state_0029",
+      "question": "What is currently true about user's music listening?"
+    },
+    {
+      "answer": "Adidas sneakers",
+      "answer_kind": "text",
+      "derivation": "the single active memory on ('user', 'footwear'); 1 superseded value(s) precede it",
+      "evidence_memory_ids": [
+        "mem_c75957554fcc3083",
+        "mem_cab6db2f97adcbfa"
+      ],
+      "kind": "current_state",
+      "namespace": "a82c026e",
+      "probe_id": "current_state_0030",
+      "question": "What is currently true about user's footwear?"
+    },
+    {
+      "answer": "LCO",
+      "answer_kind": "text",
+      "derivation": "the single active memory on ('user', 'organization_naming'); 1 superseded value(s) precede it",
+      "evidence_memory_ids": [
+        "mem_17c8d51899f3837a",
+        "mem_ce78c0c561001eed"
+      ],
+      "kind": "current_state",
+      "namespace": "1a1907b4",
+      "probe_id": "current_state_0031",
+      "question": "What is currently true about user's organization naming?"
+    },
+    {
+      "answer": "Mickey's Soundsational Parade",
+      "answer_kind": "text",
+      "derivation": "the single active memory on ('disneyland', 'disneyland_event'); 2 superseded value(s) precede it",
+      "evidence_memory_ids": [
+        "mem_07de25542a711764",
+        "mem_60b9d2fb73c72685",
+        "mem_c02b242a20b6e97c"
+      ],
+      "kind": "current_state",
+      "namespace": "gpt4_0a05b494",
+      "probe_id": "current_state_0032",
+      "question": "What is currently true about disneyland's disneyland event?"
+    },
+    {
+      "answer": "Tuesday strength training",
+      "answer_kind": "text",
+      "derivation": "the single active memory on ('user', 'fitness_schedule'); 1 superseded value(s) precede it",
+      "evidence_memory_ids": [
+        "mem_02531e63d7e25365",
+        "mem_5b2021fe44a5a46e"
+      ],
+      "kind": "current_state",
+      "namespace": "57f827a0",
+      "probe_id": "current_state_0033",
+      "question": "What is currently true about user's fitness schedule?"
+    },
+    {
+      "answer": "salsa shoes with laces",
+      "answer_kind": "text",
+      "derivation": "the single active memory on ('user', 'shoe_search'); 1 superseded value(s) precede it",
+      "evidence_memory_ids": [
+        "mem_2579a4e4f56b89ec",
+        "mem_c038413be006243a"
+      ],
+      "kind": "current_state",
+      "namespace": "46a3abf7",
+      "probe_id": "current_state_0034",
+      "question": "What is currently true about user's shoe search?"
+    },
+    {
+      "answer": "honey",
+      "answer_kind": "text",
+      "derivation": "the single active memory on ('user', 'tea_preferences'); 1 superseded value(s) precede it",
+      "evidence_memory_ids": [
+        "mem_5db847b2d9d60b94",
+        "mem_c0d7507dd1cfd915"
+      ],
+      "kind": "current_state",
+      "namespace": "5809eb10",
+      "probe_id": "current_state_0035",
+      "question": "What is currently true about user's tea preferences?"
+    },
+    {
+      "answer": "10,000",
+      "answer_kind": "text",
+      "derivation": "the single active memory on ('user', 'youtube_subscriber_goal'); 1 superseded value(s) precede it",
+      "evidence_memory_ids": [
+        "mem_796cc0e2ab99fb99",
+        "mem_e883da4c6a70c6cb"
+      ],
+      "kind": "current_state",
+      "namespace": "0e4e4c46",
+      "probe_id": "current_state_0036",
+      "question": "What is currently true about user's youtube subscriber goal?"
+    },
+    {
+      "answer": "18",
+      "answer_kind": "text",
+      "derivation": "the single active memory on ('user', 'vintage_cameras_count'); 1 superseded value(s) precede it",
+      "evidence_memory_ids": [
+        "mem_13a43ee5ee5574a7",
+        "mem_4f8e3570a82c66fb"
+      ],
+      "kind": "current_state",
+      "namespace": "15745da0_abs",
+      "probe_id": "current_state_0037",
+      "question": "What is currently true about user's vintage cameras count?"
+    },
+    {
+      "answer": "32",
+      "answer_kind": "text",
+      "derivation": "the single active memory on ('user', 'age'); 1 superseded value(s) precede it",
+      "evidence_memory_ids": [
+        "mem_eb87e3187d8b83b9",
+        "mem_fbdf11b28e7e84cd"
+      ],
+      "kind": "current_state",
+      "namespace": "0bb5a684",
+      "probe_id": "current_state_0038",
+      "question": "What is currently true about user's age?"
+    },
+    {
+      "answer": "25 minutes",
+      "answer_kind": "text",
+      "derivation": "the single active memory on ('user', 'commute_duration'); 1 superseded value(s) precede it",
+      "evidence_memory_ids": [
+        "mem_16ee3b31ca33ff91",
+        "mem_4e74990162b06b8f"
+      ],
+      "kind": "current_state",
+      "namespace": "bc149d6b",
+      "probe_id": "current_state_0039",
+      "question": "What is currently true about user's commute duration?"
+    },
+    {
+      "answer": "32",
+      "answer_kind": "text",
+      "derivation": "the single active memory on ('user', 'bird_species_count'); 1 superseded value(s) precede it",
+      "evidence_memory_ids": [
+        "mem_79578fdecd42cf3d",
+        "mem_97857052b99914d8"
+      ],
+      "kind": "current_state",
+      "namespace": "affe2881",
+      "probe_id": "current_state_0040",
+      "question": "What is currently true about user's bird species count?"
+    },
+    {
+      "answer": "The Power",
+      "answer_kind": "text",
+      "derivation": "the single active memory on ('user', 'books_reading_status'); 1 superseded value(s) precede it",
+      "evidence_memory_ids": [
+        "mem_613fe6214da61eb9",
+        "mem_e1678e5c6eb9ef31"
+      ],
+      "kind": "current_state",
+      "namespace": "gpt4_a1b77f9c",
+      "probe_id": "current_state_0041",
+      "question": "What is currently true about user's books reading status?"
+    },
+    {
+      "answer": "playing as Brazil",
+      "answer_kind": "text",
+      "derivation": "the single active memory on ('user', 'civilization_v_game'); 2 superseded value(s) precede it",
+      "evidence_memory_ids": [
+        "mem_3bafe0bcfe84a636",
+        "mem_b4ce4cf5222e8d11",
+        "mem_fc3b854fcc6e843a"
+      ],
+      "kind": "current_state",
+      "namespace": "195a1a1b",
+      "probe_id": "current_state_0042",
+      "question": "What is currently true about user's civilization v game?"
+    },
+    {
+      "answer": "favorite sneakers",
+      "answer_kind": "text",
+      "derivation": "the single active memory on ('user', 'sneakers'); 1 superseded value(s) precede it",
+      "evidence_memory_ids": [
+        "mem_3a49b00e107caad8",
+        "mem_8783952664c4a969"
+      ],
+      "kind": "current_state",
+      "namespace": "7e00a6cb",
+      "probe_id": "current_state_0043",
+      "question": "What is currently true about user's sneakers?"
+    },
+    {
+      "answer": "4500 Fetch Rewards points",
+      "answer_kind": "text",
+      "derivation": "the single active memory on ('user', 'rewards_points'); 1 superseded value(s) precede it",
+      "evidence_memory_ids": [
+        "mem_6dabf488ebab05a2",
+        "mem_c565049590fa7d97"
+      ],
+      "kind": "current_state",
+      "namespace": "a96c20ee",
+      "probe_id": "current_state_0044",
+      "question": "What is currently true about user's rewards points?"
+    },
+    {
+      "answer": "received new tennis racket",
+      "answer_kind": "text",
+      "derivation": "the single active memory on ('user', 'tennis_racket'); 1 superseded value(s) precede it",
+      "evidence_memory_ids": [
+        "mem_51d672c2c5600e8e",
+        "mem_f4211f54efd54fa1"
+      ],
+      "kind": "current_state",
+      "namespace": "gpt4_7a0daae1",
+      "probe_id": "current_state_0045",
+      "question": "What is currently true about user's tennis racket?"
+    },
+    {
+      "answer": "Apex Legends level 150",
+      "answer_kind": "text",
+      "derivation": "the single active memory on ('user', 'gaming_goals'); 1 superseded value(s) precede it",
+      "evidence_memory_ids": [
+        "mem_7bc7cb8f97e889bf",
+        "mem_7f5f305e3d560062"
+      ],
+      "kind": "current_state",
+      "namespace": "9bbe84a2",
+      "probe_id": "current_state_0046",
+      "question": "What is currently true about user's gaming goals?"
+    },
+    {
+      "answer": "41,000",
+      "answer_kind": "text",
+      "derivation": "the single active memory on ('ewell', 'population_ewell'); 1 superseded value(s) precede it",
+      "evidence_memory_ids": [
+        "mem_6d52913c58d31952",
+        "mem_7161272841963d81"
+      ],
+      "kind": "current_state",
+      "namespace": "58ef2f1c",
+      "probe_id": "current_state_0047",
+      "question": "What is currently true about ewell's population ewell?"
+    },
+    {
+      "answer": "three times a week",
+      "answer_kind": "text",
+      "derivation": "the single active memory on ('user', 'yoga_frequency'); 1 superseded value(s) precede it",
+      "evidence_memory_ids": [
+        "mem_0fdf398125034968",
+        "mem_d53d0ef184c71718"
+      ],
+      "kind": "current_state",
+      "namespace": "5831f84d",
+      "probe_id": "current_state_0048",
+      "question": "What is currently true about user's yoga frequency?"
+    }
+  ],
+  "relation_map_sha256": "1967989ae1f8380f3d77474cf992b00515a63b911f628941045bed7e46e5f21b",
+  "schema_version": 1,
+  "seed": 20260905,
+  "store": "train150.db",
+  "store_fingerprint": "7eca3a49e37c28e19e7972dfc5e93b29fadfcb96cb00b3aae582df6a0061ab12"
+}

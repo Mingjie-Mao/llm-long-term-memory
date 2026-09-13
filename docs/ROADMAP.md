@@ -1,5 +1,7 @@
 # Roadmap — from experiment to product
 
+> 2026-09-13：当前成果和执行顺序见[全部成果与完整计划](PROJECT_RESULTS_AND_PLAN_2026-09-13.zh-CN.md)。v4.2 真实开发比较已完成、未晋级；下一步是人工金标复核、新版计数仪器和产品运维闭环。下文保留各阶段当时的计划与决策，其中旧日期的待办不代表今天仍未完成。
+
 **Direction set 2026-08-14.** LLTM is a **persistent memory layer for LLM
 agents**, not a LongMemEval experiment. The experiments were the justification for
 the design; they are no longer the deliverable. Someone should be able to open the
@@ -41,31 +43,14 @@ fallback** rather than an always-on stage. Hydration is not shown to be useless 
 is untested at n=3 disagreements — but it is not entitled to a 3x context cost by
 default.
 
-Architecturally that makes LLTM two stores rather than one, which is the shape
-the product should have anyway:
+Architecturally this separates raw evidence from structured state. Both live in
+the same SQLite database, with vector sidecars:
 
-```
-                    Conversation
-                         │
-             ┌───────────┴───────────┐
-             ↓                       ↓
-     Raw conversation           Extractor
-        archive                     │
-             │                      ↓
-             │             Structured memory
-             │                      │
-Query ───────┼──────────────────────┘
-             │              memory retrieval
-             │                      │
-             │            enough to answer?
-             │              ┌───────┴───────┐
-             │             yes              no
-             │              │                │
-             │              ↓                ↓
-             └────────> answer      raw-evidence search
-                                             │
-                                    source-cited answer
-```
+![System overview: structured memory and recoverable source evidence](figures/overview.svg)
+
+The figure has been redrawn against the current working-tree implementation. See the
+[architecture atlas](ARCHITECTURE.md) for all six figures and entry-point differences;
+the research narrative below retains its historical context.
 
 Structured memory is the understood long-term state; the conversation archive is the
 ground truth for when compression turns out to have been lossy. The `turns` table
@@ -344,13 +329,10 @@ Attaching raw evidence to every answer was already measured: `two_stage_hydrated
 tripled context for no detectable gain, which is a slow slide back into naive RAG.
 So recovery is **conditional**, and the answerer decides:
 
-```
-first call -> AnswerVerdict{status: answer | need_source | no_evidence}
-   answer       -> done, one LLM call
-   need_source  -> source-local: the turns those memories came from
-   no_evidence  -> archive-wide: BM25 over every turn in the namespace
-                -> nothing found: decline, and stay declined
-```
+![Read path with all three verdict branches](figures/read-path.svg)
+
+The updated figure includes archive-wide recovery from both insufficient-memory
+verdicts. See [Figure 4](ARCHITECTURE.md#4-读取与条件回退) for the exact source-local selection rule.
 
 Two levels, cheapest first. Source-local is precise because retrieval already found
 the right memory and only the detail is missing; archive-wide exists because

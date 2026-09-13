@@ -1,0 +1,95 @@
+{
+  "schema_version": 1,
+  "experiment_id": "v4.1-scan",
+  "archived_at": "2026-09-12",
+  "archive_type": "retrospective_evidence_preservation",
+  "audit_checkout": "f5495e7651b821f34e9db2f89fd8cf4048fe86be",
+  "outcome": "exploratory_not_promoted",
+  "source_bound_at_run_time": false,
+  "per_kind_saved_verdicts": {
+    "comparison": {
+      "n": 33,
+      "correct": 17,
+      "context_complete": 33
+    },
+    "count": {
+      "n": 30,
+      "correct": 8,
+      "context_complete": 22
+    },
+    "current_state": {
+      "n": 49,
+      "correct": 37,
+      "context_complete": 49
+    },
+    "duration": {
+      "n": 30,
+      "correct": 19,
+      "context_complete": 30
+    }
+  },
+  "baseline_per_kind_saved_verdicts": {
+    "comparison": {
+      "n": 33,
+      "correct": 19,
+      "context_complete": 33
+    },
+    "count": {
+      "n": 30,
+      "correct": 5,
+      "context_complete": 17
+    },
+    "current_state": {
+      "n": 49,
+      "correct": 42,
+      "context_complete": 49
+    },
+    "duration": {
+      "n": 30,
+      "correct": 21,
+      "context_complete": 30
+    }
+  },
+  "correct_count_differences": {
+    "comparison": -2,
+    "count": 3,
+    "current_state": -5,
+    "duration": -2
+  },
+  "gate_0": "NOT EVALUABLE: historical rows lack observed scan_route; current reconstruction is not contemporaneous evidence.",
+  "historical_usage": null,
+  "provider_calls_during_archival": 0,
+  "held_out_rows_in_archive": 0,
+  "original_source": "results/raw/probes.v4.1-scan.jsonl",
+  "original_sha256": "e3bb78aab4ec7f580159087d9c1f1512d6ef6bd1b118a6dcd3e1f4117822fce6",
+  "limitations": [
+    "Saved verdicts only; no regrading.",
+    "No historical source snapshot, run_identity or observed scan_route.",
+    "No reliable historical usage sidecar bound to these rows.",
+    "Historical single-probe thresholds are descriptive checks, not reliable causal or statistical evidence.",
+    "No proof that all flat/flat2 source and configuration bytes were identical."
+  ],
+  "not_a_benchmark": "SQL ground truth over stored facts inherits extraction errors; development instrument only.",
+  "files": [
+    {
+      "path": "results/archive/v4.1-scan/probes.v4.1-scan.jsonl",
+      "bytes": 206087,
+      "sha256": "e3bb78aab4ec7f580159087d9c1f1512d6ef6bd1b118a6dcd3e1f4117822fce6"
+    },
+    {
+      "path": "results/archive/v4.1-scan/probes.v4.0-flat.jsonl",
+      "bytes": 206162,
+      "sha256": "93be07ee9a533f0d9a669f07ac56c83d2ee4c1abd143c67fa9e3b6a411b79eed"
+    },
+    {
+      "path": "results/archive/v4.1-scan/v4-probe-split.json",
+      "bytes": 7199,
+      "sha256": "7af4529a5bb6170c71b281c505f10e33a0cbd3e5168d257bcc5a9d79411304e6"
+    },
+    {
+      "path": "results/archive/v4.1-scan/README.md",
+      "bytes": 2022,
+      "sha256": "9a9ac22137f14f5eef25d8fa77a60d396c46326f08a0e5edc05857d64409effa"
+    }
+  ]
+}

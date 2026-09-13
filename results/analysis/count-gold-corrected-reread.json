@@ -1,0 +1,148 @@
+{
+  "schema_version": 1,
+  "provider_calls": 0,
+  "probe_set_never_edited": "synthesis-probes.json is hashed into v4-probe-split.json, so corrections are an overlay applied at read time.",
+  "adjudication": {
+    "file": "results/analysis/count-probe-gold-corrections.json",
+    "by": "model (Claude), rule-tagged for human review — NOT a human adjudication",
+    "counts": {
+      "adjudicated": 38,
+      "keep": 7,
+      "exclude": 31,
+      "medium_confidence": 1,
+      "disputed": 2,
+      "high_confidence": 35
+    }
+  },
+  "gold": {
+    "count_probes": 60,
+    "probes_changed": 18,
+    "members_excluded": 31,
+    "members_before": 271,
+    "members_after": 240
+  },
+  "per_run": {
+    "control-v3.3": {
+      "probes": 30,
+      "repeats_per_probe": 1.0,
+      "correct_against_original_gold": 5,
+      "correct_against_corrected_gold": 10,
+      "unnamed_members_original_gold": 130.0,
+      "unnamed_members_corrected_gold": 106.0
+    },
+    "v4.0-flat": {
+      "probes": 30,
+      "repeats_per_probe": 1.0,
+      "correct_against_original_gold": 5,
+      "correct_against_corrected_gold": 7,
+      "unnamed_members_original_gold": 45.0,
+      "unnamed_members_corrected_gold": 28.0
+    },
+    "v4.0-flat2": {
+      "probes": 30,
+      "repeats_per_probe": 1.0,
+      "correct_against_original_gold": 8,
+      "correct_against_corrected_gold": 10,
+      "unnamed_members_original_gold": 45.0,
+      "unnamed_members_corrected_gold": 29.0
+    },
+    "v4.1-scan": {
+      "probes": 30,
+      "repeats_per_probe": 1.0,
+      "correct_against_original_gold": 8,
+      "correct_against_corrected_gold": 10,
+      "unnamed_members_original_gold": 44.0,
+      "unnamed_members_corrected_gold": 26.0
+    },
+    "v4.2-control": {
+      "probes": 30,
+      "repeats_per_probe": 3.0,
+      "correct_against_original_gold": 4,
+      "correct_against_corrected_gold": 12,
+      "unnamed_members_original_gold": 47.0,
+      "unnamed_members_corrected_gold": 30.0
+    },
+    "v4.2-candidate": {
+      "probes": 30,
+      "repeats_per_probe": 3.0,
+      "correct_against_original_gold": 5,
+      "correct_against_corrected_gold": 7,
+      "unnamed_members_original_gold": 47.0,
+      "unnamed_members_corrected_gold": 31.0
+    }
+  },
+  "per_probe_gold": {
+    "count_0005": {
+      "original": 3,
+      "corrected": 1
+    },
+    "count_0007": {
+      "original": 9,
+      "corrected": 8
+    },
+    "count_0011": {
+      "original": 4,
+      "corrected": 2
+    },
+    "count_0012": {
+      "original": 5,
+      "corrected": 2
+    },
+    "count_0015": {
+      "original": 3,
+      "corrected": 2
+    },
+    "count_0016": {
+      "original": 6,
+      "corrected": 4
+    },
+    "count_0018": {
+      "original": 3,
+      "corrected": 2
+    },
+    "count_0022": {
+      "original": 3,
+      "corrected": 2
+    },
+    "count_0024": {
+      "original": 3,
+      "corrected": 0
+    },
+    "count_0025": {
+      "original": 3,
+      "corrected": 1
+    },
+    "count_0030": {
+      "original": 3,
+      "corrected": 2
+    },
+    "count_0032": {
+      "original": 5,
+      "corrected": 2
+    },
+    "count_0035": {
+      "original": 3,
+      "corrected": 2
+    },
+    "count_0039": {
+      "original": 5,
+      "corrected": 2
+    },
+    "count_0044": {
+      "original": 9,
+      "corrected": 8
+    },
+    "count_0048": {
+      "original": 4,
+      "corrected": 2
+    },
+    "count_0052": {
+      "original": 3,
+      "corrected": 2
+    },
+    "count_0056": {
+      "original": 4,
+      "corrected": 3
+    }
+  }
+}

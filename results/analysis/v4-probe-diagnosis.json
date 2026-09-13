@@ -1,0 +1,240 @@
+{
+  "comparisons_against_control": {
+    "v4.0-flat": {
+      "losses": 13,
+      "n": 142,
+      "net": 9,
+      "retrieval_identical": 142,
+      "verdict_changed": 43,
+      "wins": 22
+    },
+    "v4.0-flat2": {
+      "losses": 21,
+      "n": 142,
+      "net": 2,
+      "retrieval_identical": 142,
+      "verdict_changed": 55,
+      "wins": 23
+    },
+    "v4.1-scan": {
+      "losses": 20,
+      "n": 142,
+      "net": 3,
+      "retrieval_identical": 131,
+      "verdict_changed": 55,
+      "wins": 23
+    }
+  },
+  "count_diagnosis": {
+    "control-v3.3": {
+      "direction_of_wrong_numbers": {
+        "over": 5,
+        "under": 18
+      },
+      "gold_facts_never_named": {
+        "absent_from_context": 19,
+        "in_context_never_named": 130
+      },
+      "layers": {
+        "abstained_no_number": 2,
+        "correct": 5,
+        "reading_failure": 12,
+        "retrieval_gap": 11
+      },
+      "number_disagreed_with_own_item_list": 27,
+      "same_fact_named_twice": 0,
+      "spurious_items_named": 0
+    },
+    "v4.0-flat": {
+      "direction_of_wrong_numbers": {
+        "over": 6,
+        "under": 15
+      },
+      "gold_facts_never_named": {
+        "absent_from_context": 17,
+        "in_context_never_named": 45
+      },
+      "layers": {
+        "abstained_no_number": 4,
+        "correct": 5,
+        "reading_failure": 11,
+        "retrieval_gap": 10
+      },
+      "number_disagreed_with_own_item_list": 1,
+      "same_fact_named_twice": 7,
+      "spurious_items_named": 23
+    },
+    "v4.0-flat2": {
+      "direction_of_wrong_numbers": {
+        "over": 4,
+        "under": 15
+      },
+      "gold_facts_never_named": {
+        "absent_from_context": 17,
+        "in_context_never_named": 45
+      },
+      "layers": {
+        "abstained_no_number": 3,
+        "correct": 8,
+        "reading_failure": 10,
+        "retrieval_gap": 9
+      },
+      "number_disagreed_with_own_item_list": 0,
+      "same_fact_named_twice": 7,
+      "spurious_items_named": 17
+    },
+    "v4.1-scan": {
+      "direction_of_wrong_numbers": {
+        "over": 4,
+        "under": 16
+      },
+      "gold_facts_never_named": {
+        "absent_from_context": 10,
+        "in_context_never_named": 44
+      },
+      "layers": {
+        "abstained_no_number": 2,
+        "correct": 8,
+        "reading_failure": 13,
+        "retrieval_gap": 7
+      },
+      "number_disagreed_with_own_item_list": 0,
+      "same_fact_named_twice": 10,
+      "spurious_items_named": 24
+    }
+  },
+  "noise_floor": {
+    "losses": 17,
+    "n": 142,
+    "net": -7,
+    "pair": [
+      "v4.0-flat",
+      "v4.0-flat2"
+    ],
+    "per_kind_point_swing": {
+      "comparison": -0.0909,
+      "count": 0.1,
+      "current_state": -0.1224,
+      "duration": -0.0333
+    },
+    "retrieval_identical": 142,
+    "verdict_changed": 38,
+    "why_this_is_noise": "Same variant, same store fingerprint, and identical retrieval on every shared probe. Nothing differs between these runs but provider sampling, so their disagreement bounds what a single run of this instrument can resolve.",
+    "wins": 10
+  },
+  "not_a_benchmark": "Probe ground truth is derived by SQL over stored facts and inherits extraction loss. These are instrument readings, never LongMemEval accuracy.",
+  "pairwise_retrieval_identity": {
+    "control-v3.3 vs v4.0-flat": 142,
+    "control-v3.3 vs v4.0-flat2": 142,
+    "control-v3.3 vs v4.1-scan": 131,
+    "v4.0-flat vs v4.0-flat2": 142,
+    "v4.0-flat vs v4.1-scan": 131,
+    "v4.0-flat2 vs v4.1-scan": 131
+  },
+  "provider_calls": 0,
+  "runs": {
+    "control-v3.3": "results/archive/v4.0-flat/probes.v3.3-dev.jsonl",
+    "v4.0-flat": "results/archive/v4.0-flat/probes.v4.0-flat.jsonl",
+    "v4.0-flat2": "results/raw/probes.v4.0-flat2.jsonl",
+    "v4.1-scan": "results/raw/probes.v4.1-scan.jsonl"
+  },
+  "schema_version": 1,
+  "scoreboard": {
+    "control-v3.3": {
+      "by_kind": {
+        "comparison": {
+          "correct": 18,
+          "n": 33
+        },
+        "count": {
+          "correct": 5,
+          "n": 30
+        },
+        "current_state": {
+          "correct": 43,
+          "n": 49
+        },
+        "duration": {
+          "correct": 12,
+          "n": 30
+        }
+      },
+      "correct": 78,
+      "n": 142,
+      "rows_with_scan_route": 0,
+      "share": 0.5493
+    },
+    "v4.0-flat": {
+      "by_kind": {
+        "comparison": {
+          "correct": 19,
+          "n": 33
+        },
+        "count": {
+          "correct": 5,
+          "n": 30
+        },
+        "current_state": {
+          "correct": 42,
+          "n": 49
+        },
+        "duration": {
+          "correct": 21,
+          "n": 30
+        }
+      },
+      "correct": 87,
+      "n": 142,
+      "rows_with_scan_route": 0,
+      "share": 0.6127
+    },
+    "v4.0-flat2": {
+      "by_kind": {
+        "comparison": {
+          "correct": 16,
+          "n": 33
+        },
+        "count": {
+          "correct": 8,
+          "n": 30
+        },
+        "current_state": {
+          "correct": 36,
+          "n": 49
+        },
+        "duration": {
+          "correct": 20,
+          "n": 30
+        }
+      },
+      "correct": 80,
+      "n": 142,
+      "rows_with_scan_route": 0,
+      "share": 0.5634
+    },
+    "v4.1-scan": {
+      "by_kind": {
+        "comparison": {
+          "correct": 17,
+          "n": 33
+        },
+        "count": {
+          "correct": 8,
+          "n": 30
+        },
+        "current_state": {
+          "correct": 37,
+          "n": 49
+        },
+        "duration": {
+          "correct": 19,
+          "n": 30
+        }
+      },
+      "correct": 81,
+      "n": 142,
+      "rows_with_scan_route": 0,
+      "share": 0.5704
+    }
+  }
+}

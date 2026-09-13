@@ -38,13 +38,13 @@ import threading
 import time
 import uuid
 from collections import defaultdict, deque
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime, timedelta
+from functools import wraps
 from itertools import pairwise
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
-import numpy as np
 from fastapi import Depends, FastAPI, Header, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
@@ -63,6 +63,7 @@ from llm_long_term_memory.store import (
     Session,
     SQLiteMemoryStore,
     Turn,
+    external_session_id,
     scoped_session_id,
 )
 from llm_long_term_memory.temporal.resolve import TemporalResolver
@@ -170,6 +171,9 @@ class Playground:
     resolver: TemporalResolver
     created: dict[str, datetime]
     encoder_id: str = "unknown"
+    lock: Any = field(default_factory=threading.RLock)
+    stop_event: threading.Event = field(default_factory=threading.Event)
+    sweeper: threading.Thread | None = None
 
     def namespace_alive(self, namespace: str) -> bool:
         made = self.created.get(namespace)
@@ -185,10 +189,26 @@ def engine() -> Playground:
     return pg
 
 
+def locked_endpoint(method):
+    """Hold the one process-wide resource lock for a complete endpoint operation."""
+
+    @wraps(method)
+    def wrapped(*args, **kwargs):
+        p = kwargs["p"]
+        with p.lock:
+            return method(*args, **kwargs)
+
+    return wrapped
+
+
 def session_namespace(request: Request, x_demo_token: str = Header(default="")) -> str:
     limiter.check(f"ip:{client_ip(request)}", MAX_REQUESTS_PER_IP_PER_MINUTE, 60)
     namespace = _verify(x_demo_token)
-    if not engine().namespace_alive(namespace):
+    p = engine()
+    sweep(p)
+    with p.lock:
+        alive = p.namespace_alive(namespace)
+    if not alive:
         raise HTTPException(
             410,
             detail={
@@ -202,7 +222,7 @@ def session_namespace(request: Request, x_demo_token: str = Header(default="")) 
 # ------------------------------------------------------------------------ hard delete
 
 
-def hard_delete(store: SQLiteMemoryStore, namespace: str) -> dict[str, int]:
+def hard_delete(store: SQLiteMemoryStore, namespace: str) -> dict[str, int | list[str]]:
     """Physically remove a demo namespace.
 
     The product's `forget` marks a memory evicted and never erases it, because
@@ -222,75 +242,75 @@ def hard_delete(store: SQLiteMemoryStore, namespace: str) -> dict[str, int]:
     # and is single-writer by design; a second writer on the same file is the failure
     # this project already documents. Reusing the store's connection keeps one writer
     # even though it means reaching for a private attribute.
-    db = store._conn
-    db.execute("PRAGMA foreign_keys = ON")
-    sessions = [r[0] for r in db.execute("SELECT id FROM sessions WHERE user_id = ?", (namespace,))]
-    memories = [r[0] for r in db.execute("SELECT id FROM memories WHERE user_id = ?", (namespace,))]
-    turns = db.execute(
-        "SELECT count(*) FROM turns WHERE session_id IN "
-        "(SELECT id FROM sessions WHERE user_id = ?)",
-        (namespace,),
-    ).fetchone()[0]
-
-    db.execute("DELETE FROM memories WHERE user_id = ?", (namespace,))
-    db.execute(
-        "DELETE FROM turns WHERE session_id IN (SELECT id FROM sessions WHERE user_id = ?)",
-        (namespace,),
-    )
-    db.execute("DELETE FROM sessions WHERE user_id = ?", (namespace,))
-    db.execute("DELETE FROM entities WHERE user_id = ?", (namespace,))
-    db.commit()
-
-    return {"sessions": len(sessions), "memories": len(memories), "turns": turns, "ids": memories}
+    removed = store.hard_delete_user(namespace)
+    with store._conn:
+        store._conn.execute("DELETE FROM demo_sessions WHERE namespace = ?", (namespace,))
+    return removed
 
 
 def drop_from_index(index: NumpyFlatIndex, ids: list[str]) -> int:
     """Remove vectors for deleted memories.
 
-    `NumpyFlatIndex` is append-only — it has `add` and `save` and no delete — and it
-    lives in `src/`, which the experiment freeze hashes, so a delete method cannot be
-    added there before the final run. Rewriting the two arrays from outside is the
-    remaining option.
-
-    Leaving them would not corrupt a search: `get_many` drops ids the store no longer
-    holds and the retriever filters by namespace anyway. It would corrupt the promise.
-    An embedding is derived from what a stranger typed into a public box, and "we
-    deleted the row but kept the vector" is not the hard delete the page claims.
+    Leaving vectors behind would not corrupt search because the store drops missing
+    ids, but it would violate the hard-delete promise: an embedding is derived from
+    what a visitor typed and belongs to the same deletion boundary as the row.
     """
-    if not ids:
-        return 0
-    doomed = set(ids)
-    keep = [i for i, mid in enumerate(index._ids) if mid not in doomed]
-    dropped = len(index._ids) - len(keep)
-    if not dropped:
-        return 0
-    index._vectors = index._vectors[keep] if keep else np.zeros((0, index.dim), dtype=np.float32)
-    index._ids = [index._ids[i] for i in keep]
-    index.save()
-    return dropped
+    removed = index.remove(ids)
+    if removed:
+        index.save()
+    return removed
 
 
 def sweep(p: Playground) -> int:
-    """Delete every namespace past its hour. Called on each session creation, which is
-    the only moment the store is guaranteed to be growing."""
-    dead = [ns for ns, made in p.created.items() if datetime.now() - made >= SESSION_TTL]
-    for ns in dead:
-        drop_from_index(p.index, hard_delete(p.store, ns)["ids"])
-        p.created.pop(ns, None)
-    return len(dead)
+    """Delete every expired namespace from rows, FTS indexes and vector storage."""
+    with p.lock:
+        dead = [ns for ns, made in p.created.items() if datetime.now() - made >= SESSION_TTL]
+        for ns in dead:
+            drop_from_index(p.index, hard_delete(p.store, ns)["ids"])
+            p.created.pop(ns, None)
+        return len(dead)
+
+
+def sweep_orphans(p: Playground) -> int:
+    """Fail closed on pre-registry rows left by an older process generation."""
+    with p.lock:
+        rows = p.store._conn.execute(
+            "SELECT DISTINCT user_id FROM memories WHERE user_id LIKE 'demo_%' "
+            "UNION SELECT DISTINCT user_id FROM sessions WHERE user_id LIKE 'demo_%'"
+        )
+        orphaned = [row[0] for row in rows if row[0] not in p.created]
+        for namespace in orphaned:
+            drop_from_index(p.index, hard_delete(p.store, namespace)["ids"])
+        return len(orphaned)
+
+
+def _sweep_loop(p: Playground) -> None:
+    while not p.stop_event.wait(60):
+        sweep(p)
+
+
+def _remember_session(p: Playground, namespace: str, made: datetime) -> None:
+    p.created[namespace] = made
+    with p.store._conn:
+        p.store._conn.execute(
+            "INSERT OR REPLACE INTO demo_sessions(namespace, created_at) VALUES (?, ?)",
+            (namespace, made.isoformat()),
+        )
 
 
 # ----------------------------------------------------------------------------- wire
 
 
 class FactIn(BaseModel):
-    predicate: str = Field(description="snake_case key, e.g. lives_in")
-    object: str = Field(description="the value, e.g. Melbourne")
-    content: str = Field(description="how a person would say it")
-    subject: str = "user"
-    scope: str | None = "profile"
-    source_role: str = "user"
-    event_time: str | None = Field(default=None, description="ISO date; defaults to now")
+    predicate: str = Field(min_length=1, max_length=80, description="snake_case key, e.g. lives_in")
+    object: str = Field(min_length=1, max_length=200, description="the value, e.g. Melbourne")
+    content: str = Field(
+        min_length=1, max_length=MAX_CHARS, description="how a person would say it"
+    )
+    subject: str = Field(default="user", min_length=1, max_length=200)
+    scope: str | None = Field(default="profile", max_length=80)
+    source_role: Literal["user", "assistant"] = "user"
+    event_time: datetime | None = Field(default=None, description="ISO date; defaults to now")
     replaces_previous: bool = Field(
         default=False,
         description=(
@@ -303,14 +323,14 @@ class FactIn(BaseModel):
 
 
 class TurnIn(BaseModel):
-    role: str = "assistant"
-    content: str
-    session_id: str | None = None
+    role: Literal["user", "assistant"] = "assistant"
+    content: str = Field(min_length=1, max_length=MAX_CHARS)
+    session_id: str | None = Field(default=None, min_length=1, max_length=200)
 
 
 class QueryIn(BaseModel):
-    query: str
-    limit: int = 10
+    query: str = Field(min_length=1, max_length=500)
+    limit: int = Field(default=10, ge=1, le=50)
 
 
 app = FastAPI(title="LLTM playground", docs_url="/demo/docs", openapi_url="/demo/openapi.json")
@@ -348,6 +368,11 @@ def _start() -> None:
     DEMO_STORE.parent.mkdir(parents=True, exist_ok=True)
     store = SQLiteMemoryStore(DEMO_STORE.with_suffix(".db"))
     store.initialize()
+    store._conn.execute(
+        "CREATE TABLE IF NOT EXISTS demo_sessions ("
+        "namespace TEXT PRIMARY KEY, created_at TEXT NOT NULL)"
+    )
+    store._conn.commit()
     encoder, encoder_id = build_encoder()
 
     # A vector index is only meaningful under the encoder that produced it. This
@@ -362,50 +387,80 @@ def _start() -> None:
         for suffix in (".npy", ".ids.json"):
             index_path.with_suffix(suffix).unlink(missing_ok=True)
         db = store._conn
-        for table in ("memories", "turns", "sessions", "entities"):
+        for table in ("memories", "turns", "sessions", "entities", "demo_sessions"):
             db.execute(f"DELETE FROM {table}")
         db.commit()
     store.set_meta("demo_encoder", encoder_id)
 
     index = NumpyFlatIndex(index_path, dim=encoder.dim)
+    created: dict[str, datetime] = {}
+    for row in store._conn.execute("SELECT namespace, created_at FROM demo_sessions"):
+        try:
+            created[row[0]] = datetime.fromisoformat(row[1])
+        except (TypeError, ValueError):
+            # An unreadable expiry must fail closed: delete it in the startup sweep.
+            created[row[0]] = datetime.min
+
     pg = Playground(
         store=store,
         index=index,
         encoder=encoder,
         retriever=HybridRetriever(store, index, weights={"semantic": 1.0}, candidate_limit=50),
         resolver=TemporalResolver(store),
-        created={},
+        created=created,
         encoder_id=encoder_id,
     )
+    sweep_orphans(pg)
+    sweep(pg)
+    pg.sweeper = threading.Thread(
+        target=_sweep_loop, args=(pg,), name="demo-session-sweeper", daemon=True
+    )
+    pg.sweeper.start()
+
+
+@app.on_event("shutdown")
+def _stop() -> None:
+    global pg
+    if pg is None:
+        return
+    pg.stop_event.set()
+    if pg.sweeper is not None:
+        pg.sweeper.join(timeout=2)
+    with pg.lock:
+        pg.store.close()
+    pg = None
 
 
 @app.get("/demo/health")
 def health(p: Playground = Depends(engine)) -> dict[str, Any]:
-    return {
-        "status": "ok",
-        "live_sessions": sum(1 for ns in p.created if p.namespace_alive(ns)),
-        "llm_required": False,
-        "encoder": p.encoder_id,
-        "capabilities": [
-            "add_fact",
-            "supersession",
-            "search",
-            "explain",
-            "timeline",
-            "raw_search",
-            "hard_delete",
-        ],
-        "session_ttl_minutes": int(SESSION_TTL.total_seconds() // 60),
-        "single_valued_predicates": sorted(SINGLE_VALUED_PREDICATES),
-    }
+    with p.lock:
+        return {
+            "status": "ok",
+            "live_sessions": sum(1 for ns in p.created if p.namespace_alive(ns)),
+            "llm_required": False,
+            "encoder": p.encoder_id,
+            "capabilities": [
+                "add_fact",
+                "supersession",
+                "search",
+                "explain",
+                "timeline",
+                "raw_search",
+                "hard_delete",
+            ],
+            "session_ttl_minutes": int(SESSION_TTL.total_seconds() // 60),
+            "single_valued_predicates": sorted(SINGLE_VALUED_PREDICATES),
+        }
 
 
 @app.post("/demo/session")
+@locked_endpoint
 def new_session(request: Request, p: Playground = Depends(engine)) -> dict[str, Any]:
     limiter.check(f"new:{client_ip(request)}", MAX_SESSIONS_PER_IP_PER_HOUR, 3600)
     swept = sweep(p)
     namespace = f"demo_{uuid.uuid4().hex[:12]}"
-    p.created[namespace] = datetime.now()
+    with p.lock:
+        _remember_session(p, namespace, datetime.now())
     return {
         "token": _sign(namespace),
         "expires_in_seconds": int(SESSION_TTL.total_seconds()),
@@ -419,10 +474,12 @@ def new_session(request: Request, p: Playground = Depends(engine)) -> dict[str, 
 
 
 @app.delete("/demo/session", status_code=200)
+@locked_endpoint
 def end_session(ns: str = Depends(session_namespace), p: Playground = Depends(engine)) -> dict:
-    removed = hard_delete(p.store, ns)
-    removed["vectors"] = drop_from_index(p.index, removed.pop("ids"))
-    p.created.pop(ns, None)
+    with p.lock:
+        removed = hard_delete(p.store, ns)
+        removed["vectors"] = drop_from_index(p.index, removed.pop("ids"))
+        p.created.pop(ns, None)
     return {"deleted": True, "rows": removed}
 
 
@@ -447,21 +504,22 @@ def _serialise(m: Memory) -> dict[str, Any]:
 
 
 @app.post("/demo/facts")
+@locked_endpoint
 def add_fact(
     fact: FactIn,
     ns: str = Depends(session_namespace),
     p: Playground = Depends(engine),
 ) -> dict[str, Any]:
     """Write one fact and re-resolve its timeline. No model is called."""
-    if len(fact.content) > MAX_CHARS or len(fact.object) > 200:
-        raise HTTPException(413, "too long for a demo")
     predicate = normalize_predicate(fact.predicate)
     if not _PREDICATE_OK.match(predicate):
         raise HTTPException(422, "predicate must be snake_case letters, digits and underscores")
     if sum(1 for _ in p.store.iter_all(ns)) >= MAX_FACTS_PER_SESSION:
         raise HTTPException(429, f"a demo session holds at most {MAX_FACTS_PER_SESSION} facts")
 
-    when = datetime.fromisoformat(fact.event_time) if fact.event_time else datetime.now()
+    when = fact.event_time or datetime.now()
+    if when.tzinfo is not None:
+        when = when.astimezone().replace(tzinfo=None)
     before = {m.id: m.status for m in p.store.iter_all(ns)}
 
     memory = Memory(
@@ -491,12 +549,14 @@ def add_fact(
     return {
         "created": _serialise(memory),
         "superseded_now": stats.superseded,
+        "ambiguous_replacements": stats.skipped_ambiguous,
         "changed_by_this_write": changed,
         "memories": [_serialise(m) for m in after],
     }
 
 
 @app.post("/demo/turns")
+@locked_endpoint
 def add_turn(
     turn: TurnIn,
     ns: str = Depends(session_namespace),
@@ -505,13 +565,12 @@ def add_turn(
     """Store a raw conversation turn verbatim, so the archive has something to recover
     from. Storing is free; turning it into facts is the extractor's job and is not
     part of this half."""
-    if len(turn.content) > MAX_CHARS:
-        raise HTTPException(413, "too long for a demo")
     external = turn.session_id or "demo-chat"
     sid = scoped_session_id(ns, external)
     existing = p.store.get_session(sid)
     idx = len(existing.turns) if existing else 0
-    if idx >= MAX_TURNS_PER_SESSION:
+    total_turns = p.store.count_turns(ns)
+    if total_turns >= MAX_TURNS_PER_SESSION:
         raise HTTPException(429, f"a demo session holds at most {MAX_TURNS_PER_SESSION} turns")
     now = datetime.now()
     p.store.add_session(
@@ -537,6 +596,7 @@ def add_turn(
 
 
 @app.post("/demo/search")
+@locked_endpoint
 def search(
     q: QueryIn,
     ns: str = Depends(session_namespace),
@@ -585,6 +645,7 @@ def search(
 
 
 @app.get("/demo/memories")
+@locked_endpoint
 def memories(ns: str = Depends(session_namespace), p: Playground = Depends(engine)) -> dict:
     rows = [_serialise(m) for m in p.store.iter_all(ns)]
     return {
@@ -595,6 +656,7 @@ def memories(ns: str = Depends(session_namespace), p: Playground = Depends(engin
 
 
 @app.get("/demo/timeline")
+@locked_endpoint
 def timeline(
     predicate: str,
     subject: str = "user",
@@ -622,6 +684,7 @@ def timeline(
 
 
 @app.post("/demo/raw/search")
+@locked_endpoint
 def raw_search(
     q: QueryIn,
     ns: str = Depends(session_namespace),
@@ -635,7 +698,7 @@ def raw_search(
         "latency_ms": round((time.perf_counter() - started) * 1000, 1),
         "turns": [
             {
-                "session_id": t.session_id.split(":")[-1],
+                "session_id": external_session_id(t.session_id),
                 "turn_index": t.turn_index,
                 "role": t.role,
                 "content": t.content,
