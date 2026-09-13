@@ -18,6 +18,7 @@ question id and cross-namespace leakage would have silently inflated every resul
 
 from __future__ import annotations
 
+import json
 import uuid
 from dataclasses import dataclass
 from datetime import datetime
@@ -40,6 +41,19 @@ from llm_long_term_memory.store import (
     external_session_id,
     scoped_session_id,
 )
+
+
+class WriteInProgress(RuntimeError):
+    """Another call already claimed this idempotency key and has not finished."""
+
+
+def _jsonable(value):
+    """Memories are dataclasses; the stored replay has to round-trip through JSON."""
+    if isinstance(value, datetime):
+        return value.isoformat()
+    if hasattr(value, "__dict__"):
+        return {k: v for k, v in vars(value).items() if not k.startswith("_")}
+    return str(value)
 
 
 class NamespaceRequired(ValueError):
@@ -617,14 +631,47 @@ class MemoryService:
 
     @_synchronised
     def add_message(
-        self, user_id: str, role: str, content: str, session_id: str | None = None
+        self,
+        user_id: str,
+        role: str,
+        content: str,
+        session_id: str | None = None,
+        idempotency_key: str | None = None,
     ) -> dict[str, Any]:
         """Persist one turn and extract memories from it.
 
         Requires an extractor, which requires an API key. Read-only deployments can
         run the whole service without one.
+
+        **Why a key matters here specifically.** The turn is persisted *before* extraction
+        runs, and `turn_index` is `len(existing.turns)`. A provider failure followed by an
+        ordinary client retry therefore appended the same turn again at the next index,
+        and extraction ran over the duplicate. With a key the retry replays the first
+        reply instead of writing a second turn.
+
+        The key is claimed *before* the write, not after. Claiming it afterwards would
+        leave the window it exists to close: two concurrent retries would both find no
+        key, both write, and only then race to record one.
         """
         self._require_namespace(user_id)
+        if idempotency_key is not None:
+            idempotency_key = idempotency_key.strip()
+            if not idempotency_key or len(idempotency_key) > 200:
+                raise ValueError("idempotency_key must be 1-200 characters")
+            remembered = self.store.remembered_write(user_id, idempotency_key)
+            if remembered is not None:
+                replay = json.loads(remembered)
+                if replay.get("pending"):
+                    raise WriteInProgress("a write with this idempotency_key is still in progress")
+                replay["idempotent_replay"] = True
+                return replay
+            if not self.store.remember_write(
+                user_id, idempotency_key, json.dumps({"pending": True})
+            ):
+                # Another call claimed it between the read and the write. Its reply may
+                # still be in flight, so the caller retries rather than being handed a
+                # half-written answer.
+                raise WriteInProgress("a write with this idempotency_key is already in progress")
         if self.extractor is None:
             if not self.settings.has_api_key:
                 raise RuntimeError(
@@ -676,12 +723,17 @@ class MemoryService:
                 resolution = self.resolver.resolve_memories(outcome.memories)
                 outcome.usage["superseded"] = resolution.superseded
                 outcome.usage["ambiguous_replacements"] = resolution.skipped_ambiguous
-        return {
+        reply = {
             "session_id": external_id,
             "turn_index": turn_index,
             "memories": outcome.memories,
             "usage": outcome.usage,
         }
+        if idempotency_key is not None:
+            self.store.record_write_reply(
+                user_id, idempotency_key, json.dumps(reply, default=_jsonable)
+            )
+        return reply
 
     @_synchronised
     def export_user(self, user_id: str) -> dict[str, Any]:

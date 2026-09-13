@@ -49,7 +49,13 @@ from .models import (
     SearchResponse,
     TimelineResponse,
 )
-from .service import EncoderUnavailable, MemoryNotFound, MemoryService, NamespaceRequired
+from .service import (
+    EncoderUnavailable,
+    MemoryNotFound,
+    MemoryService,
+    NamespaceRequired,
+    WriteInProgress,
+)
 
 _service: MemoryService | None = None
 
@@ -365,6 +371,7 @@ def timeline(
 @app.post("/v1/messages", response_model=MessageResponse)
 def add_message(
     request: MessageRequest,
+    idempotency_key: str | None = Header(default=None, alias="Idempotency-Key"),
     service: MemoryService = Depends(get_service),
     principal: Principal = Depends(get_principal),
 ) -> MessageResponse:
@@ -374,7 +381,14 @@ def add_message(
             request.role,
             request.content,
             request.session_id,
+            idempotency_key=idempotency_key,
         )
+    except WriteInProgress as exc:
+        # 409, not 503: the request is well formed and the service is healthy. Something
+        # else holds the key, and the fix is to retry rather than to change the request.
+        raise HTTPException(status_code=409, detail=str(exc)) from None
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from None
     except RuntimeError as exc:
         # No extractor configured is a deployment state, not a client error.
         raise HTTPException(status_code=503, detail=str(exc)) from None

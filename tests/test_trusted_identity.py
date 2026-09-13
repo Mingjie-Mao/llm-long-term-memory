@@ -325,6 +325,43 @@ def test_a_trusted_principal_ignores_an_absent_request_and_refuses_a_conflicting
         resolve_namespace(principal, "other")
 
 
+# ------------------------------------------------------------------ credential rotation
+
+
+def test_two_tokens_may_map_to_one_tenant_so_a_credential_can_be_rotated():
+    """Rotation without downtime needs an overlap window: add the new token, let clients
+    move, then remove the old one. Nothing in the design forbids it, which means nothing
+    in the design guaranteed it either until this was written down."""
+    env = {"LLTM_API_TOKENS": "old-secret:tenant-a,new-secret:tenant-a"}
+
+    assert principal_from_token("Bearer old-secret", env) == Principal("tenant-a", True)
+    assert principal_from_token("Bearer new-secret", env) == Principal("tenant-a", True)
+
+    # After the old one is withdrawn it stops working, and the new one still does.
+    retired = {"LLTM_API_TOKENS": "new-secret:tenant-a"}
+    assert principal_from_token("Bearer new-secret", retired) == Principal("tenant-a", True)
+    with pytest.raises(AuthenticationRequired):
+        principal_from_token("Bearer old-secret", retired)
+
+
+def test_a_token_reused_across_two_tenants_is_refused_outright():
+    """The one rotation mistake that must not be quietly accepted: pointing one secret at
+    two tenants would let either read the other."""
+    with pytest.raises(AuthenticationConfigurationError):
+        configured_tokens({"LLTM_API_TOKENS": "shared:tenant-a,shared:tenant-b"})
+
+
+def test_rotation_does_not_disturb_data(client, monkeypatch):
+    """A rotated credential must reach the same namespace, not a fresh empty one."""
+    monkeypatch.setenv("LLTM_API_TOKENS", "tok-a:tenant-a,rotated:tenant-a")
+
+    before = client.get("/v1/memories", headers=auth("tok-a")).json()
+    after = client.get("/v1/memories", headers=auth("rotated")).json()
+
+    assert before["total"] == after["total"] == 1
+    assert before["memories"][0]["id"] == after["memories"][0]["id"]
+
+
 def test_a_bad_credential_raises_rather_than_falling_back_to_open_mode():
     """Falling back would make a typo in the token silently downgrade the deployment to
     no authentication at all."""

@@ -140,6 +140,10 @@ class MessageResponse(BaseModel):
     turn_index: int
     memories: list[MemoryOut]
     usage: dict[str, Any] = Field(default_factory=dict)
+    idempotent_replay: bool = False
+    """True when an `Idempotency-Key` matched an earlier write and nothing was stored.
+    A client that cannot tell a replay from a fresh write cannot tell whether its retry
+    was necessary."""
 
 
 class MemoryListResponse(BaseModel):

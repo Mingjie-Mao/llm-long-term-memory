@@ -86,7 +86,14 @@ def measure() -> dict[str, int]:
 # What the figures are a measurement *of*. Deliberately excludes `release.json` itself:
 # a digest that covered the file it is written into could never be stable, which is the
 # whole defect this replaces.
-MEASURED = ("src/**/*.py", "tests/**/*.py", "pyproject.toml")
+# Directories and one file, not globs. Git pathspec does not read `**` the way a shell
+# does — `tests/**/*.py` matched nothing at all, because it wants at least two path
+# segments, and `tests/` is flat. The digest silently covered `src` and `pyproject.toml`
+# only, and the test that was supposed to catch it asserted the value of this constant
+# rather than what the listing returned. Git recurses a directory; the suffix filter
+# below decides what counts.
+MEASURED = ("src", "tests", "pyproject.toml")
+_MEASURED_SUFFIX = (".py", ".toml")
 
 
 def measured_files() -> list[str]:
@@ -110,7 +117,32 @@ def measured_files() -> list[str]:
         print("FAIL: could not list the measured files with git")
         print(listed.stderr[-500:])
         raise SystemExit(1)
-    return sorted(name for name in listed.stdout.split("\0") if name)
+    return sorted(
+        name for name in listed.stdout.split("\0") if name and name.endswith(_MEASURED_SUFFIX)
+    )
+
+
+def untracked_measured() -> list[str]:
+    """Measured-looking files git does not track yet.
+
+    The digest covers what is published, so a new test file is invisible to it until it
+    is staged. That is correct and quietly misleading: `--update` appears to succeed while
+    recording a tree that omits the file just added. Reported rather than silently
+    included, because including it would put the digest back in the state where no other
+    checkout can reproduce it.
+    """
+    listed = subprocess.run(
+        ["git", "ls-files", "-z", "--others", "--exclude-standard", *MEASURED],
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        cwd=REPO,
+    )
+    if listed.returncode != 0:
+        return []
+    return sorted(
+        name for name in listed.stdout.split("\0") if name and name.endswith(_MEASURED_SUFFIX)
+    )
 
 
 def measured_tree() -> str:
@@ -173,6 +205,8 @@ def main() -> int:
         print(f"updated: {actual} on {claimed['verified_at']}")
         print(f"  measured tree: {tree[:16]}…")
         print(f"  reference commit: {claimed['source_commit_for_reference']}")
+        for name in untracked_measured():
+            print(f"  NOTE: {name} is untracked and is not in the digest; stage it and re-run")
         return 0
 
     for key, (was, now) in drift.items():

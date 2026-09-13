@@ -157,6 +157,28 @@ was vacuous because confidence stayed at a default value. Accuracy is unaffected
 eight other gates remain interpretable. [Aggregate](results/validation/v3-dev60.md),
 [schema audit](results/audit/v3-verdict-schema-never-sent-20260906.json).
 
+**v4 produced three negative results, and then invalidated its own instrument.** v4.0
+moved count and duration arithmetic into Python; the arithmetic worked — the control's
+stated number disagreed with its own item list on 27 of 30 count probes, and under v4
+that is 0 — and accuracy barely moved. v4.1 added a routed exhaustive scan; it closed the
+retrieval gap it was built for and changed no answers. v4.2 had the model cite count
+members by label so completeness became checkable; the mechanism fired on 84 of 90
+candidate answers and moved enumeration completeness by 0.00 against a standard error of
+3.71.
+
+Chasing which facts went unnamed then showed why: the count probes' SQL gold counts
+intentions and tastes as members of sets of completed acts — "is looking for thriller
+recommendations" scored as a book read. 19 of 30 development probes are affected.
+Re-reading every paid row against a corrected gold **reverses v4.2's verdict**, from the
+candidate looking slightly better to clearly worse. The registered outcome was
+`not_promoted` either way and no threshold was changed after the fact.
+
+So the v4 numbers are development readings taken on an instrument that could invert a
+sign, and they are not comparable with the v2 figures above. The correction overlay is
+model-made and awaiting human review; the 87 held-out probes are deliberately unspent
+until the instrument is rebuilt. [v4.2 result](results/v4.2-result.md),
+[gold correction](results/count-gold-correction.md).
+
 Source-session recall is an **any-gold-session hit** metric. It does not prove that
 all answer-bearing facts survived extraction. Detailed development results, negative
 results and the already-measured v4 probes are in the [experiment history](docs/EXPERIMENT_HISTORY.md).

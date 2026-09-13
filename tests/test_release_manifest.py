@@ -75,9 +75,18 @@ def test_the_digest_lists_files_through_git_not_the_working_tree():
 
 
 def test_the_digest_covers_source_tests_and_the_test_configuration():
-    """`pyproject.toml` carries pytest's addopts and the coverage settings, so it decides
-    the recorded numbers as surely as the code does."""
-    assert set(figures.MEASURED) == {"src/**/*.py", "tests/**/*.py", "pyproject.toml"}
+    """Asserted on what the listing returns, not on the value of a constant.
+
+    The first version of this test checked `MEASURED` and passed while the digest covered
+    nothing under `tests/` at all: git pathspec does not read `**` the way a shell does,
+    so `tests/**/*.py` matched zero files. A test that only reads configuration cannot see
+    that."""
+    listed = figures.measured_files()
+
+    assert sum(1 for name in listed if name.startswith("src/")) > 50, listed[:5]
+    assert sum(1 for name in listed if name.startswith("tests/")) > 50, listed[:5]
+    assert "pyproject.toml" in listed
+    assert all(name.endswith((".py", ".toml")) for name in listed)
 
 
 def test_a_rename_changes_the_digest():

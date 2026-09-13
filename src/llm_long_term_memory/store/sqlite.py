@@ -160,6 +160,39 @@ class SQLiteMemoryStore:
         ).fetchone()
         return int(row[0])
 
+    # ------------------------------------------------------------ idempotent writes
+
+    def remembered_write(self, user_id: str, key: str) -> str | None:
+        """The reply a previous identical write returned, if there was one."""
+        row = self._conn.execute(
+            "SELECT response FROM write_keys WHERE user_id = ? AND key = ?",
+            (user_id, key),
+        ).fetchone()
+        return row[0] if row else None
+
+    def remember_write(self, user_id: str, key: str, response: str) -> bool:
+        """Record a reply against a key. False when the key was already taken.
+
+        `INSERT OR IGNORE` rather than a check-then-write: two concurrent retries of the
+        same request would both pass a check and both proceed, which is the race the key
+        exists to close.
+        """
+        with self._conn:
+            cursor = self._conn.execute(
+                "INSERT OR IGNORE INTO write_keys (user_id, key, response, created_at) "
+                "VALUES (?, ?, ?, ?)",
+                (user_id, key, response, datetime.now().isoformat()),
+            )
+        return cursor.rowcount == 1
+
+    def record_write_reply(self, user_id: str, key: str, response: str) -> None:
+        """Replace a claimed key's placeholder with the reply it produced."""
+        with self._conn:
+            self._conn.execute(
+                "UPDATE write_keys SET response = ? WHERE user_id = ? AND key = ?",
+                (response, user_id, key),
+            )
+
     def hard_delete_user(self, user_id: str) -> dict[str, int | list[str]]:
         """Physically remove one namespace from every SQLite-backed data plane.
 
@@ -183,6 +216,9 @@ class SQLiteMemoryStore:
             )
             self._conn.execute("DELETE FROM sessions WHERE user_id = ?", (user_id,))
             self._conn.execute("DELETE FROM entities WHERE user_id = ?", (user_id,))
+            # Idempotency keys go too: replaying one after erasure would return a reply
+            # describing memories that no longer exist.
+            self._conn.execute("DELETE FROM write_keys WHERE user_id = ?", (user_id,))
         return {
             "sessions": len(session_ids),
             "memories": len(memory_ids),

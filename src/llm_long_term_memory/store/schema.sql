@@ -181,3 +181,17 @@ CREATE TABLE IF NOT EXISTS meta (
     key   TEXT PRIMARY KEY,
     value TEXT NOT NULL
 );
+
+-- Idempotency for the write path. A turn is persisted before extraction runs, so a
+-- provider failure followed by a client retry appended the same turn a second time —
+-- `turn_index` is `len(existing.turns)`, so the duplicate landed at the next index and
+-- extraction then ran over it. The key is scoped per namespace: two tenants may
+-- legitimately use the same client-generated key, and one must never read the other's
+-- reply.
+CREATE TABLE IF NOT EXISTS write_keys (
+    user_id      TEXT NOT NULL,
+    key          TEXT NOT NULL,
+    response     TEXT NOT NULL,
+    created_at   TEXT NOT NULL,
+    PRIMARY KEY (user_id, key)
+);
