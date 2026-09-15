@@ -1,0 +1,275 @@
+{
+  "note": "Extraction fidelity against sessions per extraction request. Re-scored offline from results/raw/extraction-batch-size.extractions.json by tools/batch_size_curve.py; no API calls, no quota.",
+  "config": "configs/v2.yaml",
+  "model": "gemini-3.1-flash-lite",
+  "sessions": 60,
+  "holdout": true,
+  "cohort_sha256_recorded": "2bfa18db1d06ca299c89bda1b14511c66c09718c2b9ab8f39c9873f2006d97a2",
+  "cohort_sha256_now": "2bfa18db1d06ca299c89bda1b14511c66c09718c2b9ab8f39c9873f2006d97a2",
+  "cohort_matches": true,
+  "prompts_match": true,
+  "stale_arms": [],
+  "specifics": 134,
+  "arms": [
+    {
+      "arm": "batch15",
+      "sessions_per_request": 15,
+      "grounded": false,
+      "fingerprint_recorded": "52e1c0e1c0c3",
+      "fingerprint_now": "52e1c0e1c0c3",
+      "overall": 0.373134328358209,
+      "memories": 92,
+      "memories_per_session": 1.5333333333333334,
+      "chunks": 4,
+      "requests": 8,
+      "per_facet": {
+        "quantity": 0.4444444444444444,
+        "duration": 0.35714285714285715,
+        "money": 0.0,
+        "date": 0.0,
+        "relative_time": 0.25,
+        "proper_noun": 0.33962264150943394
+      },
+      "stated": {
+        "quantity": 54,
+        "duration": 14,
+        "money": 1,
+        "date": 0,
+        "relative_time": 12,
+        "proper_noun": 53
+      },
+      "retained": {
+        "quantity": 24,
+        "duration": 5,
+        "money": 0,
+        "date": 0,
+        "relative_time": 3,
+        "proper_noun": 18
+      }
+    },
+    {
+      "arm": "batch8",
+      "sessions_per_request": 8,
+      "grounded": false,
+      "fingerprint_recorded": "eddb19a8ba81",
+      "fingerprint_now": "eddb19a8ba81",
+      "overall": 0.6492537313432836,
+      "memories": 223,
+      "memories_per_session": 3.716666666666667,
+      "chunks": 8,
+      "requests": 16,
+      "per_facet": {
+        "quantity": 0.6666666666666666,
+        "duration": 0.7142857142857143,
+        "money": 0.0,
+        "date": 0.0,
+        "relative_time": 0.4166666666666667,
+        "proper_noun": 0.6792452830188679
+      },
+      "stated": {
+        "quantity": 54,
+        "duration": 14,
+        "money": 1,
+        "date": 0,
+        "relative_time": 12,
+        "proper_noun": 53
+      },
+      "retained": {
+        "quantity": 36,
+        "duration": 10,
+        "money": 0,
+        "date": 0,
+        "relative_time": 5,
+        "proper_noun": 36
+      }
+    },
+    {
+      "arm": "batch5",
+      "sessions_per_request": 5,
+      "grounded": false,
+      "fingerprint_recorded": "c8a9eedfd5cc",
+      "fingerprint_now": "c8a9eedfd5cc",
+      "overall": 0.664179104477612,
+      "memories": 298,
+      "memories_per_session": 4.966666666666667,
+      "chunks": 12,
+      "requests": 24,
+      "per_facet": {
+        "quantity": 0.7222222222222222,
+        "duration": 0.7857142857142857,
+        "money": 0.0,
+        "date": 0.0,
+        "relative_time": 0.3333333333333333,
+        "proper_noun": 0.660377358490566
+      },
+      "stated": {
+        "quantity": 54,
+        "duration": 14,
+        "money": 1,
+        "date": 0,
+        "relative_time": 12,
+        "proper_noun": 53
+      },
+      "retained": {
+        "quantity": 39,
+        "duration": 11,
+        "money": 0,
+        "date": 0,
+        "relative_time": 4,
+        "proper_noun": 35
+      }
+    },
+    {
+      "arm": "batch3",
+      "sessions_per_request": 3,
+      "grounded": false,
+      "fingerprint_recorded": "75d3c4affbc9",
+      "fingerprint_now": "75d3c4affbc9",
+      "overall": 0.7089552238805971,
+      "memories": 383,
+      "memories_per_session": 6.383333333333334,
+      "chunks": 20,
+      "requests": 40,
+      "per_facet": {
+        "quantity": 0.7962962962962963,
+        "duration": 0.7857142857142857,
+        "money": 0.0,
+        "date": 0.0,
+        "relative_time": 0.25,
+        "proper_noun": 0.7169811320754716
+      },
+      "stated": {
+        "quantity": 54,
+        "duration": 14,
+        "money": 1,
+        "date": 0,
+        "relative_time": 12,
+        "proper_noun": 53
+      },
+      "retained": {
+        "quantity": 43,
+        "duration": 11,
+        "money": 0,
+        "date": 0,
+        "relative_time": 3,
+        "proper_noun": 38
+      }
+    },
+    {
+      "arm": "batch1",
+      "sessions_per_request": 1,
+      "grounded": false,
+      "fingerprint_recorded": "f856f96b50f7",
+      "fingerprint_now": "f856f96b50f7",
+      "overall": 0.7835820895522388,
+      "memories": 786,
+      "memories_per_session": 13.1,
+      "chunks": 60,
+      "requests": 120,
+      "per_facet": {
+        "quantity": 0.8703703703703703,
+        "duration": 0.8571428571428571,
+        "money": 0.0,
+        "date": 0.0,
+        "relative_time": 0.4166666666666667,
+        "proper_noun": 0.7735849056603774
+      },
+      "stated": {
+        "quantity": 54,
+        "duration": 14,
+        "money": 1,
+        "date": 0,
+        "relative_time": 12,
+        "proper_noun": 53
+      },
+      "retained": {
+        "quantity": 47,
+        "duration": 12,
+        "money": 0,
+        "date": 0,
+        "relative_time": 5,
+        "proper_noun": 41
+      }
+    },
+    {
+      "arm": "grounded",
+      "sessions_per_request": 1,
+      "grounded": true,
+      "fingerprint_recorded": "5467e024e49a",
+      "fingerprint_now": "5467e024e49a",
+      "overall": 0.6417910447761194,
+      "memories": 260,
+      "memories_per_session": 4.333333333333333,
+      "chunks": 60,
+      "requests": 60,
+      "per_facet": {
+        "quantity": 0.7407407407407407,
+        "duration": 0.7142857142857143,
+        "money": 0.0,
+        "date": 0.0,
+        "relative_time": 0.75,
+        "proper_noun": 0.5094339622641509
+      },
+      "stated": {
+        "quantity": 54,
+        "duration": 14,
+        "money": 1,
+        "date": 0,
+        "relative_time": 12,
+        "proper_noun": 53
+      },
+      "retained": {
+        "quantity": 40,
+        "duration": 10,
+        "money": 0,
+        "date": 0,
+        "relative_time": 9,
+        "proper_noun": 27
+      }
+    }
+  ],
+  "pairwise": [
+    {
+      "from": "batch15",
+      "to": "batch8",
+      "gained": 41,
+      "lost": 4,
+      "p": 9.334883088740753e-09
+    },
+    {
+      "from": "batch8",
+      "to": "batch5",
+      "gained": 8,
+      "lost": 6,
+      "p": 0.79052734375
+    },
+    {
+      "from": "batch5",
+      "to": "batch3",
+      "gained": 9,
+      "lost": 3,
+      "p": 0.14599609375
+    },
+    {
+      "from": "batch3",
+      "to": "batch1",
+      "gained": 11,
+      "lost": 1,
+      "p": 0.00634765625
+    },
+    {
+      "from": "batch15",
+      "to": "batch1",
+      "gained": 55,
+      "lost": 0,
+      "p": 5.551115123125783e-17
+    },
+    {
+      "from": "batch1",
+      "to": "grounded",
+      "gained": 8,
+      "lost": 27,
+      "p": 0.001878225477412343
+    }
+  ]
+}

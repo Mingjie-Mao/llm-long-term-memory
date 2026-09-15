@@ -120,7 +120,7 @@ Concrete changes:
 
 **Cost:** prompt-only changes are free to write but require re-ingestion to take
 effect (~600 extractor requests for the full dev-50 store, i.e. more than one
-free-tier day). Sequenced accordingly in [docs/ROADMAP.md](../docs/PROJECT_REPORT.zh-CN.md#后续完整计划).
+free-tier day). Sequenced accordingly in [docs/ROADMAP.md](../docs/PROJECT_REPORT.zh-CN.md#六下一步).
 
 ## Note on `single-session-preference` (0/3)
 

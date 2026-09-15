@@ -1,16 +1,22 @@
-"""Does deduplication compare facts across namespaces? Measured on a built store.
+"""How much of the index a candidate's dedup window would reach across namespaces.
 
 Retrieval is namespace-safe by an explicit filter: `HybridRetriever` searches the whole
 index and then keeps only `memory.user_id == namespace`
-(`src/llm_long_term_memory/retrieve/hybrid.py`). Deduplication is not. `Deduplicator._neighbours`
-calls `index.search(vector, limit=max_neighbours)` on the same shared index and adjudicates
-whatever comes back, with no namespace condition — so a fact extracted from one user's
-history can be adjudicated against, and dropped as a DUPLICATE of, a fact belonging to a
-different one.
+(`src/llm_long_term_memory/retrieve/hybrid.py`). **Deduplication was not**, and that is
+what this probe was written to measure: `Deduplicator._neighbours` called
+`index.search(vector, limit=max_neighbours)` on the same shared index and adjudicated
+whatever came back, so a fact from one user's history could be dropped as a DUPLICATE of
+a fact belonging to a different one — deleting it from a history that never contained it.
 
-This counts how reachable that is, on a store that already exists, with no provider call:
-for a sample of memories, how many of their nearest neighbours above the dedup threshold
-belong to another namespace.
+The numbers below are why that was fixed rather than filed: on `test100`, 42 of the
+neighbours above threshold were foreign against 3 that were not. `_neighbours` now drops
+index hits whose `user_id` differs from the candidate's, and `tests/test_ingest.py` pins
+both halves of that (a foreign near-duplicate is never adjudicated; a local one still is).
+
+The probe is kept because it measures the *store*, not the code: it answers "how much
+foreign material sits inside the window the threshold would open", which is the quantity
+that made this worth fixing and the one that would grow again if the filter were dropped.
+It costs no provider call.
 
 It measures the *final* store, where every namespace is present. During ingestion the
 store was smaller, so the counts here are not the counts that ran. The direction is what

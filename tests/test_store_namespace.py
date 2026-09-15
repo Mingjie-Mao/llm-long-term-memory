@@ -1,6 +1,6 @@
 """Answering from the conversation's store, not from a store named after the question.
 
-BEAM asks twenty questions of one conversation, and ingestion writes that conversation
+A corpus can ask many questions of one conversation, and ingestion writes that conversation
 once, under the conversation's name. A runner that still looked a question up by its own
 id would find an empty store for every one of them, answer "I do not know" twenty times,
 and every row would read as a memory failure rather than a wiring one.
@@ -16,7 +16,7 @@ from llm_long_term_memory.evaluation.datasets.longmemeval import Instance
 from llm_long_term_memory.evaluation.runners.memory import MemoryRunner
 from llm_long_term_memory.store import Memory, NumpyFlatIndex, Session, SQLiteMemoryStore
 
-CONVERSATION = "beam-100K-1"
+CONVERSATION = "conv-1"
 
 
 class ScriptedClient:
@@ -52,7 +52,7 @@ def runner_over_one_conversation(tmp_path):
             id="s1",
             user_id=CONVERSATION,
             started_at=datetime(2024, 3, 10),
-            source="beam:s00c000",
+            source="corpus:s00c000",
         )
     )
     store.add_memories(

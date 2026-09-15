@@ -446,6 +446,41 @@ def test_a_corrupt_line_does_not_stop_the_other_erasures(live, tmp_path):
     assert journal.namespaces() == ["alice"]
 
 
+@pytest.mark.parametrize(
+    "damaged",
+    [b'{"user_id": "bob",', b"[]", b'{"user_id": 12, "erased_at": "bad"}', b"\xff"],
+)
+def test_a_damaged_journal_replays_valid_deletions_but_fails_restore(live, tmp_path, damaged):
+    """Losing a deletion record cannot be reported as having replayed every deletion."""
+    br.snapshot(live, tmp_path / "bk")
+    journal = ErasureJournal.beside(live)
+    journal.record("alice")
+    with journal.path.open("ab") as handle:
+        handle.write(damaged + b"\n")
+
+    report = br.restore(tmp_path / "bk", tmp_path / "out", erasures=journal.path)
+
+    assert not report["ok"]
+    assert not report["erasures"]["replayed"]
+    assert report["erasures"]["invalid_lines"] == [2]
+    assert "complete replay cannot be verified" in report["erasures"]["reason"]
+    assert report["erasures"]["namespaces"] == 1
+    assert rows_for(tmp_path / "out" / "live.db", "alice") == 0
+    assert report["index"]["consistent"]
+
+
+def test_a_wholly_damaged_journal_does_not_pass_as_empty(live, tmp_path):
+    br.snapshot(live, tmp_path / "bk")
+    journal = ErasureJournal.beside(live)
+    journal.path.write_text('{"user_id": "alice",', encoding="utf-8")
+
+    report = br.restore(tmp_path / "bk", tmp_path / "out", erasures=journal.path)
+
+    assert not report["ok"]
+    assert report["erasures"]["invalid_lines"] == [1]
+    assert rows_for(tmp_path / "out" / "live.db", "alice") == 3
+
+
 def test_a_namespace_used_again_after_its_erasure_keeps_what_it_wrote_since(live, tmp_path):
     """Only erasures served after the backup are replayed. One served before it is already
     reflected in the copy, and whatever that namespace holds there was written afterwards —

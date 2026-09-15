@@ -206,17 +206,7 @@ def _relation_scanner(store, encoder):
 
 
 def _manifest_instances(manifest, settings) -> list:
-    """Every instance of the dataset a manifest's question ids come from.
-
-    A LongMemEval manifest names its split variant. A BEAM manifest is named for its half
-    (`beam-dev`, `beam-test`), and its instances come from that half's export rather than
-    from a LongMemEval file that could never hold them.
-    """
-    from llm_long_term_memory.evaluation.datasets import beam
-
-    half = beam.half_of(manifest)
-    if half is not None:
-        return beam.load(half, settings.data_dir)
+    """Every instance of the dataset a manifest's question ids come from."""
     return lme.load(manifest.variant, settings.data_dir)
 
 
@@ -494,13 +484,6 @@ def eval_run(
             instances = [by_id[qid] for qid in manifest.question_ids]
         else:
             instances = lme.load(cfg.dataset_variant, settings.data_dir, limit=n)
-
-    if any(inst.rubric for inst in instances):
-        # A question that ships a rubric is graded against it; the reference-answer judge
-        # would read the text the rubric was written from as a gold answer.
-        from llm_long_term_memory.evaluation.beam_judge import BeamRubricJudge
-
-        judge = BeamRubricJudge(judge.client, model=judge.model)
 
     stem = f"{variant}.{label}" if label else variant
     out = settings.results_dir / "raw" / f"{stem}.jsonl"
@@ -906,7 +889,6 @@ def ingest_run(
                 # does. A stratified sample of the manifest's size would return a
                 # different set of questions, and for a held-out split the haystacks
                 # ingested have to be the ones its questions are asked about.
-                from llm_long_term_memory.evaluation.datasets import beam
                 from llm_long_term_memory.evaluation.manifest import load_manifest
 
                 manifest = load_manifest(questions)
@@ -919,8 +901,6 @@ def ingest_run(
                     )
                 instances = [by_id[q] for q in manifest.question_ids]
                 console.print(f"[dim]manifest {manifest.name}: {len(instances)} questions[/dim]")
-                if beam.half_of(manifest) is not None:
-                    pipeline.source_label = "beam"
             else:
                 instances = lme.load(
                     cfg.dataset_variant, settings.data_dir, limit=limit or cfg.dataset_limit
@@ -1341,6 +1321,32 @@ def eval_repeat(
     console.print(Variability(variant, accuracies).summary())
 
 
+def _grounded_memory(anchored, session_id: str):
+    """One anchored fact as a `Memory`, so both arms are scored by the same ruler.
+
+    `score_sessions` reads `content`, so nothing else has to be faithful — but the typed
+    fields are carried anyway, because a comparison that quietly scored a different
+    object than the one being proposed would not be a comparison.
+    """
+    from llm_long_term_memory.store import Memory
+
+    fact = anchored.fact
+    return Memory(
+        id=f"g_{abs(hash((session_id, fact.verbatim_span))) & 0xFFFFFFFFFF:010x}",
+        user_id="fidelity",
+        type="semantic",
+        content=fact.content,
+        token_count=len(fact.content.split()),
+        subject=fact.subject,
+        predicate=fact.attribute or None,
+        object=(f"{fact.value} {fact.unit}".strip() or None) if fact.value else None,
+        source_session_id=session_id,
+        source_turn_index=anchored.turn_index,
+        source_char_start=anchored.char_start,
+        source_char_end=anchored.char_end,
+    )
+
+
 @ingest_app.command("fidelity")
 def ingest_fidelity(
     config: str = typer.Option("configs/baselines.yaml", "--config", "-c"),
@@ -1351,6 +1357,17 @@ def ingest_fidelity(
     ),
     batch: int | None = typer.Option(None, help="Override sessions per request"),
     two_stage: bool | None = typer.Option(None, help="Override the two-stage flag"),
+    grounded: bool = typer.Option(
+        False,
+        "--grounded",
+        help=(
+            "Score the evidence-grounded extractor instead: atomic facts each quoting "
+            "the turn they came from, typed value/unit, event time separate from "
+            "observation time. Refused facts are counted, not silently dropped. It "
+            "extracts one session per request, so compare it against `--batch 1` or the "
+            "batch size is a second variable."
+        ),
+    ),
     min_score: float | None = typer.Option(
         None,
         help="Exit non-zero if overall fidelity falls below this (0-1). Turns the "
@@ -1380,11 +1397,16 @@ def ingest_fidelity(
     usage = UsageTracker()
     client = GeminiClient(settings.require_api_key(), quota=quota, usage=usage)
     use_two_stage = cfg.ingest.two_stage if two_stage is None else two_stage
-    extractor = (
-        TwoStageExtractor(client, cfg.models.extractor)
-        if use_two_stage
-        else Extractor(client, cfg.models.extractor)
-    )
+    if grounded:
+        from llm_long_term_memory.ingest.grounded import GroundedExtractor
+
+        extractor = GroundedExtractor(client, cfg.models.extractor)
+    else:
+        extractor = (
+            TwoStageExtractor(client, cfg.models.extractor)
+            if use_two_stage
+            else Extractor(client, cfg.models.extractor)
+        )
 
     with console.status("Loading corpus…"):
         every = lme.load(cfg.dataset_variant, settings.data_dir)
@@ -1399,7 +1421,12 @@ def ingest_fidelity(
             if len(picked) >= sessions:
                 break
 
-    batch = batch or cfg.ingest.sessions_per_request
+    # One session per request when grounded: `turn_index` has to name a turn the model
+    # can see, and a fifteen-session prompt makes that ambiguous. Forced rather than
+    # defaulted, and stated in the header, because batch size alone moved yield about
+    # five-fold (D5) — comparing it against the shipped batch of 15 would be two
+    # variables wearing one number.
+    batch = 1 if grounded else (batch or cfg.ingest.sessions_per_request)
     console.print(
         f"[bold]fidelity[/bold] · {len(picked)} sessions from the "
         f"{'held-out' if holdout else 'dev'} split · {batch}/request · "
@@ -1418,13 +1445,16 @@ def ingest_fidelity(
     from llm_long_term_memory.ingest.keying import _PROMPT as KEYING_PROMPT
     from llm_long_term_memory.ingest.keying import KEYING_SYSTEM
 
-    active_prompt = (
-        FACTS_SYSTEM + FACTS_PROMPT + KEYING_SYSTEM + KEYING_PROMPT
-        if use_two_stage
-        else EXTRACT_SYSTEM + _PROMPT
-    )
+    if grounded:
+        active_prompt = "".join(extractor.prompt_texts())
+    elif use_two_stage:
+        active_prompt = FACTS_SYSTEM + FACTS_PROMPT + KEYING_SYSTEM + KEYING_PROMPT
+    else:
+        active_prompt = EXTRACT_SYSTEM + _PROMPT
     fingerprint = hashlib.sha1(
-        (active_prompt + cfg.models.extractor + str(batch) + str(use_two_stage)).encode()
+        (
+            active_prompt + cfg.models.extractor + str(batch) + str(use_two_stage) + str(grounded)
+        ).encode()
     ).hexdigest()[:12]
     cache_path = settings.store_dir / "fidelity-cache" / f"{fingerprint}.json"
     cached = _json.loads(cache_path.read_text(encoding="utf-8")) if cache_path.exists() else {}
@@ -1433,6 +1463,9 @@ def ingest_fidelity(
             f"[dim]reusing cached extraction {fingerprint} ({len(cached)} sessions)[/dim]"
         )
 
+    from types import SimpleNamespace
+
+    refusals = attempted = 0
     pairs = []
     for i in range(0, len(picked), batch):
         chunk = picked[i : i + batch]
@@ -1444,11 +1477,26 @@ def ingest_fidelity(
                 ]
                 pairs.append((s, mems))
             continue
-        outcome = extractor.extract(chunk)
         by_session: dict[str, list] = {s.session_id: [] for s in chunk}
-        for m in outcome.memories:
-            if m.source_session_id in by_session:
-                by_session[m.source_session_id].append(m)
+        if grounded:
+            written, refused = 0, 0
+            for session in chunk:
+                report = extractor.extract(
+                    [(t.role, t.content) for t in session.turns], session.date
+                )
+                by_session[session.session_id] = [
+                    _grounded_memory(anchored, session.session_id) for anchored in report.anchored
+                ]
+                written += len(report.anchored)
+                refused += len(report.rejected)
+            outcome = SimpleNamespace(memories=[m for v in by_session.values() for m in v])
+            refusals += refused
+            attempted += written + refused
+        else:
+            outcome = extractor.extract(chunk)
+            for m in outcome.memories:
+                if m.source_session_id in by_session:
+                    by_session[m.source_session_id].append(m)
         pairs.extend((s, by_session[s.session_id]) for s in chunk)
         for s in chunk:
             cached[s.session_id] = [
@@ -1485,6 +1533,12 @@ def ingest_fidelity(
         f"[bold]overall {report.overall:.1%}[/bold] · "
         f"{report.memories_per_session:.1f} memories/session · {report.memories} memories"
     )
+    if grounded and attempted:
+        console.print(
+            f"[bold]grounding[/bold] · {attempted - refusals}/{attempted} facts cited a span "
+            f"that was in the turn they named ({1 - refusals / attempted:.1%}); "
+            f"{refusals} refused rather than stored"
+        )
 
     for facet, misses in report.missed_examples.items():
         console.print(

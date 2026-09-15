@@ -13,11 +13,12 @@ already exists and reports, per configuration, what reached the context:
 
     any source session      at least one labelled source session is represented
     all source sessions     every labelled source session is
-    required-fact coverage  the rubric's own facts are present — BEAM only, where the
-                            rubric names the fact in words
 
-The answerer is stubbed and the judge never runs, so **layer 4 — whether the model used
-what it was given — is out of reach here by construction.** Nothing in this file can say a
+A third layer — whether the *fact* the question needs reached the context, rather than the
+session containing it — needs a benchmark that names the required fact in words of its own.
+LongMemEval does not, so it is not measurable here and is not reported. The answerer is
+stubbed and the judge never runs, so **the fourth layer — whether the model used what it
+was given — is out of reach by construction.** Nothing in this file can say a
 candidate improves answers; it can only say a candidate cannot, because the evidence still
 is not there. That is the cheap half of the question and it is the half that eliminates.
 
@@ -48,6 +49,36 @@ capacity cap applied before any question is asked.
 
 `decay_halflife` and `evict_to` **write to the store**. Point them at a copy: a sweep
 that mutates the store an experiment was paid for is not a measurement, it is damage."""
+
+
+class StubAnswerer:
+    """Answers every question with a fixed verdict, so no request is ever sent.
+
+    Retrieval is what is being measured; the answerer only has to return something the
+    runner can parse. `status: "answer"` keeps the raw-source fallback out of the picture,
+    because a fallback puts turns in the context that retrieval did not choose and the
+    comparison would stop being about retrieval.
+    """
+
+    def __init__(self) -> None:
+        self.calls = 0
+
+    def generate(self, *, role, model, prompt, system=None, schema=None, **_):
+        import json
+
+        from llm_long_term_memory.llm.client import Completion
+
+        self.calls += 1
+        return Completion(
+            text=json.dumps(
+                {"status": "answer", "answer": "stub", "reason": "", "source_query": ""}
+            ),
+            model=model,
+            input_tokens=0,
+            output_tokens=0,
+            thinking_tokens=0,
+            attempts=1,
+        )
 
 
 def parse_sweep(values: list[str]) -> list[dict]:
@@ -168,60 +199,6 @@ def replay(runner, instances, coverage_by_question=None) -> dict:
     }
 
 
-def fact_coverage(runner, instances, rows) -> dict | None:
-    """Required-fact coverage at the ranked and context stages. BEAM only."""
-    from llm_long_term_memory.evaluation import beam_coverage as fc
-
-    by_id = {row["question_id"]: row for row in rows}
-    owned: dict[str, dict[str, str]] = {}
-    decidable = ranked_hits = context_hits = required = 0
-    for instance in instances:
-        if not instance.rubric:
-            return None
-        namespace = instance.store_namespace
-        if namespace not in owned:
-            owned[namespace] = {
-                memory.id: memory.content for memory in runner.store.iter_all(namespace)
-            }
-        row = by_id.get(instance.question_id)
-        if row is None:
-            continue
-        conversation = fc.haystack(
-            *(turn.content for session in instance.sessions for turn in session.turns)
-        )
-        stages = {
-            "source": conversation,
-            "extracted": fc.haystack(*owned[namespace].values()),
-            "retrieved": fc.haystack(
-                *(owned[namespace][i] for i in row["ranked"] if i in owned[namespace])
-            ),
-            "context": fc.haystack(
-                *(owned[namespace][i] for i in row["selected"] if i in owned[namespace])
-            ),
-            "answer": "",
-        }
-        report = fc.question_report(fc.ladder(instance.rubric, conversation, stages))
-        if not report["required_facts"]:
-            continue
-        decidable += report["decidable_items"]
-        required += report["required_facts"]
-        ranked_hits += report["reached"]["retrieved"]
-        context_hits += report["reached"]["context"]
-    if not required:
-        return None
-    return {
-        "automatically_decidable_items": decidable,
-        "required_facts": required,
-        "reached_ranked": ranked_hits / required,
-        "reached_context": context_hits / required,
-        "phrasing": (
-            "Among automatically decidable evidence-bearing rubric items "
-            f"({decidable} items, {required} required facts), "
-            f"{context_hits / required:.1%} reached the final context."
-        ),
-    }
-
-
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--store", required=True, help="store filename stem")
@@ -240,8 +217,6 @@ def main() -> int:
 
     os.environ.setdefault("GEMINI_API_KEY", "replay-no-request-is-sent")
 
-    import beam_dry_run
-
     from llm_long_term_memory.cli import _build, _manifest_instances
     from llm_long_term_memory.config import Settings
     from llm_long_term_memory.evaluation.manifest import load_manifest
@@ -259,7 +234,7 @@ def main() -> int:
         # A fresh fake per configuration; `need_source_percent=0` keeps the raw-source
         # fallback out of the picture, because a fallback would put turns in the context
         # that retrieval did not choose and the comparison would stop being about retrieval.
-        fake = beam_dry_run.FakeProvider(need_source_percent=0)
+        fake = StubAnswerer()
         _cfg, _settings, runner, _judge, _usage = _build(
             args.variant,
             args.config,
@@ -279,10 +254,9 @@ def main() -> int:
             chosen = [i for i in instances if i.store_namespace in present]
             skipped = len(instances) - len(chosen)
             outcome = replay(runner, chosen)
-            coverage = fact_coverage(runner, chosen, outcome["rows"])
         finally:
             runner.store.close()
-        calls = sum(getattr(fake, "by_kind", {}).values())
+        calls = fake.calls
         if calls != len(chosen):
             # One stubbed answerer call per question and nothing else. Anything more means
             # a second pass ran and the row is not a pure retrieval measurement.
@@ -293,7 +267,6 @@ def main() -> int:
                 "configuration": configuration or {"default": True},
                 "questions_skipped_not_yet_ingested": skipped,
                 **{k: v for k, v in outcome.items() if k != "rows"},
-                "required_fact_coverage": coverage,
             }
         )
 
@@ -312,18 +285,13 @@ def main() -> int:
     out.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
 
     print(f"{payload['questions']} questions · {payload['store']} · zero provider calls\n")
-    header = f"{'configuration':28} {'any src':>8} {'all src':>8} {'ctx tok':>8} {'in ctx':>7}"
+    header = f"{'configuration':28} {'any src':>8} {'all src':>8} {'ctx tok':>8}"
     print(header)
     for row in results:
         label = ", ".join(f"{k}={v}" for k, v in row["configuration"].items())
         any_src = f"{row['any_source_session']:.1%}" if row["any_source_session"] else "n/a"
         all_src = f"{row['all_source_sessions']:.1%}" if row["all_source_sessions"] else "n/a"
-        facts = row["required_fact_coverage"]
-        in_context = f"{facts['reached_context']:.1%}" if facts else "n/a"
-        print(
-            f"{label:28} {any_src:>8} {all_src:>8} "
-            f"{row['median_context_tokens']:>8,} {in_context:>7}"
-        )
+        print(f"{label:28} {any_src:>8} {all_src:>8} {row['median_context_tokens']:>8,}")
     print(f"\nwritten: {out}")
     return 0
 

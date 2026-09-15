@@ -16,8 +16,8 @@ the model ever sees them rather than being handed over for it to guess between.
 It is **not** shown to be more accurate than plain retrieval: +7 points over naive RAG at
 p = 0.3368. [Results and counting conventions](#results).
 
-[Interactive demo](https://lltm-memory.pages.dev) · [Architecture atlas](docs/PROJECT_REPORT.zh-CN.md#系统的架构) ·
-[Experiment history](docs/PROJECT_REPORT.zh-CN.md#实验历史) · [Current research status](docs/PROJECT_REPORT.zh-CN.md#现在在哪)
+[Interactive demo](https://lltm-memory.pages.dev) · [Architecture atlas](docs/ARCHITECTURE.md#图集) ·
+[Evaluation](docs/EVALUATION.md) · [Current limitations](docs/PROJECT_REPORT.zh-CN.md#五当前局限)
 
 The worked example sends fictional facts to the demo backend. The interactive box
 sends the visitor's supported statements and questions; browser sentence patterns
@@ -26,7 +26,7 @@ updates across conversations. It does not demonstrate LLM extraction or generate
 
 ![System overview: conversations become structured memories while raw turns remain available for conditional source recovery](docs/figures/overview.svg)
 
-[Editable SVG](docs/figures/overview.svg) · [中文架构图](docs/figures/overview.zh-CN.svg) · [Implementation and optional paths](docs/PROJECT_REPORT.zh-CN.md#系统的架构)
+[Editable SVG](docs/figures/overview.svg) · [中文架构图](docs/figures/overview.zh-CN.svg) · [Implementation and optional paths](docs/ARCHITECTURE.md#图集)
 
 ## Quick start
 
@@ -104,7 +104,7 @@ baked in. Default configuration files are included; Compose can override them.
 
 Nonempty two-stage extraction usually takes two requests, plus any dedup adjudication.
 The 0.92 similarity threshold identifies neighbours; it does not itself delete facts.
-[Full caption and code mapping](docs/PROJECT_REPORT.zh-CN.md#系统的架构).
+[Full caption and code mapping](docs/ARCHITECTURE.md#图集).
 
 </details>
 
@@ -115,7 +115,7 @@ The 0.92 similarity threshold identifies neighbours; it does not itself delete f
 
 Source-session foreign keys and heuristic turn/span anchors provide different levels
 of assurance. Vector sidecars are saved separately from SQLite.
-[Full caption and code mapping](docs/PROJECT_REPORT.zh-CN.md#系统的架构).
+[Full caption and code mapping](docs/ARCHITECTURE.md#图集).
 
 </details>
 
@@ -124,7 +124,7 @@ of assurance. Vector sidecars are saved separately from SQLite.
 
 ![Retrieval and conditional source recovery, including answer, need_source and no_evidence verdicts](docs/figures/read-path.svg)
 
-The [complete atlas](docs/PROJECT_REPORT.zh-CN.md#系统的架构) also explains out-of-order temporal updates
+The [complete atlas](docs/ARCHITECTURE.md#图集) also explains out-of-order temporal updates
 and the boundary between the runtime, playground and research evaluation.
 
 </details>
@@ -132,7 +132,7 @@ and the boundary between the runtime, playground and research evaluation.
 Reranking, session-coherent context, unconditional hydration, decay, consolidation and
 utility-based packing are available but absent from the default answer route. v3
 reasoning/hydration and v4 synthesis/scanning are explicit research variants.
-See the [branch map](docs/PROJECT_REPORT.zh-CN.md#系统的架构) and
+See the [branch map](docs/ARCHITECTURE.md#图集) and
 [disabled-feature evidence](results/shipped-but-disabled.md).
 
 ## Results
@@ -188,7 +188,7 @@ until the instrument is rebuilt. [v4.2 result](results/v4.2-result.md),
 
 Source-session recall is an **any-gold-session hit** metric. It does not prove that
 all answer-bearing facts survived extraction. Detailed development results, negative
-results and the already-measured v4 probes are in the [experiment history](docs/PROJECT_REPORT.zh-CN.md#实验历史).
+results and the already-measured v4 probes are in the [experiment history](docs/EVALUATION.md).
 
 ## Interfaces
 
@@ -261,8 +261,12 @@ the prompt. Everything here is long-term: what the user is, said, and when it ch
 
 **The two gaps that matter most.** Extraction fidelity is 36.6% on detail retention and
 is the first loss point for 10 of 14 analysed failures — every layer below it inherits
-that. And there is **no next-day test**: nothing asks the same fact tomorrow in different
-words. `knowledge-update` is asked once, in one wording, inside the same run.
+that. That number turned out to be an operating point rather than a ceiling: it is what
+fifteen sessions sharing one extraction request produce, and eight sessions per request
+score 64.9% on the same ruler (+41 specifics, −4, p = 9e-09). The candidate config is
+written and unshipped — see [the batch-size result](results/batch-size-result.md). And
+there is **no next-day test**: nothing asks the same fact tomorrow in different words.
+`knowledge-update` is asked once, in one wording, inside the same run.
 
 Full detail, with the evidence behind each number: [project report](docs/PROJECT_REPORT.zh-CN.md).
 
@@ -293,29 +297,61 @@ Deploying it, and what has to be true first: [DEPLOY.md](DEPLOY.md).
 
 ## Limitations
 
-- Extraction is lossy. Date columns inherit session dates, and source spans are
-  heuristic. A source-session hit is weaker than exact evidence coverage.
-- Full history is more accurate on the frozen final test. The reported token savings
-  concern answer context and do not remove ingestion cost.
-- The service is a prototype: empty token settings allow open access, writes are
-  serialized within one process, and SQLite and vector files persist separately.
-  Cross-resource recovery and multi-process writes remain unfinished.
-- Ordinary `forget` preserves stored rows; REST namespace erasure removes online data
-  and records the erasure beside the store, and the restore drill replays erasures
-  served after the backup was taken. Scheduled backups, an off-machine copy of the
-  erasure journal, and production recovery drills remain unfinished.
+- **Extraction is where the system loses most.** Detail retention is 36.6% overall —
+  51.9% on quantities, 57.1% on durations — and it is the first loss point for 10 of 14
+  analysed failures, so every layer below it inherits the loss. Most of that is the batch
+  size the free tier forced rather than the extractor: 37.3% at fifteen sessions per
+  request against 78.4% at one, measured on the same sixty held-out sessions
+  ([the curve](results/batch-size-result.md)). The fix costs two to three quota days and
+  has not been run at scale. Two further causes, independent of batch size:
+  `event_time` is the *session's* date rather than the fact's, so all memories from one
+  conversation share a timestamp (3,776 distinct values across 4,714 sessions); and the
+  extractor emits no character offsets, so the source span is found afterwards by
+  choosing the most lexically similar sentence — an auditable anchor, not a claim that
+  the model quoted it.
+- **A source-session hit is weaker than it sounds.** Recall of 98.3% means one labelled
+  source session reached the context, not that the fact the question needs did.
+  `tools/retrieval_replay.py` reports the stricter *every* labelled source session
+  alongside it, for free; the fact-level layer needs a benchmark that names the required
+  fact in words, which LongMemEval does not.
+- **Deduplication was not namespace-scoped, and stores built before the fix cannot be
+  resumed.** `Deduplicator._neighbours` searched the shared index with no `user_id`
+  condition while retrieval applied one, so a fact could be dropped as a duplicate of a
+  fact in a conversation that never contained it — 3 same-namespace neighbours above
+  threshold against **42 cross-namespace** on `test100`. Fixed 2026-09-16, and the ingest
+  fingerprint now records the comparison scope, so every store written earlier refuses to
+  resume rather than mixing two dedup policies under one label. Rebuild with `--fresh` or
+  use a new store name; archived results are unaffected.
+- **Full history is more accurate** on the frozen final test: 86% against 72%,
+  p = 0.0043. And the context saving is on the *answer*: that run spent 1,386 requests
+  and 13.8M tokens on ingestion against 647 requests and 12.4M for all three answering
+  arms, so the store has to be queried often before it pays for itself.
+- **The service is a prototype.** `LLTM_REQUIRE_AUTH` makes open mode a choice rather
+  than an accident — set it and the process refuses to start without tokens — but the
+  default is still open, writes are serialised within one process, and SQLite and the
+  vector index persist as separate files that can diverge. Multi-process writes and
+  cross-resource recovery are unfinished, and both want a different store rather than a
+  patch.
+- **Deletion keeps its provenance.** Ordinary `forget` marks a row evicted rather than
+  removing it, because a row that is gone cannot explain why. REST namespace erasure
+  does delete, and records the erasure in a journal beside the store so a restore can
+  replay deletions served after the backup was taken. `tools/operate.py` now runs the
+  scheduled snapshot, copies that journal off the store's own disk and reports accounts
+  nearing a cap; what is still missing is a restore drill on a timer and a rate limit in
+  front of the service.
 
 ## Documentation
 
+Four documents, and they do not overlap. Everything else under `results/` is evidence
+rather than prose.
+
 | Document | Contents |
 |---|---|
-| [Architecture atlas](docs/PROJECT_REPORT.zh-CN.md#系统的架构) | Six vector figures, exact code mappings, default and optional branches |
-| [Experiment history](docs/PROJECT_REPORT.zh-CN.md#实验历史) | Consolidated phase results and qualifications |
-| [Current project report](docs/PROJECT_REPORT.zh-CN.md) · [Visual edition](docs/PROJECT_REPORT.zh-CN.html) | Current implementation, results, limitations and plan (Chinese) |
-| [Earlier report](docs/PROJECT_REPORT.zh-CN.md) · [中文](docs/PROJECT_REPORT.zh-CN.md) | Historical design rationale and measurements |
-| [Decisions](docs/PROJECT_REPORT.zh-CN.md#决策记录) | Measured design decisions |
-| [Current status](docs/PROJECT_REPORT.zh-CN.md#现在在哪) · [Roadmap](docs/PROJECT_REPORT.zh-CN.md#后续完整计划) | Evolving research log and planned work |
-| [Separation plan](docs/PROJECT_REPORT.zh-CN.md#系统的架构) | Proposed core/research split; not the current module layout |
+| This README | What it is, how to run it, headline results and limitations |
+| [Project report](docs/PROJECT_REPORT.zh-CN.md) (Chinese) | Why it is built this way, what the experiments settled, what is still missing |
+| [Architecture](docs/ARCHITECTURE.md) (Chinese) | The implementation as it stands: six figures, code mappings, auth, deletion semantics, account budgets |
+| [Evaluation](docs/EVALUATION.md) (Chinese) | Splits, arms, statistical conventions, the failure taxonomy, and every final number |
+| [DEPLOY.md](DEPLOY.md) | Deployment steps |
 | [Data protocol](results/data-protocol.md) | Permitted uses of question sets |
 
 [MIT License](LICENSE)

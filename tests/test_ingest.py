@@ -8,6 +8,7 @@ the system exists to answer.
 from __future__ import annotations
 
 import json
+from dataclasses import replace
 from datetime import datetime
 
 import numpy as np
@@ -16,7 +17,7 @@ import pytest
 from llm_long_term_memory.evaluation.datasets.longmemeval import HaystackSession, HaystackTurn
 from llm_long_term_memory.ingest import Deduplicator, Extractor, memory_id, normalize_predicate
 from llm_long_term_memory.ingest.extract import _parse_date, render_batch
-from llm_long_term_memory.store import Memory, SQLiteMemoryStore
+from llm_long_term_memory.store import Memory, NumpyFlatIndex, SQLiteMemoryStore
 
 # --------------------------------------------------------------------- helpers
 
@@ -242,6 +243,60 @@ def test_dissimilar_candidates_never_reach_the_llm():
     )
     assert len(outcome.kept) == 2
     assert outcome.adjudications == 0
+
+
+def test_a_near_duplicate_in_another_namespace_is_not_adjudicated(tmp_path):
+    """Retrieval filters by namespace after searching the shared index; dedup did not.
+
+    The consequence was not a wasted call but a deletion: a DUPLICATE verdict against a
+    neighbour belonging to someone else drops a fact from a history that never contained
+    it. Sampling a built store found 42 cross-namespace neighbours above threshold
+    against 3 same-namespace ones, so this was the ordinary case rather than the corner.
+
+    `ScriptedClient([])` is the assertion — any adjudication would raise.
+    """
+    store = SQLiteMemoryStore(tmp_path / "s.db")
+    store.initialize()
+    index = NumpyFlatIndex(tmp_path / "index", dim=3)
+    theirs = "The user lives in Canberra"
+    stored = replace(mem("theirs", theirs), user_id="u2")
+    store.add_memories([stored])
+    index.add([stored.id], np.array([[1.0, 0.0, 0.0]], dtype=np.float32))
+
+    mine = "The user's home is in Canberra"
+    encoder = StubEncoder({mine: [0.99, 0.1, 0.0]})
+
+    outcome = Deduplicator(
+        ScriptedClient([]), "m", encoder, store=store, index=index, threshold=0.92
+    ).process([mem("mine", mine, predicate="home_area")])
+
+    assert outcome.adjudications == 0
+    assert [m.id for m in outcome.kept] == ["mine"]
+    store.close()
+
+
+def test_a_near_duplicate_in_the_same_namespace_still_is(tmp_path):
+    """The scoping must not turn the stage off: the same pair inside one namespace is
+    still compared, so the fix removes the foreign comparisons and nothing else."""
+    store = SQLiteMemoryStore(tmp_path / "s.db")
+    store.initialize()
+    index = NumpyFlatIndex(tmp_path / "index", dim=3)
+    existing = mem("existing", "The user lives in Canberra")
+    store.add_memories([existing])
+    index.add([existing.id], np.array([[1.0, 0.0, 0.0]], dtype=np.float32))
+
+    mine = "The user's home is in Canberra"
+    encoder = StubEncoder({mine: [0.99, 0.1, 0.0]})
+    client = ScriptedClient([{"verdict": "DUPLICATE", "reason": "same fact"}])
+
+    outcome = Deduplicator(client, "m", encoder, store=store, index=index, threshold=0.92).process(
+        [mem("mine", mine, predicate="home_area")]
+    )
+
+    assert outcome.adjudications == 1
+    assert outcome.duplicates == 1
+    assert outcome.kept == []
+    store.close()
 
 
 def test_shared_predicate_is_checked_even_when_wording_diverges(tmp_path):

@@ -118,15 +118,32 @@ class ErasureJournal:
         leave every *other* erasure unapplied, which is the failure this file exists to
         prevent.
         """
+        return self.read_entries()[0]
+
+    def read_entries(self) -> tuple[list[Erasure], list[int]]:
+        """Read valid entries and the line numbers whose deletion record was lost.
+
+        Valid deletions still need replaying when another line is damaged. A restore
+        must also know that the journal is incomplete before declaring the copy safe.
+        No damaged content is included in the diagnostics.
+        """
         if not self.path.is_file():
-            return []
+            return [], []
         found: list[Erasure] = []
-        for line in self.path.read_text(encoding="utf-8").splitlines():
+        invalid_lines: list[int] = []
+        for number, line in enumerate(self.path.read_bytes().splitlines(), start=1):
             line = line.strip()
             if not line:
                 continue
             try:
-                data = json.loads(line)
+                data = json.loads(line.decode("utf-8"))
+                if (
+                    not isinstance(data, dict)
+                    or not isinstance(data.get("user_id"), str)
+                    or not data["user_id"].strip()
+                    or not isinstance(data.get("erased_at"), str)
+                ):
+                    raise ValueError("invalid erasure entry")
                 found.append(
                     Erasure(
                         user_id=data["user_id"],
@@ -136,11 +153,13 @@ class ErasureJournal:
                         turns=int(data.get("turns", 0)),
                     )
                 )
-            except (json.JSONDecodeError, KeyError, TypeError, ValueError):
-                continue
-        return found
+            except (UnicodeDecodeError, json.JSONDecodeError, KeyError, TypeError, ValueError):
+                invalid_lines.append(number)
+        return found, invalid_lines
 
-    def namespaces(self, *, served_after: datetime | None = None) -> list[str]:
+    def namespaces(
+        self, *, served_after: datetime | None = None, entries: list[Erasure] | None = None
+    ) -> list[str]:
         """Namespaces that must not come back, in first-erased order.
 
         `served_after` keeps only erasures served at or after that moment — the start of a
@@ -149,7 +168,7 @@ class ErasureJournal:
         serves erased data again.
         """
         seen: dict[str, None] = {}
-        for entry in self.entries():
+        for entry in self.entries() if entries is None else entries:
             if served_after is not None:
                 when = entry.erased_at_utc()
                 if when is not None and when < served_after:

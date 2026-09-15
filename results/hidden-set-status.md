@@ -1,15 +1,16 @@
 # The final test set — what exists, what does not, and what a candidate must prove
 
-> **Update 2026-09-14: BEAM is adopted, and its final half is registered.** Its dataset turned
-> out to be public (revision `3205395e` of the 100K and 500K files, CC BY-SA 4.0). All 1,100
-> questions passed `register_hidden_set.py`'s id, verbatim and near-duplicate checks against
-> the 500 LongMemEval questions, and the set was split 40/60 by conversation
-> ([`beam-split.json`](manifests/beam-split.json)). The 660-question final half is registered
-> as [`beam-test`](manifests/beam-test.json), to be answered once, after every choice is
-> frozen. Step 2 below concerned LoCoMo's audit and does not apply; step 3's resolution was
-> computed per stratum by `tools/beam_power.py`, as scenarios until BEAM's own noise floor is
-> measured. The plan is in the [roadmap](../docs/PROJECT_REPORT.zh-CN.md#后续完整计划). The text below is the record of
-> how the choice was made.
+> **Closed 2026-09-16.** BEAM was adopted, split, adapted, judged, powered, registered and
+> rehearsed; ingestion reached 44% of the development half and was then stopped. The reason
+> was cost against expected return: reaching a conclusion needed roughly eighteen quota days,
+> and v2's advantage over plain retrieval was already not significant on LongMemEval
+> (+7 points, p = 0.3368), so there was no reason to expect outside data to reverse it.
+>
+> The line paid for itself anyway. Four retrieval hypotheses were falsified for no quota, the
+> four-layer evidence attribution was designed and built, and the instrument that produced the
+> extraction batch-size curve came from it. Its code, data and registration were removed from
+> the repository; the history is in git. The survey below is left as it stood, because it is
+> the record of how the benchmark was chosen.
 
 **v4 still has no final test.** Every v4 number on record is a development number. This
 page says exactly what is blocking, so that the gap is a stated condition rather than

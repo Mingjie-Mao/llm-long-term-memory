@@ -15,6 +15,7 @@ import sqlite3
 import tempfile
 from datetime import datetime
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
@@ -267,3 +268,132 @@ def test_an_old_store_gains_the_tables_on_open():
                 AccountBudgets(store).check("alice", "m", "extract")
         finally:
             store.close()
+
+
+@pytest.fixture
+def answer_service(tmp_path):
+    from llm_long_term_memory.api.service import MemoryService
+    from llm_long_term_memory.config import Settings
+
+    service = MemoryService(
+        settings=Settings(store_dir=tmp_path, gemini_api_key="", _env_file=None),
+        encoder=SimpleNamespace(dim=2),
+    )
+    yield service
+    service.close()
+
+
+class RecordingAnswerer:
+    """One answer can include a retry and a second call after source recovery."""
+
+    model = "answer-model"
+    top_k = 10
+
+    def __init__(self, attempts=(), *, fail=False):
+        from llm_long_term_memory.llm import UsageTracker
+
+        self.client = SimpleNamespace(usage=UsageTracker())
+        self.attempts = attempts
+        self.fail = fail
+        self.calls = 0
+
+    def answer(self, instance, *, limit=None):
+        from llm_long_term_memory.evaluation.runners.base import Answer
+        from llm_long_term_memory.llm.usage import CallRecord
+
+        self.calls += 1
+        for ok, input_tokens, output_tokens in self.attempts:
+            self.client.usage.record(
+                CallRecord("answerer", self.model, input_tokens, output_tokens, 1.0, ok=ok)
+            )
+        if self.fail:
+            raise RuntimeError("answer failed")
+        return Answer("remembered", 1, notes={"fallback_level": "local"})
+
+
+def test_answer_refuses_a_spent_account_without_calling_the_provider(answer_service):
+    answer_service._answerer = RecordingAnswerer([(True, 10, 2)])
+    answer_service.budgets.set_budget("alice", daily_calls=0)
+
+    with pytest.raises(BudgetExceeded):
+        answer_service.answer("alice", "Where do I live?")
+
+    assert answer_service._answerer.calls == 0
+    assert answer_service.budgets.spent_today("alice").calls == 0
+
+
+def test_answer_charges_retries_and_source_recovery_to_only_its_account(answer_service):
+    runner = RecordingAnswerer([(False, 10, 0), (True, 10, 2), (True, 30, 4)])
+    answer_service._answerer = runner
+    # Earlier calls in the shared tracker belong to other requests.
+    runner.answer(None)
+    answer_service.budgets.set_budget("alice", daily_calls=3)
+
+    assert answer_service.answer("alice", "Where do I live?")["answer"] == "remembered"
+
+    spend = answer_service.budgets.spent_today("alice")
+    assert (spend.calls, spend.failed_calls, spend.input_tokens, spend.output_tokens) == (
+        3,
+        1,
+        50,
+        6,
+    )
+    assert answer_service.budgets.spent_today("bob").calls == 0
+    with pytest.raises(BudgetExceeded):
+        answer_service.answer("alice", "And before that?")
+
+
+@pytest.mark.parametrize("attempts, expected", [([], (0, 0)), ([(False, 20, 0)] * 3, (3, 60))])
+def test_failed_answer_charges_only_attempts_that_reached_the_provider(
+    answer_service, attempts, expected
+):
+    answer_service._answerer = RecordingAnswerer(attempts, fail=True)
+
+    with pytest.raises(RuntimeError, match="answer failed"):
+        answer_service.answer("alice", "Where do I live?")
+
+    spend = answer_service.budgets.spent_today("alice")
+    assert (spend.calls, spend.tokens) == expected
+    assert spend.failed_calls == spend.calls
+
+
+def test_answer_applies_its_specific_token_budget_to_total_account_spend(answer_service):
+    runner = RecordingAnswerer([(True, 5, 1)])
+    answer_service._answerer = runner
+    answer_service.budgets.set_budget(
+        "alice", daily_tokens=10, model=runner.model, operation="answer"
+    )
+    answer_service.budgets.record("alice", "extract-model", "extract", input_tokens=10)
+
+    with pytest.raises(BudgetExceeded, match="daily token"):
+        answer_service.answer("alice", "Where do I live?")
+
+    assert runner.calls == 0
+
+
+def test_answer_budget_refusal_is_http_429(answer_service, monkeypatch):
+    pytest.importorskip("fastapi")
+    from fastapi.testclient import TestClient
+
+    from llm_long_term_memory.api.app import app, get_principal, get_service
+    from llm_long_term_memory.api.identity import Principal
+
+    answer_service._answerer = RecordingAnswerer([(True, 10, 2)])
+    answer_service.budgets.set_budget("alice", daily_calls=0)
+    monkeypatch.setattr(
+        app,
+        "dependency_overrides",
+        {
+            get_service: lambda: answer_service,
+            get_principal: lambda: Principal(user_id="alice", trusted=True),
+        },
+    )
+    client = TestClient(app)
+    try:
+        response = client.post("/v1/answer", json={"query": "Where do I live?"})
+    finally:
+        client.close()
+
+    assert response.status_code == 429
+    assert "resets at" in response.json()["detail"]
+    assert answer_service._answerer.calls == 0

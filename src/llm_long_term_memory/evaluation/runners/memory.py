@@ -494,7 +494,7 @@ class MemoryRunner:
             instance.store_namespace,
             limit=limit,
             # The question's own date, not the wall clock. On this benchmark the
-            # difference is total: measured against today, 0 of 2,550 BEAM memories
+            # difference is total: on a corpus measured against today, 0 of 2,550 memories
             # score above 0.01 at the shipped half-life; measured against the corpus
             # itself, 182 do.
             as_of=_as_of(instance.question_date),

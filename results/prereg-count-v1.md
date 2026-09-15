@@ -29,7 +29,7 @@
 > `runtime/evidence_count.py`. The mechanism — quote each member from a user turn, let code
 > count, refuse when the pool is uncertain — is carried forward as a candidate to measure on
 > an external benchmark whose gold this project did not derive
-> ([roadmap](../docs/PROJECT_REPORT.zh-CN.md#后续完整计划)). Resuming this plan needs the paid path fixed, the sections
+> ([roadmap](../docs/PROJECT_REPORT.zh-CN.md#六下一步)). Resuming this plan needs the paid path fixed, the sections
 > below amended before any run, and a fresh approval.
 
 **Registered 2026-09-14, before any provider call on this candidate.** The mechanism,

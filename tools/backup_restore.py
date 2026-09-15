@@ -308,8 +308,9 @@ def _replay_erasures(
 
     journal = ErasureJournal(journal_path)
     cutoff = _copy_started(manifest)
-    namespaces = journal.namespaces(served_after=cutoff)
-    already_reflected = set(journal.namespaces()) - set(namespaces)
+    entries, invalid_lines = journal.read_entries()
+    namespaces = journal.namespaces(served_after=cutoff, entries=entries)
+    already_reflected = set(journal.namespaces(entries=entries)) - set(namespaces)
     removed = {"memories": 0, "sessions": 0, "turns": 0}
     erased_ids: list[str] = []
     if namespaces:
@@ -332,7 +333,14 @@ def _replay_erasures(
         with closing(sqlite3.connect(database)) as connection:
             connection.execute("PRAGMA journal_mode=DELETE").fetchone()
     return {
-        "replayed": True,
+        "replayed": not invalid_lines,
+        "reason": (
+            f"erasure journal has unreadable records on lines {invalid_lines}; "
+            "valid erasures were applied, but complete replay cannot be verified"
+            if invalid_lines
+            else None
+        ),
+        "invalid_lines": invalid_lines,
         "journal": str(journal_path),
         "found_beside_the_store": discovered,
         "cutoff": cutoff.isoformat() if cutoff else None,

@@ -69,6 +69,12 @@ class DedupOutcome:
 
 
 class Deduplicator:
+    scope = "namespace"
+    """Which memories a candidate may be adjudicated against. Read by the ingest
+    fingerprint, so this is the policy's name on disk as well as in code: change the
+    rule below and change this, or stores written under two policies become
+    indistinguishable."""
+
     def __init__(
         self,
         client: GeminiClient,
@@ -154,10 +160,22 @@ class Deduplicator:
                     found.append((float(sim), mem))
 
         if self.index is not None and self.store is not None and len(self.index):
+            # The index is shared by every namespace in the store, and `search` has no
+            # user condition — retrieval applies one after the fact, this did not. So a
+            # fact from one conversation could be adjudicated against a fact from another
+            # and dropped as its DUPLICATE, deleting it from a history that never
+            # contained it. Sampling 1,500 candidates on `test100` found 3 same-namespace
+            # neighbours above threshold against 42 cross-namespace, and two candidates
+            # whose entire window was foreign — which also crowds out the within-namespace
+            # duplicates this stage exists to catch.
+            #
+            # Filtering after the search rather than inside it keeps `limit` meaning
+            # "how many index hits to look at", so this can only ever shrink the window:
+            # it removes adjudications and can never add a DUPLICATE drop.
             for mid, sim in self.index.search(vector, limit=self.max_neighbours):
                 if sim >= self.threshold:
                     existing = self.store.get(mid)
-                    if existing is not None:
+                    if existing is not None and existing.user_id == candidate.user_id:
                         found.append((sim, existing))
 
         # A (subject, predicate) collision is worth adjudicating only when the

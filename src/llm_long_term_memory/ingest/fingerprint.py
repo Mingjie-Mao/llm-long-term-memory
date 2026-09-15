@@ -87,6 +87,16 @@ class IngestSpec:
     prompts: str
     sessions_per_request: str
     dedup_threshold: str | None = None
+    dedup_scope: str = "namespace"
+    """Which memories deduplication is allowed to compare a candidate against.
+
+    Added when `_neighbours` stopped adjudicating across namespaces. That fix changes
+    *which memories get written*, so a store built before it is not the same system as
+    one built after, and resuming one into the other would produce a store whose rows
+    come from two dedup policies with nothing to tell them apart — the failure this
+    module exists to prevent. Every fingerprint already on disk lacks the key, so
+    `differences()` reports it and the resume is refused rather than silently mixed.
+    """
 
     def as_dict(self) -> dict[str, str]:
         """The stored form. Kept as a flat string dict because it is what is written
@@ -105,6 +115,9 @@ class IngestSpec:
         }
         if self.dedup_threshold is not None:
             fp["dedup_threshold"] = self.dedup_threshold
+            # Only meaningful where deduplication runs at all, and kept beside the
+            # threshold so a spec without a deduplicator keeps the shape it had.
+            fp["dedup_scope"] = self.dedup_scope
         return fp
 
 
@@ -129,6 +142,9 @@ def from_runtime(extractor: Any, *, sessions_per_request: int, dedup: Any = None
         prompts=digest(*prompts()) if callable(prompts) else "unfingerprinted",
         sessions_per_request=str(sessions_per_request),
         dedup_threshold=_threshold(getattr(dedup, "threshold", None)),
+        # Read off the live object for the same reason `prompts` is: a deduplicator
+        # built with a different comparison rule then fingerprints as what it is.
+        dedup_scope=str(getattr(dedup, "scope", "namespace")),
     )
 
 

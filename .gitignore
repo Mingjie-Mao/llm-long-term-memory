@@ -70,13 +70,13 @@ results/review/**/packet.json
 results/review/**/packet.html
 results/review/**/gold.json
 
-# BEAM is used under CC BY-SA 4.0. ShareAlike means its conversations, questions, answers
-# and anything adapted from them may only be published under that same licence, and this
-# repository is MIT, so nothing that quotes BEAM is committed. The downloaded files, anything
-# converted from them and the stores built from them already sit under data/ and stores/.
-# Per-question rows are the remaining leak: they carry `gold`, the benchmark's own answer,
-# and `hypothesis`, a model answer that can quote the conversation. Aggregates, usage files,
-# hashes and conversation ids quote nothing and are committed as usual, with attribution.
+# The BEAM line was closed on 2026-09-16 and its code, manifests and pre-registration
+# were removed (results/hidden-set-status.md). These two lines stay: BEAM is CC BY-SA 4.0
+# and this repository is MIT, so per-question rows — which carry the benchmark's own
+# answers and model text that can quote its conversations — must never be committed.
+# Downloads and stores from that line may still exist locally under data/ and stores/,
+# both ignored wholesale. Removing a licence guard because the thing it guards is gone is
+# how it comes back unguarded.
 results/**/*beam*.jsonl
 results/**/*beam*/**/*.jsonl
 

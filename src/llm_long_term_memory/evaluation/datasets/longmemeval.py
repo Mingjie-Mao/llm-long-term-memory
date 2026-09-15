@@ -72,7 +72,7 @@ class Instance:
     """The store this question is answered from, when that is not its own.
 
     LongMemEval gives every question its own haystack, so its questions leave this unset
-    and each is its own user. BEAM asks twenty questions of one conversation; naming the
+    and each is its own user. Other corpora ask many questions of one conversation; naming the
     conversation here is what lets ingestion build that store once rather than twenty
     times, and lets retrieval find it."""
     rubric: tuple[str, ...] = ()
@@ -86,7 +86,7 @@ class Instance:
     def is_abstention(self) -> bool:
         """`_abs` questions have no answer in the haystack; the correct behavior is
         to decline. These are the reason a memory system cannot be scored on recall
-        alone. BEAM files the same case as its own `abstention` ability."""
+        alone. Other corpora file the same case as an `abstention` category."""
         return self.question_id.endswith("_abs") or self.question_type == "abstention"
 
     @property

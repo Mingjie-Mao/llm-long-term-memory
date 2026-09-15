@@ -183,8 +183,16 @@ def test_the_batch_size_in_the_fingerprint_is_the_effective_one():
 
 
 def test_the_stored_form_keeps_the_keys_already_on_disk():
-    """The clean P10 store carries these six keys. Renaming or adding one would
-    make a healthy store read as a mismatch and cost a re-ingest to fix."""
+    """Renaming or adding a key makes every healthy store read as a mismatch and
+    costs a re-ingest, so the set is pinned here and a change has to be deliberate.
+
+    It has been changed exactly once. `dedup_scope` was added when `_neighbours`
+    stopped adjudicating a candidate against other namespaces — a fix that changes
+    which memories get written, so a store from before it genuinely is a different
+    system and resuming into it would mix two dedup policies under one label. The
+    cost is real and was accepted: every store written before the fix now refuses to
+    resume. That refusal is the point, and the test below pins it.
+    """
     stored = fingerprint.from_config(cfg(), sessions_per_request=15).as_dict()
 
     assert set(stored) == {
@@ -194,8 +202,39 @@ def test_the_stored_form_keeps_the_keys_already_on_disk():
         "sessions_per_request",
         "prompts",
         "dedup_threshold",
+        "dedup_scope",
     }
     assert all(isinstance(v, str) for v in stored.values())
+
+
+def test_a_store_written_before_dedup_was_scoped_refuses_to_resume():
+    """The half of the dedup fix that is not in `dedup.py`.
+
+    Scoping the comparison without recording it would let a store built under the old
+    policy be resumed under the new one, leaving rows from two systems with nothing to
+    tell them apart — the mixed-store incident this module exists to prevent, repeated
+    for a different reason.
+    """
+    current = fingerprint.from_config(cfg(), sessions_per_request=15).as_dict()
+    before_the_fix = {k: v for k, v in current.items() if k != "dedup_scope"}
+
+    assert fingerprint.differences(before_the_fix, current) == [
+        "dedup_scope: (absent) -> namespace"
+    ]
+
+
+def test_the_scope_is_read_off_the_deduplicator_rather_than_assumed():
+    """A deduplicator that compares differently fingerprints as what it is, the same
+    way a reworded prompt does. Otherwise the key would record an intention."""
+
+    class CrossNamespace:
+        threshold = 0.92
+        scope = "store"
+
+    spec = fingerprint.from_runtime(
+        TwoStageExtractor(None, "m"), sessions_per_request=15, dedup=CrossNamespace()
+    )
+    assert spec.as_dict()["dedup_scope"] == "store"
 
 
 def test_the_threshold_is_omitted_rather_than_nulled_without_a_deduplicator():

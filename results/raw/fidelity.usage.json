@@ -1,9 +1,57 @@
 {
   "summary": {
-    "total_requests": 0,
-    "total_tokens": 0,
+    "total_requests": 4,
+    "total_tokens": 24312,
     "failures": 0,
-    "by_role": {}
+    "by_role": {
+      "extractor": {
+        "role": "extractor",
+        "calls": 4,
+        "failures": 0,
+        "input_tokens": 20222,
+        "output_tokens": 4090,
+        "p50_ms": 7502.704000100493,
+        "p95_ms": 41705.85499983281,
+        "max_ms": 41705.85499983281
+      }
+    }
   },
-  "calls": []
+  "calls": [
+    {
+      "role": "extractor",
+      "model": "gemini-3.1-flash-lite",
+      "input_tokens": 10409,
+      "output_tokens": 1191,
+      "latency_ms": 41705.85499983281,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "extractor",
+      "model": "gemini-3.1-flash-lite",
+      "input_tokens": 1080,
+      "output_tokens": 997,
+      "latency_ms": 4010.9048332087696,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "extractor",
+      "model": "gemini-3.1-flash-lite",
+      "input_tokens": 7699,
+      "output_tokens": 1037,
+      "latency_ms": 4443.896667100489,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "extractor",
+      "model": "gemini-3.1-flash-lite",
+      "input_tokens": 1034,
+      "output_tokens": 865,
+      "latency_ms": 7502.704000100493,
+      "ok": true,
+      "error": null
+    }
+  ]
 }

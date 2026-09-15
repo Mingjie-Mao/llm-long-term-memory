@@ -106,7 +106,7 @@ def namespaced_sessions(instances: list[Instance]) -> list[tuple[str, HaystackSe
     LongMemEval haystacks belongs to two different simulated users and must be
     extracted into both stores. Deduplicating it merges the personas.
 
-    Within a namespace it is deduplicated, because questions can share one. A BEAM
+    Within a namespace it is deduplicated, because questions can share one. A
     conversation carries twenty questions over the same sessions, and keying on the
     question would extract that conversation twenty times into one store.
     """
@@ -212,7 +212,7 @@ class ConfigurationMismatch(RuntimeError):
 class IngestionPipeline:
     source_label = "longmemeval"
     """Written as `<label>:<session id>` into each stored session's `source`, which is how a
-    store records the dataset its sessions came from. A BEAM ingest sets `beam`."""
+    store records the dataset its sessions came from."""
 
     def __init__(
         self,

@@ -1,6 +1,6 @@
 """Paired comparison when questions come in clusters.
 
-BEAM asks twenty questions of one conversation, and all twenty are answered from one
+A benchmark can ask many questions of one conversation, all answered from one
 store, so their outcomes are not independent: a store that lost a session loses every
 question resting on it. A test that counts those questions as independent overstates its
 own n — the error the count review's shared-evidence clustering was built to prevent.
