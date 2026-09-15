@@ -1,0 +1,122 @@
+{
+  "schema_version": 1,
+  "kind": "simulated_local_trial",
+  "provider_calls": 0,
+  "ran_at": "2026-09-14T01:24:58+10:00",
+  "accounts": 5,
+  "turns_written": 25,
+  "write_latency_ms": {
+    "median": 1.08,
+    "p95": 2.34,
+    "max": 3.13
+  },
+  "checks": [
+    {
+      "check": "every scripted turn is stored once",
+      "passed": true,
+      "detail": {
+        "turns_per_account": 5
+      }
+    },
+    {
+      "check": "a retried write replays instead of appending",
+      "passed": true,
+      "detail": {
+        "memories": 6,
+        "turns": 6,
+        "sessions": 4
+      }
+    },
+    {
+      "check": "a reused key with new content is refused",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "a failed write leaves nothing behind and its retry writes once",
+      "passed": true,
+      "detail": {
+        "before": {
+          "memories": 6,
+          "turns": 6,
+          "sessions": 4
+        },
+        "after_failure": {
+          "memories": 6,
+          "turns": 6,
+          "sessions": 4
+        },
+        "after_retry": {
+          "memories": 7,
+          "turns": 7,
+          "sessions": 4
+        }
+      }
+    },
+    {
+      "check": "an account over budget is refused before any provider call",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "search never returns another account's memory",
+      "passed": true,
+      "detail": 0
+    },
+    {
+      "check": "erasure empties the account and is journalled",
+      "passed": true,
+      "detail": {
+        "exported_memories": 5,
+        "removed": {
+          "user_id": "trial-02",
+          "sessions": 3,
+          "memories": 5,
+          "turns": 5,
+          "vectors": 5
+        }
+      }
+    },
+    {
+      "check": "a restore brings back the live accounts",
+      "passed": true,
+      "detail": [
+        "trial-01",
+        "trial-03",
+        "trial-04",
+        "trial-05"
+      ]
+    },
+    {
+      "check": "a restore does not resurrect an erased account",
+      "passed": true,
+      "detail": {
+        "restore": {
+          "ok": true,
+          "erasures": {
+            "replayed": true,
+            "journal": "/Users/mingjie/Desktop/llm-long-term-memory/.trial-tmp/trial.erasures.jsonl",
+            "found_beside_the_store": false,
+            "cutoff": "2026-09-13T15:24:58.120916+00:00",
+            "namespaces": 0,
+            "skipped_before_backup": 1,
+            "rows_removed": 0,
+            "removed": {
+              "memories": 0,
+              "sessions": 0,
+              "turns": 0
+            },
+            "vectors_removed": 0
+          }
+        }
+      }
+    }
+  ],
+  "passed": 9,
+  "failed": 0,
+  "not_covered": [
+    "answer quality and extraction quality (the extractor is a stub)",
+    "real user behaviour, and anything about a hosted deployment",
+    "multi-process contention on the same store"
+  ]
+}

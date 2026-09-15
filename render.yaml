@@ -50,3 +50,63 @@ services:
       # only usable from the pages that are meant to use it.
       - key: LLTM_DEMO_ORIGINS
         value: https://lltm-memory.pages.dev,http://localhost:8779,http://127.0.0.1:8779
+
+  # ---------------------------------------------------------------- the real service
+  #
+  # The playground above is the LLM-free half: it demonstrates retrieval and temporal
+  # updates and cannot write a memory from a conversation. This is the whole system —
+  # extraction, writes, budgets, erasure — and it differs from the playground in three
+  # ways that decide how it has to be hosted.
+  #
+  # **It needs a disk.** A memory service on ephemeral storage forgets everything on
+  # every restart, which is a demo wearing a deployment's clothes. `disk` below mounts
+  # at /data, which is where the image already points LLTM_STORE_DIR.
+  #
+  # **It needs memory.** The encoder is sentence-transformers, so the image carries CPU
+  # torch; the Dockerfile strips the CUDA stack that `uv` resolves by default, but the
+  # remainder still does not fit the free plan's 512MB. A plan with at least 2GB is the
+  # floor. (The playground avoids this by running ONNX instead, which the engine package
+  # has no path for — making one is a code change, not a configuration one.)
+  #
+  # **It holds real data.** So it must never come up in open mode: LLTM_REQUIRE_AUTH is
+  # set here, and with it the process refuses to start unless LLTM_API_TOKENS configures
+  # at least one token. That is deliberate — forgetting the tokens produces a service
+  # that works perfectly and authorises everyone.
+  #
+  # `autoDeploy: false` on purpose. The playground redeploys on every push because it
+  # holds nothing; this one holds user memories, and a push should not restart it without
+  # somebody deciding to.
+  - type: web
+    name: lltm-memory
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: standard
+    region: oregon
+    branch: main
+    autoDeploy: false
+    healthCheckPath: /healthz
+    disk:
+      name: lltm-store
+      mountPath: /data
+      sizeGB: 1
+    envVars:
+      # Extraction calls a provider. Without it the read path still serves and
+      # `POST /v1/messages` answers 503 — a deployment state, not a client error.
+      - key: GEMINI_API_KEY
+        sync: false
+      # Set in the dashboard, never in the repository: an experiment config is
+      # committed so results reproduce, and a credential must never end up in one.
+      # Format: token1:tenant-a,token2:tenant-b
+      - key: LLTM_API_TOKENS
+        sync: false
+      # Fail closed. With this set and no usable token map the process refuses to
+      # start, /healthz goes 503, and requests are refused — three independent points,
+      # because one of them will eventually be bypassed.
+      - key: LLTM_REQUIRE_AUTH
+        value: "1"
+      # The image already defaults these to /data; stated here so the disk mount and
+      # the paths cannot drift apart silently.
+      - key: LLTM_STORE_DIR
+        value: /data/stores
+      - key: LLTM_RESULTS_DIR
+        value: /data/results

@@ -1,0 +1,760 @@
+{
+  "schema_version": 2,
+  "provider_calls": 0,
+  "review_status": "machine_flagged_pending_human_review",
+  "decides_nothing": "Every entry is a regex guess about one member. No gold answer is changed, no probe file is rewritten, and 'answer_if_non_members_dropped' is an arithmetic consequence of the flags, not a corrected answer.",
+  "scope": "Members the splitter produced from a multi-entity object, and unsplit objects that are a date or carry a record's date, time or price. A gold answer can still be wrong for reasons this cannot see: a name split into two real-looking halves ('Daisy Jones and The Six'), an alias counted twice, a member that is not the asked-about kind of thing, or a member the extractor lost before the probe was built.",
+  "inputs": [
+    {
+      "path": "results/analysis/entity-count-probes.json",
+      "sha256": "5fcdeb94d511afc1705379004769d3248defab872583a8d841d71b8ddcad8527"
+    },
+    {
+      "path": "tools/audit_entity_probe_splits.py",
+      "sha256": "b556151dda96f0a459c67f759bd1e691f3def3a1d5d9df7dc8544bf0b86e4cd0"
+    }
+  ],
+  "store": "train150.db",
+  "store_fingerprint_claimed": "7104376e987ce6be09ded3e53a77ad0a20dfba024cc2a71dc365635a0d0a7d8a",
+  "probes": 60,
+  "probes_whose_gold_depends_on_a_split": 26,
+  "probes_with_a_flagged_member": 0,
+  "probes_with_a_flagged_unsplit_object": 0,
+  "flagged_members": 0,
+  "findings": [
+    {
+      "probe_id": "entity_count_06db6396_acquired",
+      "question": "How many distinct things has the user acquired? Count only facts recorded under: purchases, skills acquired. Count each distinct thing once, however many times it is mentioned.",
+      "gold_answer": 7,
+      "gold_entities": [
+        "blocking",
+        "compositing",
+        "humidifier",
+        "idea generation",
+        "lighting",
+        "materials",
+        "moodboards"
+      ],
+      "answer_if_non_members_dropped": 7,
+      "suspect_members": [],
+      "co_members_from_a_dated_object": [],
+      "splits_in_evidence": [
+        {
+          "memory_id": "mem_9a4e4051cf562a85",
+          "object": "idea generation, moodboards, blocking, lighting, materials, compositing",
+          "members": [
+            "idea generation",
+            "moodboards",
+            "blocking",
+            "lighting",
+            "materials",
+            "compositing"
+          ]
+        }
+      ]
+    },
+    {
+      "probe_id": "entity_count_09ba9854_cooked",
+      "question": "How many distinct dishes has the user cooked? Count only facts recorded under: recipes made. Count each distinct thing once, however many times it is mentioned.",
+      "gold_answer": 3,
+      "gold_entities": [
+        "chicken noodle soup",
+        "creamy broccoli",
+        "roasted butternut squash"
+      ],
+      "answer_if_non_members_dropped": 3,
+      "suspect_members": [],
+      "co_members_from_a_dated_object": [],
+      "splits_in_evidence": [
+        {
+          "memory_id": "mem_dcab44bacfa21136",
+          "object": "creamy broccoli, roasted butternut squash, chicken noodle soup",
+          "members": [
+            "creamy broccoli",
+            "roasted butternut squash",
+            "chicken noodle soup"
+          ]
+        }
+      ]
+    },
+    {
+      "probe_id": "entity_count_0e5e2d1a_visited",
+      "question": "How many distinct places has the user visited? Count only facts recorded under: family visits, trips. Count each distinct thing once, however many times it is mentioned.",
+      "gold_answer": 5,
+      "gold_entities": [
+        "Florida",
+        "grandmother",
+        "mountain getaway",
+        "South Beach",
+        "Yellowstone camping trip"
+      ],
+      "answer_if_non_members_dropped": 5,
+      "suspect_members": [],
+      "co_members_from_a_dated_object": [],
+      "splits_in_evidence": [
+        {
+          "memory_id": "mem_f89ef7b12a22ac08",
+          "object": "South Beach, Florida",
+          "members": [
+            "South Beach",
+            "Florida"
+          ]
+        }
+      ]
+    },
+    {
+      "probe_id": "entity_count_28dc39ac_acquired",
+      "question": "How many distinct things has the user acquired? Count only facts recorded under: gift given, purchases. Count each distinct thing once, however many times it is mentioned.",
+      "gold_answer": 4,
+      "gold_entities": [
+        "grapefruit",
+        "Luvs diapers at Walmart",
+        "rosemary vodka",
+        "silver necklace for sister"
+      ],
+      "answer_if_non_members_dropped": 4,
+      "suspect_members": [],
+      "co_members_from_a_dated_object": [],
+      "splits_in_evidence": [
+        {
+          "memory_id": "mem_124a14e0f575b735",
+          "object": "grapefruit and rosemary vodka",
+          "members": [
+            "grapefruit",
+            "rosemary vodka"
+          ]
+        }
+      ]
+    },
+    {
+      "probe_id": "entity_count_5809eb10_grows",
+      "question": "How many distinct plants does the user grow? Count only facts recorded under: home decor. Count each distinct thing once, however many times it is mentioned.",
+      "gold_answer": 3,
+      "gold_entities": [
+        "area rug",
+        "coasters",
+        "vase"
+      ],
+      "answer_if_non_members_dropped": 3,
+      "suspect_members": [],
+      "co_members_from_a_dated_object": [],
+      "splits_in_evidence": [
+        {
+          "memory_id": "mem_1a45c818abb325e1",
+          "object": "coasters and vase",
+          "members": [
+            "coasters",
+            "vase"
+          ]
+        }
+      ]
+    },
+    {
+      "probe_id": "entity_count_6613b389_owns",
+      "question": "How many distinct possessions does the user have on record? Count only facts recorded under: art collection, doll collection, music collection, owned spirits. Count each distinct thing once, however many times it is mentioned.",
+      "gold_answer": 6,
+      "gold_entities": [
+        "cucumber",
+        "lime vodka",
+        "Limited Edition Disney Princess doll set",
+        "limited edition vinyl record",
+        "vintage 1960s-era Barbie",
+        "watercolor painting"
+      ],
+      "answer_if_non_members_dropped": 6,
+      "suspect_members": [],
+      "co_members_from_a_dated_object": [],
+      "splits_in_evidence": [
+        {
+          "memory_id": "mem_784d66134afee816",
+          "object": "cucumber and lime vodka",
+          "members": [
+            "cucumber",
+            "lime vodka"
+          ]
+        }
+      ]
+    },
+    {
+      "probe_id": "entity_count_6aeb4375_practises_hobby",
+      "question": "How many distinct hobbies or activities does the user practise? Count only facts recorded under: hobbies. Count each distinct thing once, however many times it is mentioned.",
+      "gold_answer": 3,
+      "gold_entities": [
+        "antique coins",
+        "vintage cameras",
+        "vinyl records"
+      ],
+      "answer_if_non_members_dropped": 3,
+      "suspect_members": [],
+      "co_members_from_a_dated_object": [],
+      "splits_in_evidence": [
+        {
+          "memory_id": "mem_55d58a42c62d20fd",
+          "object": "antique coins and vintage cameras",
+          "members": [
+            "antique coins",
+            "vintage cameras"
+          ]
+        }
+      ]
+    },
+    {
+      "probe_id": "entity_count_6b168ec8_owns",
+      "question": "How many distinct possessions does the user have on record? Count only facts recorded under: bicycles owned, smartwatch owned. Count each distinct thing once, however many times it is mentioned.",
+      "gold_answer": 4,
+      "gold_entities": [
+        "commuter bike",
+        "Fossil smartwatch",
+        "mountain bike",
+        "road bike"
+      ],
+      "answer_if_non_members_dropped": 4,
+      "suspect_members": [],
+      "co_members_from_a_dated_object": [],
+      "splits_in_evidence": [
+        {
+          "memory_id": "mem_7a376cabf00735a0",
+          "object": "road bike, mountain bike, commuter bike",
+          "members": [
+            "road bike",
+            "mountain bike",
+            "commuter bike"
+          ]
+        }
+      ]
+    },
+    {
+      "probe_id": "entity_count_6e984301_owns",
+      "question": "How many distinct possessions does the user have on record? Count only facts recorded under: accessories owned, collections, phone owned, property viewing, typewriter owned. Count each distinct thing once, however many times it is mentioned.",
+      "gold_answer": 8,
+      "gold_entities": [
+        "Cedar Creek property",
+        "coins",
+        "concert tickets",
+        "Remington Noiseless Portable",
+        "Samsung Galaxy S22 Ultra",
+        "typewriters",
+        "vinyl records",
+        "wireless charging pad"
+      ],
+      "answer_if_non_members_dropped": 8,
+      "suspect_members": [],
+      "co_members_from_a_dated_object": [],
+      "splits_in_evidence": [
+        {
+          "memory_id": "mem_81c22de574ec9d0e",
+          "object": "typewriters, vinyl records, coins, concert tickets",
+          "members": [
+            "typewriters",
+            "vinyl records",
+            "coins",
+            "concert tickets"
+          ]
+        }
+      ]
+    },
+    {
+      "probe_id": "entity_count_726462e0_owns",
+      "question": "How many distinct possessions does the user have on record? Count only facts recorded under: hobbies equipment. Count each distinct thing once, however many times it is mentioned.",
+      "gold_answer": 3,
+      "gold_entities": [
+        "modeling tool set",
+        "sculpting mat",
+        "wire cutter"
+      ],
+      "answer_if_non_members_dropped": 3,
+      "suspect_members": [],
+      "co_members_from_a_dated_object": [],
+      "splits_in_evidence": [
+        {
+          "memory_id": "mem_8aadbd381189d953",
+          "object": "modeling tool set, wire cutter, sculpting mat",
+          "members": [
+            "modeling tool set",
+            "wire cutter",
+            "sculpting mat"
+          ]
+        }
+      ]
+    },
+    {
+      "probe_id": "entity_count_8c18457d_owns",
+      "question": "How many distinct possessions does the user have on record? Count only facts recorded under: kitchen equipment, possessions. Count each distinct thing once, however many times it is mentioned.",
+      "gold_answer": 10,
+      "gold_entities": [
+        "books",
+        "boots",
+        "dress",
+        "eyeshadow",
+        "fitness tracker",
+        "laptop bag",
+        "new cookware",
+        "skincare",
+        "utensils",
+        "wireless headphone"
+      ],
+      "answer_if_non_members_dropped": 10,
+      "suspect_members": [],
+      "co_members_from_a_dated_object": [],
+      "splits_in_evidence": [
+        {
+          "memory_id": "mem_b84e9f41d3e5d972",
+          "object": "wireless headphone, books, skincare, dress, boots, laptop bag, eyeshadow, fitness tracker",
+          "members": [
+            "wireless headphone",
+            "books",
+            "skincare",
+            "dress",
+            "boots",
+            "laptop bag",
+            "eyeshadow",
+            "fitness tracker"
+          ]
+        },
+        {
+          "memory_id": "mem_e14bcc91df648a1e",
+          "object": "new cookware and utensils",
+          "members": [
+            "new cookware",
+            "utensils"
+          ]
+        }
+      ]
+    },
+    {
+      "probe_id": "entity_count_8ebdbe50_ate_at",
+      "question": "How many distinct restaurants or food places has the user eaten at? Count only facts recorded under: groceries. Count each distinct thing once, however many times it is mentioned.",
+      "gold_answer": 6,
+      "gold_entities": [
+        "hummus",
+        "Mandarin oranges",
+        "seitan",
+        "tempeh",
+        "tofu",
+        "wine"
+      ],
+      "answer_if_non_members_dropped": 6,
+      "suspect_members": [],
+      "co_members_from_a_dated_object": [],
+      "splits_in_evidence": [
+        {
+          "memory_id": "mem_2aa26872ab04e492",
+          "object": "hummus, Mandarin oranges, wine",
+          "members": [
+            "hummus",
+            "Mandarin oranges",
+            "wine"
+          ]
+        },
+        {
+          "memory_id": "mem_8a6731df39e352d9",
+          "object": "tofu, tempeh, seitan",
+          "members": [
+            "tofu",
+            "tempeh",
+            "seitan"
+          ]
+        }
+      ]
+    },
+    {
+      "probe_id": "entity_count_95228167_owns",
+      "question": "How many distinct possessions does the user have on record? Count only facts recorded under: bikes owned, camera gear, clothing owned, farm equipment. Count each distinct thing once, however many times it is mentioned.",
+      "gold_answer": 11,
+      "gold_entities": [
+        "black North Face parka",
+        "cow bells",
+        "Dr. Martens boots",
+        "high-waisted dark blue Levi's jeans",
+        "hybrid bike",
+        "hybrid bike lent to sister",
+        "Nikon D850",
+        "road bike",
+        "Sigma 24-70mm lens",
+        "Think Tank Photo Urban Disguise 40L",
+        "yellow sundress"
+      ],
+      "answer_if_non_members_dropped": 11,
+      "suspect_members": [],
+      "co_members_from_a_dated_object": [],
+      "splits_in_evidence": [
+        {
+          "memory_id": "mem_7e386e2962505462",
+          "object": "road bike and hybrid bike",
+          "members": [
+            "road bike",
+            "hybrid bike"
+          ]
+        }
+      ]
+    },
+    {
+      "probe_id": "entity_count_993da5e2_grows",
+      "question": "How many distinct plants does the user grow? Count only facts recorded under: houseplants. Count each distinct thing once, however many times it is mentioned.",
+      "gold_answer": 4,
+      "gold_entities": [
+        "fern",
+        "fiddle leaf fig",
+        "snake plant",
+        "spider plant"
+      ],
+      "answer_if_non_members_dropped": 4,
+      "suspect_members": [],
+      "co_members_from_a_dated_object": [],
+      "splits_in_evidence": [
+        {
+          "memory_id": "mem_a1836416d1760461",
+          "object": "fern, snake plant, spider plant",
+          "members": [
+            "fern",
+            "snake plant",
+            "spider plant"
+          ]
+        }
+      ]
+    },
+    {
+      "probe_id": "entity_count_9ea5eabc_owns",
+      "question": "How many distinct possessions does the user have on record? Count only facts recorded under: jewelry owned, swimming gear. Count each distinct thing once, however many times it is mentioned.",
+      "gold_answer": 3,
+      "gold_entities": [
+        "goggles",
+        "silver necklace",
+        "Speedo cap"
+      ],
+      "answer_if_non_members_dropped": 3,
+      "suspect_members": [],
+      "co_members_from_a_dated_object": [],
+      "splits_in_evidence": [
+        {
+          "memory_id": "mem_834c525a7b25c312",
+          "object": "Speedo cap and goggles",
+          "members": [
+            "Speedo cap",
+            "goggles"
+          ]
+        }
+      ]
+    },
+    {
+      "probe_id": "entity_count_a9f6b44c_acquired",
+      "question": "How many distinct things has the user acquired? Count only facts recorded under: grocery purchase. Count each distinct thing once, however many times it is mentioned.",
+      "gold_answer": 4,
+      "gold_entities": [
+        "bread",
+        "eggs",
+        "fresh produce",
+        "milk"
+      ],
+      "answer_if_non_members_dropped": 4,
+      "suspect_members": [],
+      "co_members_from_a_dated_object": [],
+      "splits_in_evidence": [
+        {
+          "memory_id": "mem_0e5d06c9817c8575",
+          "object": "milk, eggs, bread, and fresh produce",
+          "members": [
+            "milk",
+            "eggs",
+            "bread",
+            "fresh produce"
+          ]
+        }
+      ]
+    },
+    {
+      "probe_id": "entity_count_a9f6b44c_owns",
+      "question": "How many distinct possessions does the user have on record? Count only facts recorded under: bike owned, bike ownership, car owned, pet owned, property ownership. Count each distinct thing once, however many times it is mentioned.",
+      "gold_answer": 9,
+      "gold_entities": [
+        "1995 Honda Civic",
+        "Honda Civic",
+        "hybrid commuter bike",
+        "Labrador named Max",
+        "mountain bike",
+        "road bike",
+        "rural land",
+        "Toyota Camry",
+        "Toyota Corolla"
+      ],
+      "answer_if_non_members_dropped": 9,
+      "suspect_members": [],
+      "co_members_from_a_dated_object": [],
+      "splits_in_evidence": [
+        {
+          "memory_id": "mem_c718d200c0aeccf3",
+          "object": "Honda Civic, Toyota Camry",
+          "members": [
+            "Honda Civic",
+            "Toyota Camry"
+          ]
+        },
+        {
+          "memory_id": "mem_f9add6a6ab812f40",
+          "object": "mountain bike and road bike",
+          "members": [
+            "mountain bike",
+            "road bike"
+          ]
+        }
+      ]
+    },
+    {
+      "probe_id": "entity_count_b46e15ed_ate_at",
+      "question": "How many distinct restaurants or food places has the user eaten at? Count only facts recorded under: meals eaten. Count each distinct thing once, however many times it is mentioned.",
+      "gold_answer": 3,
+      "gold_entities": [
+        "baked salmon",
+        "quinoa",
+        "roasted asparagus"
+      ],
+      "answer_if_non_members_dropped": 3,
+      "suspect_members": [],
+      "co_members_from_a_dated_object": [],
+      "splits_in_evidence": [
+        {
+          "memory_id": "mem_f0a0e3a924ebd090",
+          "object": "baked salmon, roasted asparagus, and quinoa",
+          "members": [
+            "baked salmon",
+            "roasted asparagus",
+            "quinoa"
+          ]
+        }
+      ]
+    },
+    {
+      "probe_id": "entity_count_cc539528_owns",
+      "question": "How many distinct possessions does the user have on record? Count only facts recorded under: books owned, donated items, instruments owned. Count each distinct thing once, however many times it is mentioned.",
+      "gold_answer": 4,
+      "gold_entities": [
+        "3 dresses",
+        "handpan",
+        "The Seven Husbands of Evelyn Hugo",
+        "The Silent Patient"
+      ],
+      "answer_if_non_members_dropped": 4,
+      "suspect_members": [],
+      "co_members_from_a_dated_object": [],
+      "splits_in_evidence": [
+        {
+          "memory_id": "mem_d1dd35f37d95818e",
+          "object": "The Seven Husbands of Evelyn Hugo and The Silent Patient",
+          "members": [
+            "The Seven Husbands of Evelyn Hugo",
+            "The Silent Patient"
+          ]
+        }
+      ]
+    },
+    {
+      "probe_id": "entity_count_ccb36322_acquired",
+      "question": "How many distinct things has the user acquired? Count only facts recorded under: art purchases, clothing purchases, electronics purchases, gift purchases. Count each distinct thing once, however many times it is mentioned.",
+      "gold_answer": 11,
+      "gold_entities": [
+        "4K TV",
+        "City Lights print",
+        "dress",
+        "handbag",
+        "leggings",
+        "shoes",
+        "silver necklace for sister",
+        "sunglasses",
+        "top",
+        "trousers",
+        "vintage onesie"
+      ],
+      "answer_if_non_members_dropped": 11,
+      "suspect_members": [],
+      "co_members_from_a_dated_object": [],
+      "splits_in_evidence": [
+        {
+          "memory_id": "mem_49233ae751d5d06f",
+          "object": "top and leggings",
+          "members": [
+            "top",
+            "leggings"
+          ]
+        },
+        {
+          "memory_id": "mem_d359b82c3bed8f07",
+          "object": "handbag and sunglasses",
+          "members": [
+            "handbag",
+            "sunglasses"
+          ]
+        },
+        {
+          "memory_id": "mem_db05788e2db3be7a",
+          "object": "dress and trousers",
+          "members": [
+            "dress",
+            "trousers"
+          ]
+        }
+      ]
+    },
+    {
+      "probe_id": "entity_count_d23cf73b_owns",
+      "question": "How many distinct possessions does the user have on record? Count only facts recorded under: music production gear, possessions. Count each distinct thing once, however many times it is mentioned.",
+      "gold_answer": 5,
+      "gold_entities": [
+        "Akai MPC Live 2",
+        "favorite scarf",
+        "Native Instruments Komplete Kontrol",
+        "Roland Go:Livecast",
+        "Tascam Model 12"
+      ],
+      "answer_if_non_members_dropped": 5,
+      "suspect_members": [],
+      "co_members_from_a_dated_object": [],
+      "splits_in_evidence": [
+        {
+          "memory_id": "mem_03704f65b0b73f82",
+          "object": "Native Instruments Komplete Kontrol and Akai MPC Live 2",
+          "members": [
+            "Native Instruments Komplete Kontrol",
+            "Akai MPC Live 2"
+          ]
+        },
+        {
+          "memory_id": "mem_7cef76c0d046f4e5",
+          "object": "Roland Go:Livecast and Tascam Model 12",
+          "members": [
+            "Roland Go:Livecast",
+            "Tascam Model 12"
+          ]
+        }
+      ]
+    },
+    {
+      "probe_id": "entity_count_e3fc4d6e_practises_hobby",
+      "question": "How many distinct hobbies or activities does the user practise? Count only facts recorded under: hobbies. Count each distinct thing once, however many times it is mentioned.",
+      "gold_answer": 5,
+      "gold_entities": [
+        "cycling",
+        "running",
+        "salsa classes",
+        "tennis",
+        "volleyball"
+      ],
+      "answer_if_non_members_dropped": 5,
+      "suspect_members": [],
+      "co_members_from_a_dated_object": [],
+      "splits_in_evidence": [
+        {
+          "memory_id": "mem_dad10876e657d3e8",
+          "object": "volleyball, running, tennis, cycling",
+          "members": [
+            "volleyball",
+            "running",
+            "tennis",
+            "cycling"
+          ]
+        }
+      ]
+    },
+    {
+      "probe_id": "entity_count_f523d9fe_cooked",
+      "question": "How many distinct dishes has the user cooked? Count only facts recorded under: baked goods, food prepared. Count each distinct thing once, however many times it is mentioned.",
+      "gold_answer": 4,
+      "gold_entities": [
+        "bell peppers",
+        "cookies",
+        "grilled chicken breasts",
+        "whole wheat baguette"
+      ],
+      "answer_if_non_members_dropped": 4,
+      "suspect_members": [],
+      "co_members_from_a_dated_object": [],
+      "splits_in_evidence": [
+        {
+          "memory_id": "mem_eb023966ca4ed438",
+          "object": "grilled chicken breasts and bell peppers",
+          "members": [
+            "grilled chicken breasts",
+            "bell peppers"
+          ]
+        }
+      ]
+    },
+    {
+      "probe_id": "entity_count_gpt4_2d58bcd6_listened_to",
+      "question": "How many distinct music or podcasts has the user listened to? Count only facts recorded under: audiobooks listened, social media. Count each distinct thing once, however many times it is mentioned.",
+      "gold_answer": 4,
+      "gold_entities": [
+        "bookstagram account",
+        "Daisy Jones",
+        "Sapiens: A Brief History of Humankind",
+        "The Six"
+      ],
+      "answer_if_non_members_dropped": 4,
+      "suspect_members": [],
+      "co_members_from_a_dated_object": [],
+      "splits_in_evidence": [
+        {
+          "memory_id": "mem_cd4f708183ba964e",
+          "object": "Sapiens: A Brief History of Humankind, Daisy Jones and The Six",
+          "members": [
+            "Sapiens: A Brief History of Humankind",
+            "Daisy Jones",
+            "The Six"
+          ]
+        }
+      ]
+    },
+    {
+      "probe_id": "entity_count_gpt4_7de946e7_owns",
+      "question": "How many distinct possessions does the user have on record? Count only facts recorded under: collectibles. Count each distinct thing once, however many times it is mentioned.",
+      "gold_answer": 6,
+      "gold_entities": [
+        "figurines",
+        "Lord of the Rings items",
+        "Prince of Persia items",
+        "Spider-Man comics",
+        "Spider-Man Funko Pop",
+        "vintage Star Wars action figures"
+      ],
+      "answer_if_non_members_dropped": 6,
+      "suspect_members": [],
+      "co_members_from_a_dated_object": [],
+      "splits_in_evidence": [
+        {
+          "memory_id": "mem_c968c834fe0de85a",
+          "object": "Spider-Man comics and figurines, Lord of the Rings items, Prince of Persia items, vintage Star Wars action figures",
+          "members": [
+            "Spider-Man comics",
+            "figurines",
+            "Lord of the Rings items",
+            "Prince of Persia items",
+            "vintage Star Wars action figures"
+          ]
+        }
+      ]
+    },
+    {
+      "probe_id": "entity_count_gpt4_e061b84g_ate_at",
+      "question": "How many distinct restaurants or food places has the user eaten at? Count only facts recorded under: meals eaten. Count each distinct thing once, however many times it is mentioned.",
+      "gold_answer": 3,
+      "gold_entities": [
+        "baked salmon",
+        "quinoa",
+        "roasted asparagus"
+      ],
+      "answer_if_non_members_dropped": 3,
+      "suspect_members": [],
+      "co_members_from_a_dated_object": [],
+      "splits_in_evidence": [
+        {
+          "memory_id": "mem_a5fc7e1571bcc649",
+          "object": "baked salmon, roasted asparagus, quinoa",
+          "members": [
+            "baked salmon",
+            "roasted asparagus",
+            "quinoa"
+          ]
+        }
+      ]
+    }
+  ]
+}

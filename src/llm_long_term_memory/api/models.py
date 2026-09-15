@@ -8,7 +8,9 @@ storage schema change without breaking clients.
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from datetime import datetime
+from functools import partial
 from typing import Any, Literal
 
 from pydantic import BaseModel, Field
@@ -45,25 +47,32 @@ class MemoryOut(BaseModel):
 
     @classmethod
     def of(cls, memory: Any) -> MemoryOut:
+        """Accepts a `Memory` or the plain mapping a stored idempotent replay holds.
+
+        The replay comes back from JSON, so it is a dict rather than a dataclass. Making
+        both shapes render identically is what keeps a retried write's response equal to
+        the original's instead of an error.
+        """
+        read = memory.get if isinstance(memory, Mapping) else partial(getattr, memory)
         return cls(
-            id=memory.id,
-            content=memory.content,
-            type=memory.type,
-            subject=memory.subject,
-            predicate=memory.predicate,
-            object=memory.object,
-            source_role=memory.source_role,
-            scope=memory.scope,
-            status=memory.status,
-            importance=memory.importance,
-            valid_from=memory.valid_from,
-            valid_to=memory.valid_to,
-            superseded_by=memory.superseded_by,
+            id=read("id"),
+            content=read("content"),
+            type=read("type"),
+            subject=read("subject"),
+            predicate=read("predicate"),
+            object=read("object"),
+            source_role=read("source_role"),
+            scope=read("scope"),
+            status=read("status"),
+            importance=read("importance"),
+            valid_from=read("valid_from"),
+            valid_to=read("valid_to"),
+            superseded_by=read("superseded_by"),
             source=SourceRef(
-                session_id=external_session_id(memory.source_session_id),
-                turn_index=memory.source_turn_index,
-                char_start=memory.source_char_start,
-                char_end=memory.source_char_end,
+                session_id=external_session_id(read("source_session_id")),
+                turn_index=read("source_turn_index"),
+                char_start=read("source_char_start"),
+                char_end=read("source_char_end"),
             ),
         )
 
@@ -274,3 +283,8 @@ class HealthResponse(BaseModel):
     # deployment that looks identical to a secured one is how a prototype gets
     # pointed at real users.
     authenticated_access: bool = False
+    # Whether this deployment refuses to serve without credentials. Reported separately
+    # from `authenticated_access` so that "secured" and "insisting on being secured" are
+    # distinguishable: a probe can tell a prototype from a deployment that would rather
+    # go red than go open.
+    authentication_required: bool = False

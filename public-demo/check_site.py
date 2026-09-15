@@ -30,8 +30,14 @@ class SiteParser(HTMLParser):
 
 
 def main() -> int:
-    files = {path.name for path in SITE.iterdir() if path.is_file()}
+    # The whole deploy root is uploaded, including subdirectories. Counting only
+    # top-level regular files lets an accidental backup/ or stores/ directory pass.
+    entries = list(SITE.iterdir())
+    files = {path.name for path in entries}
     assert files == EXPECTED_FILES, f"unexpected deploy surface: {sorted(files)}"
+    assert all(path.is_file() and not path.is_symlink() for path in entries), (
+        "deploy entries must be regular files, not directories or symlinks"
+    )
 
     index = (SITE / "index.html").read_text(encoding="utf-8")
     parser = SiteParser()
@@ -185,6 +191,27 @@ def main() -> int:
     assert plan_turn and plan_turn.group("flag") == "false", (
         "the walkthrough lets a plan supersede a fact"
     )
+    # The box's patterns stand in for the model's verdict on what a statement does to the
+    # value before it. For an attribute that holds one value at a time the product's keying
+    # prompt says `replaces`, so "I live in Sydney" retires "I live in Canberra". Marked
+    # `false`, both stayed active and the ranking chose the answer.
+    for attribute in ("lives_in", "uses_framework", "works_as", "works_at"):
+        flags = re.findall(rf'predicate:\s*"{attribute}",\s*replaces:\s*(true|false)', content)
+        assert flags and set(flags) == {"true"}, (
+            f"a {attribute} pattern leaves the earlier value active"
+        )
+
+    # Remembering across conversations is the headline claim, and the box is where a
+    # visitor can check it. A button that only cleared the transcript would stage a new
+    # conversation the engine never heard about, so every fact must carry the
+    # conversation it was stated in.
+    assert any(attrs.get("id") == "tryNewConversation" for _, attrs in elements), (
+        "the box has no way to start a new conversation"
+    )
+    assert re.search(
+        r'"/demo/facts",\s*\{\s*\.\.\.fact,\s*session_id:\s*conversationId\(conversation\)\s*\}',
+        app,
+    ), "facts are not written with the conversation they were stated in"
 
     # The live pane claims to show what the engine was sent. The engine is sent English,
     # so a translated bubble would misrepresent the request; Chinese belongs in `gloss`.

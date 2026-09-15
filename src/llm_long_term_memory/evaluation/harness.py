@@ -142,6 +142,14 @@ def run_eval(
     resume: bool = True,
     on_progress=None,
 ) -> RunReport:
+    if any(inst.rubric for inst in instances) and not getattr(judge, "accepts_rubric", False):
+        # Refused before anything runs, and before `--fresh` can truncate an artifact. A
+        # reference-answer judge given these questions would grade against the text the
+        # rubric was written from, and every row would still look graded.
+        raise ValueError(
+            f"these questions are graded by rubric, and {type(judge).__name__} grades "
+            "against a reference answer"
+        )
     path = Path(out_path)
     path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -234,6 +242,7 @@ def _run_eval_locked(runner, judge, instances, path, usage, resume, on_progress)
                     hypothesis=answer.text,
                     is_abstention=inst.is_abstention,
                     question_type=inst.question_type,
+                    **({"rubric": inst.rubric} if inst.rubric else {}),
                 )
             except DailyQuotaExhausted as exc:
                 if usage:
@@ -266,12 +275,20 @@ def _run_eval_locked(runner, judge, instances, path, usage, resume, on_progress)
                 answer_prompt_version=getattr(
                     runner, "answer_prompt_version", ANSWER_PROMPT_VERSION
                 ),
-                judge_prompt_version=JUDGE_PROMPT_VERSION,
+                # The judge's own version: a rubric judge and the reference-answer judge
+                # are different instruments, and a row has to say which one graded it.
+                judge_prompt_version=getattr(judge, "prompt_version", JUDGE_PROMPT_VERSION),
                 # From the store, not from the checked-out code: it describes the
                 # data being evaluated, which an older store will not share.
                 extractor_version=getattr(runner, "extractor_version", None),
                 store_fingerprint=getattr(runner, "store_fingerprint", None),
-                notes=answer.notes,
+                # Grades travel with the row, so a score is recomputed from them rather
+                # than bought again from the judge.
+                notes=(
+                    {**answer.notes, "judge": verdict.details}
+                    if getattr(verdict, "details", None)
+                    else answer.notes
+                ),
             )
             report.results.append(result)
             # Cost first, then the row. A kill between them can cause a repeated

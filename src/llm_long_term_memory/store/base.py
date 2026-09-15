@@ -163,6 +163,16 @@ class MemoryStore(Protocol):
 
     def mark_superseded(self, memory_id: str, superseded_by: str, valid_to: datetime) -> None: ...
 
+    def remove_memories(self, memory_ids: list[str]) -> int:
+        """Undo the memory half of a write that failed after they were persisted."""
+        ...
+
+    def restore_memory_states(
+        self, states: list[tuple[str, str, str | None, datetime | None, datetime | None]]
+    ) -> None:
+        """Put back (status, superseded_by, valid_from, valid_to) captured before resolution."""
+        ...
+
     def mark_current(self, memory_id: str) -> None:
         """Reopen a memory as the live value of its key.
 

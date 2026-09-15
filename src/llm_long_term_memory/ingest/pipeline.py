@@ -100,20 +100,25 @@ class IngestProgress:
 
 
 def namespaced_sessions(instances: list[Instance]) -> list[tuple[str, HaystackSession]]:
-    """(namespace, session) pairs, one namespace per question.
+    """(namespace, session) pairs, one namespace per store.
 
-    Deliberately not deduplicated across questions: a session appearing in two
-    haystacks belongs to two different simulated users and must be extracted into
-    both stores. Deduplicating it merges the personas.
+    Deliberately not deduplicated across namespaces: a session appearing in two
+    LongMemEval haystacks belongs to two different simulated users and must be
+    extracted into both stores. Deduplicating it merges the personas.
+
+    Within a namespace it is deduplicated, because questions can share one. A BEAM
+    conversation carries twenty questions over the same sessions, and keying on the
+    question would extract that conversation twenty times into one store.
     """
     out: list[tuple[str, HaystackSession]] = []
+    seen: set[tuple[str, str]] = set()
     for inst in instances:
-        seen: set[str] = set()
+        namespace = inst.store_namespace
         for sess in inst.sessions:
-            if sess.session_id in seen:
+            if (namespace, sess.session_id) in seen:
                 continue
-            seen.add(sess.session_id)
-            out.append((inst.question_id, sess))
+            seen.add((namespace, sess.session_id))
+            out.append((namespace, sess))
     return out
 
 
@@ -205,6 +210,10 @@ class ConfigurationMismatch(RuntimeError):
 
 
 class IngestionPipeline:
+    source_label = "longmemeval"
+    """Written as `<label>:<session id>` into each stored session's `source`, which is how a
+    store records the dataset its sessions came from. A BEAM ingest sets `beam`."""
+
     def __init__(
         self,
         extractor: Extractor,
@@ -396,7 +405,7 @@ class IngestionPipeline:
                     id=stored_session_id,
                     user_id=namespace,
                     started_at=_parse_date(sess.date) or datetime.now(),
-                    source=f"longmemeval:{sess.session_id}",
+                    source=f"{self.source_label}:{sess.session_id}",
                     turns=[
                         Turn(
                             id=f"{stored_session_id}:{turn_index}",

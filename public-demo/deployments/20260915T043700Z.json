@@ -1,0 +1,59 @@
+{
+ "schema_version": 1,
+ "deployed_at_utc": "2026-09-15T04:37:00Z",
+ "provider": "cloudflare-pages",
+ "project": "lltm-memory",
+ "branch": "main",
+ "deployment_id": "1ff35eed-b1bd-43e7-9515-26395a530121",
+ "deployment_url": "https://1ff35eed.lltm-memory.pages.dev",
+ "production_url": "https://lltm-memory.pages.dev",
+ "git_head": "aae73ad89cf758dfa4d9d8512ba086b47438f53c",
+ "dirty_worktree": false,
+ "note": "Brings the live page level with the repository, which it had trailed since 5a456a78 on 2026-09-13. The page itself did not change in this window; what moved is release.json, from 927 tests and 84% coverage to 1,360 and 86%, so a visitor reading the figures is now reading current ones. Deployed by the project owner; recorded and verified here.",
+ "deploy_root": "public-demo/site",
+ "files": [
+  {
+   "path": "app.js",
+   "sha256": "44ec345764c99c2e433b0203b06c252e0b5d0a992864debcffa1cb4b91bdeb93"
+  },
+  {
+   "path": "content.js",
+   "sha256": "68fa2341a8231de1cd0176179e46636ebda4e493a6a1e6e8443e8db888f0739d"
+  },
+  {
+   "path": "index.html",
+   "sha256": "7ceef31ae72107e8e44f853bc04af8e1bf7d1a3e8be3ab5b6cae59349df482b5"
+  },
+  {
+   "path": "playground.html",
+   "sha256": "082b5c8d05f815ff6f51b4254532af7807bd8b5213bf11fcaf08c4ba2465bdc7"
+  },
+  {
+   "path": "release.json",
+   "sha256": "40f98eaa5a7df2dd7b138c3b5aeaef7a731adf0d03fbb8b32f4d2592749c6d08"
+  },
+  {
+   "path": "release.schema.json",
+   "sha256": "ccf82bf4b6f4efe041e067d8e7256963946f112379bac08f665e12e53bce881e"
+  },
+  {
+   "path": "styles.css",
+   "sha256": "e9faeb04e7796c01f67669e399aa39123e74c6e51d42343ed0efe970843c1b64"
+  }
+ ],
+ "predeploy_gates": [
+  "public-demo/check_site.py",
+  "node --input-type=module --check (app.js, content.js)",
+  "git diff --check",
+  "full pytest suite (1,363 passed, including public-demo/)",
+  "ruff check and format",
+  "public-demo/check_release_figures.py"
+ ],
+ "postdeploy_checks": [
+  "all 7 deploy files fetched from the production origin and sha256-compared against the repository: identical",
+  "release.json served from production is byte-for-byte identical to the repository copy (cmp)",
+  "the deployment URL serves the same release.json as the production URL",
+  "production release.json reports tests=1360, line_coverage=86, verified_at=2026-09-15, matching the committed figures"
+ ],
+ "verification_note": "A first pass compared /index.html and /playground.html without following redirects and read them as mismatched. Pages redirects those paths to / and /playground, so the body was empty and the hash was a hash of nothing. The comparison follows redirects; the finding was the check's, not the deploy's."
+}

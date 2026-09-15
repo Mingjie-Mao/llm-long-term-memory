@@ -14,6 +14,16 @@ let ready = false;
 // walkthrough wiped whatever the visitor had just typed.
 const session = { walk: null, try: null };
 
+// One visitor, several conversations. The box's namespace is the user, and a conversation
+// is an engine session inside it: every fact is written with the conversation it was
+// stated in, and search spans all of them. An answer that names an earlier conversation
+// therefore came from memory — that conversation's transcript is gone from the page, and
+// a question sends nothing but its own text.
+let conversation = 1;
+let spokeInConversation = false;
+const conversationId = (n) => `conversation-${n}`;
+const conversationNumber = (id) => Number(/^conversation-(\d+)$/.exec(id ?? "")?.[1]) || null;
+
 const $ = (id) => document.getElementById(id);
 const t = (pair) => pair[lang] ?? pair.en;
 
@@ -35,6 +45,11 @@ function applyLanguage() {
   // Manifest copy is built from data, so it has to be rebuilt rather than swapped.
   renderMetrics();
   renderSuggestions();
+  renderConversationTitle();
+  // So are the state rows, which carry translated provenance.
+  for (const [target, memories] of Object.entries(lastState)) {
+    if (memories.length) renderState(target, memories);
+  }
   const status = statusText();
   if (status) $("statusText").textContent = status;
 }
@@ -146,6 +161,8 @@ function setStatus(state, message) {
 function setReady(value) {
   ready = value;
   for (const el of document.querySelectorAll("[data-requires-live]")) el.disabled = !value;
+  // Starting another conversation means nothing until this one has said something.
+  $("tryNewConversation").disabled = !value || !spokeInConversation;
 }
 
 async function freshSession(which = "walk") {
@@ -174,6 +191,9 @@ async function connect() {
   try {
     const health = await api("GET", "/demo/health", null, { cold: true });
     statusKey = { kind: "up", value: health.encoder };
+    // An engine that cannot record conversations would turn the button into a transcript
+    // wipe, which proves nothing about memory. Hide it rather than offer the imitation.
+    $("tryNewConversation").hidden = !(health.capabilities || []).includes("conversations");
     setStatus("up", statusText());
     setReady(true);
   } catch (error) {
@@ -184,21 +204,45 @@ async function connect() {
 
 // ----------------------------------------------------------------- rendering
 
-function stateRow(memory) {
+// The last state each panel drew, so a language switch can rebuild it.
+const lastState = { walkState: [], tryState: [] };
+
+// The engine's own comparison (`_value` in temporal/resolve.py), so the page calls a row a
+// restatement exactly when the resolver folded it as one.
+const sameValue = (a, b) => {
+  const value = (m) => String(m.object || m.content || "").trim().toLowerCase();
+  return value(a) === value(b);
+};
+
+function stateRow(memory, all) {
   const li = document.createElement("li");
   const superseded = memory.status === "superseded";
+  // Saying the same thing twice is folded into the first mention and stored as
+  // superseded, but nothing was replaced. Tagged as a restatement, so repeating a fact in
+  // a later conversation does not read as a change.
+  const owner = superseded ? all.find((m) => m.id === memory.superseded_by) : null;
+  const restated = Boolean(owner) && sameValue(owner, memory);
   const plan = memory.scope === "plan";
-  li.className = `row${superseded ? " superseded" : ""}${plan ? " plan" : ""}`;
+  li.className = `row${superseded ? " superseded" : ""}${restated ? " restated" : ""}${plan ? " plan" : ""}`;
   const key = document.createElement("code");
   key.textContent = `${memory.predicate} = ${memory.object ?? memory.content}`;
+  li.append(key);
+  const origin = conversationNumber(memory.session_id);
+  if (origin) {
+    const from = document.createElement("span");
+    from.className = "origin";
+    from.textContent = lang === "zh" ? `对话 ${origin}` : `conversation ${origin}`;
+    li.append(from);
+  }
   const tag = document.createElement("span");
   tag.className = "tag";
-  tag.textContent = superseded ? "superseded" : plan ? "plan" : "active";
-  li.append(key, tag);
+  tag.textContent = restated ? "restated" : superseded ? "superseded" : plan ? "plan" : "active";
+  li.append(tag);
   return li;
 }
 
 function renderState(target, memories) {
+  lastState[target] = memories;
   const list = $(target);
   list.replaceChildren();
   if (!memories.length) {
@@ -211,11 +255,11 @@ function renderState(target, memories) {
   // Superseded first, so the change reads top to bottom the way it happened.
   const order = (m) => (m.status === "superseded" ? 0 : m.scope === "plan" ? 2 : 1);
   for (const memory of [...memories].sort((a, b) => order(a) - order(b))) {
-    list.append(stateRow(memory));
+    list.append(stateRow(memory, memories));
   }
 }
 
-function bubble(role, text, gloss, note) {
+function bubble(role, text, gloss, note, noteKind = "note") {
   const li = document.createElement("li");
   li.className = `bubble ${role}`;
   const line = document.createElement("span");
@@ -229,7 +273,7 @@ function bubble(role, text, gloss, note) {
   }
   if (note) {
     const n = document.createElement("small");
-    n.className = "note";
+    n.className = noteKind;
     n.textContent = t(note);
     li.append(n);
   }
@@ -314,11 +358,40 @@ function parse(text) {
   return null;
 }
 
-function say(role, text, note) {
+function say(role, text, note, noteKind) {
   const list = $("tryChat");
   list.querySelector(".empty")?.remove();
-  list.append(bubble(role, text, null, note));
+  list.append(bubble(role, text, null, note, noteKind));
   list.scrollTop = list.scrollHeight;
+  if (!spokeInConversation) {
+    spokeInConversation = true;
+    $("tryNewConversation").disabled = !ready;
+  }
+}
+
+// Where an answer's memory was written. The box exists to show this naming a
+// conversation other than the one on screen.
+function provenance(memories) {
+  const numbers = [...new Set(memories.map((m) => conversationNumber(m.session_id)))]
+    .filter(Boolean)
+    .sort((a, b) => a - b);
+  const parts = [];
+  if (numbers.length === 1 && numbers[0] === conversation) {
+    parts.push({ zh: "记忆来自本次对话", en: "Memory from this conversation" });
+  } else if (numbers.length) {
+    parts.push({
+      zh: `记忆来自对话 ${numbers.join("、")}`,
+      en: `Memory from conversation ${numbers.join(", ")}`,
+    });
+  }
+  if (memories.length > 1) {
+    parts.push({
+      zh: `${memories.length} 个值同时有效，没有一句说替换`,
+      en: `${memories.length} values are active at once; nothing said one replaced another`,
+    });
+  }
+  if (!parts.length) return null;
+  return { zh: parts.map((p) => p.zh).join("；"), en: parts.map((p) => p.en).join(". ") };
 }
 
 async function handleTurn(text) {
@@ -326,17 +399,24 @@ async function handleTurn(text) {
   try {
     await sessionFor("try");
     if (looksLikeQuestion(text)) {
-      const found = await api("POST", "/demo/search", { query: text, limit: 5 },
+      const found = await api("POST", "/demo/search", { query: text, limit: 10 },
                              { as: "try" });
       const memories = found.memories || [];
       if (!memories.length) {
         say("answer", t(COPY.askedNothing));
         return;
       }
-      // The answer is the top retrieved memory's value, read out. No model runs here,
-      // and the page says so rather than letting the shape imply otherwise.
+      // The answer is read out of the state, not the ranking. No model runs here, and the
+      // page says so rather than letting the shape imply otherwise. Every value still
+      // active on the top memory's key is part of the answer: reading out only the best
+      // ranked one once answered "TensorFlow" to a visitor whose last word was PyTorch,
+      // because that sentence happened to sit closer to the question.
       const top = memories[0];
-      say("answer", top.object ?? top.content);
+      const current = memories.filter(
+        (m) => m.status === "active" && m.subject === top.subject && m.predicate === top.predicate,
+      );
+      say("answer", current.map((m) => m.object ?? m.content).join(lang === "zh" ? "、" : ", "),
+          provenance(current), "origin-note");
       return;
     }
 
@@ -345,18 +425,50 @@ async function handleTurn(text) {
       say("answer", t(COPY.parseFailed));
       return;
     }
-    const result = await api("POST", "/demo/facts", fact, { as: "try" });
+    const result = await api("POST", "/demo/facts", { ...fact, session_id: conversationId(conversation) },
+                             { as: "try" });
     renderState("tryState", result.memories);
     const retired = (result.changed_by_this_write || []).filter((m) => m.status === "superseded");
+    const named = (m) => {
+      const origin = conversationNumber(m.session_id);
+      const where = origin && origin !== conversation
+        ? (lang === "zh" ? `（对话 ${origin}）` : ` (conversation ${origin})`)
+        : "";
+      return `${m.predicate} = ${m.object ?? m.content}${where}`;
+    };
     say("answer", retired.length
       ? (lang === "zh"
-          ? `已记住，并取代了：${retired.map((m) => `${m.predicate} = ${m.object ?? m.content}`).join("、")}`
-          : `Remembered, superseding ${retired.map((m) => `${m.predicate} = ${m.object ?? m.content}`).join(", ")}`)
+          ? `已记住，并取代了：${retired.map(named).join("、")}`
+          : `Remembered, superseding ${retired.map(named).join(", ")}`)
       : (lang === "zh" ? "已记住。" : "Remembered."));
     $("tryAnnounce").textContent = lang === "zh" ? "记忆已更新。" : "Memory updated.";
   } catch (error) {
     say("answer", error.message);
   }
+}
+
+function renderConversationTitle() {
+  $("tryConversationTitle").textContent =
+    lang === "zh" ? `对话 ${conversation}` : `Conversation ${conversation}`;
+}
+
+function startConversation() {
+  conversation += 1;
+  spokeInConversation = false;
+  $("tryNewConversation").disabled = true;
+  renderConversationTitle();
+  // A new conversation starts with an empty transcript, as it would for an agent. The
+  // state panel is left alone: memory is the only thing that carries over.
+  const li = document.createElement("li");
+  li.className = "empty";
+  li.dataset.zh = COPY.newConversation.zh;
+  li.dataset.en = COPY.newConversation.en;
+  li.textContent = t(COPY.newConversation);
+  $("tryChat").replaceChildren(li);
+  $("tryAnnounce").textContent = lang === "zh"
+    ? `已开始对话 ${conversation}。记忆保留，之前的聊天记录不保留。`
+    : `Conversation ${conversation} started. Memory is kept; the earlier chat is not.`;
+  $("tryInput").focus();
 }
 
 function renderSuggestions() {
@@ -383,6 +495,7 @@ $("ben").addEventListener("click", () => { lang = "en"; applyLanguage(); });
 $("retry").addEventListener("click", connect);
 $("walkRun").addEventListener("click", () => runLiveScenario("walkthrough"));
 $("walkReset").addEventListener("click", resetWalkthrough);
+$("tryNewConversation").addEventListener("click", startConversation);
 $("tryForm").addEventListener("submit", async (event) => {
   event.preventDefault();
   const input = $("tryInput");

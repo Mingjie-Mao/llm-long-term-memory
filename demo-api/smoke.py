@@ -15,8 +15,9 @@ from datetime import datetime, timedelta
 from pathlib import Path
 
 scratch = Path(tempfile.mkdtemp())
-os.environ.setdefault("LLTM_DEMO_STORE", str(scratch / "playground"))
-os.environ.setdefault("LLTM_DEMO_SECRET", "smoke-secret-not-for-deployment")
+# Never inherit a real demo store: this suite exercises destructive expiry and delete.
+os.environ["LLTM_DEMO_STORE"] = str(scratch / "playground")
+os.environ["LLTM_DEMO_SECRET"] = "smoke-secret-not-for-deployment"
 # Some native runtime dependencies persist process-local telemetry beside the
 # current directory. Keep every smoke-test artefact inside the same disposable
 # directory as its database instead of dirtying the repository root.
@@ -173,6 +174,96 @@ with TestClient(app) as c:
     check("no memory rows survive in SQLite", left == 0, f"{left} left")
     check("no turn rows survive either", turns_left == 0, f"{turns_left} left")
     db.close()
+
+    print("\n— memory carries across conversations —")
+    check(
+        "health advertises conversations",
+        "conversations" in c.get("/demo/health").json()["capabilities"],
+    )
+    conv_token = c.post("/demo/session").json()["token"]
+    hc = {"x-demo-token": conv_token}
+
+    def fact_in(conversation: str, place: str) -> dict:
+        return c.post(
+            "/demo/facts",
+            headers=hc,
+            json={
+                "predicate": "lives_in",
+                "object": place,
+                "content": f"The user lives in {place}.",
+                "session_id": conversation,
+                "replaces_previous": True,
+            },
+        ).json()
+
+    said = fact_in("conversation-1", "Canberra")
+    check(
+        "a fact records the conversation it was stated in",
+        said["created"]["session_id"] == "conversation-1",
+        str(said["created"]),
+    )
+    asked = c.post(
+        "/demo/search", headers=hc, json={"query": "Where do I live?", "limit": 5}
+    ).json()["memories"]
+    check(
+        "search is not confined to the conversation a fact came from",
+        bool(asked)
+        and asked[0]["object"] == "Canberra"
+        and asked[0]["session_id"] == "conversation-1",
+        str(asked),
+    )
+    moved = fact_in("conversation-2", "Sydney")
+    retired = moved["changed_by_this_write"]
+    check(
+        "a later conversation supersedes what an earlier one said",
+        len(retired) == 1
+        and retired[0]["session_id"] == "conversation-1"
+        and retired[0]["superseded_by"] == moved["created"]["id"],
+        str(retired),
+    )
+    turn = c.post(
+        "/demo/turns",
+        headers=hc,
+        json={"role": "user", "content": "I've moved to Sydney.", "session_id": "conversation-2"},
+    )
+    check(
+        "the conversation is a real session that takes turns without losing its facts",
+        turn.status_code == 200 and c.get("/demo/memories", headers=hc).json()["total"] == 2,
+        turn.text,
+    )
+    check(
+        "a session id scoped to another namespace is refused",
+        c.post(
+            "/demo/facts",
+            headers=hc,
+            json={
+                "predicate": "note",
+                "object": "x",
+                "content": "y",
+                "session_id": "scoped-session-v1:5:demo_conversation-1",
+            },
+        ).status_code
+        == 422,
+    )
+    check(
+        "raw turns also refuse a session id scoped to another namespace",
+        c.post(
+            "/demo/turns",
+            headers=hc,
+            json={
+                "content": "must not be stored",
+                "session_id": "scoped-session-v1:5:demo_conversation-1",
+            },
+        ).status_code
+        == 422,
+    )
+    c.delete("/demo/session", headers=hc)
+    db = sqlite3.connect(Path(os.environ["LLTM_DEMO_STORE"]).with_suffix(".db"))
+    conversations_left = db.execute(
+        "SELECT count(*) FROM sessions WHERE user_id = ?", (conv_token.split(".")[0],)
+    ).fetchone()[0]
+    db.close()
+    check("deleting the namespace deletes its conversations", conversations_left == 0)
 
     print("\n— guards —")
     h2 = {"x-demo-token": c.post("/demo/session").json()["token"]}

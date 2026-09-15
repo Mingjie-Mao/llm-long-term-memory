@@ -1,6 +1,6 @@
 -- ChronoMem storage schema.
 --
--- Design notes (the "why" lives in docs/DECISIONS.md):
+-- Design notes (the "why" lives in the report's 决策记录 section):
 --   * Bi-temporal from day one. `event_time`/`valid_from`/`valid_to` describe when a
 --     fact was true in the world; `ingested_at` describes when we learned it. P4's
 --     supersede logic needs both axes, and retrofitting them later would mean
@@ -193,5 +193,59 @@ CREATE TABLE IF NOT EXISTS write_keys (
     key          TEXT NOT NULL,
     response     TEXT NOT NULL,
     created_at   TEXT NOT NULL,
+    -- A hash of the request the key was claimed for. Without it the same key sent with
+    -- different content replays the first reply, and the caller believes the second write
+    -- landed when nothing was written. The key promises "this request at most once", not
+    -- "this key answers anything".
+    fingerprint  TEXT,
+    -- 'pending' while a write is running, 'done' once its reply is recorded, 'failed' when
+    -- it raised. A crash leaves 'pending' behind, which is why claimed_at exists: a
+    -- pending claim older than the takeover window is an orphan, not a live request.
+    state        TEXT NOT NULL DEFAULT 'done',
+    claimed_at   TEXT,
     PRIMARY KEY (user_id, key)
+);
+
+-- Per-account provider usage, and the caps it is checked against.
+--
+-- Separate from `llm/rate_limiter.py`, which protects the *provider* quota shared by the
+-- whole process. This protects the account: without it one namespace can spend the day's
+-- requests and every other tenant gets nothing, which is indistinguishable from an outage
+-- to everyone but the tenant that caused it.
+--
+-- In SQLite rather than a sidecar file so that a restart cannot reset it and a backup
+-- captures spend alongside the data it was spent on. A namespace erasure deliberately
+-- leaves these rows: they hold counts, not content, and clearing them would make "delete
+-- my data" a way to reset the day's spend.
+CREATE TABLE IF NOT EXISTS account_usage (
+    user_id       TEXT NOT NULL,
+    -- The quota day this row belongs to, as an ISO date in the provider's reset zone.
+    -- Stored rather than derived so a row cannot silently change day when the server
+    -- moves or the zone database updates.
+    day           TEXT NOT NULL,
+    model         TEXT NOT NULL,
+    operation     TEXT NOT NULL,
+    calls         INTEGER NOT NULL DEFAULT 0,
+    -- Failed calls are counted in `calls` as well, not only here. A failure still reached
+    -- the provider, still consumed quota and may still be billed, so a budget that
+    -- excused failures would be a budget a retry loop could walk straight through.
+    failed_calls  INTEGER NOT NULL DEFAULT 0,
+    input_tokens  INTEGER NOT NULL DEFAULT 0,
+    output_tokens INTEGER NOT NULL DEFAULT 0,
+    updated_at    TEXT NOT NULL,
+    PRIMARY KEY (user_id, day, model, operation)
+);
+
+-- A cap of NULL means "no cap for this dimension", not zero. The distinction matters:
+-- an unset budget must not silently stop a tenant, and a deliberate zero must.
+CREATE TABLE IF NOT EXISTS account_budgets (
+    user_id       TEXT NOT NULL,
+    -- '*' matches any model or operation, so a tenant-wide cap is one row rather than one
+    -- row per model. The most specific matching row wins; see `budget.py`.
+    model         TEXT NOT NULL DEFAULT '*',
+    operation     TEXT NOT NULL DEFAULT '*',
+    daily_calls   INTEGER,
+    daily_tokens  INTEGER,
+    updated_at    TEXT NOT NULL,
+    PRIMARY KEY (user_id, model, operation)
 );

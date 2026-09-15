@@ -40,6 +40,8 @@ jobs:
       - run: uv python install 3.12
       - name: Check deploy surface, labels, translations, and release manifest
         run: uv run --no-project python public-demo/check_site.py
+      - name: Check accidental upload regressions
+        run: uv run --no-project python -m unittest discover -s public-demo -p 'test_*.py'
 
   deploy-environment:
     name: imports under the declared dependencies
@@ -59,17 +61,33 @@ jobs:
       - name: Blueprint parses
         run: |
           uv run --no-project --with pyyaml python - <<'PY'
-          import yaml, sys
-          spec = yaml.safe_load(open("render.yaml"))
-          service, = spec["services"]
-          for key in ("name", "plan", "buildCommand", "startCommand", "healthCheckPath"):
-              assert service.get(key), f"render.yaml is missing {key}"
-          assert service["plan"] == "free", "the blueprint left the free plan"
+          import yaml
+          spec = yaml.safe_load(open("render.yaml", encoding="utf-8"))
+          # Select by name. This used to unpack a single service, which was true when
+          # there was one and became a build failure the moment a second was configured.
+          by_name = {service["name"]: service for service in spec["services"]}
+
+          playground = by_name["lltm-playground"]
+          for key in ("plan", "buildCommand", "startCommand", "healthCheckPath"):
+              assert playground.get(key), f"lltm-playground is missing {key}"
+          assert playground["plan"] == "free", "the playground left the free plan"
           # The build must fetch and verify the encoder. Without this step a deploy
           # starts with no model and fails at the first search instead of at build.
-          assert "fetch_encoder.py" in service["buildCommand"], \
+          assert "fetch_encoder.py" in playground["buildCommand"], \
               "the build no longer verifies the encoder"
-          print(f"render.yaml OK: {service['name']} / {service['plan']}")
+
+          # The memory service holds user data, so three properties are not optional.
+          memory = by_name["lltm-memory"]
+          assert memory.get("disk"), "the memory service lost its disk; it would forget on restart"
+          assert memory.get("autoDeploy") is False, \
+              "the memory service must not restart because somebody pushed"
+          env = {item["key"]: item for item in memory["envVars"]}
+          assert env["LLTM_REQUIRE_AUTH"]["value"] == "1", "fail-closed auth was turned off"
+          for secret in ("LLTM_API_TOKENS", "GEMINI_API_KEY"):
+              assert env[secret].get("sync") is False, \
+                  f"{secret} must be set in the dashboard, never synced from the repository"
+
+          print(f"render.yaml OK: {', '.join(sorted(by_name))}")
           PY
 
   behaviour:

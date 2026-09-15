@@ -26,7 +26,7 @@ right.
 The judge model is pinned for the life of the project and is deliberately a
 different model from the answerer, so that a system is not grading its own prose.
 Judge reliability is measured against hand labels rather than assumed; see
-`lltm eval judge-agreement` and D4 in docs/DECISIONS.md.
+`lltm eval judge-agreement` and D4 in the report's 决策记录 section.
 """
 
 from __future__ import annotations
@@ -124,9 +124,18 @@ class JudgeResult:
     input_tokens: int
     output_tokens: int
     api_latency_ms: float = 0.0
+    score: float | None = None
+    """A graded score in [0, 1], from a judge that grades by rubric; `correct` is then its
+    declared binarisation. None for a reference-answer verdict."""
+    details: dict | None = None
+    """Everything the score was computed from. Saved on the row, so the score can be
+    recomputed later without calling the judge again."""
 
 
 class Judge:
+    prompt_version = JUDGE_PROMPT_VERSION
+    accepts_rubric = False
+
     def __init__(self, client: GeminiClient, model: str, thinking: bool = True) -> None:
         self.client = client
         self.model = model

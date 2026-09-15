@@ -1,0 +1,184 @@
+{
+  "schema_version": 1,
+  "name": "count-policy-v1",
+  "status": "proposed_pending_human_review",
+  "rules": [
+    "Never choose gold using model answers. Where a prior model verdict exists it is the object under review, not an input to it, and the review page shows it only after the evidence.",
+    "Count distinct named entities, not memory rows, receipts or mentions. Two mentions of one object are one member; when two labels may or may not name the same object, the alias rule below decides, and a pair that rule cannot decide excludes the question.",
+    "Completed acts require explicit evidence of completion; plans, preferences and recommendations are not completed acts. The user's own past-tense statement of having done it is explicit evidence; intent, conditional and future statements are not.",
+    "Current ownership requires the latest supported state as of the question's date. Giving away, donating, returning, selling, consuming, losing or breaking an item ends ownership unless the source shows otherwise. Where no source date orders two states, recorded session order may order them, but never supplies a member's event date.",
+    "An event date must come from source text. A session timestamp is not an event date; it may only resolve a relative date the source itself states, such as 'last Tuesday'. A member whose date cannot be fixed that way is excluded from a date-bounded question.",
+    "Do not split commas or and inside a name automatically. Reviewers supply the distinct members.",
+    "Merge aliases only with explicit source support or a reviewed alias decision. Preserve different works and editions when the question distinguishes them; when it does not, two editions of one work are one member.",
+    "Zero is allowed only when the inspected scope explicitly supports no members. Missing evidence is not zero: a question whose scope carries neither a member nor an explicit statement that there are none is excluded, not answered zero.",
+    "Question scope is the supplied recorded evidence, not an exhaustive claim about the user's real life.",
+    "Every accepted member needs a source id and a verbatim quote from a supplied source. A label only partly present in the user's own words is not a verbatim quote.",
+    "Before accepting a question, read its entire supplied scope for members no proposed list mentions, and record that you did. This is the recall half of the review and no check can perform it for you.",
+    "A memory whose predicate is not in the relation's approved list supplies no member. To admit one, propose adding that predicate to the table with a reason and rebuild; do not admit it for a single question.",
+    "The relation table routes predicates, not question intent. When a question asks about current ownership and the only evidence is an acquisition, or the reverse, the ownership rule decides whether the member stands; the predicate's position in the table does not by itself exclude it.",
+    "Excluded or ambiguous questions remain in the audit, but do not enter the scored set."
+  ],
+  "relations": {
+    "acquired": {
+      "unit": "object acquired",
+      "state": "completed",
+      "predicates": [
+        "art_purchases",
+        "chicken_feed_purchase",
+        "clothing_purchase",
+        "clothing_purchases",
+        "electronics_purchases",
+        "gift_purchases",
+        "gifts_purchased",
+        "gifts_received",
+        "grocery_purchase",
+        "grocery_purchases",
+        "online_purchase",
+        "purchased_items",
+        "purchases"
+      ]
+    },
+    "ate_at": {
+      "unit": "restaurant or food venue",
+      "state": "completed",
+      "predicates": [
+        "restaurants_visited",
+        "restaurants_eaten_at",
+        "dining_locations"
+      ]
+    },
+    "attended": {
+      "unit": "named event or class",
+      "state": "completed",
+      "predicates": [
+        "classes_attended",
+        "events_attended",
+        "workshops_attended"
+      ]
+    },
+    "cooked": {
+      "unit": "dish prepared",
+      "state": "completed",
+      "predicates": [
+        "food_prepared",
+        "homemade_food",
+        "recipes_made"
+      ]
+    },
+    "grows": {
+      "unit": "plant cultivated",
+      "state": "current",
+      "predicates": [
+        "plants_grown",
+        "plants_growing",
+        "plants_cultivated"
+      ]
+    },
+    "listened_to": {
+      "unit": "audio work",
+      "state": "completed",
+      "predicates": [
+        "audiobooks_listened",
+        "podcasts_listened"
+      ]
+    },
+    "owns": {
+      "unit": "identifiable possession",
+      "state": "current",
+      "predicates": [
+        "accessories_owned",
+        "antique_collection",
+        "aquarium_equipment",
+        "art_collection",
+        "baseball_collection",
+        "bicycles_owned",
+        "bike_owned",
+        "bike_ownership",
+        "bikes_owned",
+        "board_game_collection",
+        "books_owned",
+        "camera_collection",
+        "camera_gear",
+        "camera_owned",
+        "car_owned",
+        "clothing_owned",
+        "clothing_ownership",
+        "coin_collection",
+        "doll_collection",
+        "electronics_owned",
+        "farm_equipment",
+        "fishing_gear",
+        "footwear_owned",
+        "gardening_equipment",
+        "handbag_ownership",
+        "hobbies_equipment",
+        "instruments_owned",
+        "jewelry_owned",
+        "kitchen_equipment",
+        "light_bulb_owned",
+        "motorcycles_owned",
+        "music_collection",
+        "music_production_gear",
+        "owned_spirits",
+        "pet_owned",
+        "phone_owned",
+        "possessions",
+        "postcard_collection",
+        "rugs_owned",
+        "smartwatch_owned",
+        "software_owned",
+        "swimming_gear",
+        "typewriter_owned",
+        "vinyl_collection",
+        "vinyl_collection_item",
+        "watch_collection"
+      ]
+    },
+    "practises_hobby": {
+      "unit": "activity practised",
+      "state": "current",
+      "predicates": [
+        "hobbies",
+        "volunteer_activity",
+        "volunteer_work",
+        "volunteering",
+        "weekly_activities"
+      ]
+    },
+    "read": {
+      "unit": "book or article finished",
+      "state": "completed",
+      "predicates": [
+        "books_read",
+        "articles_read"
+      ]
+    },
+    "visited": {
+      "unit": "named place visited",
+      "state": "completed",
+      "predicates": [
+        "places_visited",
+        "cities_visited",
+        "countries_visited",
+        "museums_visited"
+      ]
+    }
+  },
+  "known_rejected_mappings": {
+    "groceries": "Food is not a restaurant.",
+    "meals_eaten": "A meal is not a restaurant.",
+    "home_decor": "A furnishing is not a plant.",
+    "family_visits": "A relative is not a place.",
+    "gift_given": "Giving something does not establish acquiring it.",
+    "donated_items": "Donation does not establish current ownership.",
+    "property_viewing": "Viewing property does not establish ownership.",
+    "skills_acquired": "A skill is not an acquired object.",
+    "museum_membership": "Membership does not establish event attendance.",
+    "social_media": "A platform does not establish listening to a work.",
+    "books_listening_status": "Listening is not finishing a written work.",
+    "books_reading": "Reading in progress does not establish completion.",
+    "books_reading_status": "A status predicate can include unfinished books."
+  },
+  "revision": 2,
+  "revision_note": "Draft revision before any human approval and before any gold was frozen, so the file name is unchanged; the packet binds this file by sha256, so the edit is detectable. Changes: the prohibition on model-chosen gold is promoted to the first rule; ownership names its reference time and its ending events; dates say what a session timestamp may and may not do; 'missing evidence is not zero' gains its exit; member citation and scope completeness are separated because only the first is machine-checkable; and two rules are added for the case the old table left silent (a predicate outside the relation's list, and a question whose intent differs from where the table routes its evidence)."
+}

@@ -14,6 +14,11 @@
 #     which rewrote LF to CRLF and moved the probe-set digest the held-out split names.
 #     Linux and macOS passed; only the Windows matrix saw it. That matrix exists for
 #     exactly this, and this time it earned its keep.
+#   * `configs/beam-eval.json` — a third time, and this one is the rule's own fault. The
+#     binding below named `configs/*.yaml`, so a config in a different format was outside
+#     it the moment one existed, and `beam-power.json` records that file's digest. The
+#     glob is now the directory rather than an extension, so the next config format is
+#     covered before it is written rather than after it goes red.
 #
 # So the rule is stated once over everything that carries a recorded digest, rather than
 # per file after each incident. 238 files are bound this way: 122 under `results/`, 85
@@ -34,7 +39,7 @@ results/** -text
 src/**/*.py -text
 tests/**/*.py -text
 tools/*.py -text
-configs/*.yaml -text
+configs/** -text
 pyproject.toml -text
 uv.lock -text
 

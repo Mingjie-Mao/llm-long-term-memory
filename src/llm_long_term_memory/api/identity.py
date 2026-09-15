@@ -17,6 +17,18 @@ a stated condition rather than an unexamined default: `/healthz` reports it, sta
 it, and `Principal.trusted` is False so nothing downstream can mistake a namespace the
 caller named for one it proved.
 
+**`LLTM_REQUIRE_AUTH` makes open mode impossible to reach by accident.** A deployment that
+holds real user data cannot rely on someone remembering to set `LLTM_API_TOKENS`: forgetting
+it produces a service that works perfectly and authorises everyone, which is the failure
+that looks most like success. With the switch set, a missing or unusable token map is a
+refusal at three independent points — the process will not start, `/healthz` goes 503, and
+every authenticated route answers 401 — because one of them will eventually be bypassed
+(an injected app in a test, an env var edited on a running host) and fail-closed means the
+remaining two still hold.
+
+An unparseable value for the switch is an error rather than False. `LLTM_REQUIRE_AUTH=ture`
+silently disabling the guard is precisely the accident the guard exists to prevent.
+
 **Why bearer tokens rather than OIDC.** A shared secret verified with a constant-time
 compare needs no dependency, no network call and no key rotation infrastructure, so it can
 land and be tested now. It is deliberately the weaker scheme: tokens do not expire, carry
@@ -36,6 +48,11 @@ from dataclasses import dataclass
 # model dump, a `/v1/config` response or a log line that renders settings. Nothing here
 # returns the token itself.
 TOKENS_ENV = "LLTM_API_TOKENS"
+
+REQUIRE_ENV = "LLTM_REQUIRE_AUTH"
+
+_TRUE = {"1", "true", "yes", "on"}
+_FALSE = {"", "0", "false", "no", "off"}
 
 
 @dataclass(frozen=True, slots=True)
@@ -84,6 +101,36 @@ def configured_tokens(environ: dict[str, str] | None = None) -> dict[str, str]:
     return mapping
 
 
+def auth_required(environ: dict[str, str] | None = None) -> bool:
+    """Whether this deployment refuses to run without credentials."""
+    raw = (environ if environ is not None else os.environ).get(REQUIRE_ENV, "")
+    value = raw.strip().lower()
+    if value in _TRUE:
+        return True
+    if value in _FALSE:
+        return False
+    raise AuthenticationConfigurationError(
+        f"{REQUIRE_ENV} must be one of {sorted(_TRUE | _FALSE - {''})}, not {raw.strip()!r}"
+    )
+
+
+def check_authentication_configuration(environ: dict[str, str] | None = None) -> bool:
+    """Validate the pair, and return whether authentication is enforced.
+
+    Raises when the switch is set and no usable token map backs it. Called at startup, by
+    `/healthz`, and on every credential resolution: three places, because the point of a
+    fail-closed switch is that no single bypass reopens the door.
+    """
+    required = auth_required(environ)
+    tokens = configured_tokens(environ)
+    if required and not tokens:
+        raise AuthenticationConfigurationError(
+            f"{REQUIRE_ENV} is set but {TOKENS_ENV} configures no tokens; "
+            "this deployment refuses to serve in open mode"
+        )
+    return bool(tokens)
+
+
 def auth_enabled(environ: dict[str, str] | None = None) -> bool:
     return bool(configured_tokens(environ))
 
@@ -102,6 +149,9 @@ def principal_from_token(
     In open mode this raises nothing and returns no principal: the caller falls back to
     the namespace it named, which `resolve_namespace` records as untrusted.
     """
+    # Re-checked per request, not read from startup state: an environment edited on a
+    # running host must not leave the door open behind a process that validated once.
+    check_authentication_configuration(environ)
     tokens = configured_tokens(environ)
     if not tokens:
         return Principal(user_id="", trusted=False)

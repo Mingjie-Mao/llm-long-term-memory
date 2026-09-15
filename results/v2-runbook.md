@@ -207,7 +207,7 @@ hash-binds all six sealed row/usage artifacts. Do not run the command with `--ru
 
 Do not start this from a dev result. After the one-shot final report fixes the
 experimental conclusion, use
-[`docs/PRODUCTIZATION_V2_PLAN.md`](../docs/PRODUCTIZATION_V2_PLAN.md). It defines
+[`docs/PRODUCTIZATION_V2_PLAN.md`](../docs/PROJECT_REPORT.zh-CN.md#后续完整计划). It defines
 the order and acceptance gates for trusted identity, tenant isolation, hard
 deletion/export, backup/restore, cost controls, concurrency, privacy, and
 operations. None of those changes may be folded back into the already measured v2

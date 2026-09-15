@@ -1,14 +1,14 @@
-"""A parsed verdict with an empty `answer` must never emit the structure as the reply.
+"""Object/fence leakage is guarded at every fallback return boundary and recorded.
 
-This is recorded, not repaired. The fix belongs in the prompt — a run where it fires is
-not interpretable whatever the code does with it — but a contamination that cost 55 of
-142 rows on a paid run must at least be countable afterwards rather than discovered by
-reading answers one by one.
+This is an output-format check, not a proof that a prose answer is grounded.
 """
 
 from __future__ import annotations
 
 import json
+from types import SimpleNamespace
+
+import pytest
 
 from llm_long_term_memory.evaluation.runners.synthesis import (
     SYNTHESIS_ANSWER_SYSTEM,
@@ -49,6 +49,7 @@ class _Instance:
     question = "what is currently true?"
     question_date = "2026/01/01"
     question_id = "q"
+    store_namespace = "q"
 
 
 def test_an_empty_answer_falling_back_to_json_is_flagged():
@@ -173,3 +174,48 @@ def test_a_good_reply_survives_even_when_the_model_also_emitted_structure():
     _, text, _, _ = runner._answer_with_fallback(_Instance(), "ctx", [])
     assert text == "The user taking painting classes came first."
     assert "I do not know" not in text
+
+
+@pytest.mark.parametrize("payload", ['{"status": "unexpected"}', '{"status":', "```json\n{}\n```"])
+def test_invalid_verdict_structure_does_not_bypass_the_output_guard(payload):
+    runner = _runner(payload)
+    _, text, _, _ = runner._answer_with_fallback(_Instance(), "ctx", [])
+    assert text == "I do not know."
+    assert runner._answer_was_raw_structure is True
+
+
+@pytest.mark.parametrize("status", ["need_source", "no_evidence"])
+def test_no_source_does_not_return_structure_from_the_verdict_answer(status):
+    runner = _runner(json.dumps({"status": status, "answer": '{"items": []}'}))
+    runner.fallback = SimpleNamespace(recover=lambda *args: SimpleNamespace(used=False))
+    _, text, _, _ = runner._answer_with_fallback(_Instance(), "ctx", [])
+    assert text == "I do not know."
+    assert runner._answer_was_raw_structure is True
+
+
+@pytest.mark.parametrize(
+    ("payload", "expected", "flagged"),
+    [
+        ('{"answer": "unparsed structure"}', "I do not know.", True),
+        ('```json\n{"items": []}\n```', "I do not know.", True),
+        ("The source says San Francisco.", "The source says San Francisco.", False),
+    ],
+)
+def test_second_pass_is_checked_even_when_the_prompt_requests_prose(payload, expected, flagged):
+    runner = _runner(json.dumps({"status": "need_source", "answer": ""}))
+    first = runner.client.generate()
+    replies = iter([first, SimpleNamespace(text=payload)])
+    calls = []
+
+    def generate(**kwargs):
+        calls.append(kwargs)
+        return next(replies)
+
+    runner.client = SimpleNamespace(generate=generate)
+    runner.raw_fallback_max_chars = 2400
+    evidence = SimpleNamespace(used=True, render=lambda **kwargs: "The raw source text.")
+    runner.fallback = SimpleNamespace(recover=lambda *args: evidence)
+    _, text, _, _ = runner._answer_with_fallback(_Instance(), "ctx", [])
+    assert text == expected
+    assert runner._answer_was_raw_structure is flagged
+    assert len(calls) == 2, "output validation must not spend another model call"

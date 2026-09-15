@@ -123,17 +123,43 @@ class HybridRetriever:
         self.reranker = reranker
 
     def retrieve(
-        self, query: np.ndarray, query_text: str, namespace: str, *, temporal: bool, limit: int
+        self,
+        query: np.ndarray,
+        query_text: str,
+        namespace: str,
+        *,
+        temporal: bool,
+        limit: int,
+        as_of: datetime | None = None,
     ) -> list[RetrievedMemory]:
         """Return ranked candidates without leaking namespaces or evicted records."""
         return self.retrieve_with_trace(
-            query, query_text, namespace, temporal=temporal, limit=limit
+            query, query_text, namespace, temporal=temporal, limit=limit, as_of=as_of
         )[0]
 
     def retrieve_with_trace(
-        self, query: np.ndarray, query_text: str, namespace: str, *, temporal: bool, limit: int
+        self,
+        query: np.ndarray,
+        query_text: str,
+        namespace: str,
+        *,
+        temporal: bool,
+        limit: int,
+        as_of: datetime | None = None,
     ) -> tuple[list[RetrievedMemory], RetrievalTrace]:
-        """`retrieve`, plus the pre-truncation candidate set for recall attribution."""
+        """`retrieve`, plus the pre-truncation candidate set for recall attribution.
+
+        `as_of` is the moment the question is being asked. Age was measured against
+        `datetime.now()` and nothing ever passed a reference, so a memory's recency was
+        its distance from **the wall clock of whoever ran the code**. Two consequences,
+        and the second is the serious one: a question set in 2023 scored every 2023
+        memory as ancient, and the same store ranked differently tomorrow than today —
+        which quietly breaks the property every offline falsification in this project
+        rests on, that retrieval is deterministic given the store.
+
+        Masked until now because the shipped weight on recency is 0.0, so the signal is
+        multiplied away. It stops being masked the moment anyone turns it on.
+        """
         semantic_hits = self.index.search(query, limit=len(self.index))
         semantic_raw = dict(semantic_hits)
         semantic_memories = self.store.get_many([memory_id for memory_id, _ in semantic_hits])
@@ -170,7 +196,7 @@ class HybridRetriever:
             lower_is_better=True,
         )
         query_terms = _tokens(query_text)
-        now = self.now or datetime.now()
+        now = as_of or self.now or datetime.now()
         scored = []
         for memory in memories:
             raw = semantic_raw.get(memory.id, -1.0)

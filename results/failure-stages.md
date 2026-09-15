@@ -97,7 +97,7 @@ is currently ranked out of reach; the facts these questions need are absent or
 were removed before ranking. That settles the item without an experiment and
 without appealing to what other systems do. It also disposes of the observation
 that four of five retrieval signals are weighted at zero
-(`docs/ENGINEERING_REPORT.md` §5): the weighting is a real inaccuracy in the
+(`docs/history/ENGINEERING_REPORT.md` §5): the weighting is a real inaccuracy in the
 documentation and not a cause of any failure here.
 
 The extraction ceiling of 10 is an upper bound and is known not to be reached.

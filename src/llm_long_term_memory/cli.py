@@ -205,6 +205,21 @@ def _relation_scanner(store, encoder):
     return RelationScanner(store, RelationRouter(encoder), relation_of)
 
 
+def _manifest_instances(manifest, settings) -> list:
+    """Every instance of the dataset a manifest's question ids come from.
+
+    A LongMemEval manifest names its split variant. A BEAM manifest is named for its half
+    (`beam-dev`, `beam-test`), and its instances come from that half's export rather than
+    from a LongMemEval file that could never hold them.
+    """
+    from llm_long_term_memory.evaluation.datasets import beam
+
+    half = beam.half_of(manifest)
+    if half is not None:
+        return beam.load(half, settings.data_dir)
+    return lme.load(manifest.variant, settings.data_dir)
+
+
 def _build(
     variant: str,
     cfg_path: str,
@@ -468,7 +483,7 @@ def eval_run(
             # sample of size len(manifest): stratification would return a different
             # set of questions entirely. See the --questions help text.
             manifest = load_manifest(questions)
-            every = lme.load(manifest.variant, settings.data_dir)
+            every = _manifest_instances(manifest, settings)
             by_id = {inst.question_id: inst for inst in every}
             unknown = [qid for qid in manifest.question_ids if qid not in by_id]
             if unknown:
@@ -479,6 +494,13 @@ def eval_run(
             instances = [by_id[qid] for qid in manifest.question_ids]
         else:
             instances = lme.load(cfg.dataset_variant, settings.data_dir, limit=n)
+
+    if any(inst.rubric for inst in instances):
+        # A question that ships a rubric is graded against it; the reference-answer judge
+        # would read the text the rubric was written from as a gold answer.
+        from llm_long_term_memory.evaluation.beam_judge import BeamRubricJudge
+
+        judge = BeamRubricJudge(judge.client, model=judge.model)
 
     stem = f"{variant}.{label}" if label else variant
     out = settings.results_dir / "raw" / f"{stem}.jsonl"
@@ -884,10 +906,11 @@ def ingest_run(
                 # does. A stratified sample of the manifest's size would return a
                 # different set of questions, and for a held-out split the haystacks
                 # ingested have to be the ones its questions are asked about.
+                from llm_long_term_memory.evaluation.datasets import beam
                 from llm_long_term_memory.evaluation.manifest import load_manifest
 
                 manifest = load_manifest(questions)
-                by_id = {i.question_id: i for i in lme.load(manifest.variant, settings.data_dir)}
+                by_id = {i.question_id: i for i in _manifest_instances(manifest, settings)}
                 unknown = [q for q in manifest.question_ids if q not in by_id]
                 if unknown:
                     raise typer.BadParameter(
@@ -896,6 +919,8 @@ def ingest_run(
                     )
                 instances = [by_id[q] for q in manifest.question_ids]
                 console.print(f"[dim]manifest {manifest.name}: {len(instances)} questions[/dim]")
+                if beam.half_of(manifest) is not None:
+                    pipeline.source_label = "beam"
             else:
                 instances = lme.load(
                     cfg.dataset_variant, settings.data_dir, limit=limit or cfg.dataset_limit

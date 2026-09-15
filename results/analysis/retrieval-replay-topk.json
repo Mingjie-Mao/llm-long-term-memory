@@ -1,0 +1,91 @@
+{
+  "name": "retrieval-replay",
+  "provider_calls": 0,
+  "store": "beam-dev-frozen",
+  "manifest": "beam-dev",
+  "variant": "two_stage_fallback",
+  "questions": 440,
+  "measures": "retrieval only; whether the model uses what it is given is out of reach here",
+  "configurations": [
+    {
+      "configuration": {
+        "top_k": 10
+      },
+      "questions_skipped_not_yet_ingested": 180,
+      "questions": 260,
+      "questions_with_labelled_evidence": 232,
+      "any_source_session": 0.5560344827586207,
+      "all_source_sessions": 0.1810344827586207,
+      "median_context_tokens": 303,
+      "mean_memories_in_context": 10.0,
+      "mean_memories_ranked": 10.0,
+      "required_fact_coverage": {
+        "automatically_decidable_items": 129,
+        "required_facts": 172,
+        "reached_ranked": 0.5,
+        "reached_context": 0.5,
+        "phrasing": "Among automatically decidable evidence-bearing rubric items (129 items, 172 required facts), 50.0% reached the final context."
+      }
+    },
+    {
+      "configuration": {
+        "top_k": 20
+      },
+      "questions_skipped_not_yet_ingested": 180,
+      "questions": 260,
+      "questions_with_labelled_evidence": 232,
+      "any_source_session": 0.6551724137931034,
+      "all_source_sessions": 0.22844827586206898,
+      "median_context_tokens": 549,
+      "mean_memories_in_context": 20.0,
+      "mean_memories_ranked": 20.0,
+      "required_fact_coverage": {
+        "automatically_decidable_items": 129,
+        "required_facts": 172,
+        "reached_ranked": 0.622093023255814,
+        "reached_context": 0.622093023255814,
+        "phrasing": "Among automatically decidable evidence-bearing rubric items (129 items, 172 required facts), 62.2% reached the final context."
+      }
+    },
+    {
+      "configuration": {
+        "top_k": 40
+      },
+      "questions_skipped_not_yet_ingested": 180,
+      "questions": 260,
+      "questions_with_labelled_evidence": 232,
+      "any_source_session": 0.7241379310344828,
+      "all_source_sessions": 0.3017241379310345,
+      "median_context_tokens": 1007,
+      "mean_memories_in_context": 38.61538461538461,
+      "mean_memories_ranked": 38.61538461538461,
+      "required_fact_coverage": {
+        "automatically_decidable_items": 129,
+        "required_facts": 172,
+        "reached_ranked": 0.6627906976744186,
+        "reached_context": 0.6627906976744186,
+        "phrasing": "Among automatically decidable evidence-bearing rubric items (129 items, 172 required facts), 66.3% reached the final context."
+      }
+    },
+    {
+      "configuration": {
+        "top_k": 80
+      },
+      "questions_skipped_not_yet_ingested": 180,
+      "questions": 260,
+      "questions_with_labelled_evidence": 232,
+      "any_source_session": 0.8017241379310345,
+      "all_source_sessions": 0.41379310344827586,
+      "median_context_tokens": 1724,
+      "mean_memories_in_context": 66.8076923076923,
+      "mean_memories_ranked": 66.8076923076923,
+      "required_fact_coverage": {
+        "automatically_decidable_items": 129,
+        "required_facts": 172,
+        "reached_ranked": 0.7674418604651163,
+        "reached_context": 0.7674418604651163,
+        "phrasing": "Among automatically decidable evidence-bearing rubric items (129 items, 172 required facts), 76.7% reached the final context."
+      }
+    }
+  ]
+}

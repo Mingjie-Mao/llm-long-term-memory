@@ -1,5 +1,16 @@
 # The final test set — what exists, what does not, and what a candidate must prove
 
+> **Update 2026-09-14: BEAM is adopted, and its final half is registered.** Its dataset turned
+> out to be public (revision `3205395e` of the 100K and 500K files, CC BY-SA 4.0). All 1,100
+> questions passed `register_hidden_set.py`'s id, verbatim and near-duplicate checks against
+> the 500 LongMemEval questions, and the set was split 40/60 by conversation
+> ([`beam-split.json`](manifests/beam-split.json)). The 660-question final half is registered
+> as [`beam-test`](manifests/beam-test.json), to be answered once, after every choice is
+> frozen. Step 2 below concerned LoCoMo's audit and does not apply; step 3's resolution was
+> computed per stratum by `tools/beam_power.py`, as scenarios until BEAM's own noise floor is
+> measured. The plan is in the [roadmap](../docs/PROJECT_REPORT.zh-CN.md#后续完整计划). The text below is the record of
+> how the choice was made.
+
 **v4 still has no final test.** Every v4 number on record is a development number. This
 page says exactly what is blocking, so that the gap is a stated condition rather than
 something a reader has to reconstruct from a footnote.

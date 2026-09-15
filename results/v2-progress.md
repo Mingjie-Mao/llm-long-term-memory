@@ -52,7 +52,7 @@ over.
 | heldout100 (§3.5) | — | — | 14.8 : 1 |
 
 A third independent store shows the same shape, which strengthens the reading in
-[REPORT §3.5](../docs/REPORT.md) that this is a second face of extraction loss rather
+[REPORT §3.5](../docs/PROJECT_REPORT.zh-CN.md) that this is a second face of extraction loss rather
 than a defect in the temporal layer. It still does not separate the two surviving
 explanations — the earlier value was never extracted, or the extractor sets the flag on
 update-shaped wording regardless of whether a predecessor exists. That separation needs

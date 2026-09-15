@@ -1,0 +1,119 @@
+{
+  "name": "beam-power",
+  "status": "scenario estimates: BEAM's own discordance and ICC are unmeasured",
+  "inputs": {
+    "split_sha256": "dd1ecfd45a125d6a7f54b56fce21465e21eae6b665124ea011c96f0f829f82d0",
+    "declaration_sha256": "7531cb0a2f98d5acbc6ceb46ece982f2b3403a365f9e6c7135fff46b2c368095"
+  },
+  "unit": "accuracy points at the declared binary verdict, two-sided, paired arms",
+  "sigmas": 2.0,
+  "discordance_scenarios": {
+    "heldout100 run-to-run": 0.04,
+    "v4 probes run-to-run": 0.19
+  },
+  "icc_scenarios": [
+    0.0,
+    0.05,
+    0.15
+  ],
+  "strata": [
+    {
+      "half": "dev",
+      "stratum": "all ten abilities",
+      "questions": 440,
+      "cluster_size": 20,
+      "mde_points": {
+        "heldout100 run-to-run, icc 0": 1.9,
+        "heldout100 run-to-run, icc 0.05": 2.7,
+        "heldout100 run-to-run, icc 0.15": 3.7,
+        "v4 probes run-to-run, icc 0": 4.2,
+        "v4 probes run-to-run, icc 0.05": 5.8,
+        "v4 probes run-to-run, icc 0.15": 8.2
+      }
+    },
+    {
+      "half": "dev",
+      "stratum": "the 8 primary abilities",
+      "questions": 352,
+      "cluster_size": 16,
+      "mde_points": {
+        "heldout100 run-to-run, icc 0": 2.1,
+        "heldout100 run-to-run, icc 0.05": 2.8,
+        "heldout100 run-to-run, icc 0.15": 3.8,
+        "v4 probes run-to-run, icc 0": 4.6,
+        "v4 probes run-to-run, icc 0.05": 6.1,
+        "v4 probes run-to-run, icc 0.15": 8.4
+      }
+    },
+    {
+      "half": "dev",
+      "stratum": "one ability",
+      "questions": 44,
+      "cluster_size": 2,
+      "mde_points": {
+        "heldout100 run-to-run, icc 0": 6.0,
+        "heldout100 run-to-run, icc 0.05": 6.2,
+        "heldout100 run-to-run, icc 0.15": 6.5,
+        "v4 probes run-to-run, icc 0": 13.1,
+        "v4 probes run-to-run, icc 0.05": 13.5,
+        "v4 probes run-to-run, icc 0.15": 14.1
+      }
+    },
+    {
+      "half": "test",
+      "stratum": "all ten abilities",
+      "questions": 660,
+      "cluster_size": 20,
+      "mde_points": {
+        "heldout100 run-to-run, icc 0": 1.6,
+        "heldout100 run-to-run, icc 0.05": 2.2,
+        "heldout100 run-to-run, icc 0.15": 3.1,
+        "v4 probes run-to-run, icc 0": 3.4,
+        "v4 probes run-to-run, icc 0.05": 4.7,
+        "v4 probes run-to-run, icc 0.15": 6.7
+      }
+    },
+    {
+      "half": "test",
+      "stratum": "the 8 primary abilities",
+      "questions": 528,
+      "cluster_size": 16,
+      "mde_points": {
+        "heldout100 run-to-run, icc 0": 1.7,
+        "heldout100 run-to-run, icc 0.05": 2.3,
+        "heldout100 run-to-run, icc 0.15": 3.1,
+        "v4 probes run-to-run, icc 0": 3.8,
+        "v4 probes run-to-run, icc 0.05": 5.0,
+        "v4 probes run-to-run, icc 0.15": 6.8
+      }
+    },
+    {
+      "half": "test",
+      "stratum": "one ability",
+      "questions": 66,
+      "cluster_size": 2,
+      "mde_points": {
+        "heldout100 run-to-run, icc 0": 4.9,
+        "heldout100 run-to-run, icc 0.05": 5.0,
+        "heldout100 run-to-run, icc 0.15": 5.3,
+        "v4 probes run-to-run, icc 0": 10.7,
+        "v4 probes run-to-run, icc 0.05": 11.0,
+        "v4 probes run-to-run, icc 0.15": 11.5
+      }
+    },
+    {
+      "half": "test",
+      "stratum": "100K conversations, where full context fits",
+      "questions": 240,
+      "cluster_size": 20,
+      "mde_points": {
+        "heldout100 run-to-run, icc 0": 2.6,
+        "heldout100 run-to-run, icc 0.05": 3.6,
+        "heldout100 run-to-run, icc 0.15": 5.1,
+        "v4 probes run-to-run, icc 0": 5.6,
+        "v4 probes run-to-run, icc 0.05": 7.9,
+        "v4 probes run-to-run, icc 0.15": 11.0
+      }
+    }
+  ]
+}

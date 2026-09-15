@@ -38,6 +38,13 @@ export const WALKTHROUGH = {
 // uses a model to read a turn, and this page has no model behind it. Stated on the page
 // rather than implied, because a visitor would otherwise read a parser failure as an
 // extraction failure.
+//
+// `replaces` stands in for the model's verdict on what a statement does to the value
+// before it. The product's keying prompt says `replaces` when the user signals a change
+// or when the attribute plainly holds one value at a time, and every attribute here but a
+// plan holds one. "I live in X" and "I use X" were once `false`, which left two values
+// active on one key; the answer was then whichever sentence ranked closer to the
+// question, not what the visitor said last.
 export const PATTERNS = [
   { re: /\b(?:i(?:'ve| have)? (?:just )?moved to|i now live in|i relocated to)\s+([A-Za-z][\w' -]{0,40})/i,
     predicate: "lives_in", replaces: true,
@@ -46,19 +53,19 @@ export const PATTERNS = [
     predicate: "plans_move_to", replaces: false, scope: "plan",
     say: (o) => `The user plans to move to ${o}.` },
   { re: /\bi live in\s+([A-Za-z][\w' -]{0,40})/i,
-    predicate: "lives_in", replaces: false,
+    predicate: "lives_in", replaces: true,
     say: (o) => `The user lives in ${o}.` },
   { re: /\bi(?:'ve| have)? switched to\s+([A-Za-z][\w'. -]{0,40})/i,
     predicate: "uses_framework", replaces: true,
     say: (o) => `The user uses ${o}.` },
   { re: /\bi use\s+([A-Za-z][\w'. -]{0,40})/i,
-    predicate: "uses_framework", replaces: false,
+    predicate: "uses_framework", replaces: true,
     say: (o) => `The user uses ${o}.` },
   { re: /\bi(?:'m| am) now (?:a|an)\s+([A-Za-z][\w' -]{0,40})/i,
     predicate: "works_as", replaces: true,
     say: (o) => `The user works as ${o}.` },
   { re: /\bi work as (?:a|an)?\s*([A-Za-z][\w' -]{0,40})/i,
-    predicate: "works_as", replaces: false,
+    predicate: "works_as", replaces: true,
     say: (o) => `The user works as ${o}.` },
   { re: /\bi work at\s+([A-Za-z][\w'. -]{0,40})/i,
     predicate: "works_at", replaces: true,
@@ -84,5 +91,9 @@ export const COPY = {
   noMatch: {
     zh: "检索没有命中任何记忆。",
     en: "Retrieval matched no memory.",
+  },
+  newConversation: {
+    zh: "新对话。之前的聊天记录不在这里，提问时也不会发送；问一件之前说过的事，答案只能来自记忆。",
+    en: "New conversation. The earlier chat is not here and is never sent with a question — ask about something you said before, and the answer can only come from memory.",
   },
 };

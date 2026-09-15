@@ -62,3 +62,23 @@ results/sealed/**/*.jsonl
 # `python3 docs/figures/generate.py --pdf`; the SVGs it is derived from are
 # committed because the docs embed them.
 output/
+
+# The count review packet and the frozen gold quote raw dataset turns. They stay local,
+# like the sealed run records above; `tools/count_review.py build` rebuilds the packet,
+# and `gold-manifest.json` carries the hashes a later claim is checked against.
+results/review/**/packet.json
+results/review/**/packet.html
+results/review/**/gold.json
+
+# BEAM is used under CC BY-SA 4.0. ShareAlike means its conversations, questions, answers
+# and anything adapted from them may only be published under that same licence, and this
+# repository is MIT, so nothing that quotes BEAM is committed. The downloaded files, anything
+# converted from them and the stores built from them already sit under data/ and stores/.
+# Per-question rows are the remaining leak: they carry `gold`, the benchmark's own answer,
+# and `hypothesis`, a model answer that can quote the conversation. Aggregates, usage files,
+# hashes and conversation ids quote nothing and are committed as usual, with attribution.
+results/**/*beam*.jsonl
+results/**/*beam*/**/*.jsonl
+
+# SQLite writes this when a test points FTS at an in-memory database by name.
+:memory:*

@@ -1,0 +1,111 @@
+{
+  "name": "beam-budget",
+  "recomputed_from": "the ingest checkpoint, not the registration's table",
+  "provider_calls": 0,
+  "pass_1": {
+    "complete": false,
+    "sessions_done": 1571,
+    "batches_done": 112,
+    "extraction_requests": 224,
+    "adjudication_requests": 197,
+    "adjudication_per_extraction": 0.879,
+    "adjudication_per_batch": 1.76,
+    "memories_written": 2550,
+    "duplicates_dropped": 132,
+    "projected_adjudication_at_completion": 450,
+    "caveat": "adjudication per batch rises with store density, so a rate measured before the run finishes is a floor rather than an estimate"
+  },
+  "pass_2_projection": {
+    "extraction_requests": 0,
+    "adjudication_requests": 375,
+    "basis": "pass 1's adjudications less the share that crossed a conversation, which namespace-scoped dedup never adjudicates",
+    "cross_namespace": {
+      "same_namespace": 110,
+      "cross_namespace": 22,
+      "share_crossing": 0.16666666666666666,
+      "measured_on": "the finished store, where every namespace is present"
+    },
+    "this_is_a_ceiling_on_the_saving": true
+  },
+  "zero_yield": {
+    "zero_memory_sessions": 70,
+    "substantive_sessions": 615,
+    "rate": 0.11382113821138211,
+    "train150_reference": 0.156
+  },
+  "plan": {
+    "daily_caps": {
+      "extractor": 500,
+      "answerer": 500,
+      "judge": 1500
+    },
+    "answerer_requests_per_pass": 590,
+    "stages": [
+      {
+        "stage": "3.2 ingest pass 1 (frozen dedup)",
+        "requests": {
+          "extractor": 962
+        },
+        "quota_days": 2
+      },
+      {
+        "stage": "3.2 ingest pass 2 (scoped dedup, replayed)",
+        "requests": {
+          "extractor": 375
+        },
+        "quota_days": 1
+      },
+      {
+        "stage": "3.3 answering pass A + judging",
+        "requests": {
+          "answerer": 590,
+          "judge": 440
+        },
+        "quota_days": 2
+      },
+      {
+        "stage": "noise pass B (judge only)",
+        "requests": {
+          "judge": 440
+        },
+        "quota_days": 1
+      },
+      {
+        "stage": "noise pass C (answer + judge)",
+        "requests": {
+          "answerer": 590,
+          "judge": 440
+        },
+        "quota_days": 2
+      },
+      {
+        "stage": "4.2 candidate on dev, 3 repeats",
+        "requests": {
+          "answerer": 1770,
+          "judge": 1320
+        },
+        "quota_days": 4
+      },
+      {
+        "stage": "4.4 final run, 4 arms, once",
+        "requests": {
+          "answerer": 2893,
+          "judge": 2220
+        },
+        "quota_days": 6
+      }
+    ],
+    "total_requests": {
+      "extractor": 1337,
+      "answerer": 5843,
+      "judge": 4860
+    },
+    "total_quota_days_if_stages_run_one_at_a_time": 18,
+    "floor_if_pools_are_saturated_in_parallel": 12
+  },
+  "observed_limits": {
+    "gemini-3.1-flash-lite": 500,
+    "gemini-3.5-flash-lite": 500,
+    "gemma-4-31b-it": 1500
+  }
+}

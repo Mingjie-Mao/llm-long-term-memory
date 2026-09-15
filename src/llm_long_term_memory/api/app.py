@@ -20,12 +20,15 @@ from fastapi.responses import FileResponse, JSONResponse
 
 from llm_long_term_memory.store import external_session_id
 
+from .budget import BudgetExceeded
 from .identity import (
     AuthenticationConfigurationError,
     AuthenticationRequired,
     NamespaceForbidden,
     Principal,
     auth_enabled,
+    auth_required,
+    check_authentication_configuration,
     principal_from_token,
     resolve_namespace,
 )
@@ -51,6 +54,7 @@ from .models import (
 )
 from .service import (
     EncoderUnavailable,
+    IdempotencyConflict,
     MemoryNotFound,
     MemoryService,
     NamespaceRequired,
@@ -77,6 +81,11 @@ def get_principal(authorization: str | None = Header(default=None)) -> Principal
         return principal_from_token(authorization)
     except AuthenticationRequired as exc:
         raise HTTPException(status_code=401, detail=str(exc)) from None
+    # An unusable authentication configuration — a malformed token map, or
+    # `LLTM_REQUIRE_AUTH` set with no tokens behind it — is deliberately *not* caught
+    # here. It reaches the app's handler as a 503, because the caller's credential is not
+    # the problem and no credential could fix it. 401 would invite a retry that cannot
+    # succeed; 503 takes the instance out of rotation, which is what fail-closed means.
 
 
 def namespace_of(principal: Principal, requested: str | None) -> str:
@@ -101,7 +110,10 @@ async def lifespan(app: FastAPI):
     # One composition root. Building these per request would reload a transformer
     # on every call.
     configure_logging()
-    authenticated_access = auth_enabled()  # Validate before opening the store.
+    # Validate before opening the store, and refuse to start rather than serve open. A
+    # process that comes up and authorises everyone is the failure that looks most like
+    # success, so it is not allowed to come up at all.
+    authenticated_access = check_authentication_configuration()
     # Only close what we opened. An injected service belongs to whoever injected it —
     # closing it here left a shut store behind a live global, so a second startup in
     # the same process (two TestClients, an embedded host) failed on a closed
@@ -134,6 +146,7 @@ async def lifespan(app: FastAPI):
         config=_service.fingerprint(),
         write_path="enabled" if _service.write_available else "disabled (no extractor)",
         authenticated_access=authenticated_access,
+        authentication_required=auth_required(),
         live_answer="enabled" if _service.live_answer_available else "disabled (no key)",
     )
     yield
@@ -194,7 +207,26 @@ def livez() -> dict[str, str]:
 
 @app.get("/healthz", response_model=HealthResponse)
 def healthz(service: MemoryService = Depends(get_service)):
-    """Readiness: return 503 when semantic search cannot serve traffic."""
+    """Readiness: 503 when semantic search cannot serve traffic, or when this deployment
+    requires authentication and cannot enforce it."""
+    try:
+        check_authentication_configuration()
+    except AuthenticationConfigurationError as exc:
+        # Red, not degraded-but-serving. A load balancer taking this instance out of
+        # rotation is the desired outcome: an instance that cannot authenticate must not
+        # receive traffic.
+        return JSONResponse(
+            status_code=503,
+            content=HealthResponse(
+                status="degraded",
+                store=service.store_name,
+                memories=service.store.count(),
+                search_available=service.encoder_available,
+                detail=str(exc),
+                authenticated_access=False,
+                authentication_required=True,
+            ).model_dump(mode="json"),
+        )
     available = service.encoder_available
     body = HealthResponse(
         status="ok" if available else "degraded",
@@ -206,6 +238,7 @@ def healthz(service: MemoryService = Depends(get_service)):
         else service.encoder_error
         or "semantic search unavailable: the `embed` extra is not installed",
         authenticated_access=auth_enabled(),
+        authentication_required=auth_required(),
     )
     if not available:
         return JSONResponse(status_code=503, content=body.model_dump(mode="json"))
@@ -347,6 +380,8 @@ def answer(
         result = service.answer(
             namespace_of(principal, request.user_id), request.query, limit=request.limit
         )
+    except BudgetExceeded as exc:
+        raise HTTPException(status_code=429, detail=str(exc)) from None
     except RuntimeError as exc:
         raise HTTPException(status_code=503, detail=str(exc)) from None
     return AnswerResponse(**result)
@@ -383,6 +418,17 @@ def add_message(
             request.session_id,
             idempotency_key=idempotency_key,
         )
+    except BudgetExceeded as exc:
+        # 429 with no Retry-After in seconds: the wait is until the quota day rolls, which
+        # the message states as a timestamp. A 503 would say the service is unhealthy when
+        # it is serving every other namespace normally.
+        raise HTTPException(status_code=429, detail=str(exc)) from None
+    except IdempotencyConflict as exc:
+        # 409 as well, but the opposite remedy: retrying cannot help, because the key was
+        # claimed for a different body. Kept ahead of WriteInProgress so the caller is told
+        # the actual problem — reusing a key — rather than to keep retrying a key that will
+        # never answer this request.
+        raise HTTPException(status_code=409, detail=str(exc)) from None
     except WriteInProgress as exc:
         # 409, not 503: the request is well formed and the service is healthy. Something
         # else holds the key, and the fix is to retry rather than to change the request.

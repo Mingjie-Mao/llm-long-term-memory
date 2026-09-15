@@ -15,6 +15,14 @@ chosen, rather than a single sort.
 Type floors exist because ranking is not the only consideration: without a reserved
 slice, a flood of high-scoring episodic memories crowds out the profile facts that
 almost every question needs a little of.
+
+**Which field the floors key on is a choice, and the default one barely discriminates.**
+`Memory.type` is assigned by a handful of verb regexes, and on a real store 89.8% of
+rows fall through to the `semantic` default — so a floor on `semantic` reserves a slice
+for almost everything and a floor on `profile` reserves it for 1.4%. `Memory.scope` is
+assigned by the extractor from the sentence and spreads across seven values, so floors
+keyed on it reserve what they read as reserving. `floor_field` selects; the default
+stays `type` so that no committed configuration changes meaning underneath itself.
 """
 
 from __future__ import annotations
@@ -53,6 +61,7 @@ def pack(
     budget: int,
     *,
     type_floors: dict[str, float] | None = None,
+    floor_field: str = "type",
     redundancy_penalty: float = 0.7,
     redundancy_threshold: float = 0.6,
 ) -> PackResult:
@@ -62,6 +71,10 @@ def pack(
     but the values are *predictions* whose error dwarfs the gap between greedy and
     optimal. Solving the wrong objective more precisely would buy nothing.
     """
+    # Validated before the empty-input shortcut, or a misspelled field is accepted
+    # whenever the candidate list happens to be empty and refused only later, under load.
+    if floor_field not in ("type", "scope"):
+        raise ValueError(f"floors key on 'type' or 'scope', not {floor_field!r}")
     result = PackResult(budget=budget, considered=len(memories))
     if not memories or budget <= 0:
         return result
@@ -85,7 +98,8 @@ def pack(
     used = 0
 
     def affordable(memory: Memory) -> bool:
-        from_reserve = min(reserve.get(memory.type, 0), memory.token_count)
+        bucket = getattr(memory, floor_field, None) or ""
+        from_reserve = min(reserve.get(bucket, 0), memory.token_count)
         return memory.token_count - from_reserve <= general
 
     while remaining:
@@ -113,9 +127,10 @@ def pack(
             result.dropped_for_budget += 1
             continue
 
-        from_reserve = min(reserve.get(memory.type, 0), memory.token_count)
+        bucket = getattr(memory, floor_field, None) or ""
+        from_reserve = min(reserve.get(bucket, 0), memory.token_count)
         if from_reserve:
-            reserve[memory.type] -= from_reserve
+            reserve[bucket] -= from_reserve
         general -= memory.token_count - from_reserve
 
         chosen.append(memory)

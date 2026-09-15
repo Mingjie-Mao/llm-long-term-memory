@@ -1,9 +1,10 @@
 """Count probes over *entities*, and a refusal to ask a question the store cannot answer.
 
-The previous count generator produced a question set that inverted a sign. Re-reading the
-paid v4 rows against a corrected gold moved the v4.2 arm difference from +1 to -5, and the
-model turned out to have been right where the probe said it was wrong. Four defects caused
-it, and each one is refused or fixed here rather than patched per probe.
+The previous count generator produced unreliable membership labels. Re-reading the paid
+v4 rows against a provisional model-made overlay moved the v4.2 arm difference from +1 to
+-5; that overlay still awaits human review and does not replace the registered result.
+The rules below reject some known defects. Relation mappings, name splits and membership
+still need semantic review before the generated probes can measure an answerer.
 
 **Intentions are not members of a set of completed acts.** `COUNT` over a relation swept in
 `scope='plan'` and `scope='preference'` rows, so "is looking for thriller recommendations"
@@ -29,7 +30,8 @@ nobody can verify is worse than one question fewer.
 `synthesis-probes.json` is untouched: its bytes are hashed into the held-out split, and the
 split is the only unseen check v4 has. This writes a separate set.
 
-Zero provider calls. Ground truth is SQL plus deterministic text handling, never a label.
+Zero provider calls. Proposed gold is SQL plus deterministic text handling over extracted
+facts; determinism and content fingerprints establish reproducibility, not semantic truth.
 """
 
 from __future__ import annotations
@@ -109,6 +111,61 @@ _MEASUREMENT = re.compile(
 _ARTICLE = re.compile(r"^(the|a|an|some|several|various|my|their|his|her)\s+", re.IGNORECASE)
 _NOISE = re.compile(r"[^\w\s'-]")
 
+# Objects the splitter must not be trusted on. The comment above has always said an
+# uncertain split is refused; until the split audit these were the four shapes where it
+# silently was not, and every one of them put a non-member into a shipped gold answer.
+#
+# Month names are whole words. The first version matched any word that merely began with a
+# month's three letters, so 'decorating', 'Marketing' and 'novels' were dates: none of them
+# reached the shipped refusals, but a rule that calls a hobby a date refuses a sound probe on
+# the next store and records the wrong reason for it.
+_MONTH = (
+    r"(?:jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|june?|july?|aug(?:ust)?|"
+    r"sep(?:t(?:ember)?)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)\b\.?"
+)
+_ORDINAL = r"(?:st|nd|rd|th)?"
+# An object that ends in when it happened is a record, not a list. `'MoMA, Dec 2023'` gave
+# "how many places has the user visited?" a month as a place; `'TechFest, San Francisco,
+# February 2023'` gave "how many events attended?" a city and a month. Refused whole rather
+# than repaired by dropping the date: once an object is known to carry provenance, its
+# other commas are provenance too, and 'San Francisco' is not an event either.
+_DATE_MEMBER = re.compile(
+    rf"^(?:{_MONTH}\s*(?:\d{{1,2}}{_ORDINAL},?\s*)?(?:(?:19|20)\d{{2}})?|(?:19|20)\d{{2}}|"
+    # A decade split off a shared noun: '1970s and 1980s cameras' made '1970s' a possession.
+    rf"(?:19|20)\d0s|"
+    rf"\d{{1,2}}{_ORDINAL}\s+(?:of\s+)?{_MONTH}(?:\s*(?:19|20)\d{{2}})?|"
+    rf"(?:19|20)\d{{2}}-\d{{2}}-\d{{2}})$",
+    re.IGNORECASE,
+)
+# Provenance written into a single object instead of split off by a separator. The rules
+# here used to look only at members a separator produced, so a record that never split
+# passed whole: the second emission of the set counted 'January 15 2023' as a place
+# visited, one city twice through two itinerary lines ('arrive Calgary June 14 2023 11:30
+# am'), one pair of sneakers twice through two receipts ('sneakers on 2023-04-10 for $80
+# from Amazon'), and 'raised $150' as an event attended. A day or a year after a month, an
+# ISO date, a clock time or a price marks a record of an occasion, and two records of one
+# occasion never deduplicate. A leading model year does not: '1995 Honda Civic' names a car.
+_PROVENANCE = re.compile(
+    rf"\b{_MONTH}\s*\d{{1,2}}{_ORDINAL}\b|\b{_MONTH},?\s*(?:19|20)\d{{2}}\b|"
+    rf"\b\d{{1,2}}{_ORDINAL}\s+(?:of\s+)?{_MONTH}|\b(?:19|20)\d{{2}}-\d{{2}}-\d{{2}}\b|"
+    r"\b\d{1,2}:\d{2}\b|\b\d{1,2}\s*(?:am|pm)\b|[$€£¥]\s?\d",
+    re.IGNORECASE,
+)
+# A fragment that is the tail of a sentence, not a noun. `'attended on March 22nd, 2023'`
+# is not two events; it is not even one entity.
+_CLAUSE_MEMBER = re.compile(
+    r"^(?:attended|held|hosted|visited|located|organi[sz]ed|purchased|bought|read|on|in|"
+    r"at|for|since|from|during|to|by)\b",
+    re.IGNORECASE,
+)
+# A work with its author attached. `'Milk and Filth by Carmen Giménez Smith'` is one poetry
+# collection whose title contains "and"; the split made it two books. Any byline means the
+# object names a titled work, so its internal separators belong to the title.
+_BYLINE = re.compile(r"\bby\s+[A-Z]", re.UNICODE)
+# Companions, not members. `'basketball with Tom and Alex'` is one hobby and two people;
+# the split counted Alex as a hobby.
+_COMPANION = re.compile(r"\bwith\s+\S", re.IGNORECASE)
+
 
 class Refusal(Exception):
     """The question cannot be asked honestly. Carries the reason for the record."""
@@ -144,6 +201,42 @@ def entities_of(memory_object: str | None) -> list[str]:
     return parts or [raw]
 
 
+def split_refusal(memory_object: str | None) -> str | None:
+    """Why this object's split cannot be trusted, or None if it can.
+
+    Separate from `entities_of` on purpose. `entities_of` answers "what does this object
+    say", which the split audit needs to report on objects this function rejects; this
+    answers "may a gold answer be built on that", which only the generator needs. Keeping
+    them apart is what lets the audit show a reviewer the bad split it refused.
+    """
+    raw = (memory_object or "").strip()
+    parts = entities_of(raw)
+    if len(parts) < 2:
+        # Nothing was split, so there is no split to distrust — but the object can still be
+        # a clause rather than a thing, or a record of an occasion rather than a name. A bare
+        # year is not refused here: '1984' is a book.
+        if parts and _CLAUSE_MEMBER.match(parts[0]):
+            return "reads as a clause, not a thing"
+        if _PROVENANCE.search(raw):
+            return (
+                "carries its own date, time or price, so it records an occasion rather than "
+                "naming a member"
+            )
+        return None
+    if _BYLINE.search(raw):
+        return "carries a byline, so its separators belong to a title"
+    if _COMPANION.search(raw):
+        return "names companions, which are not members of the asked-about set"
+    for part in parts:
+        if _DATE_MEMBER.match(part):
+            return f"splits into a date ({part!r}), so the object records provenance"
+        if _CLAUSE_MEMBER.match(part):
+            return f"splits into a clause fragment ({part!r}), not an entity"
+    if _PROVENANCE.search(raw):
+        return "carries its own date, time or price, so its separators are provenance too"
+    return None
+
+
 def scope_conflicts(predicates: list[str]) -> list[str]:
     """Predicates whose names would make a completed-act question contradict itself."""
     # Underscores are normalised to spaces first. A predicate arrives here either raw
@@ -154,6 +247,27 @@ def scope_conflicts(predicates: list[str]) -> list[str]:
 
 def _is_intent(text: str) -> bool:
     return bool(_INTENT_PREDICATE.search(text) or _INTENT_PHRASE.search(text))
+
+
+def _event_time(memory: Any) -> datetime | None:
+    """A member's event time, or None where the row cannot supply one.
+
+    `sqlite3.Row` raises rather than returning None for a column the query did not select,
+    so a caller that forgot `event_time` must be told, not silently handed an unbounded
+    count. Both that case and a NULL column come back as None here and become a refusal.
+    """
+    try:
+        raw = memory["event_time"]
+    except (IndexError, KeyError):
+        return None
+    if raw is None:
+        return None
+    if isinstance(raw, datetime):
+        return raw
+    try:
+        return datetime.fromisoformat(str(raw))
+    except ValueError:
+        return None
 
 
 def build_probe(
@@ -171,6 +285,24 @@ def build_probe(
     if not completed:
         raise Refusal("every candidate member records an intention rather than an act")
 
+    if window is not None:
+        # The window used to reach only the question text. It said "count only facts dated
+        # between …" while the answer stayed the count of every member, so any probe built
+        # with one carried a gold answer that contradicted its own question. Filtering here
+        # is what makes the sentence true; a row that cannot be dated is refused, because
+        # counting it would answer a time-bounded question with an undated fact.
+        start, end = window
+        dated = []
+        for memory in completed:
+            when = _event_time(memory)
+            if when is None:
+                raise Refusal(f"member {memory['id']} has no event time to bound")
+            if start <= when <= end:
+                dated.append(memory)
+        completed = dated
+        if not completed:
+            raise Refusal(f"no member falls inside {start:%Y-%m-%d}..{end:%Y-%m-%d}")
+
     predicates = sorted({(m["predicate"] or "").replace("_", " ") for m in completed})
     conflicts = scope_conflicts(predicates)
     if conflicts:
@@ -180,6 +312,12 @@ def build_probe(
 
     by_key: dict[str, dict[str, Any]] = {}
     for memory in completed:
+        # Before the members are counted, not after: a gold answer built on a bad split is
+        # wrong in a way no later check can see, because the count and the entity list
+        # agree with each other. This is the check the module docstring always claimed.
+        untrustworthy = split_refusal(memory["object"])
+        if untrustworthy:
+            raise Refusal(f"member {memory['id']} {untrustworthy}")
         found = entities_of(memory["object"])
         if not found:
             raise Refusal(f"member {memory['id']} carries no recoverable entity")
@@ -219,22 +357,68 @@ def build_probe(
             f"the mapped relation_type is {relation!r}, and scope is one of "
             f"{sorted(COMPLETED_SCOPES)}; entities split from the stored object and "
             f"deduplicated case-insensitively; scope stated in the question as {predicates}"
+            + (
+                # Said in the derivation because it limits what a time-bounded answer can
+                # mean: the engine's event time mostly inherits the session date, so this
+                # counts facts stated in the window, not acts that happened in it.
+                f"; bounded to event_time in [{window[0]:%Y-%m-%d}, {window[1]:%Y-%m-%d}], "
+                f"which inherits the session date rather than a parsed event date"
+                if window is not None
+                else ""
+            )
         ),
     }
 
 
 def _fingerprint(connection: sqlite3.Connection) -> str:
-    parts = [
-        str(connection.execute("SELECT count(*) FROM memories").fetchone()[0]),
-        str(connection.execute("SELECT count(*) FROM turns").fetchone()[0]),
-        str(connection.execute("SELECT count(*) FROM sessions").fetchone()[0]),
-    ]
-    return hashlib.sha256("|".join(parts).encode("utf-8")).hexdigest()
+    """Bind fact and provenance contents, including committed WAL changes.
+
+    Row counts miss edits to an existing fact, scope or source. Hash logical rows from
+    the same read transaction used to generate the probes, in a stable order; neither
+    physical SQLite layout nor insertion order is part of the evidence identity.
+    """
+    digest = hashlib.sha256(b"sqlite-evidence-content-v1\n")
+    for table in ("memories", "turns", "sessions", "evidence", "entities", "memory_entities"):
+        # Names come only from the fixed inventory above, never from a caller.
+        exists = connection.execute(
+            "SELECT 1 FROM sqlite_master WHERE type='table' AND name=?", (table,)
+        ).fetchone()
+        if not exists:
+            if table in {"memories", "turns", "sessions"}:
+                raise ValueError(f"missing evidence table: {table}")
+            digest.update(f"{table}:absent\n".encode())
+            continue
+        columns = [
+            item[0] for item in connection.execute(f'SELECT * FROM "{table}" LIMIT 0').description
+        ]
+        header = json.dumps([table, columns], ensure_ascii=False, separators=(",", ":"))
+        digest.update((header + "\n").encode("utf-8"))
+        order = ", ".join(str(i) for i in range(1, len(columns) + 1))
+        for row in connection.execute(f'SELECT * FROM "{table}" ORDER BY {order}'):
+            values = [
+                value if not isinstance(value, bytes) else {"blob_hex": value.hex()}
+                for value in row
+            ]
+            encoded = json.dumps(values, ensure_ascii=False, allow_nan=False, separators=(",", ":"))
+            digest.update((encoded + "\n").encode("utf-8"))
+    return digest.hexdigest()
 
 
 def generate(store: Path, relation_map: Path, seed: int, limit: int) -> dict[str, Any]:
     connection = sqlite3.connect(f"file:{store}?mode=ro", uri=True)
     connection.row_factory = sqlite3.Row
+    try:
+        # Without a transaction, facts could be read before an edit and fingerprinted
+        # after it. SQLite's read snapshot also includes committed WAL records.
+        connection.execute("BEGIN")
+        return _generate(connection, store, relation_map, seed, limit)
+    finally:
+        connection.close()
+
+
+def _generate(
+    connection: sqlite3.Connection, store: Path, relation_map: Path, seed: int, limit: int
+) -> dict[str, Any]:
     with open(relation_map, encoding="utf-8", newline="") as handle:
         relations = {row["predicate_raw"]: row["relation_type"] for row in csv.DictReader(handle)}
 
@@ -255,14 +439,20 @@ def generate(store: Path, relation_map: Path, seed: int, limit: int) -> dict[str
     refusals: list[dict[str, str]] = []
     for user_id, relation in keys:
         try:
-            probes.append(build_probe(user_id, relation, groups[(user_id, relation)]))
+            probe = build_probe(user_id, relation, groups[(user_id, relation)])
         except Refusal as why:
             refusals.append({"namespace": user_id, "relation": relation, "reason": str(why)})
+        else:
+            # Named for what it asks, not for where it landed in this emission. Ids used to be
+            # positions, so every refusal a rule change added renumbered the probes after it —
+            # one regeneration changed the id of 49 of the 55 probes it kept — and a review
+            # decision recorded against an id would attach to a different question the next
+            # time the set was built. Namespace and relation are the probe's identity already.
+            probe["probe_id"] = f"entity_count_{user_id}_{relation}"
+            probe["relation"] = relation
+            probes.append(probe)
         if len(probes) >= limit:
             break
-
-    for index, probe in enumerate(probes):
-        probe["probe_id"] = f"entity_count_{index:04d}"
 
     return {
         "schema_version": 1,
@@ -276,10 +466,27 @@ def generate(store: Path, relation_map: Path, seed: int, limit: int) -> dict[str
             "members and one row as one member. That file is unchanged: its bytes are "
             "hashed into the held-out split."
         ),
+        "split_rules": (
+            "An object whose split yields a date, a clause fragment, a byline or a "
+            "companion is refused whole rather than repaired, because once an object is "
+            "known to carry provenance its other separators are provenance too. The first "
+            "emission of this file predated the rule and shipped four gold answers that "
+            "counted a month as a place visited or a city as an event attended; "
+            "tools/audit_entity_probe_splits.py found them and tests/"
+            "test_entity_count_probes.py pins each one. The second emission checked "
+            "provenance only on members a separator produced, so a record that never split "
+            "passed whole and three more gold answers counted a vet visit's date as a place, "
+            "one city and one pair of sneakers twice, and a sum raised as an event; an "
+            "object carrying a dated day or month, an ISO date, a clock time or a price is "
+            "now refused whether or not it splits. Splits that survive the rules are "
+            "still only machine-checked: 'Daisy Jones and The Six' is indistinguishable "
+            "from two real titles, and no rule here decides it."
+        ),
         "provider_calls": 0,
         "seed": seed,
         "limit": limit,
         "store": store.name,
+        "store_fingerprint_kind": "sqlite-evidence-content-v1",
         "store_fingerprint": _fingerprint(connection),
         "relation_map_sha256": hashlib.sha256(relation_map.read_bytes()).hexdigest(),
         "completed_scopes": sorted(COMPLETED_SCOPES),
@@ -321,7 +528,11 @@ def main() -> int:
     print(f"refused   : {len(payload['refused'])}")
     for reason, count in payload["refusal_reasons"].items():
         print(f"  {count:4d}  {reason}")
-    print(f"\nwrote {args.out.relative_to(REPO)}")
+    try:
+        shown = args.out.resolve().relative_to(REPO)
+    except ValueError:
+        shown = args.out
+    print(f"\nwrote {shown}")
     return 0
 
 

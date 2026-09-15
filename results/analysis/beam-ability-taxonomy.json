@@ -1,0 +1,142 @@
+{
+  "name": "beam-ability-taxonomy",
+  "half": "dev",
+  "source": "https://huggingface.co/datasets/Mohammadta/BEAM",
+  "licence": "CC BY-SA 4.0",
+  "provider_calls": 0,
+  "question": "does this ability's rubric grade what memory kept, or how the reply reads?",
+  "screen": "step[- ]by[- ]step|sequential step|breaks? down|concise|brief|bullet|numbered|\\bformat\\b|\\btone\\b|\\btable\\b|heading|logical steps|framework|presentation style|structure|paragraph|length|\\blist form",
+  "method": "loose keyword screen over every rubric item, then every match read by hand",
+  "quotes_beam": false,
+  "abilities": {
+    "abstention": {
+      "questions": 44,
+      "rubric_items": 44,
+      "items_per_question": {
+        "mean": 1,
+        "median": 1.0,
+        "max": 1
+      },
+      "screened": 3,
+      "manner_after_reading": 0,
+      "manner_item_ids": []
+    },
+    "contradiction_resolution": {
+      "questions": 44,
+      "rubric_items": 176,
+      "items_per_question": {
+        "mean": 4,
+        "median": 4.0,
+        "max": 4
+      },
+      "screened": 0,
+      "manner_after_reading": 0,
+      "manner_item_ids": []
+    },
+    "event_ordering": {
+      "questions": 44,
+      "rubric_items": 287,
+      "items_per_question": {
+        "mean": 6.52,
+        "median": 5.0,
+        "max": 11
+      },
+      "screened": 1,
+      "manner_after_reading": 0,
+      "manner_item_ids": []
+    },
+    "information_extraction": {
+      "questions": 44,
+      "rubric_items": 76,
+      "items_per_question": {
+        "mean": 1.73,
+        "median": 1.0,
+        "max": 8
+      },
+      "screened": 0,
+      "manner_after_reading": 0,
+      "manner_item_ids": []
+    },
+    "instruction_following": {
+      "questions": 44,
+      "rubric_items": 68,
+      "items_per_question": {
+        "mean": 1.55,
+        "median": 1.0,
+        "max": 6
+      },
+      "screened": 4,
+      "manner_after_reading": 4,
+      "manner_item_ids": [
+        "beam-100K-10-instruction_following-0#1",
+        "beam-100K-5-instruction_following-0#1",
+        "beam-100K-6-instruction_following-0#1",
+        "beam-500K-8-instruction_following-0#1"
+      ]
+    },
+    "knowledge_update": {
+      "questions": 44,
+      "rubric_items": 46,
+      "items_per_question": {
+        "mean": 1.05,
+        "median": 1.0,
+        "max": 2
+      },
+      "screened": 0,
+      "manner_after_reading": 0,
+      "manner_item_ids": []
+    },
+    "multi_session_reasoning": {
+      "questions": 44,
+      "rubric_items": 94,
+      "items_per_question": {
+        "mean": 2.14,
+        "median": 2.0,
+        "max": 5
+      },
+      "screened": 0,
+      "manner_after_reading": 0,
+      "manner_item_ids": []
+    },
+    "preference_following": {
+      "questions": 44,
+      "rubric_items": 73,
+      "items_per_question": {
+        "mean": 1.66,
+        "median": 2.0,
+        "max": 4
+      },
+      "screened": 5,
+      "manner_after_reading": 3,
+      "manner_item_ids": [
+        "beam-100K-12-preference_following-0#1",
+        "beam-100K-5-preference_following-0#1",
+        "beam-100K-5-preference_following-1#1"
+      ]
+    },
+    "summarization": {
+      "questions": 44,
+      "rubric_items": 234,
+      "items_per_question": {
+        "mean": 5.32,
+        "median": 5.0,
+        "max": 12
+      },
+      "screened": 11,
+      "manner_after_reading": 0,
+      "manner_item_ids": []
+    },
+    "temporal_reasoning": {
+      "questions": 44,
+      "rubric_items": 67,
+      "items_per_question": {
+        "mean": 1.52,
+        "median": 1.5,
+        "max": 3
+      },
+      "screened": 0,
+      "manner_after_reading": 0,
+      "manner_item_ids": []
+    }
+  }
+}

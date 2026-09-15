@@ -69,12 +69,16 @@
   <section class="demo" aria-labelledby="try-title">
     <div class="demo-head">
       <h2 id="try-title" data-zh="自己试" data-en="Try it yourself">Try it yourself</h2>
-      <p class="lede" data-zh="说几句关于你自己的话，改变其中一件，再问回来。" data-en="State a few things about yourself, change one of them, then ask.">State a few things about yourself, change one of them, then ask.</p>
+      <p class="lede" data-zh="说几句关于你自己的话，改变其中一件，再问回来。然后开一段新对话再问：之前的聊天不会带过去，答案只能来自记忆。" data-en="State a few things about yourself, change one of them, then ask. Then start a new conversation and ask again: the earlier chat stays behind, so the answer can only come from memory.">State a few things about yourself, change one of them, then ask. Then start a new conversation and ask again: the earlier chat stays behind, so the answer can only come from memory.</p>
     </div>
 
     <div class="split">
       <div class="pane">
-        <h3 class="pane-title" data-zh="你的对话" data-en="Your conversation">Your conversation</h3>
+        <div class="pane-head">
+          <h3 class="pane-title" id="tryConversationTitle">Conversation 1</h3>
+          <button class="ghost small" id="tryNewConversation" type="button" disabled data-requires-live
+                  data-zh="新对话" data-en="New conversation">New conversation</button>
+        </div>
         <ol class="chat" id="tryChat">
           <li class="empty" data-zh="还没有内容。" data-en="Nothing yet.">Nothing yet.</li>
         </ol>

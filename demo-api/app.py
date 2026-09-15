@@ -311,6 +311,16 @@ class FactIn(BaseModel):
     scope: str | None = Field(default="profile", max_length=80)
     source_role: Literal["user", "assistant"] = "user"
     event_time: datetime | None = Field(default=None, description="ISO date; defaults to now")
+    session_id: str | None = Field(
+        default=None,
+        min_length=1,
+        max_length=200,
+        description=(
+            "The conversation this fact was stated in. Every conversation in a namespace "
+            "shares one memory, so a later conversation retrieves what an earlier one said; "
+            "the id is what lets a reply say which conversation that was."
+        ),
+    )
     replaces_previous: bool = Field(
         default=False,
         description=(
@@ -447,6 +457,9 @@ def health(p: Playground = Depends(engine)) -> dict[str, Any]:
                 "timeline",
                 "raw_search",
                 "hard_delete",
+                # Facts carry the conversation they were stated in. The page shows its
+                # New conversation button only when this is present.
+                "conversations",
             ],
             "session_ttl_minutes": int(SESSION_TTL.total_seconds() // 60),
             "single_valued_predicates": sorted(SINGLE_VALUED_PREDICATES),
@@ -500,6 +513,8 @@ def _serialise(m: Memory) -> dict[str, Any]:
         "replaces_previous": m.replaces_previous,
         "single_valued_key": bool(m.predicate)
         and normalize_predicate(m.predicate) in SINGLE_VALUED_PREDICATES,
+        # The conversation the fact was stated in, as the client named it.
+        "session_id": external_session_id(m.source_session_id),
     }
 
 
@@ -517,6 +532,25 @@ def add_fact(
     if sum(1 for _ in p.store.iter_all(ns)) >= MAX_FACTS_PER_SESSION:
         raise HTTPException(429, f"a demo session holds at most {MAX_FACTS_PER_SESSION} facts")
 
+    source_session = None
+    if fact.session_id is not None:
+        try:
+            source_session = scoped_session_id(ns, fact.session_id)
+        except ValueError as exc:
+            raise HTTPException(422, str(exc)) from exc
+        # The memory row references its session, so a conversation exists from its first
+        # fact. Created only when absent, so it keeps the start of whatever opened it.
+        if p.store.get_session(source_session) is None:
+            p.store.add_session(
+                Session(
+                    id=source_session,
+                    user_id=ns,
+                    started_at=datetime.now(),
+                    source="demo",
+                    turns=[],
+                )
+            )
+
     when = fact.event_time or datetime.now()
     if when.tzinfo is not None:
         when = when.astimezone().replace(tzinfo=None)
@@ -532,6 +566,7 @@ def add_fact(
         predicate=predicate,
         object=fact.object,
         source_role=fact.source_role,
+        source_session_id=source_session,
         scope=fact.scope,
         event_time=when,
         valid_from=when,
@@ -566,7 +601,10 @@ def add_turn(
     from. Storing is free; turning it into facts is the extractor's job and is not
     part of this half."""
     external = turn.session_id or "demo-chat"
-    sid = scoped_session_id(ns, external)
+    try:
+        sid = scoped_session_id(ns, external)
+    except ValueError as exc:
+        raise HTTPException(422, str(exc)) from exc
     existing = p.store.get_session(sid)
     idx = len(existing.turns) if existing else 0
     total_turns = p.store.count_turns(ns)

@@ -76,6 +76,18 @@ TEMPORAL_NOTE = (
 )
 
 
+def _as_of(question_date: str) -> datetime | None:
+    """The question's date, or None when it cannot be read.
+
+    None falls back to the wall clock, which is what every caller got before. A
+    guessed date would be worse than no date: it would make recency confidently wrong
+    rather than visibly absent.
+    """
+    from llm_long_term_memory.ingest.extract import _parse_date
+
+    return _parse_date(question_date) if question_date else None
+
+
 def _external_session_ids(values) -> set[str]:
     return {external_session_id(value) for value in values if value}
 
@@ -392,7 +404,12 @@ class MemoryRunner:
         return self._retrieve_with_trace(query, question, namespace)[0]
 
     def _retrieve_with_trace(
-        self, query: np.ndarray, question: str, namespace: str, limit: int | None = None
+        self,
+        query: np.ndarray,
+        question: str,
+        namespace: str,
+        limit: int | None = None,
+        as_of: datetime | None = None,
     ):
         ranked, trace = self.retriever.retrieve_with_trace(
             query,
@@ -400,6 +417,7 @@ class MemoryRunner:
             namespace,
             temporal=self.temporal,
             limit=limit or self.top_k,
+            as_of=as_of,
         )
         if self.scanner is None:
             return ranked, trace
@@ -419,7 +437,7 @@ class MemoryRunner:
     def retrieve(self, instance: Instance) -> list[RetrievedMemory]:
         """Retrieve exactly the candidates used by normal answering."""
         query = self.encoder.encode_one(instance.question)
-        return self._retrieve(query, instance.question, instance.question_id)
+        return self._retrieve(query, instance.question, instance.store_namespace)
 
     def _pack(self, candidates: list[Memory], retrieved: dict[str, RetrievedMemory], query: str):
         """Select under a token budget instead of truncating at top_k.
@@ -464,14 +482,22 @@ class MemoryRunner:
 
             apply_decay(
                 self.store,
-                instance.question_id,
+                instance.store_namespace,
                 now=now,
                 halflife_days=self.decay_halflife_days,
             )
         retrieval_started = perf_counter()
         query_vector = self.encoder.encode_one(instance.question)
         retrieved, trace = self._retrieve_with_trace(
-            query_vector, instance.question, instance.question_id, limit=limit
+            query_vector,
+            instance.question,
+            instance.store_namespace,
+            limit=limit,
+            # The question's own date, not the wall clock. On this benchmark the
+            # difference is total: measured against today, 0 of 2,550 BEAM memories
+            # score above 0.01 at the shipped half-life; measured against the corpus
+            # itself, 182 do.
+            as_of=_as_of(instance.question_date),
         )
         retrieval_latency_ms = (perf_counter() - retrieval_started) * 1000
         selected = [hit.memory for hit in retrieved]
@@ -483,7 +509,7 @@ class MemoryRunner:
             # decides which conversations they belong to and hands over each one
             # whole, in the order it happened.
             by_session: dict[str, list[Memory]] = {}
-            for memory in self.store.iter_all(instance.question_id):
+            for memory in self.store.iter_all(instance.store_namespace):
                 if memory.source_session_id:
                     by_session.setdefault(memory.source_session_id, []).append(memory)
             forced_sessions = None
@@ -634,6 +660,11 @@ class MemoryRunner:
                 "all_source_sessions_recalled": (
                     _session_coverage(evidence, selected_sessions) == 1.0 if evidence else None
                 ),
+                # Ranked before the context budget chose among them. Without this the
+                # rows cannot separate "retrieval never found the fact" from "retrieval
+                # found it and composition dropped it", and that distinction is
+                # unrecoverable after the run — the two call for opposite fixes.
+                "ranked_memory_ids": [hit.memory.id for hit in retrieved],
                 "candidates_considered": len(trace.candidate_ids),
                 "reranked": trace.reranked,
                 "evidence_hydration": self.evidence_hydration,
@@ -730,20 +761,32 @@ Today's date is {date}.
 Question: {question}
 """
 
+    def _readable_fallback_answer(self, text: str) -> str:
+        """Apply the existing object/fence guard at every fallback return boundary.
+
+        This detects output shape, not factual correctness. Keep the diagnostic
+        separate from the final text so a successful computation is never discarded
+        merely because the model's earlier answer field was structured.
+        """
+        text = text.strip()
+        if text.startswith(("{", "```")):
+            self._answer_was_raw_structure = True
+            return "I do not know."
+        return text or "I do not know."
+
     def _answer_with_fallback(self, instance: Instance, context: str, selected: list[Memory]):
         """One LLM call when memory suffices, two when it does not.
 
-        The first call returns a verdict rather than prose. Only `need_source` pays
-        for raw evidence and a second call — which is what keeps this from becoming
-        naive RAG with extra steps.
+        Both `need_source` and `no_evidence` can search the raw archive. A second
+        model call is made only when that search recovers evidence.
         """
         first = self._complete(instance, context, structured=True)
         try:
             verdict = self.verdict_schema.model_validate_json(first.text)
         except ValueError:
-            # A model that ignored the schema still produced an answer; treat the
-            # raw text as one rather than failing the question.
-            return first, first.text.strip(), None, None
+            # Preserve prose when the model ignored the schema, but never return
+            # an object or fenced payload solely because validation failed.
+            return first, self._readable_fallback_answer(first.text), None, None
 
         if verdict.status == "answer" or self.fallback is None:
             text = verdict.answer.strip() or first.text.strip()
@@ -764,8 +807,7 @@ Question: {question}
             # them had been scored correct the run before — prose like "The user taking
             # painting classes came first."
             self._answer_was_raw_structure = text.lstrip().startswith(("{", "```"))
-            if final.lstrip().startswith(("{", "```")):
-                final = "I do not know."
+            final = self._readable_fallback_answer(final)
             # Measured on the *final* answer, not on the intermediate. The first version
             # of this flag asked "was `answer` empty and the raw text JSON", which is a
             # different question: `compute` then replaced that text with "5 days" and the
@@ -776,14 +818,14 @@ Question: {question}
             return first, final, verdict, None
 
         evidence = self.fallback.recover(
-            instance.question_id,
+            instance.store_namespace,
             verdict.source_query or instance.question,
             selected if verdict.status == "need_source" else [],
         )
         if not evidence.used:
             # Nothing in the archive either. Abstention is correct here, and is a
             # measured strength worth protecting.
-            return first, (verdict.answer or "I do not know.").strip(), verdict, evidence
+            return first, self._readable_fallback_answer(verdict.answer), verdict, evidence
 
         rendered_evidence = evidence.render(max_chars=self.raw_fallback_max_chars)
         if self.answer_policy == "reasoned_v3":
@@ -818,7 +860,7 @@ Question: {question}
             max_output_tokens=self.max_output_tokens,
             est_input_tokens=int(len(prompt) / self.chars_per_token),
         )
-        return second, second.text.strip(), verdict, evidence
+        return second, self._readable_fallback_answer(second.text), verdict, evidence
 
     def _apply_computation(self, verdict, text: str) -> str:
         """Let the code overwrite the model's arithmetic, where there is arithmetic.

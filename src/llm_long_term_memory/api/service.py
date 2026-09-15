@@ -18,21 +18,24 @@ question id and cross-namespace leakage would have silently inflated every resul
 
 from __future__ import annotations
 
+import hashlib
 import json
 import uuid
-from dataclasses import dataclass
-from datetime import datetime
+from dataclasses import asdict, dataclass, is_dataclass
+from datetime import UTC, datetime, timedelta
 from functools import wraps
 from pathlib import Path
 from threading import RLock
 from time import perf_counter
 from typing import Any
 
+from llm_long_term_memory.api.budget import AccountBudgets, BudgetExceeded
 from llm_long_term_memory.config import ExperimentConfig, Settings
 from llm_long_term_memory.evaluation.judge import JUDGE_PROMPT_VERSION
 from llm_long_term_memory.evaluation.runners.base import ANSWER_PROMPT_VERSION
 from llm_long_term_memory.retrieve import EvidenceHydrator, HybridRetriever
 from llm_long_term_memory.store import (
+    ErasureJournal,
     Memory,
     NumpyFlatIndex,
     Session,
@@ -47,10 +50,41 @@ class WriteInProgress(RuntimeError):
     """Another call already claimed this idempotency key and has not finished."""
 
 
+class IdempotencyConflict(RuntimeError):
+    """This idempotency key was claimed for a different request body."""
+
+
+# How long a claimed key may stay pending before a retry may take it over. A crash cannot
+# run the failure path, so some window is required or a key held by a dead process is
+# unusable forever. Set well above any write this service performs: taking over a claim
+# that is still running would write twice, and a caller waiting is the cheaper mistake.
+PENDING_WRITE_TAKEOVER = timedelta(minutes=15)
+
+
+def _request_fingerprint(role: str, content: str, session_id: str | None) -> str:
+    """What the key was claimed for.
+
+    Everything that changes what gets written, and nothing that does not: the same message
+    retried into the same session is the same request whatever its transport details. A
+    hash rather than the body itself, because this is stored and the body is user content.
+    """
+    payload = json.dumps([role, content, session_id], ensure_ascii=False, sort_keys=True)
+    return hashlib.sha256(payload.encode("utf-8")).hexdigest()
+
+
 def _jsonable(value):
-    """Memories are dataclasses; the stored replay has to round-trip through JSON."""
+    """Memories are dataclasses; the stored replay has to round-trip through JSON.
+
+    `Memory` is a slots dataclass, so it has no `__dict__`. Reading one through `vars()`
+    fell through to `str()`, and the replay of a successful write came back as a list of
+    reprs — which the response model then tried to read attributes off, answering the
+    retry with a 500. The retry is the one request idempotency exists to make safe, so
+    the field order here matters: dataclasses first, `__dict__` only after.
+    """
     if isinstance(value, datetime):
         return value.isoformat()
+    if is_dataclass(value) and not isinstance(value, type):
+        return asdict(value)
     if hasattr(value, "__dict__"):
         return {k: v for k, v in vars(value).items() if not k.startswith("_")}
     return str(value)
@@ -204,6 +238,8 @@ class MemoryService:
 
         self.store = SQLiteMemoryStore(self.settings.store_dir / f"{store_name}.db")
         self.store.initialize()
+        self._budgets: AccountBudgets | None = None
+        self._erasures: ErasureJournal | None = None
 
         # Injected in tests. Left lazy in production so that importing the app does
         # not pull torch.
@@ -524,7 +560,17 @@ class MemoryService:
         # then reporting a count computed under a different k is how the inspector
         # ended up explaining a memory set the answerer never saw.
         runner = self.answerer
-        result = runner.answer(instance, limit=limit)
+        model = getattr(runner, "model", self.config.models.answerer)
+        self.budgets.check(user_id, model, "answer")
+        records = getattr(getattr(getattr(runner, "client", None), "usage", None), "records", None)
+        records = records if isinstance(records, list) else None
+        attempt_start = len(records) if records is not None else None
+        try:
+            result = runner.answer(instance, limit=limit)
+        except Exception:
+            self._charge_answer(user_id, model, records, attempt_start, None)
+            raise
+        self._charge_answer(user_id, model, records, attempt_start, result)
 
         notes = result.notes
         # The memories the answerer actually received, returned so the inspector can
@@ -553,6 +599,37 @@ class MemoryService:
             "latency_ms": round((perf_counter() - started) * 1000, 1),
             "answerer_calls": 2 if notes.get("fallback_level", "none") != "none" else 1,
         }
+
+    def _charge_answer(self, user_id, model, records, started, result) -> None:
+        """Charge all answer attempts, including retries and raw-source recovery.
+
+        The live runner shares its client's UsageTracker. An empty slice means the
+        request stopped before contacting the provider, so it costs nothing. Injected
+        runners without a tracker use the answer's reported tokens as a fallback,
+        matching the conservative failed-call accounting on the write path.
+        """
+        if records is not None:
+            for attempt in records[started:]:
+                self.budgets.record(
+                    user_id,
+                    attempt.model or model,
+                    attempt.role or "answer",
+                    input_tokens=attempt.input_tokens,
+                    output_tokens=attempt.output_tokens,
+                    ok=attempt.ok,
+                )
+            return
+        self.budgets.record(
+            user_id,
+            model,
+            "answer",
+            input_tokens=getattr(result, "prompt_tokens", 0),
+            output_tokens=getattr(result, "output_tokens", 0),
+            calls=2
+            if result is not None and result.notes.get("fallback_level", "none") != "none"
+            else 1,
+            ok=result is not None,
+        )
 
     @_synchronised
     def raw_search(self, user_id: str, query: str, limit: int = 3) -> list[Any]:
@@ -629,6 +706,36 @@ class MemoryService:
 
     # ----------------------------------------------------------------- writes
 
+    @property
+    def erasures(self) -> ErasureJournal:
+        """The erasure journal for this service's store, beside it rather than in it.
+
+        Bound to the current store for the same reason `budgets` is: a service whose store
+        is swapped would otherwise keep writing tombstones next to the old one, where no
+        restore of the new one will ever look for them.
+        """
+        journal = ErasureJournal.beside(self.store.path)
+        if self._erasures is None or self._erasures.path != journal.path:
+            self._erasures = journal
+        return self._erasures
+
+    @property
+    def budgets(self) -> AccountBudgets:
+        """Per-account spend, bound to whichever store this service currently holds.
+
+        Distinct from the process-wide provider limiter in `llm/rate_limiter.py`: that one
+        stops the deployment exhausting the provider, this one stops one namespace
+        exhausting the deployment.
+
+        Rebuilt when the store is swapped rather than captured in `__init__`. A service
+        whose store is replaced after construction — which the harness does, and which a
+        restore would do — otherwise keeps a ledger pointed at the old connection, and the
+        first budget check after the swap reads a closed database.
+        """
+        if self._budgets is None or self._budgets.store is not self.store:
+            self._budgets = AccountBudgets(self.store)
+        return self._budgets
+
     @_synchronised
     def add_message(
         self,
@@ -658,20 +765,133 @@ class MemoryService:
             idempotency_key = idempotency_key.strip()
             if not idempotency_key or len(idempotency_key) > 200:
                 raise ValueError("idempotency_key must be 1-200 characters")
-            remembered = self.store.remembered_write(user_id, idempotency_key)
-            if remembered is not None:
-                replay = json.loads(remembered)
-                if replay.get("pending"):
-                    raise WriteInProgress("a write with this idempotency_key is still in progress")
-                replay["idempotent_replay"] = True
+        # Everything that can refuse the request without calling anyone is settled before a
+        # key is claimed or anything is charged. A session id scoped to another user (the
+        # caller's 422) and a deployment with no extractor (a 503) used to be charged to the
+        # account as a failed provider call and to leave the key 'failed', as though an
+        # attempt had run; a client retrying its own 422 spent its daily budget on requests
+        # that never left the process.
+        if session_id is not None:
+            scoped_session_id(user_id, session_id)
+        self._require_extractor()
+        if idempotency_key is not None:
+            replay = self._claim_write_key(
+                user_id, idempotency_key, _request_fingerprint(role, content, session_id)
+            )
+            if replay is not None:
                 return replay
+        # After the claim, so a replay of a finished write is served free even to an account
+        # that is now over budget; before any provider call, so an account over budget is
+        # stopped here rather than by a provider 429 that every other tenant would also see.
+        try:
+            self.budgets.check(user_id, self.config.models.extractor, "extract")
+        except BudgetExceeded as refusal:
+            # The claim is released, not left pending. Nothing ran, so nothing is charged —
+            # but a claim held past its 429 answered the caller's retry, once the cap was
+            # lifted or the day rolled over, with "still in progress" for the whole
+            # takeover window.
+            if idempotency_key is not None:
+                self.store.record_write_failure(
+                    user_id, idempotency_key, f"{type(refusal).__name__}: {refusal}"
+                )
+            raise
+        started = self._provider_attempts()
+        try:
+            reply = self._add_message(user_id, role, content, session_id)
+        except Exception as failure:
+            # Charged for what reached the provider; see `_charge_write`. A budget that
+            # excused failures is one a retry loop walks straight through, and a retry loop
+            # is what runs when things are already going wrong.
+            self._charge_write(user_id, started, None)
+            # The claim must not outlive the attempt. Before this, a provider error left
+            # the key 'pending' for good: every later retry read the placeholder and was
+            # told a write was still in progress, so the one thing the key was supposed to
+            # make safe — retrying a failed write — was the thing it made impossible.
+            if idempotency_key is not None:
+                self.store.record_write_failure(
+                    user_id, idempotency_key, f"{type(failure).__name__}: {failure}"
+                )
+            raise
+        self._charge_write(user_id, started, reply)
+        if idempotency_key is not None:
+            self.store.record_write_reply(
+                user_id, idempotency_key, json.dumps(reply, default=_jsonable)
+            )
+        return reply
+
+    def _claim_write_key(self, user_id: str, key: str, fingerprint: str) -> dict[str, Any] | None:
+        """Claim the key, or return the reply a previous identical write produced.
+
+        Returns None when the caller should go ahead and write. Raises when the key
+        cannot be claimed: either another attempt holds it, or it was claimed for a
+        different request.
+        """
+        existing = self.store.write_key(user_id, key)
+        if existing is None:
             if not self.store.remember_write(
-                user_id, idempotency_key, json.dumps({"pending": True})
+                user_id, key, json.dumps({"pending": True}), fingerprint
             ):
                 # Another call claimed it between the read and the write. Its reply may
                 # still be in flight, so the caller retries rather than being handed a
                 # half-written answer.
                 raise WriteInProgress("a write with this idempotency_key is already in progress")
+            return None
+
+        # A key claimed for one request may not answer a different one. Replaying the
+        # first reply would tell the caller their second message was stored when it never
+        # was, which is a silent data loss the caller cannot detect. NULL fingerprints
+        # come from rows written before the column existed and are not second-guessed.
+        recorded = existing.get("fingerprint")
+        if recorded is not None and recorded != fingerprint:
+            raise IdempotencyConflict(
+                "this idempotency_key was used for a different request; "
+                "use a new key for a new message"
+            )
+
+        state = existing.get("state") or "done"
+        if state == "done":
+            replay = json.loads(existing["response"])
+            replay["idempotent_replay"] = True
+            return replay
+        if state == "pending" and not self._claim_is_stale(existing):
+            raise WriteInProgress("a write with this idempotency_key is still in progress")
+        # 'failed', or a 'pending' claim old enough that the process holding it is gone.
+        # A compare-and-swap on the row as it was read, so two retries racing on one orphan
+        # cannot both take it over.
+        if not self.store.take_over_write(
+            user_id,
+            key,
+            fingerprint,
+            expected_state=state,
+            expected_claimed_at=existing.get("claimed_at"),
+        ):
+            raise WriteInProgress("another call took over this idempotency_key first")
+        return None
+
+    def _claim_is_stale(self, row: dict[str, Any]) -> bool:
+        """Whether a pending claim is an orphan rather than a live request.
+
+        A crash cannot run the failure path, so without a takeover window a key held by a
+        dead process stays unusable forever. The window is deliberately longer than any
+        write should take: taking over a claim that is actually still running would write
+        twice, which is worse than making the caller wait.
+        """
+        claimed_at = row.get("claimed_at")
+        if not claimed_at:
+            # Claimed before this column existed. Treat as stale: such a row can only have
+            # been left behind by the version that had no failure path at all.
+            return True
+        try:
+            claimed = datetime.fromisoformat(claimed_at)
+        except ValueError:
+            return True
+        if claimed.tzinfo is None:
+            # Claims are stamped in UTC. A naive stamp predates that, and was local time.
+            claimed = claimed.astimezone()
+        return datetime.now(UTC) - claimed > PENDING_WRITE_TAKEOVER
+
+    def _require_extractor(self) -> None:
+        """Build the live extractor on first use, or say why the write path is unavailable."""
         if self.extractor is None:
             if not self.settings.has_api_key:
                 raise RuntimeError(
@@ -679,6 +899,107 @@ class MemoryService:
                 )
             self.extractor = self._build_live_extractor()
 
+    def _provider_attempts(self) -> int | None:
+        """How many provider attempts the extractor has on record, or None if it keeps none.
+
+        The live extractor shares the provider client's `UsageTracker`, which records every
+        attempt — retries and failures included — as it happens. Writes are serialised per
+        process, so the records after this mark belong to the write about to run.
+        """
+        records = getattr(getattr(self.extractor, "usage", None), "records", None)
+        return len(records) if isinstance(records, list) else None
+
+    def _charge_write(
+        self, user_id: str, started: int | None, reply: dict[str, Any] | None
+    ) -> None:
+        """Put one write's provider spend on the account's ledger; `reply` is None on failure.
+
+        Where the extractor keeps per-attempt records, the charge is exactly the attempts
+        made during this write, grouped by model and role, with their tokens and failures.
+        A failed write used to be charged one call and no tokens whatever it had sent, while
+        the provider client retries rate limits and dropped connections inside a single
+        write: a retry storm, the thing a budget exists to stop, went through at a fraction
+        of its cost. Records with nothing after the mark mean nothing reached the provider,
+        and nothing is charged.
+        """
+        model = self.config.models.extractor
+        if started is not None:
+            groups: dict[tuple[str, str], list[Any]] = {}
+            for attempt in self.extractor.usage.records[started:]:
+                key = (attempt.model or model, attempt.role or "extract")
+                groups.setdefault(key, []).append(attempt)
+            for (attempt_model, role), attempts in groups.items():
+                self.budgets.record(
+                    user_id,
+                    attempt_model,
+                    role,
+                    calls=len(attempts),
+                    failed_calls=sum(1 for attempt in attempts if not attempt.ok),
+                    input_tokens=sum(attempt.input_tokens for attempt in attempts),
+                    output_tokens=sum(attempt.output_tokens for attempt in attempts),
+                )
+            if groups or reply is None:
+                return
+        elif reply is None:
+            # An extractor that keeps no records cannot say what it sent. One failed call is
+            # charged rather than none: under-charging is the direction a budget must not err.
+            self.budgets.record(user_id, model, "extract", ok=False)
+            return
+
+        usage = reply.get("usage") or {}
+        # From `by_role`, not from `total_tokens`: the ledger keeps input and output apart
+        # because they are priced apart. `RoleStats` carries no model, so the configured one
+        # stands in; it is the model this path calls.
+        charged = 0
+        for role_stats in (usage.get("by_role") or {}).values():
+            calls = int(role_stats.get("calls") or 0)
+            self.budgets.record(
+                user_id,
+                model,
+                role_stats.get("role") or "extract",
+                input_tokens=int(role_stats.get("input_tokens") or 0),
+                output_tokens=int(role_stats.get("output_tokens") or 0),
+                calls=calls,
+                # The failures, not every call of a role that had one: `failed_calls` is how
+                # an operator tells a retry storm from a single retry.
+                failed_calls=int(role_stats.get("failures") or 0),
+            )
+            charged += calls
+        if not charged:
+            # A write that extracted nothing still went through the service. Recording a
+            # zero-token call keeps "this namespace made a request" true in the ledger;
+            # dropping it would let a caller that always extracts nothing run uncounted.
+            self.budgets.record(user_id, model, "extract")
+
+    def _resolution_snapshot(
+        self, memories: list[Memory]
+    ) -> list[tuple[str, str, str | None, datetime | None, datetime | None]]:
+        """The rows resolution may edit, as they stand now.
+
+        The resolver rebuilds whole `(user_id, subject, predicate)` keys, so the rows it
+        can touch are exactly the ones already stored under the keys this batch carries.
+        Reading them before the write is what makes a rollback possible at all.
+        """
+        keys = {
+            (m.user_id, m.subject, m.predicate)
+            for m in memories
+            if m.user_id and m.subject and m.predicate
+        }
+        return [
+            (row.id, row.status, row.superseded_by, row.valid_from, row.valid_to)
+            for user_id, subject, predicate in sorted(keys)
+            for row in self.store.find_by_predicate(
+                user_id, subject, predicate, include_superseded=True
+            )
+        ]
+
+    def _add_message(
+        self, user_id: str, role: str, content: str, session_id: str | None
+    ) -> dict[str, Any]:
+        """The write itself, with no idempotency or budget bookkeeping.
+
+        Expects `_require_extractor` to have run; `add_message` calls it before claiming.
+        """
         now = datetime.now()
         external_id = session_id or f"s_{uuid.uuid4().hex[:12]}"
         session_id = scoped_session_id(user_id, external_id)
@@ -705,35 +1026,72 @@ class MemoryService:
             )
         )
 
-        outcome = self.extractor.extract_turn(
-            user_id=user_id, session_id=session_id, role=role, content=content, now=now
-        )
+        try:
+            outcome = self.extractor.extract_turn(
+                user_id=user_id, session_id=session_id, role=role, content=content, now=now
+            )
+        except Exception:
+            # The turn is written before extraction so that a success cannot leave memories
+            # without the text they came from. The cost is this rollback: a provider
+            # failure would otherwise leave a turn nothing was extracted from, and the
+            # retry would append it a second time at the next index. Undoing it is what
+            # lets a failed write be retried at all rather than wedged forever.
+            self.store.remove_turn(f"{session_id}:{turn_index}")
+            raise
         if outcome.memories:
             for memory in outcome.memories:
                 memory.user_id = user_id
                 memory.source_session_id = session_id
                 memory.source_turn_index = turn_index
+            # Captured before anything is written, because resolution is not invertible:
+            # it closes validity intervals and points existing rows at a successor, and
+            # nothing in the result says what those rows held before.
+            prior = self._resolution_snapshot(outcome.memories)
             self.store.add_memories(outcome.memories)
-            self.index.add(
-                [m.id for m in outcome.memories],
-                self.encoder.encode([m.content for m in outcome.memories]),
-            )
-            self.index.save()
-            if self.resolver is not None:
-                resolution = self.resolver.resolve_memories(outcome.memories)
-                outcome.usage["superseded"] = resolution.superseded
-                outcome.usage["ambiguous_replacements"] = resolution.skipped_ambiguous
-        reply = {
+            try:
+                self.index.add(
+                    [m.id for m in outcome.memories],
+                    self.encoder.encode([m.content for m in outcome.memories]),
+                )
+                self.index.save()
+                if self.resolver is not None:
+                    resolution = self.resolver.resolve_memories(outcome.memories)
+                    outcome.usage["superseded"] = resolution.superseded
+                    outcome.usage["ambiguous_replacements"] = resolution.skipped_ambiguous
+            except Exception:
+                # Extraction succeeding is not the write succeeding. Encoding, the index
+                # save and the resolver all run after the memories are durable, and a
+                # failure in any of them used to leave them there while the caller was
+                # told the write failed — so the retry, which re-extracts from scratch,
+                # wrote the same facts a second time under new ids.
+                #
+                # SQLite first, and unconditionally. Resolution is undone before the
+                # memories are deleted because a pre-existing row may already point at
+                # one of them, and `superseded_by` is a plain reference that a delete
+                # would leave dangling.
+                self.store.restore_memory_states(prior)
+                self.store.remove_memories([m.id for m in outcome.memories])
+                self.store.remove_turn(f"{session_id}:{turn_index}")
+                try:
+                    self.index.remove([m.id for m in outcome.memories])
+                    self.index.save()
+                except Exception:
+                    # The index is frequently the thing that just failed — a full disk
+                    # fails the rollback's save exactly as it failed the write's — so
+                    # this cannot be allowed to abandon the undo or to replace the
+                    # original error with a less informative one. It is safe to skip:
+                    # `get_many` drops ids it cannot find, so a vector with no row
+                    # behind it is filtered out at hydration and costs space, not
+                    # correctness. An orphan memory would not be survivable; an orphan
+                    # vector is.
+                    pass
+                raise
+        return {
             "session_id": external_id,
             "turn_index": turn_index,
             "memories": outcome.memories,
             "usage": outcome.usage,
         }
-        if idempotency_key is not None:
-            self.store.record_write_reply(
-                user_id, idempotency_key, json.dumps(reply, default=_jsonable)
-            )
-        return reply
 
     @_synchronised
     def export_user(self, user_id: str) -> dict[str, Any]:
@@ -823,6 +1181,16 @@ class MemoryService:
         vectors = self.index.remove(memory_ids)
         if vectors:
             self.index.save()
+        # Recorded after the rows are gone, so the journal never claims an erasure that
+        # did not happen. The backups taken before this moment still hold the data, and
+        # this line is what a restore replays to stop it coming back; without it, erasure
+        # is only true until the next time someone restores.
+        self.erasures.record(
+            user_id,
+            memories=int(removed.get("memories", 0)),
+            sessions=int(removed.get("sessions", 0)),
+            turns=int(removed.get("turns", 0)),
+        )
         return {"user_id": user_id, **removed, "vectors": vectors}
 
     @_synchronised

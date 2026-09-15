@@ -8,10 +8,12 @@ touching the retrieval or packing layers.
 
 from __future__ import annotations
 
+import json
 import re
 import sqlite3
-from datetime import datetime
+from datetime import UTC, datetime
 from pathlib import Path
+from typing import Any
 
 from .base import LexicalHit, Memory, MemoryStatus, MemoryType, Session, Turn
 
@@ -116,6 +118,23 @@ class SQLiteMemoryStore:
         if "scope" not in columns:
             self._conn.execute("ALTER TABLE memories ADD COLUMN scope TEXT")
 
+        # Idempotency keys gained a request fingerprint and an explicit state. Existing
+        # rows are rows whose reply was already recorded, so they backfill to 'done' — the
+        # default in the schema — and to a NULL fingerprint, which the claim path reads as
+        # "claimed before fingerprints existed" and lets through rather than rejecting a
+        # legitimate retry of a write that predates this column.
+        write_key_columns = {
+            row["name"] for row in self._conn.execute("PRAGMA table_info(write_keys)").fetchall()
+        }
+        if write_key_columns and "fingerprint" not in write_key_columns:
+            self._conn.execute("ALTER TABLE write_keys ADD COLUMN fingerprint TEXT")
+        if write_key_columns and "state" not in write_key_columns:
+            self._conn.execute(
+                "ALTER TABLE write_keys ADD COLUMN state TEXT NOT NULL DEFAULT 'done'"
+            )
+        if write_key_columns and "claimed_at" not in write_key_columns:
+            self._conn.execute("ALTER TABLE write_keys ADD COLUMN claimed_at TEXT")
+
         # The turns index is created empty by the schema and its triggers only fire
         # on rows inserted afterwards, so a store ingested before the index existed
         # would search an empty archive and silently find nothing — the worst failure
@@ -152,6 +171,62 @@ class SQLiteMemoryStore:
                 ],
             )
 
+    def remove_turn(self, turn_id: str) -> bool:
+        """Delete one turn. True when a row was actually removed.
+
+        Exists for the write path's rollback. A turn is persisted before extraction runs,
+        so a provider failure leaves a turn behind with nothing extracted from it; without
+        this, the retry either appends a duplicate turn or has to be refused forever. The
+        `turns_fts` trigger removes the index entry with the row.
+        """
+        with self._conn:
+            cursor = self._conn.execute("DELETE FROM turns WHERE id = ?", (turn_id,))
+        return cursor.rowcount == 1
+
+    def remove_memories(self, memory_ids: list[str]) -> int:
+        """Delete memory rows written by a write that then failed. Returns rows removed.
+
+        The other half of `remove_turn`. Extraction succeeding is not the end of the
+        write: the index still has to accept the vectors, save them, and the resolver
+        still has to run. A failure in any of those left the memories durable while the
+        caller was told the write failed, and the retry — which re-extracts from scratch —
+        wrote them a second time.
+
+        `memory_entities` and `evidence` cascade. `superseded_by` does not: it is a plain
+        reference, so a row pointing at one of these has to be restored *first* or the
+        delete leaves a dangling id. `restore_memory_states` is what does that, and the
+        write path calls it before this.
+        """
+        if not memory_ids:
+            return 0
+        marks = ",".join("?" * len(memory_ids))
+        with self._conn:
+            cursor = self._conn.execute(
+                f"DELETE FROM memories WHERE id IN ({marks})", tuple(memory_ids)
+            )
+        return cursor.rowcount
+
+    def restore_memory_states(self, states: list[tuple[str, str, str | None, Any, Any]]) -> None:
+        """Put back the status, supersede link and validity window of existing rows.
+
+        Resolution edits rows that were already there — closing their validity interval
+        and pointing them at a successor. When the write those edits belong to does not
+        complete, the edits have to come back off, and they cannot be recomputed: the
+        resolver is not an inverse function. So the write path snapshots the rows on the
+        keys it is about to touch, and this restores that snapshot verbatim.
+        """
+        if not states:
+            return
+        with self._conn:
+            self._conn.executemany(
+                "UPDATE memories SET status=?, superseded_by=?, valid_from=?, valid_to=? "
+                "WHERE id=?",
+                [
+                    (status, superseded_by, _dt(valid_from), _dt(valid_to), memory_id)
+                    for memory_id, status, superseded_by, valid_from, valid_to in states
+                ],
+            )
+
     def count_turns(self, user_id: str) -> int:
         row = self._conn.execute(
             "SELECT count(*) FROM turns WHERE session_id IN "
@@ -162,6 +237,20 @@ class SQLiteMemoryStore:
 
     # ------------------------------------------------------------ idempotent writes
 
+    def write_key(self, user_id: str, key: str) -> dict[str, Any] | None:
+        """What is on record for one idempotency key, or None if it is unclaimed.
+
+        Returned rather than interpreted here: whether a pending claim is live or an
+        orphan is a policy question about how long a write may take, and that belongs
+        with the caller that knows.
+        """
+        row = self._conn.execute(
+            "SELECT response, created_at, fingerprint, state, claimed_at "
+            "FROM write_keys WHERE user_id = ? AND key = ?",
+            (user_id, key),
+        ).fetchone()
+        return dict(row) if row else None
+
     def remembered_write(self, user_id: str, key: str) -> str | None:
         """The reply a previous identical write returned, if there was one."""
         row = self._conn.execute(
@@ -170,8 +259,10 @@ class SQLiteMemoryStore:
         ).fetchone()
         return row[0] if row else None
 
-    def remember_write(self, user_id: str, key: str, response: str) -> bool:
-        """Record a reply against a key. False when the key was already taken.
+    def remember_write(
+        self, user_id: str, key: str, response: str, fingerprint: str | None = None
+    ) -> bool:
+        """Claim a key for a write in progress. False when the key was already taken.
 
         `INSERT OR IGNORE` rather than a check-then-write: two concurrent retries of the
         same request would both pass a check and both proceed, which is the race the key
@@ -179,9 +270,55 @@ class SQLiteMemoryStore:
         """
         with self._conn:
             cursor = self._conn.execute(
-                "INSERT OR IGNORE INTO write_keys (user_id, key, response, created_at) "
-                "VALUES (?, ?, ?, ?)",
-                (user_id, key, response, datetime.now().isoformat()),
+                "INSERT OR IGNORE INTO write_keys "
+                "(user_id, key, response, created_at, fingerprint, state, claimed_at) "
+                "VALUES (?, ?, ?, ?, ?, 'pending', ?)",
+                # `created_at` keeps the store's local convention. `claimed_at` is UTC because
+                # the takeover window is measured from it, and in local wall-clock time that
+                # window is wrong for an hour twice a year: across the spring-forward gap a
+                # claim seconds old reads as an hour old and is taken over while still running.
+                (
+                    user_id,
+                    key,
+                    response,
+                    datetime.now().isoformat(),
+                    fingerprint,
+                    datetime.now(UTC).isoformat(),
+                ),
+            )
+        return cursor.rowcount == 1
+
+    def take_over_write(
+        self,
+        user_id: str,
+        key: str,
+        fingerprint: str | None,
+        *,
+        expected_state: str,
+        expected_claimed_at: str | None,
+    ) -> bool:
+        """Re-claim a key whose previous attempt failed or was abandoned.
+
+        A compare-and-swap on exactly what the caller read — the state *and* the claim time
+        — in one statement. Conditioning on the state alone did not close the race this
+        exists for: the first taker sets the row back to 'pending', which a condition of
+        `state IN ('failed', 'pending')` still matches, so a second retry that had read the
+        same orphan took it over as well and both wrote. Every takeover stamps a new
+        `claimed_at`, so a row anyone has re-claimed since the read no longer matches.
+        """
+        with self._conn:
+            cursor = self._conn.execute(
+                "UPDATE write_keys SET state = 'pending', claimed_at = ?, fingerprint = ?, "
+                "response = ? WHERE user_id = ? AND key = ? AND state = ? AND claimed_at IS ?",
+                (
+                    datetime.now(UTC).isoformat(),
+                    fingerprint,
+                    json.dumps({"pending": True}),
+                    user_id,
+                    key,
+                    expected_state,
+                    expected_claimed_at,
+                ),
             )
         return cursor.rowcount == 1
 
@@ -189,8 +326,127 @@ class SQLiteMemoryStore:
         """Replace a claimed key's placeholder with the reply it produced."""
         with self._conn:
             self._conn.execute(
-                "UPDATE write_keys SET response = ? WHERE user_id = ? AND key = ?",
+                "UPDATE write_keys SET response = ?, state = 'done' WHERE user_id = ? AND key = ?",
                 (response, user_id, key),
+            )
+
+    def record_write_failure(self, user_id: str, key: str, detail: str) -> None:
+        """Mark a claimed key as failed so the caller can retry it.
+
+        The row is kept rather than deleted. A deleted key is indistinguishable from one
+        that was never claimed, and the operator asking "did that write ever run?" needs
+        the difference; it is also what makes a retry visible as a retry.
+        """
+        with self._conn:
+            self._conn.execute(
+                "UPDATE write_keys SET state = 'failed', response = ? "
+                "WHERE user_id = ? AND key = ? AND state = 'pending'",
+                (json.dumps({"failed": True, "detail": detail[:500]}), user_id, key),
+            )
+
+    # ------------------------------------------------------------ account budgets
+
+    def accounts_with_quota(self, day: str | None = None) -> list[str]:
+        """Accounts that hold a cap or have spent today.
+
+        Not the same set as `user_ids()`, which lists namespaces holding memories. An
+        account can be spending quota with no memory to show for it — every write failed,
+        or it only ever searched — and those are exactly the accounts an operator wants
+        named before they are refused.
+        """
+        sql = "SELECT user_id FROM account_budgets"
+        params: tuple = ()
+        if day is not None:
+            sql += " UNION SELECT user_id FROM account_usage WHERE day = ?"
+            params = (day,)
+        else:
+            sql += " UNION SELECT user_id FROM account_usage"
+        return sorted(row[0] for row in self._conn.execute(sql, params))
+
+    def account_budget(self, user_id: str, model: str, operation: str) -> dict[str, Any] | None:
+        row = self._conn.execute(
+            "SELECT daily_calls, daily_tokens FROM account_budgets "
+            "WHERE user_id = ? AND model = ? AND operation = ?",
+            (user_id, model, operation),
+        ).fetchone()
+        return dict(row) if row else None
+
+    def set_account_budget(
+        self,
+        user_id: str,
+        model: str,
+        operation: str,
+        daily_calls: int | None,
+        daily_tokens: int | None,
+    ) -> None:
+        with self._conn:
+            self._conn.execute(
+                "INSERT OR REPLACE INTO account_budgets "
+                "(user_id, model, operation, daily_calls, daily_tokens, updated_at) "
+                "VALUES (?,?,?,?,?,?)",
+                (user_id, model, operation, daily_calls, daily_tokens, datetime.now().isoformat()),
+            )
+
+    def account_spend(self, user_id: str, day: str) -> Any:
+        """One account's spend for one quota day, summed across models and operations."""
+        from llm_long_term_memory.api.budget import Spend
+
+        row = self._conn.execute(
+            "SELECT COALESCE(sum(calls), 0) AS calls, "
+            "COALESCE(sum(failed_calls), 0) AS failed_calls, "
+            "COALESCE(sum(input_tokens), 0) AS input_tokens, "
+            "COALESCE(sum(output_tokens), 0) AS output_tokens "
+            "FROM account_usage WHERE user_id = ? AND day = ?",
+            (user_id, day),
+        ).fetchone()
+        return Spend(
+            int(row["calls"]),
+            int(row["failed_calls"]),
+            int(row["input_tokens"]),
+            int(row["output_tokens"]),
+        )
+
+    def record_account_usage(
+        self,
+        user_id: str,
+        day: str,
+        model: str,
+        operation: str,
+        *,
+        calls: int,
+        failed_calls: int,
+        input_tokens: int,
+        output_tokens: int,
+    ) -> None:
+        """Add to one ledger row, creating it if today is its first call.
+
+        `ON CONFLICT ... DO UPDATE` rather than read-modify-write: two concurrent calls
+        doing the latter would each read the same count and each write it back plus one,
+        losing a call from the ledger — and a ledger that undercounts is a budget that
+        does not hold.
+        """
+        with self._conn:
+            self._conn.execute(
+                "INSERT INTO account_usage "
+                "(user_id, day, model, operation, calls, failed_calls, input_tokens, "
+                "output_tokens, updated_at) VALUES (?,?,?,?,?,?,?,?,?) "
+                "ON CONFLICT(user_id, day, model, operation) DO UPDATE SET "
+                "calls = calls + excluded.calls, "
+                "failed_calls = failed_calls + excluded.failed_calls, "
+                "input_tokens = input_tokens + excluded.input_tokens, "
+                "output_tokens = output_tokens + excluded.output_tokens, "
+                "updated_at = excluded.updated_at",
+                (
+                    user_id,
+                    day,
+                    model,
+                    operation,
+                    calls,
+                    failed_calls,
+                    input_tokens,
+                    output_tokens,
+                    datetime.now().isoformat(),
+                ),
             )
 
     def hard_delete_user(self, user_id: str) -> dict[str, int | list[str]]:
@@ -219,6 +475,12 @@ class SQLiteMemoryStore:
             # Idempotency keys go too: replaying one after erasure would return a reply
             # describing memories that no longer exist.
             self._conn.execute("DELETE FROM write_keys WHERE user_id = ?", (user_id,))
+            # `account_usage` and `account_budgets` are deliberately NOT deleted here.
+            # Erasure removes the user's content; the ledger holds counts, not content,
+            # and clearing it would make "delete my data" a way to reset the day's spend
+            # to zero and start again. The budget row is operator configuration and is
+            # not the tenant's to remove either. Both are dropped by the operator when an
+            # account is genuinely closed, which is a different action from an erasure.
         return {
             "sessions": len(session_ids),
             "memories": len(memory_ids),

@@ -1,0 +1,17 @@
+{
+  "name": "dedup-namespace-leak",
+  "store": "stores/test100.db",
+  "provider_calls": 0,
+  "memories": 12471,
+  "namespaces": 100,
+  "threshold": 0.92,
+  "max_neighbours": 3,
+  "sampled": 1500,
+  "neighbours_above_threshold": {
+    "same_namespace": 3,
+    "cross_namespace": 42,
+    "owner_unknown": 0
+  },
+  "samples_whose_whole_window_was_foreign": 2,
+  "reading": "Every cross-namespace pair here is a pair the deduplicator would have adjudicated had both memories been in the store at the time, and a DUPLICATE verdict on one drops a fact from a conversation that never contained its supposed duplicate. A window filled by foreign memories also crowds out the within-namespace duplicates dedup exists to catch."
+}

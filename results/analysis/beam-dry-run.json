@@ -1,0 +1,141 @@
+{
+  "name": "beam-dry-run",
+  "half": "dev",
+  "provider_calls": 0,
+  "note": "every reply was produced locally from the prompt; nothing was sent",
+  "rehearsal": {
+    "conversations": 2,
+    "questions": 40,
+    "sessions": 245,
+    "memories_by_conversation": {
+      "beam-100K-5": 160,
+      "beam-500K-8": 754
+    },
+    "cross_namespace_adjudications": 12,
+    "calls_by_kind": {
+      "extract_stage_a": 17,
+      "extract_stage_b": 17,
+      "dedup_adjudication": 65,
+      "answer": 40,
+      "judge": 40,
+      "answer_from_raw_source": 9
+    },
+    "calls_during_ingest": {
+      "extract_stage_a": 17,
+      "extract_stage_b": 17,
+      "dedup_adjudication": 65
+    },
+    "estimated_input_tokens": {
+      "extract_stage_a": 582115,
+      "extract_stage_b": 43676,
+      "dedup_adjudication": 12124,
+      "answer": 42671,
+      "judge": 12386,
+      "answer_from_raw_source": 4834
+    },
+    "answerer_calls_per_question": 1.225,
+    "resume_added_rows": 0,
+    "requests_spent_by_resume": 0,
+    "interruption_drills": {
+      "quota": {
+        "stopped_after_rows": 11,
+        "stop": "partial report returned",
+        "rows_after_resume": 40,
+        "questions_re_answered_by_resume": 0
+      },
+      "judge": {
+        "stopped_after_rows": 13,
+        "stop": "InvalidJudgement",
+        "rows_after_resume": 40,
+        "questions_re_answered_by_resume": 0
+      }
+    },
+    "paired_comparison": {
+      "abilities": [
+        "abstention",
+        "contradiction_resolution",
+        "event_ordering",
+        "information_extraction",
+        "knowledge_update",
+        "multi_session_reasoning",
+        "preference_following",
+        "temporal_reasoning"
+      ],
+      "conversations_compared": 2,
+      "conversations_dropped_incomplete": [],
+      "questions_compared": 32,
+      "mean_difference": 0.025111607142857144,
+      "conversations_favouring_b": 1,
+      "conversations_favouring_a": 0,
+      "conversations_tied": 1,
+      "p_value": 1.0
+    }
+  },
+  "development_half": {
+    "conversations": 22,
+    "questions": 440,
+    "session_chunks": 3679,
+    "sessions_per_request": 15,
+    "batches": 256,
+    "extraction_requests": 512,
+    "projected_judge_requests": 440,
+    "stage_a_input_tokens": 8037065,
+    "projected_answerer_requests": {
+      "at_longmemeval_fallback_rate_1.34": 590,
+      "at_this_rehearsal_rate": 539
+    },
+    "basis": "Extraction is counted from the real batching and is exact. The answerer figure is not: how often the answerer asks for raw source is a property of the model, and a dry run has no model. 1.34 requests per question is LongMemEval's measured rate (docs/QUOTA_DISCIPLINE.md); the rehearsal's own rate comes from this file's declared need_source share and measures nothing. The first BEAM answering run replaces both with a measurement."
+  },
+  "row_checks": {
+    "rows": 40,
+    "problems": [
+      "deduplication adjudicated 12 candidate(s) against memories of another conversation (1 conversation pair(s)); a DUPLICATE verdict there deletes a fact the other conversation never contained (results/analysis/dedup-namespace-leak.json)"
+    ],
+    "passed": false
+  },
+  "fact_coverage_rehearsal": {
+    "questions_with_a_required_fact_ladder": 9,
+    "layers": {
+      "any_source_session": {
+        "conversations": 2,
+        "value": 0.725
+      },
+      "all_source_sessions": {
+        "conversations": 2,
+        "value": 0.4444444444444444
+      },
+      "required_fact_coverage": {
+        "conversations": 2,
+        "value": 0.8214285714285714
+      },
+      "answer_utilisation": {
+        "conversations": 2,
+        "value": 0.35
+      }
+    },
+    "first_loss": {
+      "answer": 4,
+      "nothing lost": 2,
+      "source": 2,
+      "retrieved": 1
+    },
+    "note": "shapes only; the memories these rows were answered from are canned"
+  },
+  "aggregate_shape": {
+    "primary_questions": 32,
+    "primary_conversations": 2,
+    "abilities_present": [
+      "abstention",
+      "contradiction_resolution",
+      "event_ordering",
+      "information_extraction",
+      "instruction_following",
+      "knowledge_update",
+      "multi_session_reasoning",
+      "preference_following",
+      "summarization",
+      "temporal_reasoning"
+    ],
+    "event_order_tau_norm_computed": true
+  }
+}

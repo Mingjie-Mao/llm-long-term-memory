@@ -1,0 +1,35 @@
+{
+  "name": "dedup-fix-behavioral-diff",
+  "provider_calls": 0,
+  "question": "does namespace-scoping deduplication change what reaches the answerer?",
+  "conversations": 2,
+  "questions": 40,
+  "cross_namespace_adjudications": 12,
+  "under_the_dry_run_verdicts": {
+    "memories_before": 914,
+    "memories_after": 915,
+    "memories_the_fix_saved": 1,
+    "conversations_affected": [
+      "beam-500K-8"
+    ],
+    "questions": 40,
+    "questions_with_different_ranked_memory_ids": 0,
+    "questions_with_a_different_context": 0,
+    "identical": false,
+    "verdict": "system change: what reaches the model differs, so this is a second arm"
+  },
+  "under_forced_duplicate_verdicts": {
+    "memories_before": 909,
+    "memories_after": 915,
+    "memories_the_fix_saved": 6,
+    "conversations_affected": [
+      "beam-500K-8"
+    ],
+    "questions": 40,
+    "questions_with_different_ranked_memory_ids": 0,
+    "questions_with_a_different_context": 0,
+    "identical": false,
+    "verdict": "system change: what reaches the model differs, so this is a second arm"
+  },
+  "reading": "The first comparison uses the dry run's own verdict rule, which calls a pair a duplicate only when the two texts are identical \u2014 a benign model. The second forces every cross-conversation pair to DUPLICATE, which is what the fix exists to prevent and what a real model may do on a seed-twin pair. A real store was built by a real model whose pairwise verdicts were never recorded, so the second comparison is the one that decides whether this can be called the frozen system."
+}

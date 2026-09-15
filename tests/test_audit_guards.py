@@ -165,3 +165,36 @@ def test_release_check_refuses_partial_test_success(monkeypatch):
     )
     with pytest.raises(SystemExit):
         module.measure()
+
+
+def test_every_config_is_bound_against_line_ending_translation():
+    """`configs/beam-eval.json`'s digest is recorded in `beam-power.json`, and the binding
+    named `configs/*.yaml` — so a config in another format sat outside it the moment one
+    existed, and Windows CI went red on a hash that had not changed. The glob is the
+    directory now; this fails if it narrows back to an extension."""
+    from pathlib import Path
+
+    repo = Path(__file__).resolve().parent.parent
+    rules = repo / ".gitattributes"
+    assert "configs/** -text" in rules.read_text(encoding="utf-8")
+
+
+def test_the_binding_covers_every_file_whose_digest_is_recorded_by_beam_power():
+    """The check that would have caught it: ask the tool which files it hashes, and
+    require each to be bound."""
+    import subprocess
+    from pathlib import Path
+
+    repo = Path(__file__).resolve().parent.parent
+    for path in ("configs/beam-eval.json", "results/manifests/beam-split.json"):
+        out = subprocess.run(
+            ["git", "check-attr", "text", "--", path],
+            cwd=repo,
+            capture_output=True,
+            text=True,
+            # This project runs with EncodingWarning as an error, so a subprocess that
+            # decodes its output has to say how. Locale-dependent decoding is exactly the
+            # class of bug the warning exists for, and it fires on every platform.
+            encoding="utf-8",
+        )
+        assert "text: unset" in out.stdout, f"{path} is not protected: {out.stdout.strip()}"

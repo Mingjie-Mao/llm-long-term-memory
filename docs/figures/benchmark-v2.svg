@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1180" height="470" viewBox="0 0 1180 470" role="img" aria-labelledby="title desc">
+<title id="title">v2 正式终测：正确率与回答上下文</title>
+<desc id="desc">100 题，每臂一次。左侧正确率使用零起点线性轴。右侧列出上下文 token 原始数值，不共用正确率坐标。记忆与 RAG 上下文为字符估算，全文为 provider 输入 token。</desc>
+<rect width="1180" height="470" fill="#FAFBFC"/>
+<text x="32" y="42" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="25" font-weight="700" fill="#223448">同一组 100 题，三个取舍</text>
+<text x="32" y="73" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="17" font-weight="400" fill="#627184">冻结 v2 · 每臂一次 · 未包含共享抽取成本</text>
+<text x="235" y="116" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="18" font-weight="700" fill="#223448">回答正确率</text>
+<text x="818" y="116" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="18" font-weight="700" fill="#223448">中位回答上下文</text>
+<path d="M235.0 132V332" stroke="#DCE3EB"/>
+<text x="226.0" y="360" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="15" font-weight="400" fill="#627184">0%</text>
+<path d="M340.0 132V332" stroke="#DCE3EB"/>
+<text x="331.0" y="360" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="15" font-weight="400" fill="#627184">25%</text>
+<path d="M445.0 132V332" stroke="#DCE3EB"/>
+<text x="436.0" y="360" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="15" font-weight="400" fill="#627184">50%</text>
+<path d="M550.0 132V332" stroke="#DCE3EB"/>
+<text x="541.0" y="360" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="15" font-weight="400" fill="#627184">75%</text>
+<path d="M655.0 132V332" stroke="#DCE3EB"/>
+<text x="646.0" y="360" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="15" font-weight="400" fill="#627184">100%</text>
+<text x="32" y="169" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="20" font-weight="700" fill="#246C5E">v2 记忆 + 回退</text>
+<rect x="235" y="143" width="302.4" height="34" rx="3" fill="#246C5E"/>
+<text x="549.4" y="168" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="21" font-weight="700" fill="#246C5E">72%</text>
+<text x="818" y="169" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="24" font-weight="700" fill="#246C5E">574 token</text>
+<text x="1030" y="168" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="16" font-weight="400" fill="#627184">字符估算</text>
+<text x="32" y="236" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="20" font-weight="700" fill="#355D8A">整段历史</text>
+<rect x="235" y="210" width="361.2" height="34" rx="3" fill="#355D8A"/>
+<text x="608.2" y="235" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="21" font-weight="700" fill="#355D8A">86%</text>
+<text x="818" y="236" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="24" font-weight="700" fill="#355D8A">109,059 token</text>
+<text x="1030" y="235" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="16" font-weight="400" fill="#627184">provider</text>
+<text x="32" y="303" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="20" font-weight="700" fill="#8291A2">naive RAG</text>
+<rect x="235" y="277" width="273.0" height="34" rx="3" fill="#8291A2"/>
+<text x="520.0" y="302" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="21" font-weight="700" fill="#8291A2">65%</text>
+<text x="818" y="303" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="24" font-weight="700" fill="#8291A2">12,763 token</text>
+<text x="1030" y="302" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="16" font-weight="400" fill="#627184">字符估算</text>
+<text x="32" y="409" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="18" font-weight="400" fill="#223448">v2 与 naive RAG 的 +7 个百分点尚不显著；整段历史更准确。</text>
+<text x="32" y="440" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="17" font-weight="400" fill="#627184">上下文口径不同：比值只能近似比较，不直接等于账单节省。</text>
+</svg>

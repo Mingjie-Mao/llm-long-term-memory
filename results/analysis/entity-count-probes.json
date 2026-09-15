@@ -2,6 +2,7 @@
   "schema_version": 1,
   "not_a_benchmark": "Ground truth is SQL over stored facts plus deterministic entity handling, so it inherits extraction loss. These are instrument readings and must never be reported beside a LongMemEval accuracy figure.",
   "supersedes": "The `count` probes in synthesis-probes.json, whose gold counted intentions as members and one row as one member. That file is unchanged: its bytes are hashed into the held-out split.",
+  "split_rules": "An object whose split yields a date, a clause fragment, a byline or a companion is refused whole rather than repaired, because once an object is known to carry provenance its other separators are provenance too. The first emission of this file predated the rule and shipped four gold answers that counted a month as a place visited or a city as an event attended; tools/audit_entity_probe_splits.py found them and tests/test_entity_count_probes.py pins each one. The second emission checked provenance only on members a separator produced, so a record that never split passed whole and three more gold answers counted a vet visit's date as a place, one city and one pair of sneakers twice, and a sum raised as an event; an object carrying a dated day or month, an ISO date, a clock time or a price is now refused whether or not it splits. Splits that survive the rules are still only machine-checked: 'Daisy Jones and The Six' is indistinguishable from two real titles, and no rule here decides it.",
   "provider_calls": 0,
   "seed": 20260913,
   "limit": 60,
@@ -42,7 +43,8 @@
         "mem_fc47bda0ad7557f3"
       ],
       "derivation": "COUNT of DISTINCT entities over active memories where subject='user', the mapped relation_type is 'attended', and scope is one of ['event', 'profile']; entities split from the stored object and deduplicated case-insensitively; scope stated in the question as ['classes attended', 'events attended']",
-      "probe_id": "entity_count_0000"
+      "probe_id": "entity_count_d23cf73b_attended",
+      "relation": "attended"
     },
     {
       "kind": "entity_count",
@@ -68,7 +70,8 @@
         "mem_f36a58d9c6c1d084"
       ],
       "derivation": "COUNT of DISTINCT entities over active memories where subject='user', the mapped relation_type is 'owns', and scope is one of ['event', 'profile']; entities split from the stored object and deduplicated case-insensitively; scope stated in the question as ['clothing owned', 'electronics owned', 'possessions']",
-      "probe_id": "entity_count_0001"
+      "probe_id": "entity_count_gpt4_0a05b494_owns",
+      "relation": "owns"
     },
     {
       "kind": "entity_count",
@@ -92,7 +95,8 @@
         "mem_eb023966ca4ed438"
       ],
       "derivation": "COUNT of DISTINCT entities over active memories where subject='user', the mapped relation_type is 'cooked', and scope is one of ['event', 'profile']; entities split from the stored object and deduplicated case-insensitively; scope stated in the question as ['baked goods', 'food prepared']",
-      "probe_id": "entity_count_0002"
+      "probe_id": "entity_count_f523d9fe_cooked",
+      "relation": "cooked"
     },
     {
       "kind": "entity_count",
@@ -116,7 +120,8 @@
         "mem_c6539bf81a068979"
       ],
       "derivation": "COUNT of DISTINCT entities over active memories where subject='user', the mapped relation_type is 'grows', and scope is one of ['event', 'profile']; entities split from the stored object and deduplicated case-insensitively; scope stated in the question as ['houseplants']",
-      "probe_id": "entity_count_0003"
+      "probe_id": "entity_count_993da5e2_grows",
+      "relation": "grows"
     },
     {
       "kind": "entity_count",
@@ -140,7 +145,8 @@
         "mem_e1678e5c6eb9ef31"
       ],
       "derivation": "COUNT of DISTINCT entities over active memories where subject='user', the mapped relation_type is 'read', and scope is one of ['event', 'profile']; entities split from the stored object and deduplicated case-insensitively; scope stated in the question as ['books listening status', 'books reading', 'books reading status']",
-      "probe_id": "entity_count_0004"
+      "probe_id": "entity_count_gpt4_a1b77f9c_read",
+      "relation": "read"
     },
     {
       "kind": "entity_count",
@@ -160,55 +166,8 @@
         "mem_8aadbd381189d953"
       ],
       "derivation": "COUNT of DISTINCT entities over active memories where subject='user', the mapped relation_type is 'owns', and scope is one of ['event', 'profile']; entities split from the stored object and deduplicated case-insensitively; scope stated in the question as ['hobbies equipment']",
-      "probe_id": "entity_count_0005"
-    },
-    {
-      "kind": "entity_count",
-      "namespace": "1f2b8d4f",
-      "question": "How many distinct plants does the user grow? Count only facts recorded under: herb sales, houseplants. Count each distinct thing once, however many times it is mentioned.",
-      "answer": 3,
-      "answer_kind": "integer",
-      "scope_predicates": [
-        "herb sales",
-        "houseplants"
-      ],
-      "entities": [
-        "12 bunches for $120",
-        "African Violet",
-        "succulent"
-      ],
-      "evidence_memory_ids": [
-        "mem_11e4aa52565b532d",
-        "mem_260b2ea6d2d7515d",
-        "mem_76bc8aefc9f794d1"
-      ],
-      "derivation": "COUNT of DISTINCT entities over active memories where subject='user', the mapped relation_type is 'grows', and scope is one of ['event', 'profile']; entities split from the stored object and deduplicated case-insensitively; scope stated in the question as ['herb sales', 'houseplants']",
-      "probe_id": "entity_count_0006"
-    },
-    {
-      "kind": "entity_count",
-      "namespace": "5a7937c8",
-      "question": "How many distinct places has the user visited? Count only facts recorded under: business travel, museum visits. Count each distinct thing once, however many times it is mentioned.",
-      "answer": 5,
-      "answer_kind": "integer",
-      "scope_predicates": [
-        "business travel",
-        "museum visits"
-      ],
-      "entities": [
-        "American Museum of Natural History",
-        "Chicago",
-        "Dec 2023",
-        "Jan 10 2024",
-        "MoMA"
-      ],
-      "evidence_memory_ids": [
-        "mem_4e31a6c10ac848c5",
-        "mem_a0c8367efc0e7b3a",
-        "mem_d4d657f7eb8f8673"
-      ],
-      "derivation": "COUNT of DISTINCT entities over active memories where subject='user', the mapped relation_type is 'visited', and scope is one of ['event', 'profile']; entities split from the stored object and deduplicated case-insensitively; scope stated in the question as ['business travel', 'museum visits']",
-      "probe_id": "entity_count_0007"
+      "probe_id": "entity_count_726462e0_owns",
+      "relation": "owns"
     },
     {
       "kind": "entity_count",
@@ -230,7 +189,8 @@
         "mem_de71ec367c617766"
       ],
       "derivation": "COUNT of DISTINCT entities over active memories where subject='user', the mapped relation_type is 'acquired', and scope is one of ['event', 'profile']; entities split from the stored object and deduplicated case-insensitively; scope stated in the question as ['purchases']",
-      "probe_id": "entity_count_0008"
+      "probe_id": "entity_count_3a704032_acquired",
+      "relation": "acquired"
     },
     {
       "kind": "entity_count",
@@ -255,7 +215,8 @@
         "mem_93714d5d136b8c3c"
       ],
       "derivation": "COUNT of DISTINCT entities over active memories where subject='user', the mapped relation_type is 'owns', and scope is one of ['event', 'profile']; entities split from the stored object and deduplicated case-insensitively; scope stated in the question as ['music production gear', 'possessions']",
-      "probe_id": "entity_count_0009"
+      "probe_id": "entity_count_d23cf73b_owns",
+      "relation": "owns"
     },
     {
       "kind": "entity_count",
@@ -276,68 +237,8 @@
         "mem_0e5d06c9817c8575"
       ],
       "derivation": "COUNT of DISTINCT entities over active memories where subject='user', the mapped relation_type is 'acquired', and scope is one of ['event', 'profile']; entities split from the stored object and deduplicated case-insensitively; scope stated in the question as ['grocery purchase']",
-      "probe_id": "entity_count_0010"
-    },
-    {
-      "kind": "entity_count",
-      "namespace": "8a2466db",
-      "question": "How many distinct events has the user attended? Count only facts recorded under: charity event, event attendance. Count each distinct thing once, however many times it is mentioned.",
-      "answer": 8,
-      "answer_kind": "integer",
-      "scope_predicates": [
-        "charity event",
-        "event attendance"
-      ],
-      "entities": [
-        "2023",
-        "charity yoga event on May 28",
-        "company-organized charity gala in early April 2023",
-        "project management workshop",
-        "Red Cross charity gala in April 2023",
-        "Run for a Cause marathon in April 2023",
-        "vendor meeting",
-        "Walk for Hunger on May 21"
-      ],
-      "evidence_memory_ids": [
-        "mem_100250f599389739",
-        "mem_2a12c3def1e2bec0",
-        "mem_4a54c9ded97586d1",
-        "mem_935725facb37f4a8",
-        "mem_a746176e6d4f0730",
-        "mem_a96a47a1f2b6bf52",
-        "mem_b83bd3f520552915"
-      ],
-      "derivation": "COUNT of DISTINCT entities over active memories where subject='user', the mapped relation_type is 'attended', and scope is one of ['event', 'profile']; entities split from the stored object and deduplicated case-insensitively; scope stated in the question as ['charity event', 'event attendance']",
-      "probe_id": "entity_count_0011"
-    },
-    {
-      "kind": "entity_count",
-      "namespace": "b759caee",
-      "question": "How many distinct events has the user attended? Count only facts recorded under: charity events, festivals attended, religious attendance, seminars attended. Count each distinct thing once, however many times it is mentioned.",
-      "answer": 5,
-      "answer_kind": "integer",
-      "scope_predicates": [
-        "charity events",
-        "festivals attended",
-        "religious attendance",
-        "seminars attended"
-      ],
-      "entities": [
-        "cycling event September 2022",
-        "market stall design",
-        "raised $150",
-        "St. Jerome's Laneway Festival",
-        "St. Mary's Church Nov 2022"
-      ],
-      "evidence_memory_ids": [
-        "mem_6f9a45f53e1e6850",
-        "mem_8bca5abfa55e1a63",
-        "mem_a39e7d52c9f14799",
-        "mem_ca7e7700c07b35f9",
-        "mem_efb423b2bd6cbe5e"
-      ],
-      "derivation": "COUNT of DISTINCT entities over active memories where subject='user', the mapped relation_type is 'attended', and scope is one of ['event', 'profile']; entities split from the stored object and deduplicated case-insensitively; scope stated in the question as ['charity events', 'festivals attended', 'religious attendance', 'seminars attended']",
-      "probe_id": "entity_count_0012"
+      "probe_id": "entity_count_a9f6b44c_acquired",
+      "relation": "acquired"
     },
     {
       "kind": "entity_count",
@@ -361,7 +262,8 @@
         "mem_8a6731df39e352d9"
       ],
       "derivation": "COUNT of DISTINCT entities over active memories where subject='user', the mapped relation_type is 'ate_at', and scope is one of ['event', 'profile']; entities split from the stored object and deduplicated case-insensitively; scope stated in the question as ['groceries']",
-      "probe_id": "entity_count_0013"
+      "probe_id": "entity_count_8ebdbe50_ate_at",
+      "relation": "ate_at"
     },
     {
       "kind": "entity_count",
@@ -386,7 +288,8 @@
         "mem_f33e23a9b3f4c41f"
       ],
       "derivation": "COUNT of DISTINCT entities over active memories where subject='user', the mapped relation_type is 'owns', and scope is one of ['event', 'profile']; entities split from the stored object and deduplicated case-insensitively; scope stated in the question as ['books owned', 'donated items', 'instruments owned']",
-      "probe_id": "entity_count_0014"
+      "probe_id": "entity_count_cc539528_owns",
+      "relation": "owns"
     },
     {
       "kind": "entity_count",
@@ -412,7 +315,8 @@
         "mem_f41e918b700a1c07"
       ],
       "derivation": "COUNT of DISTINCT entities over active memories where subject='user', the mapped relation_type is 'practises_hobby', and scope is one of ['event', 'profile']; entities split from the stored object and deduplicated case-insensitively; scope stated in the question as ['game activity', 'hobbies', 'volunteer work']",
-      "probe_id": "entity_count_0015"
+      "probe_id": "entity_count_9bbe84a2_practises_hobby",
+      "relation": "practises_hobby"
     },
     {
       "kind": "entity_count",
@@ -448,7 +352,8 @@
         "mem_f9add6a6ab812f40"
       ],
       "derivation": "COUNT of DISTINCT entities over active memories where subject='user', the mapped relation_type is 'owns', and scope is one of ['event', 'profile']; entities split from the stored object and deduplicated case-insensitively; scope stated in the question as ['bike owned', 'bike ownership', 'car owned', 'pet owned', 'property ownership']",
-      "probe_id": "entity_count_0016"
+      "probe_id": "entity_count_a9f6b44c_owns",
+      "relation": "owns"
     },
     {
       "kind": "entity_count",
@@ -484,7 +389,8 @@
         "mem_f27ff15763a0b894"
       ],
       "derivation": "COUNT of DISTINCT entities over active memories where subject='user', the mapped relation_type is 'acquired', and scope is one of ['event', 'profile']; entities split from the stored object and deduplicated case-insensitively; scope stated in the question as ['gifts purchased', 'purchased items', 'purchases']",
-      "probe_id": "entity_count_0017"
+      "probe_id": "entity_count_a3838d2b_acquired",
+      "relation": "acquired"
     },
     {
       "kind": "entity_count",
@@ -509,7 +415,8 @@
         "mem_ced8c7d7f9f41770"
       ],
       "derivation": "COUNT of DISTINCT entities over active memories where subject='user', the mapped relation_type is 'owns', and scope is one of ['event', 'profile']; entities split from the stored object and deduplicated case-insensitively; scope stated in the question as ['possessions', 'vinyl collection']",
-      "probe_id": "entity_count_0018"
+      "probe_id": "entity_count_22d2cb42_owns",
+      "relation": "owns"
     },
     {
       "kind": "entity_count",
@@ -533,7 +440,8 @@
         "mem_afa434806b9c146d"
       ],
       "derivation": "COUNT of DISTINCT entities over active memories where subject='user', the mapped relation_type is 'owns', and scope is one of ['event', 'profile']; entities split from the stored object and deduplicated case-insensitively; scope stated in the question as ['camera owned', 'doll collection', 'light bulb owned']",
-      "probe_id": "entity_count_0019"
+      "probe_id": "entity_count_cc5ded98_owns",
+      "relation": "owns"
     },
     {
       "kind": "entity_count",
@@ -554,7 +462,8 @@
         "mem_55d58a42c62d20fd"
       ],
       "derivation": "COUNT of DISTINCT entities over active memories where subject='user', the mapped relation_type is 'practises_hobby', and scope is one of ['event', 'profile']; entities split from the stored object and deduplicated case-insensitively; scope stated in the question as ['hobbies']",
-      "probe_id": "entity_count_0020"
+      "probe_id": "entity_count_6aeb4375_practises_hobby",
+      "relation": "practises_hobby"
     },
     {
       "kind": "entity_count",
@@ -579,7 +488,8 @@
         "mem_c3a238b5ed3743e2"
       ],
       "derivation": "COUNT of DISTINCT entities over active memories where subject='user', the mapped relation_type is 'acquired', and scope is one of ['event', 'profile']; entities split from the stored object and deduplicated case-insensitively; scope stated in the question as ['gifts received', 'online purchase']",
-      "probe_id": "entity_count_0021"
+      "probe_id": "entity_count_1568498a_acquired",
+      "relation": "acquired"
     },
     {
       "kind": "entity_count",
@@ -602,7 +512,8 @@
         "mem_cd4f708183ba964e"
       ],
       "derivation": "COUNT of DISTINCT entities over active memories where subject='user', the mapped relation_type is 'listened_to', and scope is one of ['event', 'profile']; entities split from the stored object and deduplicated case-insensitively; scope stated in the question as ['audiobooks listened', 'social media']",
-      "probe_id": "entity_count_0022"
+      "probe_id": "entity_count_gpt4_2d58bcd6_listened_to",
+      "relation": "listened_to"
     },
     {
       "kind": "entity_count",
@@ -639,7 +550,8 @@
         "mem_fc2000da52fc205b"
       ],
       "derivation": "COUNT of DISTINCT entities over active memories where subject='user', the mapped relation_type is 'owns', and scope is one of ['event', 'profile']; entities split from the stored object and deduplicated case-insensitively; scope stated in the question as ['baseball collection', 'bikes owned', 'camera collection', 'coin collection', 'motorcycles owned', 'watch collection']",
-      "probe_id": "entity_count_0023"
+      "probe_id": "entity_count_0ddfec37_abs_owns",
+      "relation": "owns"
     },
     {
       "kind": "entity_count",
@@ -662,7 +574,8 @@
         "mem_8a943089478091dd"
       ],
       "derivation": "COUNT of DISTINCT entities over active memories where subject='user', the mapped relation_type is 'acquired', and scope is one of ['event', 'profile']; entities split from the stored object and deduplicated case-insensitively; scope stated in the question as ['clothing purchases', 'gifts purchased']",
-      "probe_id": "entity_count_0024"
+      "probe_id": "entity_count_1c0ddc50_acquired",
+      "relation": "acquired"
     },
     {
       "kind": "entity_count",
@@ -689,7 +602,8 @@
         "mem_e833665ec5c3c6de"
       ],
       "derivation": "COUNT of DISTINCT entities over active memories where subject='user', the mapped relation_type is 'owns', and scope is one of ['event', 'profile']; entities split from the stored object and deduplicated case-insensitively; scope stated in the question as ['antique collection', 'possessions']",
-      "probe_id": "entity_count_0025"
+      "probe_id": "entity_count_dd2973ad_owns",
+      "relation": "owns"
     },
     {
       "kind": "entity_count",
@@ -712,7 +626,8 @@
         "mem_fafce6a5380e2a1d"
       ],
       "derivation": "COUNT of DISTINCT entities over active memories where subject='user', the mapped relation_type is 'owns', and scope is one of ['event', 'profile']; entities split from the stored object and deduplicated case-insensitively; scope stated in the question as ['clothing', 'collectibles']",
-      "probe_id": "entity_count_0026"
+      "probe_id": "entity_count_a4996e51_owns",
+      "relation": "owns"
     },
     {
       "kind": "entity_count",
@@ -736,7 +651,8 @@
         "mem_f9fb490c38139377"
       ],
       "derivation": "COUNT of DISTINCT entities over active memories where subject='user', the mapped relation_type is 'owns', and scope is one of ['event', 'profile']; entities split from the stored object and deduplicated case-insensitively; scope stated in the question as ['possessions', 'property ownership', 'software owned']",
-      "probe_id": "entity_count_0027"
+      "probe_id": "entity_count_d682f1a2_owns",
+      "relation": "owns"
     },
     {
       "kind": "entity_count",
@@ -760,32 +676,8 @@
         "mem_a63b03c448591b29"
       ],
       "derivation": "COUNT of DISTINCT entities over active memories where subject='user', the mapped relation_type is 'owns', and scope is one of ['event', 'profile']; entities split from the stored object and deduplicated case-insensitively; scope stated in the question as ['possessions']",
-      "probe_id": "entity_count_0028"
-    },
-    {
-      "kind": "entity_count",
-      "namespace": "0e4e4c46",
-      "question": "How many distinct hobbies or activities does the user practise? Count only facts recorded under: hobbies, hobby duration, social activity. Count each distinct thing once, however many times it is mentioned.",
-      "answer": 4,
-      "answer_kind": "integer",
-      "scope_predicates": [
-        "hobbies",
-        "hobby duration",
-        "social activity"
-      ],
-      "entities": [
-        "Alex",
-        "basketball with Tom",
-        "cocktail mixing for one month",
-        "fishing"
-      ],
-      "evidence_memory_ids": [
-        "mem_0b7b58fdfa006d2b",
-        "mem_433d90850e36a04a",
-        "mem_7240e76dab375650"
-      ],
-      "derivation": "COUNT of DISTINCT entities over active memories where subject='user', the mapped relation_type is 'practises_hobby', and scope is one of ['event', 'profile']; entities split from the stored object and deduplicated case-insensitively; scope stated in the question as ['hobbies', 'hobby duration', 'social activity']",
-      "probe_id": "entity_count_0029"
+      "probe_id": "entity_count_d905b33f_owns",
+      "relation": "owns"
     },
     {
       "kind": "entity_count",
@@ -812,7 +704,8 @@
         "mem_df2b452f5d5a9094"
       ],
       "derivation": "COUNT of DISTINCT entities over active memories where subject='user', the mapped relation_type is 'owns', and scope is one of ['event', 'profile']; entities split from the stored object and deduplicated case-insensitively; scope stated in the question as ['footwear owned', 'possessions']",
-      "probe_id": "entity_count_0030"
+      "probe_id": "entity_count_gpt4_731e37d7_owns",
+      "relation": "owns"
     },
     {
       "kind": "entity_count",
@@ -838,7 +731,8 @@
         "mem_d04a8360842ab77d"
       ],
       "derivation": "COUNT of DISTINCT entities over active memories where subject='user', the mapped relation_type is 'cooked', and scope is one of ['event', 'profile']; entities split from the stored object and deduplicated case-insensitively; scope stated in the question as ['cooking classes', 'cooking skills', 'homemade food']",
-      "probe_id": "entity_count_0031"
+      "probe_id": "entity_count_6071bd76_cooked",
+      "relation": "cooked"
     },
     {
       "kind": "entity_count",
@@ -862,31 +756,8 @@
         "mem_924b738051dc5d8b"
       ],
       "derivation": "COUNT of DISTINCT entities over active memories where subject='user', the mapped relation_type is 'acquired', and scope is one of ['event', 'profile']; entities split from the stored object and deduplicated case-insensitively; scope stated in the question as ['gift given', 'purchases']",
-      "probe_id": "entity_count_0032"
-    },
-    {
-      "kind": "entity_count",
-      "namespace": "1c549ce4",
-      "question": "How many distinct possessions does the user have on record? Count only facts recorded under: camera ownership, footwear owned, furniture owned. Count each distinct thing once, however many times it is mentioned.",
-      "answer": 3,
-      "answer_kind": "integer",
-      "scope_predicates": [
-        "camera ownership",
-        "footwear owned",
-        "furniture owned"
-      ],
-      "entities": [
-        "1960s Canon QL17 for $50",
-        "black Adidas sneakers",
-        "IKEA coffee table"
-      ],
-      "evidence_memory_ids": [
-        "mem_1f48041464458082",
-        "mem_aca24e79af62432c",
-        "mem_e976050f3a70f464"
-      ],
-      "derivation": "COUNT of DISTINCT entities over active memories where subject='user', the mapped relation_type is 'owns', and scope is one of ['event', 'profile']; entities split from the stored object and deduplicated case-insensitively; scope stated in the question as ['camera ownership', 'footwear owned', 'furniture owned']",
-      "probe_id": "entity_count_0033"
+      "probe_id": "entity_count_28dc39ac_acquired",
+      "relation": "acquired"
     },
     {
       "kind": "entity_count",
@@ -915,29 +786,8 @@
         "mem_e14bcc91df648a1e"
       ],
       "derivation": "COUNT of DISTINCT entities over active memories where subject='user', the mapped relation_type is 'owns', and scope is one of ['event', 'profile']; entities split from the stored object and deduplicated case-insensitively; scope stated in the question as ['kitchen equipment', 'possessions']",
-      "probe_id": "entity_count_0034"
-    },
-    {
-      "kind": "entity_count",
-      "namespace": "3b6f954b",
-      "question": "How many distinct events has the user attended? Count only facts recorded under: events attended, photography workshop. Count each distinct thing once, however many times it is mentioned.",
-      "answer": 3,
-      "answer_kind": "integer",
-      "scope_predicates": [
-        "events attended",
-        "photography workshop"
-      ],
-      "entities": [
-        "2023",
-        "attended on March 22nd",
-        "History Museum lecture series"
-      ],
-      "evidence_memory_ids": [
-        "mem_64b313bc0351160f",
-        "mem_c06fe5931a5f96fe"
-      ],
-      "derivation": "COUNT of DISTINCT entities over active memories where subject='user', the mapped relation_type is 'attended', and scope is one of ['event', 'profile']; entities split from the stored object and deduplicated case-insensitively; scope stated in the question as ['events attended', 'photography workshop']",
-      "probe_id": "entity_count_0035"
+      "probe_id": "entity_count_8c18457d_owns",
+      "relation": "owns"
     },
     {
       "kind": "entity_count",
@@ -961,30 +811,8 @@
         "mem_992abcfb3c110e49"
       ],
       "derivation": "COUNT of DISTINCT entities over active memories where subject='user', the mapped relation_type is 'owns', and scope is one of ['event', 'profile']; entities split from the stored object and deduplicated case-insensitively; scope stated in the question as ['board game collection', 'clothing item', 'phone owned']",
-      "probe_id": "entity_count_0036"
-    },
-    {
-      "kind": "entity_count",
-      "namespace": "c7cf7dfd",
-      "question": "How many distinct places has the user visited? Count only facts recorded under: travel itinerary, vet visit. Count each distinct thing once, however many times it is mentioned.",
-      "answer": 3,
-      "answer_kind": "integer",
-      "scope_predicates": [
-        "travel itinerary",
-        "vet visit"
-      ],
-      "entities": [
-        "arrive Calgary June 14 2023 11:30 am",
-        "depart Calgary June 19 2023 10:25 am",
-        "January 15 2023"
-      ],
-      "evidence_memory_ids": [
-        "mem_1efaac30e0be0d5f",
-        "mem_d2317d1c92c60d12",
-        "mem_f9900fed18e9c8e7"
-      ],
-      "derivation": "COUNT of DISTINCT entities over active memories where subject='user', the mapped relation_type is 'visited', and scope is one of ['event', 'profile']; entities split from the stored object and deduplicated case-insensitively; scope stated in the question as ['travel itinerary', 'vet visit']",
-      "probe_id": "entity_count_0037"
+      "probe_id": "entity_count_25e5aa4f_owns",
+      "relation": "owns"
     },
     {
       "kind": "entity_count",
@@ -1022,7 +850,8 @@
         "mem_e372788138278694"
       ],
       "derivation": "COUNT of DISTINCT entities over active memories where subject='user', the mapped relation_type is 'acquired', and scope is one of ['event', 'profile']; entities split from the stored object and deduplicated case-insensitively; scope stated in the question as ['art purchases', 'clothing purchases', 'electronics purchases', 'gift purchases']",
-      "probe_id": "entity_count_0038"
+      "probe_id": "entity_count_ccb36322_acquired",
+      "relation": "acquired"
     },
     {
       "kind": "entity_count",
@@ -1045,32 +874,8 @@
         "mem_c7cd0137a154d634"
       ],
       "derivation": "COUNT of DISTINCT entities over active memories where subject='user', the mapped relation_type is 'owns', and scope is one of ['event', 'profile']; entities split from the stored object and deduplicated case-insensitively; scope stated in the question as ['art collection', 'vinyl collection item']",
-      "probe_id": "entity_count_0039"
-    },
-    {
-      "kind": "entity_count",
-      "namespace": "57f827a0",
-      "question": "How many distinct possessions does the user have on record? Count only facts recorded under: books owned, coin collection, network equipment. Count each distinct thing once, however many times it is mentioned.",
-      "answer": 4,
-      "answer_kind": "integer",
-      "scope_predicates": [
-        "books owned",
-        "coin collection",
-        "network equipment"
-      ],
-      "entities": [
-        "1893 Morgan dollar",
-        "Filth by Carmen Giménez Smith",
-        "Milk",
-        "range extender in living room"
-      ],
-      "evidence_memory_ids": [
-        "mem_10714ea80ca4a883",
-        "mem_4d25029309ebb4e2",
-        "mem_646d2f57e9b1b0ee"
-      ],
-      "derivation": "COUNT of DISTINCT entities over active memories where subject='user', the mapped relation_type is 'owns', and scope is one of ['event', 'profile']; entities split from the stored object and deduplicated case-insensitively; scope stated in the question as ['books owned', 'coin collection', 'network equipment']",
-      "probe_id": "entity_count_0040"
+      "probe_id": "entity_count_gpt4_78cf46a3_owns",
+      "relation": "owns"
     },
     {
       "kind": "entity_count",
@@ -1092,7 +897,8 @@
         "mem_799f525fb5306102"
       ],
       "derivation": "COUNT of DISTINCT entities over active memories where subject='user', the mapped relation_type is 'ate_at', and scope is one of ['event', 'profile']; entities split from the stored object and deduplicated case-insensitively; scope stated in the question as ['groceries']",
-      "probe_id": "entity_count_0041"
+      "probe_id": "entity_count_3fdac837_ate_at",
+      "relation": "ate_at"
     },
     {
       "kind": "entity_count",
@@ -1122,7 +928,8 @@
         "mem_f2a03165cff90b3f"
       ],
       "derivation": "COUNT of DISTINCT entities over active memories where subject='user', the mapped relation_type is 'owns', and scope is one of ['event', 'profile']; entities split from the stored object and deduplicated case-insensitively; scope stated in the question as ['art collection', 'doll collection', 'music collection', 'owned spirits']",
-      "probe_id": "entity_count_0042"
+      "probe_id": "entity_count_6613b389_owns",
+      "relation": "owns"
     },
     {
       "kind": "entity_count",
@@ -1148,7 +955,8 @@
         "mem_c6718beca1e52223"
       ],
       "derivation": "COUNT of DISTINCT entities over active memories where subject='user', the mapped relation_type is 'acquired', and scope is one of ['event', 'profile']; entities split from the stored object and deduplicated case-insensitively; scope stated in the question as ['purchases', 'skills acquired']",
-      "probe_id": "entity_count_0043"
+      "probe_id": "entity_count_06db6396_acquired",
+      "relation": "acquired"
     },
     {
       "kind": "entity_count",
@@ -1168,7 +976,8 @@
         "mem_a5fc7e1571bcc649"
       ],
       "derivation": "COUNT of DISTINCT entities over active memories where subject='user', the mapped relation_type is 'ate_at', and scope is one of ['event', 'profile']; entities split from the stored object and deduplicated case-insensitively; scope stated in the question as ['meals eaten']",
-      "probe_id": "entity_count_0044"
+      "probe_id": "entity_count_gpt4_e061b84g_ate_at",
+      "relation": "ate_at"
     },
     {
       "kind": "entity_count",
@@ -1188,7 +997,8 @@
         "mem_f0a0e3a924ebd090"
       ],
       "derivation": "COUNT of DISTINCT entities over active memories where subject='user', the mapped relation_type is 'ate_at', and scope is one of ['event', 'profile']; entities split from the stored object and deduplicated case-insensitively; scope stated in the question as ['meals eaten']",
-      "probe_id": "entity_count_0045"
+      "probe_id": "entity_count_b46e15ed_ate_at",
+      "relation": "ate_at"
     },
     {
       "kind": "entity_count",
@@ -1211,31 +1021,8 @@
         "mem_70ef1084163b2130"
       ],
       "derivation": "COUNT of DISTINCT entities over active memories where subject='user', the mapped relation_type is 'acquired', and scope is one of ['event', 'profile']; entities split from the stored object and deduplicated case-insensitively; scope stated in the question as ['chicken feed purchase', 'clothing purchase']",
-      "probe_id": "entity_count_0046"
-    },
-    {
-      "kind": "entity_count",
-      "namespace": "8ebdbe50",
-      "question": "How many distinct things has the user acquired? Count only facts recorded under: online purchases. Count each distinct thing once, however many times it is mentioned.",
-      "answer": 4,
-      "answer_kind": "integer",
-      "scope_predicates": [
-        "online purchases"
-      ],
-      "entities": [
-        "books on 2023-06-05 for $50 from Barnes & Noble",
-        "laptop on 2023-06-12 for $1,200 from Best Buy",
-        "sneakers from Amazon on 2023-05-22",
-        "sneakers on 2023-04-10 for $80 from Amazon"
-      ],
-      "evidence_memory_ids": [
-        "mem_2f1e96c4067793f1",
-        "mem_7ce01e9d5200cca3",
-        "mem_d42c3b16063765e5",
-        "mem_f6b380efae586918"
-      ],
-      "derivation": "COUNT of DISTINCT entities over active memories where subject='user', the mapped relation_type is 'acquired', and scope is one of ['event', 'profile']; entities split from the stored object and deduplicated case-insensitively; scope stated in the question as ['online purchases']",
-      "probe_id": "entity_count_0047"
+      "probe_id": "entity_count_bc149d6b_acquired",
+      "relation": "acquired"
     },
     {
       "kind": "entity_count",
@@ -1256,7 +1043,8 @@
         "mem_f8b1be4e9a32d33f"
       ],
       "derivation": "COUNT of DISTINCT entities over active memories where subject='user', the mapped relation_type is 'grows', and scope is one of ['event', 'profile']; entities split from the stored object and deduplicated case-insensitively; scope stated in the question as ['home decor']",
-      "probe_id": "entity_count_0048"
+      "probe_id": "entity_count_5809eb10_grows",
+      "relation": "grows"
     },
     {
       "kind": "entity_count",
@@ -1284,7 +1072,8 @@
         "mem_db94b476713036f4"
       ],
       "derivation": "COUNT of DISTINCT entities over active memories where subject='user', the mapped relation_type is 'owns', and scope is one of ['event', 'profile']; entities split from the stored object and deduplicated case-insensitively; scope stated in the question as ['collectibles', 'fishing gear', 'land ownership']",
-      "probe_id": "entity_count_0049"
+      "probe_id": "entity_count_a82c026e_owns",
+      "relation": "owns"
     },
     {
       "kind": "entity_count",
@@ -1308,7 +1097,8 @@
         "mem_ab2e3d8891093931"
       ],
       "derivation": "COUNT of DISTINCT entities over active memories where subject='user', the mapped relation_type is 'acquired', and scope is one of ['event', 'profile']; entities split from the stored object and deduplicated case-insensitively; scope stated in the question as ['clothing purchases', 'gift purchases', 'grocery purchases']",
-      "probe_id": "entity_count_0050"
+      "probe_id": "entity_count_60bf93ed_abs_acquired",
+      "relation": "acquired"
     },
     {
       "kind": "entity_count",
@@ -1334,35 +1124,8 @@
         "mem_c0b12a96afa0f889"
       ],
       "derivation": "COUNT of DISTINCT entities over active memories where subject='user', the mapped relation_type is 'practises_hobby', and scope is one of ['event', 'profile']; entities split from the stored object and deduplicated case-insensitively; scope stated in the question as ['hobbies', 'social activities', 'volunteering']",
-      "probe_id": "entity_count_0051"
-    },
-    {
-      "kind": "entity_count",
-      "namespace": "6613b389",
-      "question": "How many distinct events has the user attended? Count only facts recorded under: events attended. Count each distinct thing once, however many times it is mentioned.",
-      "answer": 9,
-      "answer_kind": "integer",
-      "scope_predicates": [
-        "events attended"
-      ],
-      "entities": [
-        "April 2023",
-        "February 2023",
-        "InvestFest",
-        "June 2023",
-        "Los Angeles",
-        "Marketing Expo",
-        "New York",
-        "San Francisco",
-        "TechFest"
-      ],
-      "evidence_memory_ids": [
-        "mem_7dba3486d529765c",
-        "mem_a05b0c3703d30feb",
-        "mem_c22af64aab27210f"
-      ],
-      "derivation": "COUNT of DISTINCT entities over active memories where subject='user', the mapped relation_type is 'attended', and scope is one of ['event', 'profile']; entities split from the stored object and deduplicated case-insensitively; scope stated in the question as ['events attended']",
-      "probe_id": "entity_count_0052"
+      "probe_id": "entity_count_8c18457d_practises_hobby",
+      "relation": "practises_hobby"
     },
     {
       "kind": "entity_count",
@@ -1397,7 +1160,8 @@
         "mem_f54e224b48a9826b"
       ],
       "derivation": "COUNT of DISTINCT entities over active memories where subject='user', the mapped relation_type is 'owns', and scope is one of ['event', 'profile']; entities split from the stored object and deduplicated case-insensitively; scope stated in the question as ['clothing ownership', 'collectibles', 'gardening equipment', 'handbag ownership']",
-      "probe_id": "entity_count_0053"
+      "probe_id": "entity_count_6071bd76_owns",
+      "relation": "owns"
     },
     {
       "kind": "entity_count",
@@ -1437,7 +1201,8 @@
         "mem_efa40f521efd1158"
       ],
       "derivation": "COUNT of DISTINCT entities over active memories where subject='user', the mapped relation_type is 'owns', and scope is one of ['event', 'profile']; entities split from the stored object and deduplicated case-insensitively; scope stated in the question as ['bikes owned', 'camera gear', 'clothing owned', 'farm equipment']",
-      "probe_id": "entity_count_0054"
+      "probe_id": "entity_count_95228167_owns",
+      "relation": "owns"
     },
     {
       "kind": "entity_count",
@@ -1457,7 +1222,8 @@
         "mem_dcab44bacfa21136"
       ],
       "derivation": "COUNT of DISTINCT entities over active memories where subject='user', the mapped relation_type is 'cooked', and scope is one of ['event', 'profile']; entities split from the stored object and deduplicated case-insensitively; scope stated in the question as ['recipes made']",
-      "probe_id": "entity_count_0055"
+      "probe_id": "entity_count_09ba9854_cooked",
+      "relation": "cooked"
     },
     {
       "kind": "entity_count",
@@ -1479,7 +1245,8 @@
         "mem_f8cb87b61b2ec891"
       ],
       "derivation": "COUNT of DISTINCT entities over active memories where subject='user', the mapped relation_type is 'owns', and scope is one of ['event', 'profile']; entities split from the stored object and deduplicated case-insensitively; scope stated in the question as ['jewelry owned', 'swimming gear']",
-      "probe_id": "entity_count_0056"
+      "probe_id": "entity_count_9ea5eabc_owns",
+      "relation": "owns"
     },
     {
       "kind": "entity_count",
@@ -1510,7 +1277,8 @@
         "mem_d3014586d6bc7fe9"
       ],
       "derivation": "COUNT of DISTINCT entities over active memories where subject='user', the mapped relation_type is 'attended', and scope is one of ['event', 'profile']; entities split from the stored object and deduplicated case-insensitively; scope stated in the question as ['events attended', 'workshops attended']",
-      "probe_id": "entity_count_0057"
+      "probe_id": "entity_count_157a136e_attended",
+      "relation": "attended"
     },
     {
       "kind": "entity_count",
@@ -1548,7 +1316,8 @@
         "mem_ff708930412f1d11"
       ],
       "derivation": "COUNT of DISTINCT entities over active memories where subject='user', the mapped relation_type is 'owns', and scope is one of ['event', 'profile']; entities split from the stored object and deduplicated case-insensitively; scope stated in the question as ['books owned', 'business ownership', 'camera gear', 'postcard collection', 'rugs owned']",
-      "probe_id": "entity_count_0058"
+      "probe_id": "entity_count_09ba9854_owns",
+      "relation": "owns"
     },
     {
       "kind": "entity_count",
@@ -1571,7 +1340,291 @@
         "mem_cdc76e7b8056c082"
       ],
       "derivation": "COUNT of DISTINCT entities over active memories where subject='user', the mapped relation_type is 'owns', and scope is one of ['event', 'profile']; entities split from the stored object and deduplicated case-insensitively; scope stated in the question as ['bicycles owned', 'smartwatch owned']",
-      "probe_id": "entity_count_0059"
+      "probe_id": "entity_count_6b168ec8_owns",
+      "relation": "owns"
+    },
+    {
+      "kind": "entity_count",
+      "namespace": "6e984301",
+      "question": "How many distinct possessions does the user have on record? Count only facts recorded under: accessories owned, collections, phone owned, property viewing, typewriter owned. Count each distinct thing once, however many times it is mentioned.",
+      "answer": 8,
+      "answer_kind": "integer",
+      "scope_predicates": [
+        "accessories owned",
+        "collections",
+        "phone owned",
+        "property viewing",
+        "typewriter owned"
+      ],
+      "entities": [
+        "Cedar Creek property",
+        "coins",
+        "concert tickets",
+        "Remington Noiseless Portable",
+        "Samsung Galaxy S22 Ultra",
+        "typewriters",
+        "vinyl records",
+        "wireless charging pad"
+      ],
+      "evidence_memory_ids": [
+        "mem_4210f986318b3964",
+        "mem_5a3410f6145c8beb",
+        "mem_80598a28eead33fc",
+        "mem_81c22de574ec9d0e",
+        "mem_8530cdb5a8357ebf"
+      ],
+      "derivation": "COUNT of DISTINCT entities over active memories where subject='user', the mapped relation_type is 'owns', and scope is one of ['event', 'profile']; entities split from the stored object and deduplicated case-insensitively; scope stated in the question as ['accessories owned', 'collections', 'phone owned', 'property viewing', 'typewriter owned']",
+      "probe_id": "entity_count_6e984301_owns",
+      "relation": "owns"
+    },
+    {
+      "kind": "entity_count",
+      "namespace": "1c0ddc50",
+      "question": "How many distinct hobbies or activities does the user practise? Count only facts recorded under: volunteer activity, weekly activities. Count each distinct thing once, however many times it is mentioned.",
+      "answer": 3,
+      "answer_kind": "integer",
+      "scope_predicates": [
+        "volunteer activity",
+        "weekly activities"
+      ],
+      "entities": [
+        "animal shelter charity walk",
+        "charity gala",
+        "squash with Ryan on Thursdays"
+      ],
+      "evidence_memory_ids": [
+        "mem_5512fb18a49605dc",
+        "mem_57e7ec00aa3a56f4",
+        "mem_868a350235278445"
+      ],
+      "derivation": "COUNT of DISTINCT entities over active memories where subject='user', the mapped relation_type is 'practises_hobby', and scope is one of ['event', 'profile']; entities split from the stored object and deduplicated case-insensitively; scope stated in the question as ['volunteer activity', 'weekly activities']",
+      "probe_id": "entity_count_1c0ddc50_practises_hobby",
+      "relation": "practises_hobby"
+    },
+    {
+      "kind": "entity_count",
+      "namespace": "gpt4_59149c77",
+      "question": "How many distinct possessions does the user have on record? Count only facts recorded under: aquarium equipment, music collection, vinyl collection. Count each distinct thing once, however many times it is mentioned.",
+      "answer": 3,
+      "answer_kind": "integer",
+      "scope_predicates": [
+        "aquarium equipment",
+        "music collection",
+        "vinyl collection"
+      ],
+      "entities": [
+        "Arctic Monkeys The Car",
+        "Eheim canister filter",
+        "Sgt. Pepper's Lonely Hearts Club Band"
+      ],
+      "evidence_memory_ids": [
+        "mem_019b73b3bd4df38e",
+        "mem_219448dca3ef4b09",
+        "mem_91f82029675c9d35"
+      ],
+      "derivation": "COUNT of DISTINCT entities over active memories where subject='user', the mapped relation_type is 'owns', and scope is one of ['event', 'profile']; entities split from the stored object and deduplicated case-insensitively; scope stated in the question as ['aquarium equipment', 'music collection', 'vinyl collection']",
+      "probe_id": "entity_count_gpt4_59149c77_owns",
+      "relation": "owns"
+    },
+    {
+      "kind": "entity_count",
+      "namespace": "c8090214",
+      "question": "How many distinct events has the user attended? Count only facts recorded under: events attended, workshops attended. Count each distinct thing once, however many times it is mentioned.",
+      "answer": 4,
+      "answer_kind": "integer",
+      "scope_predicates": [
+        "events attended",
+        "workshops attended"
+      ],
+      "entities": [
+        "Holiday Market",
+        "musical theater workshop",
+        "physical theater masterclass",
+        "University Art Gallery lecture"
+      ],
+      "evidence_memory_ids": [
+        "mem_134d1599eb343c9b",
+        "mem_257dd81bd4ab4d77",
+        "mem_482791a76cd6cd33",
+        "mem_d7c8e28f125b258c"
+      ],
+      "derivation": "COUNT of DISTINCT entities over active memories where subject='user', the mapped relation_type is 'attended', and scope is one of ['event', 'profile']; entities split from the stored object and deduplicated case-insensitively; scope stated in the question as ['events attended', 'workshops attended']",
+      "probe_id": "entity_count_c8090214_attended",
+      "relation": "attended"
+    },
+    {
+      "kind": "entity_count",
+      "namespace": "c8090214",
+      "question": "How many distinct books or articles has the user read? Count only facts recorded under: books read, books reading. Count each distinct thing once, however many times it is mentioned.",
+      "answer": 3,
+      "answer_kind": "integer",
+      "scope_predicates": [
+        "books read",
+        "books reading"
+      ],
+      "entities": [
+        "The 7 Habits of Highly Effective People",
+        "All the Light We Cannot See",
+        "Sapiens: A Brief History of Humankind"
+      ],
+      "evidence_memory_ids": [
+        "mem_1430f55c15288cd7",
+        "mem_c8349c8c96ec5d58",
+        "mem_cc6adf606e352803"
+      ],
+      "derivation": "COUNT of DISTINCT entities over active memories where subject='user', the mapped relation_type is 'read', and scope is one of ['event', 'profile']; entities split from the stored object and deduplicated case-insensitively; scope stated in the question as ['books read', 'books reading']",
+      "probe_id": "entity_count_c8090214_read",
+      "relation": "read"
+    },
+    {
+      "kind": "entity_count",
+      "namespace": "0e5e2d1a",
+      "question": "How many distinct places has the user visited? Count only facts recorded under: family visits, trips. Count each distinct thing once, however many times it is mentioned.",
+      "answer": 5,
+      "answer_kind": "integer",
+      "scope_predicates": [
+        "family visits",
+        "trips"
+      ],
+      "entities": [
+        "Florida",
+        "grandmother",
+        "mountain getaway",
+        "South Beach",
+        "Yellowstone camping trip"
+      ],
+      "evidence_memory_ids": [
+        "mem_0398775a65b14adf",
+        "mem_16e10ebad0f35d59",
+        "mem_3746ca171e4986eb",
+        "mem_f89ef7b12a22ac08"
+      ],
+      "derivation": "COUNT of DISTINCT entities over active memories where subject='user', the mapped relation_type is 'visited', and scope is one of ['event', 'profile']; entities split from the stored object and deduplicated case-insensitively; scope stated in the question as ['family visits', 'trips']",
+      "probe_id": "entity_count_0e5e2d1a_visited",
+      "relation": "visited"
+    },
+    {
+      "kind": "entity_count",
+      "namespace": "e3fc4d6e",
+      "question": "How many distinct hobbies or activities does the user practise? Count only facts recorded under: hobbies. Count each distinct thing once, however many times it is mentioned.",
+      "answer": 5,
+      "answer_kind": "integer",
+      "scope_predicates": [
+        "hobbies"
+      ],
+      "entities": [
+        "cycling",
+        "running",
+        "salsa classes",
+        "tennis",
+        "volleyball"
+      ],
+      "evidence_memory_ids": [
+        "mem_bb3dbf7e81535ed6",
+        "mem_dad10876e657d3e8"
+      ],
+      "derivation": "COUNT of DISTINCT entities over active memories where subject='user', the mapped relation_type is 'practises_hobby', and scope is one of ['event', 'profile']; entities split from the stored object and deduplicated case-insensitively; scope stated in the question as ['hobbies']",
+      "probe_id": "entity_count_e3fc4d6e_practises_hobby",
+      "relation": "practises_hobby"
+    },
+    {
+      "kind": "entity_count",
+      "namespace": "60bf93ed_abs",
+      "question": "How many distinct possessions does the user have on record? Count only facts recorded under: clothing items. Count each distinct thing once, however many times it is mentioned.",
+      "answer": 4,
+      "answer_kind": "integer",
+      "scope_predicates": [
+        "clothing items"
+      ],
+      "entities": [
+        "green sweater lent to sister",
+        "navy blue blazer at dry cleaners",
+        "sandals to be picked up",
+        "silver necklace"
+      ],
+      "evidence_memory_ids": [
+        "mem_51a1a70f413df113",
+        "mem_550c83d361ff0c4e",
+        "mem_a04e04daf46df5a4",
+        "mem_e3e2e89d9189c7a6"
+      ],
+      "derivation": "COUNT of DISTINCT entities over active memories where subject='user', the mapped relation_type is 'owns', and scope is one of ['event', 'profile']; entities split from the stored object and deduplicated case-insensitively; scope stated in the question as ['clothing items']",
+      "probe_id": "entity_count_60bf93ed_abs_owns",
+      "relation": "owns"
+    },
+    {
+      "kind": "entity_count",
+      "namespace": "gpt4_7a0daae1",
+      "question": "How many distinct events has the user attended? Count only facts recorded under: events attended, museum membership. Count each distinct thing once, however many times it is mentioned.",
+      "answer": 3,
+      "answer_kind": "integer",
+      "scope_predicates": [
+        "events attended",
+        "museum membership"
+      ],
+      "entities": [
+        "family reunion",
+        "museum membership",
+        "Science Museum Late Night"
+      ],
+      "evidence_memory_ids": [
+        "mem_476a63dd33bfc42f",
+        "mem_7307eeeaab895cfe",
+        "mem_a91e0e9a85a6b9d1"
+      ],
+      "derivation": "COUNT of DISTINCT entities over active memories where subject='user', the mapped relation_type is 'attended', and scope is one of ['event', 'profile']; entities split from the stored object and deduplicated case-insensitively; scope stated in the question as ['events attended', 'museum membership']",
+      "probe_id": "entity_count_gpt4_7a0daae1_attended",
+      "relation": "attended"
+    },
+    {
+      "kind": "entity_count",
+      "namespace": "86b68151",
+      "question": "How many distinct possessions does the user have on record? Count only facts recorded under: books owned, equipment, land ownership. Count each distinct thing once, however many times it is mentioned.",
+      "answer": 3,
+      "answer_kind": "integer",
+      "scope_predicates": [
+        "books owned",
+        "equipment",
+        "land ownership"
+      ],
+      "entities": [
+        "5-acre plot",
+        "old books",
+        "spotting scope"
+      ],
+      "evidence_memory_ids": [
+        "mem_7e88529e123ac8ec",
+        "mem_aced95528b1b2a49",
+        "mem_dc365093672cf373"
+      ],
+      "derivation": "COUNT of DISTINCT entities over active memories where subject='user', the mapped relation_type is 'owns', and scope is one of ['event', 'profile']; entities split from the stored object and deduplicated case-insensitively; scope stated in the question as ['books owned', 'equipment', 'land ownership']",
+      "probe_id": "entity_count_86b68151_owns",
+      "relation": "owns"
+    },
+    {
+      "kind": "entity_count",
+      "namespace": "gpt4_7de946e7",
+      "question": "How many distinct possessions does the user have on record? Count only facts recorded under: collectibles. Count each distinct thing once, however many times it is mentioned.",
+      "answer": 6,
+      "answer_kind": "integer",
+      "scope_predicates": [
+        "collectibles"
+      ],
+      "entities": [
+        "figurines",
+        "Lord of the Rings items",
+        "Prince of Persia items",
+        "Spider-Man comics",
+        "Spider-Man Funko Pop",
+        "vintage Star Wars action figures"
+      ],
+      "evidence_memory_ids": [
+        "mem_9b18455144edd666",
+        "mem_c968c834fe0de85a"
+      ],
+      "derivation": "COUNT of DISTINCT entities over active memories where subject='user', the mapped relation_type is 'owns', and scope is one of ['event', 'profile']; entities split from the stored object and deduplicated case-insensitively; scope stated in the question as ['collectibles']",
+      "probe_id": "entity_count_gpt4_7de946e7_owns",
+      "relation": "owns"
     }
   ],
   "refused": [
@@ -1653,7 +1706,7 @@
     {
       "namespace": "15745da0_abs",
       "relation": "practises_hobby",
-      "reason": "only 2 distinct entities after deduplication"
+      "reason": "member mem_d9b663940f9159b0 names companions, which are not members of the asked-about set"
     },
     {
       "namespace": "a96c20ee",
@@ -1674,6 +1727,16 @@
       "namespace": "3d86fd0a",
       "relation": "knows_person",
       "reason": "every candidate member records an intention rather than an act"
+    },
+    {
+      "namespace": "1f2b8d4f",
+      "relation": "grows",
+      "reason": "member mem_76bc8aefc9f794d1 carries its own date, time or price, so it records an occasion rather than naming a member"
+    },
+    {
+      "namespace": "5a7937c8",
+      "relation": "visited",
+      "reason": "member mem_d4d657f7eb8f8673 splits into a date ('Jan 10 2024'), so the object records provenance"
     },
     {
       "namespace": "gpt4_a2d1d1f6",
@@ -1741,6 +1804,11 @@
       "reason": "every candidate member records an intention rather than an act"
     },
     {
+      "namespace": "8a2466db",
+      "relation": "attended",
+      "reason": "member mem_a96a47a1f2b6bf52 carries its own date, time or price, so it records an occasion rather than naming a member"
+    },
+    {
       "namespace": "561fabcd",
       "relation": "grows",
       "reason": "every candidate member records an intention rather than an act"
@@ -1764,6 +1832,11 @@
       "namespace": "gpt4_7de946e7",
       "relation": "visited",
       "reason": "every candidate member records an intention rather than an act"
+    },
+    {
+      "namespace": "b759caee",
+      "relation": "attended",
+      "reason": "member mem_efb423b2bd6cbe5e carries its own date, time or price, so it records an occasion rather than naming a member"
     },
     {
       "namespace": "58ef2f1c",
@@ -1991,6 +2064,11 @@
       "reason": "every candidate member records an intention rather than an act"
     },
     {
+      "namespace": "0e4e4c46",
+      "relation": "practises_hobby",
+      "reason": "member mem_7240e76dab375650 names companions, which are not members of the asked-about set"
+    },
+    {
       "namespace": "8c18457d",
       "relation": "visited",
       "reason": "only 1 distinct entities after deduplication"
@@ -2008,7 +2086,7 @@
     {
       "namespace": "gpt4_a56e767c",
       "relation": "visited",
-      "reason": "only 2 distinct entities after deduplication"
+      "reason": "member mem_9553bff9292cb0fb splits into a date ('2023'), so the object records provenance"
     },
     {
       "namespace": "5809eb10",
@@ -2024,6 +2102,11 @@
       "namespace": "6b168ec8",
       "relation": "cooked",
       "reason": "only 1 distinct entities after deduplication"
+    },
+    {
+      "namespace": "1c549ce4",
+      "relation": "owns",
+      "reason": "member mem_aca24e79af62432c carries its own date, time or price, so it records an occasion rather than naming a member"
     },
     {
       "namespace": "d23cf73b",
@@ -2061,6 +2144,11 @@
       "reason": "every candidate member records an intention rather than an act"
     },
     {
+      "namespace": "3b6f954b",
+      "relation": "attended",
+      "reason": "member mem_64b313bc0351160f splits into a clause fragment ('attended on March 22nd'), not an entity"
+    },
+    {
       "namespace": "1568498a",
       "relation": "used_service",
       "reason": "every candidate member records an intention rather than an act"
@@ -2091,6 +2179,11 @@
       "reason": "only 1 distinct entities after deduplication"
     },
     {
+      "namespace": "c7cf7dfd",
+      "relation": "visited",
+      "reason": "member mem_1efaac30e0be0d5f carries its own date, time or price, so it records an occasion rather than naming a member"
+    },
+    {
       "namespace": "gpt4_2487a7cb",
       "relation": "used_service",
       "reason": "every candidate member records an intention rather than an act"
@@ -2114,6 +2207,11 @@
       "namespace": "gpt4_74aed68e",
       "relation": "owns",
       "reason": "only 1 distinct entities after deduplication"
+    },
+    {
+      "namespace": "57f827a0",
+      "relation": "owns",
+      "reason": "member mem_4d25029309ebb4e2 carries a byline, so its separators belong to a title"
     },
     {
       "namespace": "58470ed2",
@@ -2193,7 +2291,7 @@
     {
       "namespace": "gpt4_b5700ca0",
       "relation": "visited",
-      "reason": "only 2 distinct entities after deduplication"
+      "reason": "member mem_e19b1945d3595d90 carries its own date, time or price, so it records an occasion rather than naming a member"
     },
     {
       "namespace": "25e5aa4f",
@@ -2234,6 +2332,11 @@
       "namespace": "0db4c65d",
       "relation": "read",
       "reason": "every candidate member records an intention rather than an act"
+    },
+    {
+      "namespace": "8ebdbe50",
+      "relation": "acquired",
+      "reason": "member mem_2f1e96c4067793f1 carries its own date, time or price, so it records an occasion rather than naming a member"
     },
     {
       "namespace": "bc149d6b",
@@ -2304,6 +2407,11 @@
       "namespace": "35a27287",
       "relation": "listened_to",
       "reason": "only 1 distinct entities after deduplication"
+    },
+    {
+      "namespace": "6613b389",
+      "relation": "attended",
+      "reason": "member mem_a05b0c3703d30feb splits into a date ('April 2023'), so the object records provenance"
     },
     {
       "namespace": "gpt4_fa19884c",
@@ -2384,11 +2492,246 @@
       "namespace": "9a707b82",
       "relation": "visited",
       "reason": "only 1 distinct entities after deduplication"
+    },
+    {
+      "namespace": "6aeb4375",
+      "relation": "listened_to",
+      "reason": "every candidate member records an intention rather than an act"
+    },
+    {
+      "namespace": "ef66a6e5",
+      "relation": "listened_to",
+      "reason": "every candidate member records an intention rather than an act"
+    },
+    {
+      "namespace": "gpt4_7a0daae1",
+      "relation": "owns",
+      "reason": "only 1 distinct entities after deduplication"
+    },
+    {
+      "namespace": "gpt4_6ed717ea",
+      "relation": "read",
+      "reason": "only 2 distinct entities after deduplication"
+    },
+    {
+      "namespace": "ed4ddc30",
+      "relation": "owns",
+      "reason": "only 1 distinct entities after deduplication"
+    },
+    {
+      "namespace": "f9e8c073",
+      "relation": "practises_hobby",
+      "reason": "only 2 distinct entities after deduplication"
+    },
+    {
+      "namespace": "6a1eabeb",
+      "relation": "ate_at",
+      "reason": "only 1 distinct entities after deduplication"
+    },
+    {
+      "namespace": "195a1a1b",
+      "relation": "attended",
+      "reason": "every candidate member records an intention rather than an act"
+    },
+    {
+      "namespace": "e3038f8c",
+      "relation": "knows_person",
+      "reason": "only 1 distinct entities after deduplication"
+    },
+    {
+      "namespace": "982b5123",
+      "relation": "attended",
+      "reason": "member mem_365a92714ad619c2 splits into a date ('May 21 2023'), so the object records provenance"
+    },
+    {
+      "namespace": "8550ddae",
+      "relation": "acquired",
+      "reason": "only 1 distinct entities after deduplication"
+    },
+    {
+      "namespace": "7a8d0b71",
+      "relation": "attended",
+      "reason": "member mem_180b29d00c461982 carries its own date, time or price, so it records an occasion rather than naming a member"
+    },
+    {
+      "namespace": "a82c026e",
+      "relation": "read",
+      "reason": "only 1 distinct entities after deduplication"
+    },
+    {
+      "namespace": "1e043500",
+      "relation": "owns",
+      "reason": "member mem_584508cfb47fb4c3 splits into a date ('1970s'), so the object records provenance"
+    },
+    {
+      "namespace": "58ef2f1c",
+      "relation": "read",
+      "reason": "every candidate member records an intention rather than an act"
+    },
+    {
+      "namespace": "gpt4_8279ba02",
+      "relation": "ate_at",
+      "reason": "every candidate member records an intention rather than an act"
+    },
+    {
+      "namespace": "51a45a95",
+      "relation": "cooked",
+      "reason": "every candidate member records an intention rather than an act"
+    },
+    {
+      "namespace": "b759caee",
+      "relation": "acquired",
+      "reason": "only 1 distinct entities after deduplication"
+    },
+    {
+      "namespace": "0bc8ad92",
+      "relation": "acquired",
+      "reason": "every candidate member records an intention rather than an act"
+    },
+    {
+      "namespace": "5809eb10",
+      "relation": "listened_to",
+      "reason": "every candidate member records an intention rather than an act"
+    },
+    {
+      "namespace": "22d2cb42",
+      "relation": "grows",
+      "reason": "only 1 distinct entities after deduplication"
+    },
+    {
+      "namespace": "311778f1",
+      "relation": "completed",
+      "reason": "only 2 distinct entities after deduplication"
+    },
+    {
+      "namespace": "6aeb4375",
+      "relation": "visited",
+      "reason": "only 1 distinct entities after deduplication"
+    },
+    {
+      "namespace": "3fdac837",
+      "relation": "grows",
+      "reason": "member mem_f99689d141b46cd5 carries no recoverable entity"
+    },
+    {
+      "namespace": "6456829e",
+      "relation": "attended",
+      "reason": "only 1 distinct entities after deduplication"
+    },
+    {
+      "namespace": "afdc33df",
+      "relation": "completed",
+      "reason": "only 1 distinct entities after deduplication"
+    },
+    {
+      "namespace": "gpt4_2f8be40d",
+      "relation": "owns",
+      "reason": "only 2 distinct entities after deduplication"
+    },
+    {
+      "namespace": "9bbe84a2",
+      "relation": "attended",
+      "reason": "member mem_1226ec132cf6fe33 carries its own date, time or price, so it records an occasion rather than naming a member"
+    },
+    {
+      "namespace": "b759caee",
+      "relation": "cooked",
+      "reason": "only 1 distinct entities after deduplication"
+    },
+    {
+      "namespace": "c7cf7dfd",
+      "relation": "practises_hobby",
+      "reason": "only 1 distinct entities after deduplication"
+    },
+    {
+      "namespace": "28dc39ac",
+      "relation": "watched",
+      "reason": "only 2 distinct entities after deduplication"
+    },
+    {
+      "namespace": "gpt4_4edbafa2",
+      "relation": "watched",
+      "reason": "only 2 distinct entities after deduplication"
+    },
+    {
+      "namespace": "195a1a1b",
+      "relation": "practises_hobby",
+      "reason": "only 2 distinct entities after deduplication"
+    },
+    {
+      "namespace": "ed4ddc30",
+      "relation": "acquired",
+      "reason": "member mem_124fd1fb86df9223 carries its own date, time or price, so it records an occasion rather than naming a member"
+    },
+    {
+      "namespace": "f9e8c073",
+      "relation": "listened_to",
+      "reason": "only 1 distinct entities after deduplication"
+    },
+    {
+      "namespace": "a96c20ee",
+      "relation": "cooked",
+      "reason": "only 1 distinct entities after deduplication"
+    },
+    {
+      "namespace": "0e5e2d1a",
+      "relation": "ate_at",
+      "reason": "only 1 distinct entities after deduplication"
+    },
+    {
+      "namespace": "c7cf7dfd",
+      "relation": "ate_at",
+      "reason": "every candidate member records an intention rather than an act"
+    },
+    {
+      "namespace": "gpt4_74aed68e",
+      "relation": "watched",
+      "reason": "only 1 distinct entities after deduplication"
+    },
+    {
+      "namespace": "eac54add",
+      "relation": "read",
+      "reason": "only 1 distinct entities after deduplication"
+    },
+    {
+      "namespace": "eeda8a6d",
+      "relation": "ate_at",
+      "reason": "every candidate member records an intention rather than an act"
+    },
+    {
+      "namespace": "1a8a66a6",
+      "relation": "acquired",
+      "reason": "only 1 distinct entities after deduplication"
+    },
+    {
+      "namespace": "1f2b8d4f",
+      "relation": "acquired",
+      "reason": "only 2 distinct entities after deduplication"
+    },
+    {
+      "namespace": "6071bd76",
+      "relation": "attended",
+      "reason": "only 1 distinct entities after deduplication"
+    },
+    {
+      "namespace": "ed4ddc30",
+      "relation": "read",
+      "reason": "every candidate member records an intention rather than an act"
+    },
+    {
+      "namespace": "8c18457d",
+      "relation": "knows_person",
+      "reason": "only 2 distinct entities after deduplication"
+    },
+    {
+      "namespace": "gpt4_ab202e7f",
+      "relation": "ate_at",
+      "reason": "only 2 distinct entities after deduplication"
     }
   ],
   "refusal_reasons": {
-    "only …": 116,
-    "every …": 43,
-    "member …": 3
+    "only …": 143,
+    "every …": 54,
+    "member …": 23
   }
 }

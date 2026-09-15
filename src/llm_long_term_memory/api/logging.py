@@ -10,7 +10,7 @@ alone, without reproducing the request:
 
 Cost in currency is deliberately absent. This project runs on a free tier with no
 published price schedule, and a USD figure invented from a list price would be a
-number that looks authoritative and is not (D-cost, docs/DECISIONS.md).
+number that looks authoritative and is not (D-cost, the report's 决策记录 section).
 
 Nothing here logs memory content or a credential. A memory body is user data; an
 id and a count are enough to debug with.

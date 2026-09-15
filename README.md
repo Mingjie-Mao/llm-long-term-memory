@@ -1,4 +1,4 @@
-[English](README.md) · [中文](README.zh-CN.md)
+[![English](docs/badges/lang-en-active.svg)](README.md)[![中文](docs/badges/lang-zh-idle.svg)](README.zh-CN.md)
 
 # llm-long-term-memory
 
@@ -6,20 +6,27 @@ A persistent memory layer for LLM applications: extract structured facts from
 conversations, track changes over time, and recover original turns when a question
 needs a detail that extraction lost.
 
-**Research prototype.** The frozen v2 system answered 72% of `test100` with 574 median
-context tokens; full history reached 86% with 109,059. The tradeoff is smaller answer
-context with lower accuracy than full history. [Results and counting conventions](#results).
+**What it buys, measured once on a held-out hundred.** The frozen v2 system answered
+**72%** of `test100` from a median of **574 context tokens**. Full history answered 86%
+from 109,059 — better, from **190x the context**. Where the gap runs the other way is
+time: questions about what changed scored **74.1%** against full history's **23.1%**, and
+knowledge updates **75.0%**, because superseded facts are resolved into timelines before
+the model ever sees them rather than being handed over for it to guess between.
 
-[Interactive demo](https://lltm-memory.pages.dev) · [Architecture atlas](docs/ARCHITECTURE.md) ·
-[Experiment history](docs/EXPERIMENT_HISTORY.md) · [Current research status](docs/CURRENT_STATUS.md)
+It is **not** shown to be more accurate than plain retrieval: +7 points over naive RAG at
+p = 0.3368. [Results and counting conventions](#results).
 
-The demo uses fictional scenarios. Its guided tour runs in the browser; its live
-playground exercises local embeddings, retrieval and temporal updates on explicit
-structured facts. It does not demonstrate LLM extraction or generated answers.
+[Interactive demo](https://lltm-memory.pages.dev) · [Architecture atlas](docs/PROJECT_REPORT.zh-CN.md#系统的架构) ·
+[Experiment history](docs/PROJECT_REPORT.zh-CN.md#实验历史) · [Current research status](docs/PROJECT_REPORT.zh-CN.md#现在在哪)
+
+The worked example sends fictional facts to the demo backend. The interactive box
+sends the visitor's supported statements and questions; browser sentence patterns
+produce explicit facts, and the backend runs local embeddings, retrieval and temporal
+updates across conversations. It does not demonstrate LLM extraction or generated answers.
 
 ![System overview: conversations become structured memories while raw turns remain available for conditional source recovery](docs/figures/overview.svg)
 
-[Editable SVG](docs/figures/overview.svg) · [中文架构图](docs/figures/overview.zh-CN.svg) · [Implementation and optional paths](docs/ARCHITECTURE.md)
+[Editable SVG](docs/figures/overview.svg) · [中文架构图](docs/figures/overview.zh-CN.svg) · [Implementation and optional paths](docs/PROJECT_REPORT.zh-CN.md#系统的架构)
 
 ## Quick start
 
@@ -97,7 +104,7 @@ baked in. Default configuration files are included; Compose can override them.
 
 Nonempty two-stage extraction usually takes two requests, plus any dedup adjudication.
 The 0.92 similarity threshold identifies neighbours; it does not itself delete facts.
-[Full caption and code mapping](docs/ARCHITECTURE.md#2-批量写入).
+[Full caption and code mapping](docs/PROJECT_REPORT.zh-CN.md#系统的架构).
 
 </details>
 
@@ -108,7 +115,7 @@ The 0.92 similarity threshold identifies neighbours; it does not itself delete f
 
 Source-session foreign keys and heuristic turn/span anchors provide different levels
 of assurance. Vector sidecars are saved separately from SQLite.
-[Full caption and code mapping](docs/ARCHITECTURE.md#3-存储模型).
+[Full caption and code mapping](docs/PROJECT_REPORT.zh-CN.md#系统的架构).
 
 </details>
 
@@ -117,7 +124,7 @@ of assurance. Vector sidecars are saved separately from SQLite.
 
 ![Retrieval and conditional source recovery, including answer, need_source and no_evidence verdicts](docs/figures/read-path.svg)
 
-The [complete atlas](docs/ARCHITECTURE.md) also explains out-of-order temporal updates
+The [complete atlas](docs/PROJECT_REPORT.zh-CN.md#系统的架构) also explains out-of-order temporal updates
 and the boundary between the runtime, playground and research evaluation.
 
 </details>
@@ -125,7 +132,7 @@ and the boundary between the runtime, playground and research evaluation.
 Reranking, session-coherent context, unconditional hydration, decay, consolidation and
 utility-based packing are available but absent from the default answer route. v3
 reasoning/hydration and v4 synthesis/scanning are explicit research variants.
-See the [branch map](docs/ARCHITECTURE.md#可选分支的真实状态) and
+See the [branch map](docs/PROJECT_REPORT.zh-CN.md#系统的架构) and
 [disabled-feature evidence](results/shipped-but-disabled.md).
 
 ## Results
@@ -181,7 +188,7 @@ until the instrument is rebuilt. [v4.2 result](results/v4.2-result.md),
 
 Source-session recall is an **any-gold-session hit** metric. It does not prove that
 all answer-bearing facts survived extraction. Detailed development results, negative
-results and the already-measured v4 probes are in the [experiment history](docs/EXPERIMENT_HISTORY.md).
+results and the already-measured v4 probes are in the [experiment history](docs/PROJECT_REPORT.zh-CN.md#实验历史).
 
 ## Interfaces
 
@@ -232,6 +239,58 @@ REST's credential-derived identity boundary and should remain local-only.
 
 </details>
 
+## Memory design, in short
+
+One tier, not three. There is **no working memory** (task state, tools called, step
+number) and **no short-term memory** — the current turn is whatever the caller puts in
+the prompt. Everything here is long-term: what the user is, said, and when it changed.
+
+| Question | What is built | Measured |
+|---|---|---|
+| **What is stored** | 5 memory types x 7 scopes; scope is model-assigned and unverified | — |
+| **Immediate write** | `POST /v1/messages` extracts synchronously, so a fact lands before any summary; idempotency key protects retries | no priority signal: a critical fact and small talk share one path |
+| **Background merge** | Consolidation clusters >= 3 memories above 0.84 and keeps evidence links | **off in v2** |
+| **Conflict and state** | Timelines are rebuilt from every memory for a key in event order, not patched; restatement collapses to the earliest interval; no LLM call | knowledge-update **75.0%**, temporal **74.1%** on the final test |
+| **History is kept** | Superseded facts stay in the store with validity intervals; `as_of()` and `/v1/timeline` replay them | "where I lived then vs now" is a query, not a loss |
+| **Retrieval** | Five signals exist; v2 weights **semantic only** | every added signal was worse: importance -5.3, BM25 -6.0, entity -17.3 points |
+| **Recency weighting** | Half-life 30 days against a corpus whose freshest memory is 932 days old | dead signal: 0 of 18,519 memories score above 0.01 |
+| **Context** | Never filled, so never compressed: extraction *is* the compression, and raw turns stay verbatim | median **574 tokens** vs 12,763 naive RAG and 109,059 full history |
+| **Losing detail** | Raw-source fallback recovers verbatim turns when the answerer reports a missing specific | fired on **35.0%**; **18.0%** of outcomes correct only after it |
+| **Decay and eviction** | Exponential decay and capacity eviction are implemented | **both off**; never calibrated on a corpus that grows |
+| **Retention** | No time limit and no capacity limit. Memories leave only by explicit deletion | unbounded by design |
+
+**The two gaps that matter most.** Extraction fidelity is 36.6% on detail retention and
+is the first loss point for 10 of 14 analysed failures — every layer below it inherits
+that. And there is **no next-day test**: nothing asks the same fact tomorrow in different
+words. `knowledge-update` is asked once, in one wording, inside the same run.
+
+Full detail, with the evidence behind each number: [project report](docs/PROJECT_REPORT.zh-CN.md).
+
+### Running it on a timer
+
+A backup policy nobody executes is a plan, not a backup. `tools/operate.py` is one
+command a scheduler calls, doing the three jobs a deployment holding real data needs:
+
+```bash
+python3 tools/operate.py \
+  --store stores/live.db --backups /var/backups/lltm \
+  --journal-copy /mnt/offsite/lltm --keep 7 --alert-at 0.8 --log /var/log/lltm-ops.jsonl
+```
+
+It snapshots **before** pruning, so a retention sweep cannot delete the copy the new
+snapshot has not replaced yet. It copies the erasure journal off the store's own disk,
+because a deletion record lost with the store makes a restore replay nothing and then
+report that the erased namespaces were correctly removed. And it names accounts nearing
+a daily cap while there is still time to act, rather than letting them find out as a 429
+— including accounts that have spent quota without writing a single memory, which the
+namespace list does not show.
+
+Exit code 0 is all clear, 1 needs attention, 2 could not complete; one JSON line per run
+goes to `--log`, so "did last night's backup run" is answerable without reading a mailbox.
+Restores are rehearsed separately with `tools/backup_restore.py verify`.
+
+Deploying it, and what has to be true first: [DEPLOY.md](DEPLOY.md).
+
 ## Limitations
 
 - Extraction is lossy. Date columns inherit session dates, and source spans are
@@ -241,21 +300,22 @@ REST's credential-derived identity boundary and should remain local-only.
 - The service is a prototype: empty token settings allow open access, writes are
   serialized within one process, and SQLite and vector files persist separately.
   Cross-resource recovery and multi-process writes remain unfinished.
-- Ordinary `forget` preserves stored rows; REST namespace erasure removes online
-  data. Backup retention, replaying erasures after restore, and production recovery
-  drills remain unfinished.
+- Ordinary `forget` preserves stored rows; REST namespace erasure removes online data
+  and records the erasure beside the store, and the restore drill replays erasures
+  served after the backup was taken. Scheduled backups, an off-machine copy of the
+  erasure journal, and production recovery drills remain unfinished.
 
 ## Documentation
 
 | Document | Contents |
 |---|---|
-| [Architecture atlas](docs/ARCHITECTURE.md) | Six vector figures, exact code mappings, default and optional branches |
-| [Experiment history](docs/EXPERIMENT_HISTORY.md) | Consolidated phase results and qualifications |
-| [System report](docs/REPORT.md) · [中文](docs/REPORT.zh-CN.md) | Detailed design rationale and earlier measurements |
-| [Decisions](docs/DECISIONS.md) | Measured design decisions |
-| [Current status](docs/CURRENT_STATUS.md) · [Roadmap](docs/ROADMAP.md) | Evolving research log and planned work |
-| [Separation plan](docs/ARCHITECTURE_SEPARATION_PLAN.md) | Proposed core/research split; not the current module layout |
+| [Architecture atlas](docs/PROJECT_REPORT.zh-CN.md#系统的架构) | Six vector figures, exact code mappings, default and optional branches |
+| [Experiment history](docs/PROJECT_REPORT.zh-CN.md#实验历史) | Consolidated phase results and qualifications |
+| [Current project report](docs/PROJECT_REPORT.zh-CN.md) · [Visual edition](docs/PROJECT_REPORT.zh-CN.html) | Current implementation, results, limitations and plan (Chinese) |
+| [Earlier report](docs/PROJECT_REPORT.zh-CN.md) · [中文](docs/PROJECT_REPORT.zh-CN.md) | Historical design rationale and measurements |
+| [Decisions](docs/PROJECT_REPORT.zh-CN.md#决策记录) | Measured design decisions |
+| [Current status](docs/PROJECT_REPORT.zh-CN.md#现在在哪) · [Roadmap](docs/PROJECT_REPORT.zh-CN.md#后续完整计划) | Evolving research log and planned work |
+| [Separation plan](docs/PROJECT_REPORT.zh-CN.md#系统的架构) | Proposed core/research split; not the current module layout |
 | [Data protocol](results/data-protocol.md) | Permitted uses of question sets |
-| [README review](docs/README_REVIEW.zh-CN.md) | Specific documentation corrections and remaining suggestions |
 
 [MIT License](LICENSE)

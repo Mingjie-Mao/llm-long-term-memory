@@ -1,0 +1,95 @@
+{
+  "name": "beam-fact-matcher-validation",
+  "half": "dev",
+  "provider_calls": 0,
+  "question": "is a required fact findable in the sessions BEAM labels as its source?",
+  "rubric_items": 1165,
+  "decidable": 261,
+  "decidable_share": 0.224,
+  "evidence_bearing": 221,
+  "found_in_labelled_source": 191,
+  "ceiling": 0.864,
+  "derived": 40,
+  "undecidable": 896,
+  "negative": 8,
+  "reading": "`ceiling` is the share of evidence-bearing items whose every required token appears in its own labelled source. Coverage figures read through this matcher cannot be more reliable than it. `decidable_share` says how much of the rubric the matcher will speak about at all; the rest is reported as undecidable and never as a loss.",
+  "by_ability": {
+    "abstention": {
+      "evidence": 14,
+      "found_in_labelled_source": 13,
+      "items": 44,
+      "partly_found": 1,
+      "undecidable": 30
+    },
+    "contradiction_resolution": {
+      "elsewhere_in_conversation": 1,
+      "evidence": 11,
+      "found_in_labelled_source": 10,
+      "items": 176,
+      "undecidable": 165
+    },
+    "event_ordering": {
+      "evidence": 10,
+      "found_in_labelled_source": 10,
+      "items": 287,
+      "undecidable": 277
+    },
+    "information_extraction": {
+      "derived": 2,
+      "elsewhere_in_conversation": 2,
+      "evidence": 28,
+      "found_in_labelled_source": 26,
+      "items": 76,
+      "undecidable": 46
+    },
+    "instruction_following": {
+      "evidence": 1,
+      "found_in_labelled_source": 1,
+      "items": 68,
+      "negative": 4,
+      "undecidable": 63
+    },
+    "knowledge_update": {
+      "derived": 1,
+      "elsewhere_in_conversation": 4,
+      "evidence": 35,
+      "found_in_labelled_source": 31,
+      "items": 46,
+      "undecidable": 10
+    },
+    "multi_session_reasoning": {
+      "derived": 8,
+      "elsewhere_in_conversation": 3,
+      "evidence": 27,
+      "found_in_labelled_source": 24,
+      "items": 94,
+      "undecidable": 59
+    },
+    "preference_following": {
+      "derived": 1,
+      "evidence": 2,
+      "found_in_labelled_source": 2,
+      "items": 73,
+      "negative": 4,
+      "undecidable": 66
+    },
+    "summarization": {
+      "derived": 2,
+      "elsewhere_in_conversation": 4,
+      "evidence": 53,
+      "found_in_labelled_source": 47,
+      "items": 234,
+      "partly_found": 2,
+      "undecidable": 179
+    },
+    "temporal_reasoning": {
+      "derived": 26,
+      "elsewhere_in_conversation": 10,
+      "evidence": 40,
+      "found_in_labelled_source": 27,
+      "items": 67,
+      "partly_found": 3,
+      "undecidable": 1
+    }
+  }
+}

@@ -1,0 +1,1334 @@
+{
+  "schema_version": 1,
+  "provider_calls": 0,
+  "scope": "proposed members in the review packet; human verdicts are pending",
+  "cannot_measure": "facts lost during extraction, and whether a supported member is the right answer to the question",
+  "packet_sha256": "d3329844c8f6359c36b60074531b4e9a30b072f0c96bfcf7fe6229c7bfea7b1e",
+  "totals": {
+    "questions": 40,
+    "proposed_members": 182,
+    "questions_with_a_blocking_member": 29,
+    "questions_carrying_a_packet_flag": 18
+  },
+  "members_by_stage": {
+    "unsupported_in_user_text": 5,
+    "only_in_assistant_text": 10,
+    "label_partly_supported": 18,
+    "carried_by_unapproved_predicate": 43,
+    "quotable_under_an_approved_predicate": 106
+  },
+  "questions_by_first_blocking_stage": {
+    "unsupported_in_user_text": 0,
+    "only_in_assistant_text": 2,
+    "label_partly_supported": 13,
+    "carried_by_unapproved_predicate": 14
+  },
+  "questions": [
+    {
+      "id": "entity_count_d23cf73b_attended",
+      "relation": "attended",
+      "proposed": 4,
+      "first_blocking_stage": null,
+      "members": [
+        {
+          "entity": "City Gallery tour",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "fermentation workshop",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "project management workshop",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "vegan cuisine class",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        }
+      ],
+      "flags": []
+    },
+    {
+      "id": "entity_count_993da5e2_grows",
+      "relation": "grows",
+      "proposed": 4,
+      "first_blocking_stage": "carried_by_unapproved_predicate",
+      "members": [
+        {
+          "entity": "fern",
+          "stage": "carried_by_unapproved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "fiddle leaf fig",
+          "stage": "carried_by_unapproved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "snake plant",
+          "stage": "carried_by_unapproved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "spider plant",
+          "stage": "carried_by_unapproved_predicate",
+          "user_coverage": 1.0
+        }
+      ],
+      "flags": [
+        "unapproved_predicates: houseplants"
+      ]
+    },
+    {
+      "id": "entity_count_gpt4_a1b77f9c_read",
+      "relation": "read",
+      "proposed": 3,
+      "first_blocking_stage": "carried_by_unapproved_predicate",
+      "members": [
+        {
+          "entity": "The Nightingale",
+          "stage": "carried_by_unapproved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "The Power",
+          "stage": "carried_by_unapproved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "Sapiens: A Brief History of Humankind",
+          "stage": "carried_by_unapproved_predicate",
+          "user_coverage": 1.0
+        }
+      ],
+      "flags": [
+        "unapproved_predicates: books_listening_status, books_reading, books_reading_status"
+      ]
+    },
+    {
+      "id": "entity_count_3a704032_acquired",
+      "relation": "acquired",
+      "proposed": 3,
+      "first_blocking_stage": null,
+      "members": [
+        {
+          "entity": "boots",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "designer handbag",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "winter coat",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        }
+      ],
+      "flags": []
+    },
+    {
+      "id": "entity_count_d23cf73b_owns",
+      "relation": "owns",
+      "proposed": 5,
+      "first_blocking_stage": "only_in_assistant_text",
+      "members": [
+        {
+          "entity": "Akai MPC Live 2",
+          "stage": "only_in_assistant_text",
+          "user_coverage": 0.0
+        },
+        {
+          "entity": "favorite scarf",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "Native Instruments Komplete Kontrol",
+          "stage": "only_in_assistant_text",
+          "user_coverage": 0.0
+        },
+        {
+          "entity": "Roland Go:Livecast",
+          "stage": "only_in_assistant_text",
+          "user_coverage": 0.0
+        },
+        {
+          "entity": "Tascam Model 12",
+          "stage": "only_in_assistant_text",
+          "user_coverage": 0.0
+        }
+      ],
+      "flags": []
+    },
+    {
+      "id": "entity_count_a9f6b44c_acquired",
+      "relation": "acquired",
+      "proposed": 4,
+      "first_blocking_stage": null,
+      "members": [
+        {
+          "entity": "bread",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "eggs",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "fresh produce",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "milk",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        }
+      ],
+      "flags": []
+    },
+    {
+      "id": "entity_count_8ebdbe50_ate_at",
+      "relation": "ate_at",
+      "proposed": 6,
+      "first_blocking_stage": "carried_by_unapproved_predicate",
+      "members": [
+        {
+          "entity": "hummus",
+          "stage": "carried_by_unapproved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "Mandarin oranges",
+          "stage": "carried_by_unapproved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "seitan",
+          "stage": "carried_by_unapproved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "tempeh",
+          "stage": "carried_by_unapproved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "tofu",
+          "stage": "carried_by_unapproved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "wine",
+          "stage": "carried_by_unapproved_predicate",
+          "user_coverage": 1.0
+        }
+      ],
+      "flags": [
+        "unapproved_predicates: groceries"
+      ]
+    },
+    {
+      "id": "entity_count_cc539528_owns",
+      "relation": "owns",
+      "proposed": 4,
+      "first_blocking_stage": "carried_by_unapproved_predicate",
+      "members": [
+        {
+          "entity": "3 dresses",
+          "stage": "carried_by_unapproved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "handpan",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "The Seven Husbands of Evelyn Hugo",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "The Silent Patient",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        }
+      ],
+      "flags": [
+        "unapproved_predicates: donated_items"
+      ]
+    },
+    {
+      "id": "entity_count_a9f6b44c_owns",
+      "relation": "owns",
+      "proposed": 9,
+      "first_blocking_stage": "label_partly_supported",
+      "members": [
+        {
+          "entity": "1995 Honda Civic",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "Honda Civic",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "hybrid commuter bike",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "Labrador named Max",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "mountain bike",
+          "stage": "label_partly_supported",
+          "user_coverage": 0.5
+        },
+        {
+          "entity": "road bike",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "rural land",
+          "stage": "carried_by_unapproved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "Toyota Camry",
+          "stage": "label_partly_supported",
+          "user_coverage": 0.5
+        },
+        {
+          "entity": "Toyota Corolla",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        }
+      ],
+      "flags": [
+        "unapproved_predicates: property_ownership"
+      ]
+    },
+    {
+      "id": "entity_count_22d2cb42_owns",
+      "relation": "owns",
+      "proposed": 4,
+      "first_blocking_stage": "label_partly_supported",
+      "members": [
+        {
+          "entity": "antique music box",
+          "stage": "label_partly_supported",
+          "user_coverage": 0.67
+        },
+        {
+          "entity": "The Beatles - Sgt. Pepper's Lonely Hearts Club Band",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "David Bowie - Space Oddity 7-inch",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "Fleetwood Mac - Rumours",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        }
+      ],
+      "flags": []
+    },
+    {
+      "id": "entity_count_cc5ded98_owns",
+      "relation": "owns",
+      "proposed": 3,
+      "first_blocking_stage": "label_partly_supported",
+      "members": [
+        {
+          "entity": "1950s-era Canon rangefinder",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "soft white LED bulb from IKEA",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "vintage 1960s Ponytail Barbie",
+          "stage": "label_partly_supported",
+          "user_coverage": 0.75
+        }
+      ],
+      "flags": []
+    },
+    {
+      "id": "entity_count_6aeb4375_practises_hobby",
+      "relation": "practises_hobby",
+      "proposed": 3,
+      "first_blocking_stage": null,
+      "members": [
+        {
+          "entity": "antique coins",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "vintage cameras",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "vinyl records",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        }
+      ],
+      "flags": []
+    },
+    {
+      "id": "entity_count_1568498a_acquired",
+      "relation": "acquired",
+      "proposed": 4,
+      "first_blocking_stage": null,
+      "members": [
+        {
+          "entity": "coffee maker",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "Nike running shoes",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "Tiffany & Co. item",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "wireless charging pad",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        }
+      ],
+      "flags": []
+    },
+    {
+      "id": "entity_count_gpt4_2d58bcd6_listened_to",
+      "relation": "listened_to",
+      "proposed": 4,
+      "first_blocking_stage": "carried_by_unapproved_predicate",
+      "members": [
+        {
+          "entity": "bookstagram account",
+          "stage": "carried_by_unapproved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "Daisy Jones",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "Sapiens: A Brief History of Humankind",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "The Six",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        }
+      ],
+      "flags": [
+        "unapproved_predicates: social_media"
+      ]
+    },
+    {
+      "id": "entity_count_0ddfec37_abs_owns",
+      "relation": "owns",
+      "proposed": 8,
+      "first_blocking_stage": "label_partly_supported",
+      "members": [
+        {
+          "entity": "15 autographed baseballs",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "1943 Lincoln Wheat Cent with copper planchet error",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "1960s Omega Seamaster",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "1960s-era Canon rangefinder",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "20 autographed baseballs",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "Honda CB500",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "medium-sized hybrid bike",
+          "stage": "label_partly_supported",
+          "user_coverage": 0.75
+        },
+        {
+          "entity": "signed Mike Trout baseball",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        }
+      ],
+      "flags": []
+    },
+    {
+      "id": "entity_count_1c0ddc50_acquired",
+      "relation": "acquired",
+      "proposed": 3,
+      "first_blocking_stage": "label_partly_supported",
+      "members": [
+        {
+          "entity": "black ankle boots from Zara",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "crystal vase for mother",
+          "stage": "label_partly_supported",
+          "user_coverage": 0.67
+        },
+        {
+          "entity": "silver necklace for Emma",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        }
+      ],
+      "flags": []
+    },
+    {
+      "id": "entity_count_dd2973ad_owns",
+      "relation": "owns",
+      "proposed": 5,
+      "first_blocking_stage": "label_partly_supported",
+      "members": [
+        {
+          "entity": "clear phone case",
+          "stage": "label_partly_supported",
+          "user_coverage": 0.67
+        },
+        {
+          "entity": "dark grey backpack",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "scarf",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "silver brooch with blue gemstone",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "wooden music box",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        }
+      ],
+      "flags": []
+    },
+    {
+      "id": "entity_count_a4996e51_owns",
+      "relation": "owns",
+      "proposed": 3,
+      "first_blocking_stage": "carried_by_unapproved_predicate",
+      "members": [
+        {
+          "entity": "ASOS distressed denim jeans",
+          "stage": "carried_by_unapproved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "Game of Thrones Night King Funko POP! figure",
+          "stage": "carried_by_unapproved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "vintage My Little Pony named Glory",
+          "stage": "carried_by_unapproved_predicate",
+          "user_coverage": 1.0
+        }
+      ],
+      "flags": [
+        "unapproved_predicates: clothing, collectibles"
+      ]
+    },
+    {
+      "id": "entity_count_d682f1a2_owns",
+      "relation": "owns",
+      "proposed": 3,
+      "first_blocking_stage": "carried_by_unapproved_predicate",
+      "members": [
+        {
+          "entity": "5-acre plot in Oakdale",
+          "stage": "carried_by_unapproved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "Adobe Illustrator",
+          "stage": "only_in_assistant_text",
+          "user_coverage": 0.0
+        },
+        {
+          "entity": "dark blue REI backpack",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        }
+      ],
+      "flags": [
+        "unapproved_predicates: property_ownership"
+      ]
+    },
+    {
+      "id": "entity_count_d905b33f_owns",
+      "relation": "owns",
+      "proposed": 4,
+      "first_blocking_stage": null,
+      "members": [
+        {
+          "entity": "1920s antique mirror",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "antique desk",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "antique locket",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "The Walking Dead first edition",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        }
+      ],
+      "flags": []
+    },
+    {
+      "id": "entity_count_gpt4_731e37d7_owns",
+      "relation": "owns",
+      "proposed": 5,
+      "first_blocking_stage": null,
+      "members": [
+        {
+          "entity": "1957 Gibson Les Paul Goldtop guitar",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "1960s Omega Seamaster watch",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "black leather boots",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "rare book by Jorge Luis Borges",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "white sneakers",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        }
+      ],
+      "flags": []
+    },
+    {
+      "id": "entity_count_8c18457d_owns",
+      "relation": "owns",
+      "proposed": 10,
+      "first_blocking_stage": "only_in_assistant_text",
+      "members": [
+        {
+          "entity": "books",
+          "stage": "only_in_assistant_text",
+          "user_coverage": 0.0
+        },
+        {
+          "entity": "boots",
+          "stage": "only_in_assistant_text",
+          "user_coverage": 0.0
+        },
+        {
+          "entity": "dress",
+          "stage": "only_in_assistant_text",
+          "user_coverage": 0.0
+        },
+        {
+          "entity": "eyeshadow",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "fitness tracker",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "laptop bag",
+          "stage": "only_in_assistant_text",
+          "user_coverage": 0.0
+        },
+        {
+          "entity": "new cookware",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "skincare",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "utensils",
+          "stage": "unsupported_in_user_text",
+          "user_coverage": 0.0
+        },
+        {
+          "entity": "wireless headphone",
+          "stage": "only_in_assistant_text",
+          "user_coverage": 0.0
+        }
+      ],
+      "flags": []
+    },
+    {
+      "id": "entity_count_25e5aa4f_owns",
+      "relation": "owns",
+      "proposed": 3,
+      "first_blocking_stage": "carried_by_unapproved_predicate",
+      "members": [
+        {
+          "entity": "5 new board games",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "iPhone 11",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "red sweater",
+          "stage": "carried_by_unapproved_predicate",
+          "user_coverage": 1.0
+        }
+      ],
+      "flags": [
+        "unapproved_predicates: clothing_item"
+      ]
+    },
+    {
+      "id": "entity_count_gpt4_78cf46a3_owns",
+      "relation": "owns",
+      "proposed": 3,
+      "first_blocking_stage": "label_partly_supported",
+      "members": [
+        {
+          "entity": "1967 Sgt. Pepper's Lonely Hearts Club Band",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "Gustav Klimt prints",
+          "stage": "label_partly_supported",
+          "user_coverage": 0.67
+        },
+        {
+          "entity": "Sunset Over the Ocean painting",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        }
+      ],
+      "flags": []
+    },
+    {
+      "id": "entity_count_06db6396_acquired",
+      "relation": "acquired",
+      "proposed": 7,
+      "first_blocking_stage": "carried_by_unapproved_predicate",
+      "members": [
+        {
+          "entity": "blocking",
+          "stage": "carried_by_unapproved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "compositing",
+          "stage": "carried_by_unapproved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "humidifier",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "idea generation",
+          "stage": "unsupported_in_user_text",
+          "user_coverage": 0.0
+        },
+        {
+          "entity": "lighting",
+          "stage": "carried_by_unapproved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "materials",
+          "stage": "carried_by_unapproved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "moodboards",
+          "stage": "unsupported_in_user_text",
+          "user_coverage": 0.0
+        }
+      ],
+      "flags": [
+        "unapproved_predicates: skills_acquired"
+      ]
+    },
+    {
+      "id": "entity_count_bc149d6b_acquired",
+      "relation": "acquired",
+      "proposed": 3,
+      "first_blocking_stage": "label_partly_supported",
+      "members": [
+        {
+          "entity": "20 pounds organic scratch grains",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "50-pound layer feed",
+          "stage": "label_partly_supported",
+          "user_coverage": 0.33
+        },
+        {
+          "entity": "black leather boots from Zara",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        }
+      ],
+      "flags": []
+    },
+    {
+      "id": "entity_count_5809eb10_grows",
+      "relation": "grows",
+      "proposed": 3,
+      "first_blocking_stage": "carried_by_unapproved_predicate",
+      "members": [
+        {
+          "entity": "area rug",
+          "stage": "carried_by_unapproved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "coasters",
+          "stage": "carried_by_unapproved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "vase",
+          "stage": "carried_by_unapproved_predicate",
+          "user_coverage": 1.0
+        }
+      ],
+      "flags": [
+        "unapproved_predicates: home_decor"
+      ]
+    },
+    {
+      "id": "entity_count_a82c026e_owns",
+      "relation": "owns",
+      "proposed": 5,
+      "first_blocking_stage": "label_partly_supported",
+      "members": [
+        {
+          "entity": "13 Funko Pop figures",
+          "stage": "label_partly_supported",
+          "user_coverage": 0.67
+        },
+        {
+          "entity": "Illinois",
+          "stage": "carried_by_unapproved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "rare holographic Charizard Pokémon card",
+          "stage": "carried_by_unapproved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "Shimano Curado reel",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "vintage Transformers action figure",
+          "stage": "carried_by_unapproved_predicate",
+          "user_coverage": 1.0
+        }
+      ],
+      "flags": [
+        "unapproved_predicates: collectibles, land_ownership"
+      ]
+    },
+    {
+      "id": "entity_count_8c18457d_practises_hobby",
+      "relation": "practises_hobby",
+      "proposed": 4,
+      "first_blocking_stage": "label_partly_supported",
+      "members": [
+        {
+          "entity": "Brooklyn Film Festival",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "played Codenames with Rachel",
+          "stage": "label_partly_supported",
+          "user_coverage": 0.67
+        },
+        {
+          "entity": "quilt making",
+          "stage": "label_partly_supported",
+          "user_coverage": 0.5
+        },
+        {
+          "entity": "quilt making time investment",
+          "stage": "label_partly_supported",
+          "user_coverage": 0.5
+        }
+      ],
+      "flags": [
+        "unapproved_predicates: social_activities"
+      ]
+    },
+    {
+      "id": "entity_count_95228167_owns",
+      "relation": "owns",
+      "proposed": 11,
+      "first_blocking_stage": "label_partly_supported",
+      "members": [
+        {
+          "entity": "black North Face parka",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "cow bells",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "Dr. Martens boots",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "high-waisted dark blue Levi's jeans",
+          "stage": "label_partly_supported",
+          "user_coverage": 0.67
+        },
+        {
+          "entity": "hybrid bike",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "hybrid bike lent to sister",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "Nikon D850",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "road bike",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "Sigma 24-70mm lens",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "Think Tank Photo Urban Disguise 40L",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "yellow sundress",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        }
+      ],
+      "flags": []
+    },
+    {
+      "id": "entity_count_6b168ec8_owns",
+      "relation": "owns",
+      "proposed": 4,
+      "first_blocking_stage": null,
+      "members": [
+        {
+          "entity": "commuter bike",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "Fossil smartwatch",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "mountain bike",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "road bike",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        }
+      ],
+      "flags": []
+    },
+    {
+      "id": "entity_count_6e984301_owns",
+      "relation": "owns",
+      "proposed": 8,
+      "first_blocking_stage": "label_partly_supported",
+      "members": [
+        {
+          "entity": "Cedar Creek property",
+          "stage": "label_partly_supported",
+          "user_coverage": 0.67
+        },
+        {
+          "entity": "coins",
+          "stage": "carried_by_unapproved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "concert tickets",
+          "stage": "carried_by_unapproved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "Remington Noiseless Portable",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "Samsung Galaxy S22 Ultra",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "typewriters",
+          "stage": "carried_by_unapproved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "vinyl records",
+          "stage": "carried_by_unapproved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "wireless charging pad",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        }
+      ],
+      "flags": [
+        "unapproved_predicates: collections, property_viewing"
+      ]
+    },
+    {
+      "id": "entity_count_1c0ddc50_practises_hobby",
+      "relation": "practises_hobby",
+      "proposed": 3,
+      "first_blocking_stage": "label_partly_supported",
+      "members": [
+        {
+          "entity": "animal shelter charity walk",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "charity gala",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "squash with Ryan on Thursdays",
+          "stage": "label_partly_supported",
+          "user_coverage": 0.67
+        }
+      ],
+      "flags": []
+    },
+    {
+      "id": "entity_count_gpt4_59149c77_owns",
+      "relation": "owns",
+      "proposed": 3,
+      "first_blocking_stage": null,
+      "members": [
+        {
+          "entity": "Arctic Monkeys The Car",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "Eheim canister filter",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "Sgt. Pepper's Lonely Hearts Club Band",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        }
+      ],
+      "flags": []
+    },
+    {
+      "id": "entity_count_c8090214_attended",
+      "relation": "attended",
+      "proposed": 4,
+      "first_blocking_stage": null,
+      "members": [
+        {
+          "entity": "Holiday Market",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "musical theater workshop",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "physical theater masterclass",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "University Art Gallery lecture",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        }
+      ],
+      "flags": []
+    },
+    {
+      "id": "entity_count_c8090214_read",
+      "relation": "read",
+      "proposed": 3,
+      "first_blocking_stage": "carried_by_unapproved_predicate",
+      "members": [
+        {
+          "entity": "The 7 Habits of Highly Effective People",
+          "stage": "carried_by_unapproved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "All the Light We Cannot See",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "Sapiens: A Brief History of Humankind",
+          "stage": "carried_by_unapproved_predicate",
+          "user_coverage": 1.0
+        }
+      ],
+      "flags": [
+        "unapproved_predicates: books_reading"
+      ]
+    },
+    {
+      "id": "entity_count_0e5e2d1a_visited",
+      "relation": "visited",
+      "proposed": 5,
+      "first_blocking_stage": "carried_by_unapproved_predicate",
+      "members": [
+        {
+          "entity": "Florida",
+          "stage": "carried_by_unapproved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "grandmother",
+          "stage": "unsupported_in_user_text",
+          "user_coverage": 0.0
+        },
+        {
+          "entity": "mountain getaway",
+          "stage": "label_partly_supported",
+          "user_coverage": 0.5
+        },
+        {
+          "entity": "South Beach",
+          "stage": "carried_by_unapproved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "Yellowstone camping trip",
+          "stage": "carried_by_unapproved_predicate",
+          "user_coverage": 1.0
+        }
+      ],
+      "flags": [
+        "unapproved_predicates: family_visits, trips"
+      ]
+    },
+    {
+      "id": "entity_count_e3fc4d6e_practises_hobby",
+      "relation": "practises_hobby",
+      "proposed": 5,
+      "first_blocking_stage": null,
+      "members": [
+        {
+          "entity": "cycling",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "running",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "salsa classes",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "tennis",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "volleyball",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        }
+      ],
+      "flags": []
+    },
+    {
+      "id": "entity_count_60bf93ed_abs_owns",
+      "relation": "owns",
+      "proposed": 4,
+      "first_blocking_stage": "carried_by_unapproved_predicate",
+      "members": [
+        {
+          "entity": "green sweater lent to sister",
+          "stage": "carried_by_unapproved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "navy blue blazer at dry cleaners",
+          "stage": "carried_by_unapproved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "sandals to be picked up",
+          "stage": "unsupported_in_user_text",
+          "user_coverage": 0.0
+        },
+        {
+          "entity": "silver necklace",
+          "stage": "label_partly_supported",
+          "user_coverage": 0.5
+        }
+      ],
+      "flags": [
+        "unapproved_predicates: clothing_items"
+      ]
+    },
+    {
+      "id": "entity_count_gpt4_7a0daae1_attended",
+      "relation": "attended",
+      "proposed": 3,
+      "first_blocking_stage": "carried_by_unapproved_predicate",
+      "members": [
+        {
+          "entity": "family reunion",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "museum membership",
+          "stage": "carried_by_unapproved_predicate",
+          "user_coverage": 1.0
+        },
+        {
+          "entity": "Science Museum Late Night",
+          "stage": "quotable_under_an_approved_predicate",
+          "user_coverage": 1.0
+        }
+      ],
+      "flags": [
+        "unapproved_predicates: museum_membership"
+      ]
+    }
+  ]
+}
