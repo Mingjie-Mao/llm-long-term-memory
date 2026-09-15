@@ -315,6 +315,28 @@ uv run python tools/backup_restore.py prune --folder /backups --keep 14
 超额返回 **429**，消息里带上是哪一维超了、用了多少、什么时候重置。
 
 
+## 定时运维
+
+一份没人执行的备份策略是计划，不是备份。`tools/operate.py` 是一条给调度器调用的命令，做一个
+持有真实数据的部署需要的三件事：
+
+```bash
+python3 tools/operate.py \
+  --store stores/live.db --backups /var/backups/lltm \
+  --journal-copy /mnt/offsite/lltm --keep 7 --alert-at 0.8 --log /var/log/lltm-ops.jsonl
+```
+
+- **先快照再裁剪。** 否则一次保留期清理可能删掉那份新快照还没顶替的副本。
+- **把删除日志复制到 store 自己那块盘之外。** 删除记录和库一起丢失，会让恢复重放不了任何东西，
+  然后报告"被删的命名空间已正确移除"——一个说谎的成功。
+- **在还来得及的时候点名接近日上限的账号**，而不是让它们以一个 429 的形式发现。包括那些花了
+  配额却一条记忆都没写成的账号，命名空间列表看不见它们。
+
+退出码 0 全清、1 需要关注、2 没能完成；每次运行往 `--log` 写一行 JSON，所以"昨晚的备份跑了没有"
+不用翻邮箱就能回答。恢复演练是另一条命令：`tools/backup_restore.py verify`。
+
+**仍然缺的**：定时的恢复演练（上面那条 `verify` 存在，但没有东西定期跑它），以及服务前面的限流。
+
 ## 还没有的东西
 
 诚实起见列在这里，因为运维手册最容易变成能力清单：
