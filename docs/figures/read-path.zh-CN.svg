@@ -1,0 +1,92 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1010" viewBox="0 0 1200 1010" role="img" aria-labelledby="title desc">
+<title id="title">先读记忆，按需恢复原文证据</title>
+<desc id="desc">Architecture verified against the repository on 2026-09-07. See docs/ARCHITECTURE.md for the detailed figure caption and source mapping. Solid arrows show flow; dashed arrows show conditional paths.</desc>
+<rect x="0" y="0" width="1200" height="1010" rx="7" fill="#FFFFFF" stroke="none" stroke-width="1.3"/>
+<text x="40" y="42" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#345E80" text-anchor="start">FIGURE 04</text>
+<text x="40" y="82" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="31" font-weight="400" fill="#203247" text-anchor="start">先读记忆，按需恢复原文证据</text>
+<text x="40" y="113" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="17" font-weight="400" fill="#586775" text-anchor="start">默认的记忆优先路径，已启用原文回退。虚线只在需要恢复原文时执行。</text>
+<polyline points="40,133 1160,133" fill="none" stroke="#CED6DC" stroke-width="1" stroke-linejoin="round"/>
+<rect x="40" y="193" width="190" height="125" rx="7" fill="#EEF4F8" stroke="#345E80" stroke-width="1.3"/>
+<text x="56" y="222" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="19" font-weight="700" fill="#345E80" text-anchor="start">问题</text>
+<text x="56" y="250" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="17" font-weight="400" fill="#203247" text-anchor="start">user_id + 查询</text>
+<text x="56" y="274" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="17" font-weight="400" fill="#203247" text-anchor="start">MiniLM 嵌入</text>
+<rect x="285" y="167" width="280" height="100" rx="7" fill="#EEF4F8" stroke="#345E80" stroke-width="1.3"/>
+<text x="301" y="196" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="19" font-weight="700" fill="#345E80" text-anchor="start">语义候选</text>
+<text x="301" y="224" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="17" font-weight="400" fill="#203247" text-anchor="start">扫索引，再过滤租户/状态</text>
+<text x="301" y="248" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="17" font-weight="400" fill="#203247" text-anchor="start">最多保留 50 条</text>
+<rect x="285" y="294" width="280" height="100" rx="7" fill="#EFF6F3" stroke="#32766D" stroke-width="1.3"/>
+<text x="301" y="323" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="19" font-weight="700" fill="#32766D" text-anchor="start">词法候选</text>
+<text x="301" y="351" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="17" font-weight="400" fill="#203247" text-anchor="start">FTS5 + SQL 过滤租户/状态</text>
+<text x="301" y="375" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="17" font-weight="400" fill="#203247" text-anchor="start">最多保留 50 条</text>
+<polyline points="230,236 255,236 255,217 285,217" fill="none" stroke="#8795A1" stroke-width="1.7" stroke-linejoin="round"/>
+<polygon points="285,217 277.0,213.3 277.0,220.7" fill="#8795A1"/>
+<polyline points="230,281 255,281 255,344 285,344" fill="none" stroke="#32766D" stroke-width="1.7" stroke-linejoin="round"/>
+<polygon points="285,344 277.0,340.3 277.0,347.7" fill="#32766D"/>
+<rect x="620" y="193" width="250" height="151" rx="7" fill="#EEF4F8" stroke="#345E80" stroke-width="1.3"/>
+<text x="636" y="222" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="19" font-weight="700" fill="#345E80" text-anchor="start">并集与打分</text>
+<text x="636" y="250" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="17" font-weight="400" fill="#203247" text-anchor="start">按 memory ID 去重</text>
+<text x="636" y="274" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="17" font-weight="400" fill="#203247" text-anchor="start">至多 100 个候选</text>
+<text x="636" y="298" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="17" font-weight="400" fill="#203247" text-anchor="start">默认权重：语义 1</text>
+<polyline points="565,217 620,217" fill="none" stroke="#8795A1" stroke-width="1.7" stroke-linejoin="round"/>
+<polygon points="620,217 612.0,213.3 612.0,220.7" fill="#8795A1"/>
+<polyline points="565,344 592,344 592,313 620,313" fill="none" stroke="#32766D" stroke-width="1.7" stroke-linejoin="round"/>
+<polygon points="620,313 612.0,309.3 612.0,316.7" fill="#32766D"/>
+<rect x="915" y="193" width="245" height="151" rx="7" fill="#EEF4F8" stroke="#345E80" stroke-width="1.3"/>
+<text x="931" y="222" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="19" font-weight="700" fill="#345E80" text-anchor="start">选取与组装</text>
+<text x="931" y="250" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="17" font-weight="400" fill="#203247" text-anchor="start">取排名前 k 条记忆</text>
+<text x="931" y="274" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="17" font-weight="400" fill="#203247" text-anchor="start">按范围 / 时间分组</text>
+<text x="931" y="298" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="17" font-weight="400" fill="#203247" text-anchor="start">组装回答上下文</text>
+<polyline points="870,267 915,267" fill="none" stroke="#8795A1" stroke-width="1.7" stroke-linejoin="round"/>
+<polygon points="915,267 907.0,263.3 907.0,270.7" fill="#8795A1"/>
+<text x="630" y="373" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="16" font-weight="400" fill="#586775" text-anchor="start">其余四路权重为 0</text>
+<text x="926" y="373" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="16" font-weight="400" fill="#586775" text-anchor="start">服务 k=10；v2 评测 k=20</text>
+<polyline points="1140,344 1140,424 177,424 177,480" fill="none" stroke="#8795A1" stroke-width="1.7" stroke-linejoin="round"/>
+<polygon points="177,480 180.7,472.0 173.3,472.0" fill="#8795A1"/>
+<rect x="40" y="480" width="275" height="296" rx="7" fill="#EEF4F8" stroke="#345E80" stroke-width="1.3"/>
+<text x="56" y="509" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="19" font-weight="700" fill="#345E80" text-anchor="start">第一次模型调用</text>
+<text x="56" y="537" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="18" font-weight="400" fill="#203247" text-anchor="start">解析 AnswerVerdict</text>
+<text x="60" y="590" font-family="Courier New, monospace" font-size="18" font-weight="400" fill="#345E80" text-anchor="start">answer</text>
+<text x="60" y="661" font-family="Courier New, monospace" font-size="18" font-weight="400" fill="#96662D" text-anchor="start">need_source</text>
+<text x="60" y="735" font-family="Courier New, monospace" font-size="18" font-weight="400" fill="#96662D" text-anchor="start">no_evidence</text>
+<rect x="405" y="474" width="325" height="90" rx="7" fill="#EFF6F3" stroke="#32766D" stroke-width="1.3"/>
+<text x="421" y="503" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="19" font-weight="700" fill="#32766D" text-anchor="start">直接返回答案</text>
+<text x="421" y="531" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="17" font-weight="400" fill="#203247" text-anchor="start">不搜原文，不做第二次调用</text>
+<polyline points="315,581 360,581 360,519 405,519" fill="none" stroke="#32766D" stroke-width="1.7" stroke-linejoin="round"/>
+<polygon points="405,519 397.0,515.3 397.0,522.7" fill="#32766D"/>
+<rect x="405" y="601" width="325" height="113" rx="7" fill="#FBF5EB" stroke="#96662D" stroke-width="1.3"/>
+<text x="421" y="630" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="19" font-weight="700" fill="#96662D" text-anchor="start">带来源的恢复</text>
+<text x="421" y="658" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="17" font-weight="400" fill="#203247" text-anchor="start">用 BM25 给原文轮次排名</text>
+<text x="421" y="682" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="17" font-weight="400" fill="#203247" text-anchor="start">选本地出处或全档案</text>
+<polyline points="315,654 405,654" fill="none" stroke="#96662D" stroke-width="1.7" stroke-linejoin="round" stroke-dasharray="7 5"/>
+<polygon points="405,654 397.0,650.3 397.0,657.7" fill="#96662D"/>
+<rect x="405" y="751" width="325" height="90" rx="7" fill="#FBF5EB" stroke="#96662D" stroke-width="1.3"/>
+<text x="421" y="780" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="19" font-weight="700" fill="#96662D" text-anchor="start">全档案恢复</text>
+<text x="421" y="808" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="17" font-weight="400" fill="#203247" text-anchor="start">不带所选记忆的锚点搜索</text>
+<polyline points="315,730 362,730 362,796 405,796" fill="none" stroke="#96662D" stroke-width="1.7" stroke-linejoin="round" stroke-dasharray="7 5"/>
+<polygon points="405,796 397.0,792.3 397.0,799.7" fill="#96662D"/>
+<rect x="840" y="601" width="320" height="113" rx="7" fill="#FBF5EB" stroke="#96662D" stroke-width="1.3"/>
+<text x="856" y="630" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="19" font-weight="700" fill="#96662D" text-anchor="start">找到原文轮次了吗？</text>
+<text x="856" y="658" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="17" font-weight="400" fill="#203247" text-anchor="start">最多 3 个轮次</text>
+<text x="856" y="682" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="17" font-weight="400" fill="#203247" text-anchor="start">2,400 个原文字符</text>
+<polyline points="730,654 840,654" fill="none" stroke="#96662D" stroke-width="1.7" stroke-linejoin="round" stroke-dasharray="7 5"/>
+<polygon points="840,654 832.0,650.3 832.0,657.7" fill="#96662D"/>
+<polyline points="730,796 785,796 785,688 840,688" fill="none" stroke="#96662D" stroke-width="1.7" stroke-linejoin="round" stroke-dasharray="7 5"/>
+<polygon points="840,688 832.0,684.3 832.0,691.7" fill="#96662D"/>
+<rect x="840" y="474" width="320" height="90" rx="7" fill="#EFF6F3" stroke="#32766D" stroke-width="1.3"/>
+<text x="856" y="503" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="19" font-weight="700" fill="#32766D" text-anchor="start">没有找到证据</text>
+<text x="856" y="531" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="17" font-weight="400" fill="#203247" text-anchor="start">返回判定文本 / 弃答</text>
+<polyline points="1000,601 1000,564" fill="none" stroke="#96662D" stroke-width="1.7" stroke-linejoin="round" stroke-dasharray="7 5"/>
+<polygon points="1000,564 996.3,572.0 1003.7,572.0" fill="#96662D"/>
+<text x="1015" y="586" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="16" font-weight="400" fill="#96662D" text-anchor="start">否</text>
+<rect x="840" y="783" width="320" height="103" rx="7" fill="#EFF6F3" stroke="#32766D" stroke-width="1.3"/>
+<text x="856" y="812" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="19" font-weight="700" fill="#32766D" text-anchor="start">第二次模型调用</text>
+<text x="856" y="840" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="17" font-weight="400" fill="#203247" text-anchor="start">依据恢复的原文作答</text>
+<text x="856" y="864" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="17" font-weight="400" fill="#203247" text-anchor="start">返回最终自然语言</text>
+<polyline points="1000,714 1000,783" fill="none" stroke="#96662D" stroke-width="1.7" stroke-linejoin="round" stroke-dasharray="7 5"/>
+<polygon points="1000,783 1003.7,775.0 996.3,775.0" fill="#96662D"/>
+<text x="1015" y="752" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="16" font-weight="400" fill="#96662D" text-anchor="start">是</text>
+<polyline points="40,910 1160,910" fill="none" stroke="#CED6DC" stroke-width="1" stroke-linejoin="round"/>
+<text x="40" y="933" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="16" font-weight="400" fill="#586775" text-anchor="start">need_source 判定仍可能走全档案恢复——当最佳 BM25 命中落在本地来源会话之外时。</text>
+<text x="40" y="956" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="16" font-weight="400" fill="#586775" text-anchor="start">重排、会话连贯上下文、预算打包、衰减与自适应补水都是可选分支，默认关闭。</text>
+<text x="40" y="979" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="16" font-weight="400" fill="#586775" text-anchor="start">图中上限来自已提交的默认配置。第一次判定解析失败有单独的返回路径。</text>
+</svg>

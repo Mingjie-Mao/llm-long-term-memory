@@ -121,7 +121,7 @@ uv run lltm mcp
 
 | 文档 | 内容 |
 |---|---|
-| [PROJECT_REPORT.zh-CN.md](docs/PROJECT_REPORT.zh-CN.md) | 项目在解决什么、为什么这样设计、研究结论与当前问题 |
+| [PROJECT_REPORT.zh-CN.md](docs/PROJECT_REPORT.zh-CN.md) · [English](docs/PROJECT_REPORT.md) | 项目在解决什么、为什么这样设计、研究结论与当前问题 |
 | [ARCHITECTURE.md](docs/ARCHITECTURE.md) | 系统架构、代码定位、认证与运维语义 |
 | [EVALUATION.md](docs/EVALUATION.md) | 数据切分、实验方法与统计结果 |
 | [DEPLOY.md](DEPLOY.md) | 部署、备份与恢复 |

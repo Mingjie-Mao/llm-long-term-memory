@@ -1,0 +1,90 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1055" viewBox="0 0 1200 1055" role="img" aria-labelledby="title desc">
+<title id="title">运行入口与研究评测的边界</title>
+<desc id="desc">Architecture verified against the repository on 2026-09-07. See docs/ARCHITECTURE.md for the detailed figure caption and source mapping. Solid arrows show flow; dashed arrows show conditional paths.</desc>
+<rect x="0" y="0" width="1200" height="1055" rx="7" fill="#FFFFFF" stroke="none" stroke-width="1.3"/>
+<text x="40" y="42" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#345E80" text-anchor="start">FIGURE 06</text>
+<text x="40" y="82" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="31" font-weight="400" fill="#203247" text-anchor="start">运行入口与研究评测的边界</text>
+<text x="40" y="113" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="17" font-weight="400" fill="#586775" text-anchor="start">三个适配层共用组件，但它们并不执行同一条写入路径，也不暴露同样的能力。</text>
+<polyline points="40,133 1160,133" fill="none" stroke="#CED6DC" stroke-width="1" stroke-linejoin="round"/>
+<text x="40" y="175" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="17" font-weight="700" fill="#586775" text-anchor="start">A. 当前的运行入口</text>
+<rect x="40" y="201" width="350" height="99" rx="7" fill="#EEF4F8" stroke="#345E80" stroke-width="1.3"/>
+<text x="56" y="230" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="19" font-weight="700" fill="#345E80" text-anchor="start">CLI / Python 批量管线</text>
+<text x="56" y="258" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="400" fill="#203247" text-anchor="start">lltm ingest run</text>
+<text x="56" y="282" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="400" fill="#203247" text-anchor="start">IngestionPipeline</text>
+<rect x="425" y="201" width="350" height="99" rx="7" fill="#EEF4F8" stroke="#345E80" stroke-width="1.3"/>
+<text x="441" y="230" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="19" font-weight="700" fill="#345E80" text-anchor="start">REST + 检查界面 + MCP</text>
+<text x="441" y="258" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="400" fill="#203247" text-anchor="start">api.app / mcp_server</text>
+<text x="441" y="282" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="400" fill="#203247" text-anchor="start">MemoryService</text>
+<rect x="810" y="201" width="350" height="99" rx="7" fill="#FBF5EB" stroke="#96662D" stroke-width="1.3"/>
+<text x="826" y="230" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="19" font-weight="700" fill="#96662D" text-anchor="start">公开演示后端</text>
+<text x="826" y="258" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="400" fill="#203247" text-anchor="start">public-demo/site -&gt; demo-api</text>
+<text x="826" y="282" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="400" fill="#203247" text-anchor="start">Playground</text>
+<rect x="40" y="341" width="350" height="165" rx="7" fill="#EEF4F8" stroke="#345E80" stroke-width="1.3"/>
+<text x="56" y="370" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="19" font-weight="700" fill="#345E80" text-anchor="start">完整批量写入路径</text>
+<text x="56" y="398" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="18" font-weight="400" fill="#203247" text-anchor="start">两阶段抽取 + 去重</text>
+<text x="56" y="422" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="18" font-weight="400" fill="#203247" text-anchor="start">归档 + 写库 + 向量</text>
+<text x="56" y="446" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="18" font-weight="400" fill="#203247" text-anchor="start">时间线重建 + 检查点</text>
+<text x="56" y="470" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="18" font-weight="400" fill="#203247" text-anchor="start">抽取需要调用模型</text>
+<rect x="425" y="341" width="350" height="165" rx="7" fill="#EEF4F8" stroke="#345E80" stroke-width="1.3"/>
+<text x="441" y="370" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="19" font-weight="700" fill="#345E80" text-anchor="start">服务的读写路径</text>
+<text x="441" y="398" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="18" font-weight="400" fill="#203247" text-anchor="start">检索、原文查找、时间线</text>
+<text x="441" y="422" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="18" font-weight="400" fill="#203247" text-anchor="start">经 MemoryRunner 回答</text>
+<text x="441" y="446" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="18" font-weight="400" fill="#203247" text-anchor="start">按需构造单轮抽取器</text>
+<text x="441" y="470" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="18" font-weight="400" fill="#203247" text-anchor="start">去重 + 时间线重建</text>
+<rect x="810" y="341" width="350" height="165" rx="7" fill="#FBF5EB" stroke="#96662D" stroke-width="1.3"/>
+<text x="826" y="370" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="19" font-weight="700" fill="#96662D" text-anchor="start">直接写入结构化事实</text>
+<text x="826" y="398" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="18" font-weight="400" fill="#203247" text-anchor="start">带类型的事实 + 原始轮次</text>
+<text x="826" y="422" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="18" font-weight="400" fill="#203247" text-anchor="start">本地嵌入 + 时间线重建</text>
+<text x="826" y="446" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="18" font-weight="400" fill="#203247" text-anchor="start">签名的临时命名空间</text>
+<text x="826" y="470" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="18" font-weight="400" fill="#203247" text-anchor="start">没有 LLM 抽取或回答</text>
+<polyline points="215,300 215,341" fill="none" stroke="#8795A1" stroke-width="1.7" stroke-linejoin="round"/>
+<polygon points="215,341 218.7,333.0 211.3,333.0" fill="#8795A1"/>
+<polyline points="600,300 600,341" fill="none" stroke="#8795A1" stroke-width="1.7" stroke-linejoin="round"/>
+<polygon points="600,341 603.7,333.0 596.3,333.0" fill="#8795A1"/>
+<polyline points="985,300 985,341" fill="none" stroke="#8795A1" stroke-width="1.7" stroke-linejoin="round"/>
+<polygon points="985,341 988.7,333.0 981.3,333.0" fill="#8795A1"/>
+<rect x="40" y="550" width="1120" height="72" rx="7" fill="#EFF6F3" stroke="#32766D" stroke-width="1.3"/>
+<text x="60" y="580" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="19" font-weight="700" fill="#32766D" text-anchor="start">共用的基础组件</text>
+<text x="60" y="607" font-family="Helvetica, Arial, sans-serif" font-size="19" font-weight="400" fill="#203247" text-anchor="start">MemoryStore / SQLite   |   NumpyFlatIndex   |   Encoder   |   HybridRetriever   |   TemporalResolver</text>
+<polyline points="215,506 215,550" fill="none" stroke="#32766D" stroke-width="1.7" stroke-linejoin="round"/>
+<polygon points="215,550 218.7,542.0 211.3,542.0" fill="#32766D"/>
+<polyline points="600,506 600,550" fill="none" stroke="#32766D" stroke-width="1.7" stroke-linejoin="round"/>
+<polygon points="600,550 603.7,542.0 596.3,542.0" fill="#32766D"/>
+<polyline points="985,506 985,550" fill="none" stroke="#32766D" stroke-width="1.7" stroke-linejoin="round"/>
+<polygon points="985,550 988.7,542.0 981.3,542.0" fill="#32766D"/>
+<text x="40" y="678" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="17" font-weight="700" fill="#586775" text-anchor="start">B. 评测  /  显式的运行器、冻结的输入、可审计的产物</text>
+<rect x="40" y="712" width="200" height="132" rx="7" fill="#EEF4F8" stroke="#345E80" stroke-width="1.3"/>
+<text x="56" y="741" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="19" font-weight="700" fill="#345E80" text-anchor="start">冻结输入</text>
+<text x="56" y="769" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="16" font-weight="400" fill="#203247" text-anchor="start">配置 + 源码哈希</text>
+<text x="56" y="793" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="16" font-weight="400" fill="#203247" text-anchor="start">清单 + 库状态</text>
+<rect x="270" y="712" width="200" height="132" rx="7" fill="#EEF4F8" stroke="#345E80" stroke-width="1.3"/>
+<text x="286" y="741" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="19" font-weight="700" fill="#345E80" text-anchor="start">跑各个臂</text>
+<text x="286" y="769" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="16" font-weight="400" fill="#203247" text-anchor="start">记忆 / 整段历史</text>
+<text x="286" y="793" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="16" font-weight="400" fill="#203247" text-anchor="start">朴素检索基线</text>
+<rect x="500" y="712" width="200" height="132" rx="7" fill="#EEF4F8" stroke="#345E80" stroke-width="1.3"/>
+<text x="516" y="741" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="19" font-weight="700" fill="#345E80" text-anchor="start">评分</text>
+<text x="516" y="769" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="16" font-weight="400" fill="#203247" text-anchor="start">独立的评分角色</text>
+<text x="516" y="793" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="16" font-weight="400" fill="#203247" text-anchor="start">答案 + 参考</text>
+<rect x="730" y="712" width="200" height="132" rx="7" fill="#EEF4F8" stroke="#345E80" stroke-width="1.3"/>
+<text x="746" y="741" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="19" font-weight="700" fill="#345E80" text-anchor="start">记录证据</text>
+<text x="746" y="769" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="16" font-weight="400" fill="#203247" text-anchor="start">JSONL 逐题行 + 用量</text>
+<text x="746" y="793" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="16" font-weight="400" fill="#203247" text-anchor="start">运行锁 + 续跑账本</text>
+<rect x="960" y="712" width="200" height="132" rx="7" fill="#EEF4F8" stroke="#345E80" stroke-width="1.3"/>
+<text x="976" y="741" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="19" font-weight="700" fill="#345E80" text-anchor="start">聚合</text>
+<text x="976" y="769" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="16" font-weight="400" fill="#203247" text-anchor="start">正确率 + 成本 + 召回</text>
+<text x="976" y="793" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="16" font-weight="400" fill="#203247" text-anchor="start">配对检验 + 门限</text>
+<polyline points="240,778 270,778" fill="none" stroke="#8795A1" stroke-width="1.7" stroke-linejoin="round"/>
+<polygon points="270,778 262.0,774.3 262.0,781.7" fill="#8795A1"/>
+<polyline points="470,778 500,778" fill="none" stroke="#8795A1" stroke-width="1.7" stroke-linejoin="round"/>
+<polygon points="500,778 492.0,774.3 492.0,781.7" fill="#8795A1"/>
+<polyline points="700,778 730,778" fill="none" stroke="#8795A1" stroke-width="1.7" stroke-linejoin="round"/>
+<polygon points="730,778 722.0,774.3 722.0,781.7" fill="#8795A1"/>
+<polyline points="930,778 960,778" fill="none" stroke="#8795A1" stroke-width="1.7" stroke-linejoin="round"/>
+<polygon points="960,778 952.0,774.3 952.0,781.7" fill="#8795A1"/>
+<rect x="40" y="880" width="1120" height="72" rx="7" fill="#F6F7F8" stroke="#CED6DC" stroke-width="1.3"/>
+<text x="59" y="909" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="18" font-weight="700" fill="#203247" text-anchor="start">由运行器选择的研究扩展</text>
+<text x="59" y="936" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="18" font-weight="400" fill="#203247" text-anchor="start">会话连贯上下文 / oracle   |   v3 证据补水   |   v4 算术 + 关系扫描   |   影响力 / 预算打包</text>
+<polyline points="40,978 1160,978" fill="none" stroke="#CED6DC" stroke-width="1" stroke-linejoin="round"/>
+<text x="40" y="1001" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="16" font-weight="400" fill="#586775" text-anchor="start">当前依赖：MemoryService 从 evaluation/ 导入 MemoryRunner 和 Instance。拟议的拆分尚未实现。</text>
+<text x="40" y="1024" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="16" font-weight="400" fill="#586775" text-anchor="start">评测金标只用于评分和显式 oracle 诊断；普通检索不使用它们。</text>
+</svg>

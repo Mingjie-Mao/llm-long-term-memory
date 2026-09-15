@@ -8,18 +8,18 @@
 
 ## 图集
 
-总览于 2026-09-13 按当前代码重画，提供中英文两版；其余五张细节图保留英文标签，中文图注解释边界与实现细节。
+六张图都有中英文两版，由同一份布局代码生成，所以两版坐标一致、内容对齐。下面嵌入的是中文版，表格里同时给出英文版链接。
 
-六张图使用白底、细线与可编辑文字。新总览使用横向彩色分区：蓝色接入、绿色抽取/回答、橙色存储、红色召回/回退、紫色客户端/候选。其余细节图沿用蓝色处理、绿色记忆状态、赭色原文证据。实线表示流程或引用，虚线表示条件路径；图 3 的虚线特指应用层的来源查找。盒子表示逻辑职责，不表示独立进程。
+六张图使用白底、细线与可编辑文字。总览使用横向彩色分区：蓝色接入、绿色抽取/回答、橙色存储、红色召回/回退、紫色客户端/候选。其余细节图沿用蓝色处理、绿色记忆状态、赭色原文证据。实线表示流程或引用，虚线表示条件路径；图 3 的虚线特指应用层的来源查找。盒子表示逻辑职责，不表示独立进程。
 
 | 图 | 关注的问题 | 可编辑矢量图 |
 |---|---|---|
-| 1 | 系统如何连接记忆与原文？ | [中文总览](figures/overview.zh-CN.svg) · [English](figures/overview.svg) |
-| 2 | 会话如何被抽取、去重、写入和更新？ | [批量写入](figures/write-path.svg) |
-| 3 | 哪些数据在 SQLite，哪些在向量文件？ | [存储模型](figures/storage.svg) |
-| 4 | 候选如何排序，何时回退原文？ | [读取与回退](figures/read-path.svg) |
-| 5 | 旧事实晚到时如何修正时间线？ | [时间更新](figures/temporal.svg) |
-| 6 | REST、MCP、批处理、演示和评测是什么关系？ | [入口与评测](figures/runtime-evaluation.svg) |
+| 1 | 系统如何连接记忆与原文？ | [系统总览](figures/overview.zh-CN.svg) · [English](figures/overview.svg) |
+| 2 | 会话如何被抽取、去重、写入和更新？ | [批量写入](figures/write-path.zh-CN.svg) · [English](figures/write-path.svg) |
+| 3 | 哪些数据在 SQLite，哪些在向量文件？ | [存储模型](figures/storage.zh-CN.svg) · [English](figures/storage.svg) |
+| 4 | 候选如何排序，何时回退原文？ | [读取与回退](figures/read-path.zh-CN.svg) · [English](figures/read-path.svg) |
+| 5 | 旧事实晚到时如何修正时间线？ | [时间更新](figures/temporal.zh-CN.svg) · [English](figures/temporal.svg) |
+| 6 | REST、MCP、批处理、演示和评测是什么关系？ | [入口与评测](figures/runtime-evaluation.zh-CN.svg) · [English](figures/runtime-evaluation.svg) |
 
 ## 1. 系统总览
 
@@ -39,7 +39,7 @@ REST 配置令牌后获得凭据绑定的租户身份；空配置是开放模式
 
 ## 2. 批量写入
 
-![批量写入：Stage A、Stage B、规则与出处，然后归档、去重、持久化、时序消解和检查点](figures/write-path.svg)
+![批量写入：Stage A、Stage B、规则与出处，然后归档、去重、持久化、时序消解和检查点](figures/write-path.zh-CN.svg)
 
 **图 2.** `IngestionPipeline.run()` 先检查抽取指纹，再按命名空间分批，跳过检查点中已完成或已被内容策略拒绝的会话。`_ingest_batch()` 的主路径是：
 
@@ -59,7 +59,7 @@ REST 配置令牌后获得凭据绑定的租户身份；空配置是开放模式
 
 ## 3. 存储模型
 
-![存储模型：SQLite 会话、轮次、记忆与 FTS5 索引，以及独立保存的 NumPy 向量和 ID 映射](figures/storage.svg)
+![存储模型：SQLite 会话、轮次、记忆与 FTS5 索引，以及独立保存的 NumPy 向量和 ID 映射](figures/storage.zh-CN.svg)
 
 **图 3.** 正常服务与 CLI 使用同一命名约定：
 
@@ -90,7 +90,7 @@ SQLite 保存源数据、状态、词法索引以及辅助关系。向量索引�
 
 ## 4. 读取与条件回退
 
-![读取路径：语义与词法各取候选，合并评分并组装上下文，三种判定分别进入答案或原文恢复](figures/read-path.svg)
+![读取路径：语义与词法各取候选，合并评分并组装上下文，三种判定分别进入答案或原文恢复](figures/read-path.zh-CN.svg)
 
 **图 4.** `HybridRetriever.retrieve_with_trace()` 在整个向量索引上做精确相似度检索，再过滤用户和状态，取最多 `candidate_limit` 条语义候选；词法路径在 SQL 中过滤后也取最多 `candidate_limit` 条。二者按 memory ID 取并集，**不是合并后再截成 50 条**。默认每路 50，合并后至多 100。
 
@@ -118,7 +118,7 @@ SQLite 保存源数据、状态、词法索引以及辅助关系。向量索引�
 
 ## 5. 时间更新
 
-![时间更新示例：事实按八月、一月、三月顺序到达，仍重建为一月到三月、三月到八月、八月起的有效区间](figures/temporal.svg)
+![时间更新示例：事实按八月、一月、三月顺序到达，仍重建为一月到三月、三月到八月、八月起的有效区间](figures/temporal.zh-CN.svg)
 
 **图 5.** 同一 `(user_id, subject, predicate)` 上，后到达的旧事实不会直接成为当前值。resolver 读取包括 superseded 在内的全链，按 `(event_time, id)` 排序，重算状态和有效期；因此三月事实晚到时可以把一月事实的 `valid_to` 从八月改为三月。
 
@@ -130,7 +130,7 @@ SQLite 保存源数据、状态、词法索引以及辅助关系。向量索引�
 
 ## 6. 入口与研究评测
 
-![入口与评测：批处理、REST/MCP、无需 LLM 的演示写入，以及冻结、运行、评分和聚合工作流](figures/runtime-evaluation.svg)
+![入口与评测：批处理、REST/MCP、无需 LLM 的演示写入，以及冻结、运行、评分和聚合工作流](figures/runtime-evaluation.zh-CN.svg)
 
 **图 6.** 仓库包含三种运行入口，不能把它们简单画成一条统一写入流水线：
 
@@ -169,11 +169,11 @@ REST 另有凭据身份边界、数据导出与命名空间硬删除，不能由
 ## 重建与论文使用
 
 ```bash
-python3 docs/figures/generate.py         # 六张图 + 中文总览，共七份 SVG；仅需 Python 标准库
-python3 docs/figures/generate.py --pdf   # 加导出六页英文矢量 PDF，需要 reportlab
+python3 docs/figures/generate.py         # 六张图 × 中英文，共十二份 SVG；仅需 Python 标准库
+python3 docs/figures/generate.py --pdf   # 再导出六页英文矢量 PDF，需要 reportlab
 ```
 
-源文件：[generate.py](figures/generate.py)、[双语总览布局](figures/overview.py)。PDF 输出到 `output/pdf/architecture-atlas.pdf`；横向总览页使用 2600×1040 画布，其余页保留原尺寸。SVG 保留可选中的文字、形状和路径；图标由路径绘制，不依赖模型品牌标志或外部图片。PDF 同样使用矢量图形，不是截图。论文排版建议每次使用一张图并配对应图注；主文使用总览与回退图，存储细节和实验流程可以放附录。长图适合通栏或单独横页，避免缩小到单栏后文字难读。
+源文件：[generate.py](figures/generate.py)、[总览布局](figures/overview.py)。中英文共用一套坐标，只有文案经 `tr()` 分流，所以改版式不会让两版走偏。PDF 只导出英文版：reportlab 内置的 Helvetica 没有中日韩字形，中文页会导成一排空框。PDF 输出到 `output/pdf/architecture-atlas.pdf`；横向总览页使用 2600×1040 画布，其余页保留原尺寸。SVG 保留可选中的文字、形状和路径；图标由路径绘制，不依赖模型品牌标志或外部图片。PDF 同样使用矢量图形，不是截图。论文排版建议每次使用一张图并配对应图注；主文使用总览与回退图，存储细节和实验流程可以放附录。长图适合通栏或单独横页，避免缩小到单栏后文字难读。
 
 此生成器只处理文档，不导入项目运行代码，不读数据库、题目或密钥，也不发出模型请求。未向受冻结的 `scripts/`、`src/`、配置或证据目录增加文件。
 

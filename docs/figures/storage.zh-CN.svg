@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="900" viewBox="0 0 1200 900" role="img" aria-labelledby="title desc">
+<title id="title">关系型真相源，外挂向量文件</title>
+<desc id="desc">Architecture verified against the repository on 2026-09-07. See docs/ARCHITECTURE.md for the detailed figure caption and source mapping. Solid arrows show flow; dashed arrows show conditional paths.</desc>
+<rect x="0" y="0" width="1200" height="900" rx="7" fill="#FFFFFF" stroke="none" stroke-width="1.3"/>
+<text x="40" y="42" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#345E80" text-anchor="start">FIGURE 03</text>
+<text x="40" y="82" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="31" font-weight="400" fill="#203247" text-anchor="start">关系型真相源，外挂向量文件</text>
+<text x="40" y="113" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="17" font-weight="400" fill="#586775" text-anchor="start">物理表名与关系取自 schema.sql、SQLiteMemoryStore 与 NumpyFlatIndex。</text>
+<polyline points="40,133 1160,133" fill="none" stroke="#CED6DC" stroke-width="1" stroke-linejoin="round"/>
+<rect x="40" y="165" width="800" height="570" rx="7" fill="#FFFFFF" stroke="#345E80" stroke-width="1.3"/>
+<text x="62" y="198" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="17" font-weight="700" fill="#586775" text-anchor="start">SQLITE  /  &lt;store&gt;.db  /  WAL + 外键</text>
+<rect x="64" y="224" width="326" height="110" rx="7" fill="#EEF4F8" stroke="#345E80" stroke-width="1.3"/>
+<text x="80" y="253" font-family="Helvetica, Arial, sans-serif" font-size="19" font-weight="700" fill="#345E80" text-anchor="start">sessions</text>
+<text x="80" y="281" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="400" fill="#203247" text-anchor="start">PK id  |  user_id</text>
+<text x="80" y="305" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="400" fill="#203247" text-anchor="start">started_at  |  source</text>
+<rect x="464" y="224" width="350" height="110" rx="7" fill="#EEF4F8" stroke="#345E80" stroke-width="1.3"/>
+<text x="480" y="253" font-family="Helvetica, Arial, sans-serif" font-size="19" font-weight="700" fill="#345E80" text-anchor="start">turns</text>
+<text x="480" y="281" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="400" fill="#203247" text-anchor="start">PK id  |  FK session_id</text>
+<text x="480" y="305" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="400" fill="#203247" text-anchor="start">turn_index, role, content, ts</text>
+<polyline points="390,270 464,270" fill="none" stroke="#8795A1" stroke-width="1.7" stroke-linejoin="round"/>
+<polygon points="464,270 456.0,266.3 456.0,273.7" fill="#8795A1"/>
+<text x="407" y="255" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="400" fill="#586775" text-anchor="start">1 : N</text>
+<rect x="64" y="397" width="400" height="284" rx="7" fill="#EEF4F8" stroke="#345E80" stroke-width="1.3"/>
+<text x="80" y="426" font-family="Helvetica, Arial, sans-serif" font-size="19" font-weight="700" fill="#345E80" text-anchor="start">memories</text>
+<text x="80" y="454" font-family="Helvetica, Arial, sans-serif" font-size="17" font-weight="400" fill="#203247" text-anchor="start">PK id  |  user_id  |  content</text>
+<text x="80" y="478" font-family="Helvetica, Arial, sans-serif" font-size="17" font-weight="400" fill="#203247" text-anchor="start">subject, predicate, object</text>
+<text x="80" y="502" font-family="Helvetica, Arial, sans-serif" font-size="17" font-weight="400" fill="#203247" text-anchor="start">source_role, scope, type</text>
+<text x="80" y="526" font-family="Helvetica, Arial, sans-serif" font-size="17" font-weight="400" fill="#203247" text-anchor="start">event_time, valid_from, valid_to</text>
+<text x="80" y="550" font-family="Helvetica, Arial, sans-serif" font-size="17" font-weight="400" fill="#203247" text-anchor="start">ingested_at, update_op, status</text>
+<text x="80" y="574" font-family="Helvetica, Arial, sans-serif" font-size="17" font-weight="400" fill="#203247" text-anchor="start">superseded_by  -&gt;  memories.id</text>
+<text x="80" y="598" font-family="Helvetica, Arial, sans-serif" font-size="17" font-weight="400" fill="#203247" text-anchor="start">source_session_id  -&gt;  sessions.id</text>
+<text x="80" y="622" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="17" font-weight="400" fill="#203247" text-anchor="start">source_turn_index + 字符偏移</text>
+<text x="80" y="646" font-family="Helvetica, Arial, sans-serif" font-size="17" font-weight="400" fill="#203247" text-anchor="start">importance, strength, token_count</text>
+<polyline points="208,397 208,334" fill="none" stroke="#8795A1" stroke-width="1.7" stroke-linejoin="round"/>
+<polygon points="208,334 204.3,342.0 211.7,342.0" fill="#8795A1"/>
+<text x="222" y="369" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="16" font-weight="400" fill="#586775" text-anchor="start">会话外键</text>
+<polyline points="464,418 492,418 492,360 638,360 638,334" fill="none" stroke="#8795A1" stroke-width="1.7" stroke-linejoin="round" stroke-dasharray="7 5"/>
+<polygon points="638,334 634.3,342.0 641.7,342.0" fill="#8795A1"/>
+<text x="507" y="389" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="16" font-weight="400" fill="#586775" text-anchor="start">轮次 / 区间查找</text>
+<rect x="539" y="436" width="275" height="94" rx="7" fill="#FBF5EB" stroke="#96662D" stroke-width="1.3"/>
+<text x="555" y="465" font-family="Helvetica, Arial, sans-serif" font-size="19" font-weight="700" fill="#96662D" text-anchor="start">turns_fts</text>
+<text x="555" y="493" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="17" font-weight="400" fill="#203247" text-anchor="start">对原始轮次做 BM25</text>
+<polyline points="784,334 784,436" fill="none" stroke="#96662D" stroke-width="1.7" stroke-linejoin="round"/>
+<polygon points="784,436 787.7,428.0 780.3,428.0" fill="#96662D"/>
+<text x="688" y="414" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="16" font-weight="400" fill="#96662D" text-anchor="start">触发器</text>
+<rect x="539" y="587" width="275" height="94" rx="7" fill="#EFF6F3" stroke="#32766D" stroke-width="1.3"/>
+<text x="555" y="616" font-family="Helvetica, Arial, sans-serif" font-size="19" font-weight="700" fill="#32766D" text-anchor="start">memories_fts</text>
+<text x="555" y="644" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="17" font-weight="400" fill="#203247" text-anchor="start">对事实内容做 BM25</text>
+<polyline points="464,635 539,635" fill="none" stroke="#32766D" stroke-width="1.7" stroke-linejoin="round"/>
+<polygon points="539,635 531.0,631.3 531.0,638.7" fill="#32766D"/>
+<text x="473" y="614" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="16" font-weight="400" fill="#32766D" text-anchor="start">触发器</text>
+<text x="64" y="711" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="16" font-weight="400" fill="#586775" text-anchor="start">辅助表：entities + memory_entities  |  evidence  |  meta</text>
+<rect x="869" y="165" width="291" height="570" rx="7" fill="#EFF6F3" stroke="#32766D" stroke-width="1.3"/>
+<text x="890" y="198" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="17" font-weight="700" fill="#586775" text-anchor="start">外挂向量文件</text>
+<text x="890" y="240" font-family="Helvetica, Arial, sans-serif" font-size="19" font-weight="700" fill="#32766D" text-anchor="start">&lt;store&gt;-index.npy</text>
+<text x="890" y="275" font-family="Helvetica, Arial, sans-serif" font-size="19" font-weight="400" fill="#203247" text-anchor="start">N x 384 float32</text>
+<text x="890" y="307" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="18" font-weight="400" fill="#203247" text-anchor="start">L2 归一化向量</text>
+<text x="890" y="339" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="18" font-weight="400" fill="#203247" text-anchor="start">精确内积全扫描</text>
+<polyline points="890,370 1138,370" fill="none" stroke="#CED6DC" stroke-width="1" stroke-linejoin="round"/>
+<text x="890" y="409" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="700" fill="#32766D" text-anchor="start">&lt;store&gt;-index.ids.json</text>
+<text x="890" y="444" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="18" font-weight="400" fill="#203247" text-anchor="start">行号 -&gt; memory ID</text>
+<text x="890" y="476" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="18" font-weight="400" fill="#203247" text-anchor="start">由应用维护的对应关系</text>
+<text x="890" y="508" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="18" font-weight="400" fill="#203247" text-anchor="start">不是 SQL 外键</text>
+<polyline points="890,538 1138,538" fill="none" stroke="#CED6DC" stroke-width="1" stroke-linejoin="round"/>
+<text x="890" y="576" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="18" font-weight="700" fill="#203247" text-anchor="start">与库同目录</text>
+<text x="890" y="608" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="18" font-weight="400" fill="#203247" text-anchor="start">独立的保存操作</text>
+<text x="890" y="640" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="18" font-weight="400" fill="#203247" text-anchor="start">状态过滤在检索时做</text>
+<rect x="40" y="763" width="1120" height="58" rx="7" fill="#F6F7F8" stroke="#CED6DC" stroke-width="1.3"/>
+<text x="58" y="798" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="18" font-weight="400" fill="#203247" text-anchor="start">出处区间是启发式的、可为空的锚点。会话链接是真外键；轮次与偏移链接不是。</text>
+<polyline points="40,846 1160,846" fill="none" stroke="#CED6DC" stroke-width="1" stroke-linejoin="round"/>
+<text x="40" y="869" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, Arial, sans-serif" font-size="16" font-weight="400" fill="#586775" text-anchor="start">常规 supersession 与 forget 只更新状态。迁移清理与演示会话删除会物理删除行。</text>
+</svg>

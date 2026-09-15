@@ -10,7 +10,7 @@ It solves **long-term memory only**. It is not an agent's working memory, and it
 manage the current session's short-term context.
 
 [Live demo](https://lltm-memory.pages.dev) · [Architecture](docs/ARCHITECTURE.md) ·
-[Evaluation](docs/EVALUATION.md) · [Project report](docs/PROJECT_REPORT.zh-CN.md) (Chinese)
+[Evaluation](docs/EVALUATION.md) · [Project report](docs/PROJECT_REPORT.md)
 
 > The demo runs the half that needs no LLM: local embeddings, cross-session retrieval and
 > temporal updates are real, facts are produced explicitly by browser sentence patterns,
@@ -68,7 +68,7 @@ Answer context
 - **Raw fallback**: when structured memory lacks a number, date or exact wording, the
   original turns are searched again.
 
-Why it is built this way: [project report](docs/PROJECT_REPORT.zh-CN.md) (Chinese).
+Why it is built this way: [project report](docs/PROJECT_REPORT.md).
 Implementation: [ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
 ## Quick start
@@ -138,7 +138,7 @@ Auth, deletion semantics, account budgets and scheduled operations:
 
 | Document | Contents |
 |---|---|
-| [PROJECT_REPORT.zh-CN.md](docs/PROJECT_REPORT.zh-CN.md) | What the project solves, why it is designed this way, findings and open problems |
+| [PROJECT_REPORT.md](docs/PROJECT_REPORT.md) · [中文](docs/PROJECT_REPORT.zh-CN.md) | What the project solves, why it is designed this way, findings and open problems |
 | [ARCHITECTURE.md](docs/ARCHITECTURE.md) | System architecture, code mappings, auth and operational semantics |
 | [EVALUATION.md](docs/EVALUATION.md) | Splits, method and statistical results |
 | [DEPLOY.md](DEPLOY.md) | Deployment, backup and restore |
