@@ -1,0 +1,85 @@
+{
+  "summary": {
+    "total_requests": 6,
+    "total_tokens": 2058,
+    "failures": 4,
+    "by_role": {
+      "answerer": {
+        "role": "answerer",
+        "calls": 2,
+        "failures": 1,
+        "input_tokens": 1722,
+        "output_tokens": 65,
+        "p50_ms": 1385.540459305048,
+        "p95_ms": 1398.697083350271,
+        "max_ms": 1398.697083350271
+      },
+      "judge": {
+        "role": "judge",
+        "calls": 4,
+        "failures": 3,
+        "input_tokens": 240,
+        "output_tokens": 31,
+        "p50_ms": 1309.604125097394,
+        "p95_ms": 31780.452666804194,
+        "max_ms": 31780.452666804194
+      }
+    }
+  },
+  "calls": [
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 1398.697083350271,
+      "ok": false,
+      "error": "ClientError: 400 INVALID_ARGUMENT. {'error': {'code': 400, 'message': 'Request contains an invalid argument.', 'status': 'INVALID_ARGUMENT'}}"
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 1722,
+      "output_tokens": 65,
+      "latency_ms": 1385.540459305048,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 1045.3303749673069,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 1309.604125097394,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 1181.8224173039198,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 240,
+      "output_tokens": 31,
+      "latency_ms": 31780.452666804194,
+      "ok": true,
+      "error": null
+    }
+  ]
+}

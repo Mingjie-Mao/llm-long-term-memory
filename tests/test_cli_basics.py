@@ -5,6 +5,7 @@ from types import SimpleNamespace
 from typer.testing import CliRunner
 
 from llm_long_term_memory import cli
+from llm_long_term_memory.evaluation.datasets import longmemeval as lme
 from llm_long_term_memory.evaluation.datasets.longmemeval import Stats
 
 
@@ -25,7 +26,7 @@ def test_default_store_keeps_two_stage_variants_separate():
 def test_doctor_reports_key_paths_and_download_state(monkeypatch, tmp_path):
     data = tmp_path / "data"
     data.mkdir()
-    first_name = next(iter(cli.lme.VARIANTS.values()))
+    first_name = next(iter(lme.VARIANTS.values()))
     (data / first_name).write_text("[]", encoding="utf-8")
     settings = SimpleNamespace(
         has_api_key=True,
@@ -70,7 +71,7 @@ def test_data_download_delegates_variant_directory_and_force(monkeypatch, tmp_pa
         calls.append((variant, data_dir, force))
         return downloaded
 
-    monkeypatch.setattr(cli.lme, "download", fake_download)
+    monkeypatch.setattr(lme, "download", fake_download)
 
     result = invoke("data", "download", "--variant", "m", "--data-dir", str(tmp_path), "--force")
 
@@ -96,8 +97,8 @@ def stats() -> Stats:
 
 
 def test_data_stats_renders_measured_corpus_fields(monkeypatch):
-    monkeypatch.setattr(cli.lme, "load", lambda *args, **kwargs: [object()])
-    monkeypatch.setattr(cli.lme, "compute_stats", lambda *args, **kwargs: stats())
+    monkeypatch.setattr(lme, "load", lambda *args, **kwargs: [object()])
+    monkeypatch.setattr(lme, "compute_stats", lambda *args, **kwargs: stats())
 
     result = invoke("data", "stats", "--variant", "s", "--limit", "2")
 
@@ -108,8 +109,8 @@ def test_data_stats_renders_measured_corpus_fields(monkeypatch):
 
 
 def test_data_plan_renders_request_and_day_tradeoffs(monkeypatch, tmp_path):
-    monkeypatch.setattr(cli.lme, "load", lambda *args, **kwargs: [object()])
-    monkeypatch.setattr(cli.lme, "compute_stats", lambda *args, **kwargs: stats())
+    monkeypatch.setattr(lme, "load", lambda *args, **kwargs: [object()])
+    monkeypatch.setattr(lme, "compute_stats", lambda *args, **kwargs: stats())
 
     result = invoke("data", "plan", "--data-dir", str(tmp_path), "--rpd", "1")
 

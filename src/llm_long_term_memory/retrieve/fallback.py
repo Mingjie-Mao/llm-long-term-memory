@@ -54,6 +54,7 @@ trade it away.
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass, field
 from typing import Literal
 
@@ -156,4 +157,77 @@ class RawFallback:
         return RawEvidence(
             level="none",
             reason="Neither structured memory nor the raw archive contains this.",
+        )
+
+    def recover_local_detail(self, user_id: str, query: str, memories: list[Memory]) -> RawEvidence:
+        """Search every turn inside the sessions located by structured memory.
+
+        Provenance hydration starts at the exact turn that produced a memory. That is
+        ideal for recovering dropped words from the same statement, but v2c found a
+        second case: the coarse fact was stated in turn 2 and its exact date appeared
+        later in turn 8 of the same conversation. This method keeps the safe
+        source-local boundary while allowing the query to select a better turn inside
+        that boundary. It never falls through to another session.
+        """
+        local_sessions = {
+            memory.source_session_id for memory in memories if memory.source_session_id
+        }
+        if not local_sessions:
+            return RawEvidence(
+                level="none", reason="No retrieved memory identifies a source session."
+            )
+        # Restrict in SQL *before* ranking and truncation. Filtering a global top-15
+        # afterwards worked on tiny stores but silently returned no local evidence once
+        # unrelated archive turns occupied those 15 slots.
+        ranked = self.store.search_turns_in_sessions(
+            user_id, query, local_sessions, limit=self.pool
+        )
+        turns = [self._best_fragment(turn, query) for turn in ranked[: self.max_turns]]
+        if not turns:
+            return RawEvidence(
+                level="none",
+                reason="The located source sessions contain no turn matching the requested detail.",
+            )
+        return RawEvidence(
+            turns=turns,
+            level="source_local",
+            reason=(
+                "Structured memory located the conversation but retained lower precision; "
+                "ranked the original turns inside that conversation for the exact detail."
+            ),
+        )
+
+    @staticmethod
+    def _best_fragment(turn: Turn, query: str, max_chars: int = 1200) -> Turn:
+        """Keep the most query-relevant verbatim window of an unusually long turn.
+
+        The old renderer always kept the beginning.  In long assistant answers the
+        requested price, date, title or URL is often near the end, so the correct turn
+        could be selected and the actual answer still cut off.  Short turns remain
+        byte-identical.  Long turns are split only at existing paragraph/sentence
+        boundaries and the winning sentence receives one neighbour on each side.
+        """
+        if len(turn.content) <= max_chars:
+            return turn
+        parts = [part for part in re.split(r"(?<=[.!?])\s+|\n+", turn.content) if part]
+        if not parts:
+            return turn
+        terms = {term.casefold() for term in re.findall(r"[\w'-]+", query) if len(term) > 2}
+
+        def score(index: int) -> tuple[int, int]:
+            words = {word.casefold() for word in re.findall(r"[\w'-]+", parts[index])}
+            return len(words & terms), -index
+
+        best = max(range(len(parts)), key=score)
+        start, end = max(0, best - 1), min(len(parts), best + 2)
+        fragment = " ".join(parts[start:end])
+        if len(fragment) > max_chars:
+            fragment = parts[best][:max_chars]
+        return Turn(
+            id=turn.id,
+            session_id=turn.session_id,
+            turn_index=turn.turn_index,
+            role=turn.role,
+            content=fragment,
+            ts=turn.ts,
         )

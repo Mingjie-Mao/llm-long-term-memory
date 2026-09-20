@@ -28,7 +28,7 @@ import re
 from collections import Counter
 from dataclasses import dataclass, field
 
-from llm_long_term_memory.evaluation.datasets.longmemeval import HaystackSession
+from llm_long_term_memory.conversation import ConversationSession
 from llm_long_term_memory.store import Memory
 
 # Deliberately narrow patterns. A loose one inflates the denominator with tokens no
@@ -140,7 +140,7 @@ _FILLER = {"a second", "a minute", "one second", "one minute", "a moment", "toda
 _SENTENCE = re.compile(r"[^.!?]+[.!?]?")
 
 
-def user_assertions(session: HaystackSession) -> str:
+def user_assertions(session: ConversationSession) -> str:
     """The user's own statements, excluding what they merely asked about.
 
     The denominator has to be things the extractor *should* have kept, or tuning
@@ -168,7 +168,7 @@ def user_assertions(session: HaystackSession) -> str:
     return "\n".join(kept)
 
 
-def user_text(session: HaystackSession) -> str:
+def user_text(session: ConversationSession) -> str:
     """Every user turn, questions included. Kept for callers that want the raw
     denominator; the gate uses `user_assertions`."""
     return "\n".join(t.content for t in session.turns if t.role == "user")
@@ -204,7 +204,7 @@ class FidelityReport:
 
 
 def score_sessions(
-    pairs: list[tuple[HaystackSession, list[Memory]]], keep_examples: int = 6
+    pairs: list[tuple[ConversationSession, list[Memory]]], keep_examples: int = 6
 ) -> FidelityReport:
     """`pairs` is (session, memories extracted from it)."""
     report = FidelityReport()

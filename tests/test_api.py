@@ -634,9 +634,9 @@ def test_live_answer_uses_the_requested_limit_without_mutating_the_shared_runner
     class StubAnswerer:
         top_k = 10
 
-        def answer(self, instance, *, limit=None):
-            assert instance.question_id == "alice"
-            assert instance.question == "where do I live?"
+        def answer_request(self, request, *, limit=None, evidence_session_ids=()):
+            assert request.user_id == "alice"
+            assert request.question == "where do I live?"
             assert limit == 3
             assert self.top_k == 10
             return SimpleNamespace(

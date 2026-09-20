@@ -29,10 +29,10 @@ from threading import RLock
 from time import perf_counter
 from typing import Any
 
+from llm_long_term_memory.answering import ANSWER_PROMPT_VERSION
 from llm_long_term_memory.api.budget import AccountBudgets, BudgetExceeded
 from llm_long_term_memory.config import ExperimentConfig, Settings
 from llm_long_term_memory.evaluation.judge import JUDGE_PROMPT_VERSION
-from llm_long_term_memory.evaluation.runners.base import ANSWER_PROMPT_VERSION
 from llm_long_term_memory.retrieve import EvidenceHydrator, HybridRetriever
 from llm_long_term_memory.store import (
     ErasureJournal,
@@ -159,20 +159,17 @@ class LiveTurnExtractor:
     def extract_turn(
         self, *, user_id: str, session_id: str, role: str, content: str, now: datetime
     ) -> TurnExtractionOutcome:
-        from llm_long_term_memory.evaluation.datasets.longmemeval import (
-            HaystackSession,
-            HaystackTurn,
-        )
+        from llm_long_term_memory.conversation import ConversationSession, ConversationTurn
         from llm_long_term_memory.llm import UsageTracker
 
         started = len(self.usage.records)
         self.batch_extractor.user_id = user_id
         extracted = self.batch_extractor.extract(
             [
-                HaystackSession(
+                ConversationSession(
                     session_id=session_id,
                     date=now.strftime("%Y-%m-%d %H:%M"),
-                    turns=[HaystackTurn(role=role, content=content)],
+                    turns=[ConversationTurn(role=role, content=content)],
                 )
             ]
         )
@@ -544,17 +541,18 @@ class MemoryService:
             raise RuntimeError(
                 "no answerer configured; set GEMINI_API_KEY to enable live answering"
             )
-        from llm_long_term_memory.evaluation.datasets.longmemeval import Instance
+        from llm_long_term_memory.conversation import AnswerRequest
 
         started = perf_counter()
-        instance = Instance(
-            question_id=user_id,
-            question_type="live",
+        # This used to build a benchmark `Instance` with `answer=""` and
+        # `question_type="live"`, which is a gold-answer record with the gold left
+        # blank: a live question is not a benchmark row, and the two fields it had to
+        # invent were the giveaway. The request carries what answering needs and
+        # nothing about what the answer should be.
+        request = AnswerRequest(
             question=query,
-            answer="",
-            question_date=datetime.now().strftime("%Y/%m/%d"),
-            sessions=[],
-            answer_session_ids=[],
+            asked_on=datetime.now().strftime("%Y/%m/%d"),
+            user_id=user_id,
         )
         # A caller-supplied limit must actually apply. Accepting one, ignoring it, and
         # then reporting a count computed under a different k is how the inspector
@@ -566,7 +564,7 @@ class MemoryService:
         records = records if isinstance(records, list) else None
         attempt_start = len(records) if records is not None else None
         try:
-            result = runner.answer(instance, limit=limit)
+            result = runner.answer_request(request, limit=limit)
         except Exception:
             self._charge_answer(user_id, model, records, attempt_start, None)
             raise

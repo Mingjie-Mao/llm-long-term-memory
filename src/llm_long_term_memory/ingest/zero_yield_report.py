@@ -10,8 +10,11 @@ from __future__ import annotations
 
 from collections import defaultdict
 from dataclasses import asdict, dataclass
-from math import comb
 from typing import Any
+
+# Re-exported: this module owned the only implementation for a while and callers
+# import it from here. The arithmetic lives in `llm_long_term_memory.stats` now.
+from llm_long_term_memory.stats import exact_mcnemar
 
 
 @dataclass(frozen=True, slots=True)
@@ -29,15 +32,6 @@ class BatchPilotSummary:
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
-
-
-def exact_mcnemar(wins: int, losses: int) -> float:
-    """Two-sided exact McNemar/binomial p-value for discordant pairs."""
-    n = wins + losses
-    if not n:
-        return 1.0
-    tail = sum(comb(n, k) for k in range(min(wins, losses) + 1)) / 2**n
-    return min(1.0, 2 * tail)
 
 
 def summarize_batch_pilot(payload: dict[str, Any]) -> BatchPilotSummary:

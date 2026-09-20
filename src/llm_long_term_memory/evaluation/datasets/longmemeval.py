@@ -22,6 +22,8 @@ from pathlib import Path
 
 import httpx
 
+from llm_long_term_memory.conversation import ConversationSession, ConversationTurn
+
 BASE_URL = "https://huggingface.co/datasets/xiaowu0162/longmemeval-cleaned/resolve/main"
 
 VARIANTS = {
@@ -38,25 +40,22 @@ CHARS_PER_TOKEN = 4.6
 
 
 @dataclass(slots=True)
-class HaystackTurn:
-    role: str
-    content: str
+class HaystackTurn(ConversationTurn):
+    """A turn plus the benchmark's own label for it.
+
+    `has_answer` is gold: it says this turn contains what the question is asking for.
+    It is why these types subclass the product's rather than being them — ingestion
+    must never receive it, or an extractor could be tuned on the answer key.
+    """
+
     has_answer: bool = False
 
 
 @dataclass(slots=True)
-class HaystackSession:
-    session_id: str
-    date: str
-    turns: list[HaystackTurn]
-
-    @property
-    def char_count(self) -> int:
-        return sum(len(t.content) for t in self.turns)
-
+class HaystackSession(ConversationSession):
     @property
     def is_evidence(self) -> bool:
-        return any(t.has_answer for t in self.turns)
+        return any(getattr(turn, "has_answer", False) for turn in self.turns)
 
 
 @dataclass(slots=True)

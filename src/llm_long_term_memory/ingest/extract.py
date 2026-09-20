@@ -15,7 +15,7 @@ import hashlib
 from dataclasses import dataclass
 from datetime import datetime
 
-from llm_long_term_memory.evaluation.datasets.longmemeval import HaystackSession
+from llm_long_term_memory.conversation import ConversationSession
 from llm_long_term_memory.llm.client import GeminiClient
 from llm_long_term_memory.store import Memory
 
@@ -153,7 +153,7 @@ If a session contains nothing about the user, extract nothing from it.
 """
 
 
-def render_batch(sessions: list[HaystackSession]) -> str:
+def render_batch(sessions: list[ConversationSession]) -> str:
     blocks = []
     for i, sess in enumerate(sessions):
         turns = "\n".join(f"{t.role}: {t.content}" for t in sess.turns)
@@ -215,7 +215,7 @@ class Extractor:
         self.user_id = user_id
         self.chars_per_token = chars_per_token
 
-    def extract(self, sessions: list[HaystackSession]) -> ExtractionOutcome:
+    def extract(self, sessions: list[ConversationSession]) -> ExtractionOutcome:
         if not sessions:
             return ExtractionOutcome([], 0, requests=0)
 
@@ -239,7 +239,7 @@ class Extractor:
         return self._to_memories(result.memories, sessions)
 
     def _to_memories(
-        self, extracted: list[ExtractedMemory], sessions: list[HaystackSession]
+        self, extracted: list[ExtractedMemory], sessions: list[ConversationSession]
     ) -> ExtractionOutcome:
         memories: list[Memory] = []
         bad_index = 0

@@ -754,6 +754,45 @@ class SQLiteMemoryStore:
             for r in rows
         ]
 
+    def search_turns_in_sessions(
+        self, user_id: str, query: str, session_ids: set[str], limit: int = 3
+    ) -> list[Turn]:
+        """Rank inside source sessions, before applying the result limit.
+
+        Filtering a small global top-N after the query is not equivalent: on a large
+        archive, every local hit can fall below that global cutoff.  The session IDs
+        originate from retrieved-memory provenance, and the user join prevents a
+        caller from crossing namespace boundaries.
+        """
+        match = _fts_match(query)
+        sessions = sorted(session_ids)
+        if not match or not sessions:
+            return []
+        placeholders = ",".join("?" for _ in sessions)
+        rows = self._conn.execute(
+            f"""
+            SELECT t.id, t.session_id, t.turn_index, t.role, t.content, t.ts
+            FROM turns_fts f
+            JOIN turns t ON t.rowid = f.rowid
+            JOIN sessions s ON s.id = t.session_id
+            WHERE turns_fts MATCH ? AND s.user_id = ?
+              AND t.session_id IN ({placeholders})
+            ORDER BY bm25(turns_fts), t.rowid LIMIT ?
+            """,
+            (match, user_id, *sessions, limit),
+        ).fetchall()
+        return [
+            Turn(
+                id=r["id"],
+                session_id=r["session_id"],
+                turn_index=r["turn_index"],
+                role=r["role"],
+                content=r["content"],
+                ts=_parse(r["ts"]),
+            )
+            for r in rows
+        ]
+
     # --------------------------------------------------------------- retrieval
 
     def search_lexical(

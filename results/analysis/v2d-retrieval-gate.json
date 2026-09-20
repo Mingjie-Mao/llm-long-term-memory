@@ -1,0 +1,21 @@
+{
+  "source": "results/raw/two_stage_v2c.reasoning48-v2c8.jsonl",
+  "questions": 48,
+  "wrong": 11,
+  "recalled": {
+    "candidates": 46,
+    "ranked": 46,
+    "selected": 46
+  },
+  "ranking_losses": 0,
+  "selection_losses": 0,
+  "wrong_with_selected_evidence": 10,
+  "wrong_without_selected_evidence": 1,
+  "wrong_without_selected_ids": [
+    "e48988bc"
+  ],
+  "correct_without_selected_evidence": 1,
+  "maximum_accuracy_gain_if_every_retrieval_miss_were_fixed": 0.020833333333333332,
+  "decision": "KEEP_RETRIEVAL_FIXED",
+  "reason": "Most wrong answers already had a gold source session selected; no evidence was lost between candidate generation, ranking, and selection."
+}

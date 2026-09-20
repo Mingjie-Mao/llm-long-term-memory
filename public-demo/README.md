@@ -91,7 +91,7 @@ The inspector (`src/llm_long_term_memory/api/static/index.html`) is a *tool*: it
 shows the namespace you ask it for and nothing before that. It used to double as the
 demo, with four `?demo=` links hard-coding LongMemEval namespaces, which meant
 opening it put a synthetic persona's private-looking history on screen unasked. See
-the 2026-08-27 note in [the report's 后续改进 section](../docs/PROJECT_REPORT.zh-CN.md#十一后续改进).
+the 2026-08-27 note in [the report's 后续改进 section](../docs/PROJECT_REPORT.md#十一后续改进).
 
 So the demonstration lives here instead, on openly fictional data, and the inspector
 went back to being a tool.

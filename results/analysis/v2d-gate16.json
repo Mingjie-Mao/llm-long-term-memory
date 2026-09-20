@@ -1,0 +1,441 @@
+{
+  "classification": "DEVELOPMENT RESULT",
+  "representative_accuracy_estimate": false,
+  "protocol_deviation": "The registered v2d.3 nested/expanded response schema was rejected before any row was written. Provider-compatibility-only revisions produced v2d.4 compact schema; the first effective run then wrote all 16 rows under the registered result label.",
+  "questions": 16,
+  "candidate_correct": 8,
+  "baseline_correct": 8,
+  "mechanism": {
+    "n": 14,
+    "candidate_correct": 7,
+    "baseline_correct": 7,
+    "wins": [
+      "1192316e",
+      "0db4c65d"
+    ],
+    "losses": [
+      "d23cf73b",
+      "gpt4_d12ceb0e"
+    ],
+    "ties": 10
+  },
+  "source_detail": {
+    "ids": [
+      "0e5e2d1a",
+      "7e00a6cb"
+    ],
+    "regressions": [],
+    "candidate_correct": 1,
+    "baseline_correct": 1
+  },
+  "gates": {
+    "overall_not_below_baseline": true,
+    "mechanism_wins_exceed_losses": false,
+    "source_detail_no_regression": true,
+    "computed_citations_valid": true,
+    "frozen_inputs_read_only": true
+  },
+  "decision": "STOP_NO_48",
+  "source_session_recall": 16,
+  "operations": {
+    "average": 1,
+    "count": 4,
+    "difference": 1,
+    "duration": 2,
+    "lookup": 5,
+    "sum": 3
+  },
+  "fallbacks": {
+    "archive_wide": 1,
+    "none": 14,
+    "source_local": 1
+  },
+  "code_computations": [
+    {
+      "question_id": "gpt4_2f91af09",
+      "correct": true,
+      "operation": "sum",
+      "labels": [
+        "M1",
+        "M2",
+        "M4"
+      ],
+      "citations_valid": true,
+      "detail": {
+        "operation": "sum",
+        "operands": [
+          {
+            "name": "operand_1",
+            "value": "17",
+            "unit": "",
+            "label": "M1"
+          },
+          {
+            "name": "operand_2",
+            "value": "5",
+            "unit": "",
+            "label": "M2"
+          },
+          {
+            "name": "operand_3",
+            "value": "1",
+            "unit": "",
+            "label": "M4"
+          }
+        ],
+        "result": "23",
+        "unit": "pieces",
+        "difference_direction": null
+      }
+    },
+    {
+      "question_id": "0db4c65d",
+      "correct": true,
+      "operation": "duration",
+      "labels": [
+        "M1",
+        "M2"
+      ],
+      "citations_valid": true,
+      "detail": {
+        "operation": "duration",
+        "start": "2022-12-28",
+        "end": "2023-01-15",
+        "days": 18,
+        "requested_unit": "days",
+        "start_source": "Finished 'The Seven Husbands of Evelyn Hugo' [M1]",
+        "end_source": "Attended book reading event for 'The Silent Patient' [M2]"
+      }
+    }
+  ],
+  "refused_computations": [
+    {
+      "question_id": "2e6d26dc",
+      "operation": "count",
+      "reason": "an item has no valid source label"
+    },
+    {
+      "question_id": "d23cf73b",
+      "operation": "count",
+      "reason": "an item has no valid source label"
+    },
+    {
+      "question_id": "d682f1a2",
+      "operation": "count",
+      "reason": "an item has no valid source label"
+    },
+    {
+      "question_id": "gpt4_d12ceb0e",
+      "operation": "average",
+      "reason": "numeric operands are invalid"
+    },
+    {
+      "question_id": "9d25d4e0",
+      "operation": "count",
+      "reason": "an item has no valid source label"
+    },
+    {
+      "question_id": "1192316e",
+      "operation": "sum",
+      "reason": "numeric operands are invalid"
+    },
+    {
+      "question_id": "c18a7dc8",
+      "operation": "difference",
+      "reason": "numeric operands are invalid"
+    },
+    {
+      "question_id": "gpt4_59149c77",
+      "operation": "duration",
+      "reason": "a date operand or citation is invalid"
+    },
+    {
+      "question_id": "gpt4_a1b77f9c",
+      "operation": "sum",
+      "reason": "numeric operands are invalid"
+    }
+  ],
+  "rejection_unit_tests": [
+    "invented source label",
+    "misaligned operand arrays",
+    "missing date citation",
+    "incompatible units",
+    "zero percentage baseline"
+  ],
+  "usage": {
+    "ingest": {
+      "attempts": 253,
+      "successful_calls": 243,
+      "failed_attempts": 10,
+      "tokens": 2407918,
+      "by_role": {
+        "extractor": {
+          "role": "extractor",
+          "calls": 253,
+          "failures": 10,
+          "input_tokens": 2060232,
+          "output_tokens": 347686,
+          "p50_ms": 5231.326290871948,
+          "p95_ms": 12593.815333675593,
+          "max_ms": 29463.63224973902
+        }
+      }
+    },
+    "qa": {
+      "attempts": 58,
+      "successful_calls": 34,
+      "failed_attempts": 24,
+      "tokens": 37502,
+      "by_role": {
+        "answerer": {
+          "role": "answerer",
+          "calls": 25,
+          "failures": 7,
+          "input_tokens": 31153,
+          "output_tokens": 2519,
+          "p50_ms": 1424.6298749931157,
+          "p95_ms": 1863.1747923791409,
+          "max_ms": 26243.83974960074
+        },
+        "judge": {
+          "role": "judge",
+          "calls": 33,
+          "failures": 17,
+          "input_tokens": 3364,
+          "output_tokens": 466,
+          "p50_ms": 8851.166750304401,
+          "p95_ms": 31447.95533409342,
+          "max_ms": 34928.71200013906
+        }
+      }
+    }
+  },
+  "rows": [
+    {
+      "question_id": "001be529",
+      "question_type": "single-session-user",
+      "baseline_correct": true,
+      "candidate_correct": true,
+      "operation": "lookup",
+      "fallback": "none",
+      "source_session_recalled": true,
+      "computation": {
+        "operation": "lookup"
+      }
+    },
+    {
+      "question_id": "2e6d26dc",
+      "question_type": "multi-session",
+      "baseline_correct": true,
+      "candidate_correct": true,
+      "operation": "count",
+      "fallback": "none",
+      "source_session_recalled": true,
+      "computation": {
+        "operation": "count",
+        "reason": "an item has no valid source label"
+      }
+    },
+    {
+      "question_id": "d23cf73b",
+      "question_type": "multi-session",
+      "baseline_correct": true,
+      "candidate_correct": false,
+      "operation": "count",
+      "fallback": "none",
+      "source_session_recalled": true,
+      "computation": {
+        "operation": "count",
+        "reason": "an item has no valid source label"
+      }
+    },
+    {
+      "question_id": "d682f1a2",
+      "question_type": "multi-session",
+      "baseline_correct": false,
+      "candidate_correct": false,
+      "operation": "count",
+      "fallback": "none",
+      "source_session_recalled": true,
+      "computation": {
+        "operation": "count",
+        "reason": "an item has no valid source label"
+      }
+    },
+    {
+      "question_id": "gpt4_d12ceb0e",
+      "question_type": "multi-session",
+      "baseline_correct": true,
+      "candidate_correct": false,
+      "operation": "average",
+      "fallback": "none",
+      "source_session_recalled": true,
+      "computation": {
+        "operation": "average",
+        "reason": "numeric operands are invalid"
+      }
+    },
+    {
+      "question_id": "9d25d4e0",
+      "question_type": "multi-session",
+      "baseline_correct": false,
+      "candidate_correct": false,
+      "operation": "count",
+      "fallback": "none",
+      "source_session_recalled": true,
+      "computation": {
+        "operation": "count",
+        "reason": "an item has no valid source label"
+      }
+    },
+    {
+      "question_id": "gpt4_2f91af09",
+      "question_type": "multi-session",
+      "baseline_correct": true,
+      "candidate_correct": true,
+      "operation": "sum",
+      "fallback": "none",
+      "source_session_recalled": true,
+      "computation": {
+        "operation": "sum",
+        "operands": [
+          {
+            "name": "operand_1",
+            "value": "17",
+            "unit": "",
+            "label": "M1"
+          },
+          {
+            "name": "operand_2",
+            "value": "5",
+            "unit": "",
+            "label": "M2"
+          },
+          {
+            "name": "operand_3",
+            "value": "1",
+            "unit": "",
+            "label": "M4"
+          }
+        ],
+        "result": "23",
+        "unit": "pieces",
+        "difference_direction": null
+      }
+    },
+    {
+      "question_id": "1192316e",
+      "question_type": "multi-session",
+      "baseline_correct": false,
+      "candidate_correct": true,
+      "operation": "sum",
+      "fallback": "none",
+      "source_session_recalled": true,
+      "computation": {
+        "operation": "sum",
+        "reason": "numeric operands are invalid"
+      }
+    },
+    {
+      "question_id": "c18a7dc8",
+      "question_type": "multi-session",
+      "baseline_correct": true,
+      "candidate_correct": true,
+      "operation": "difference",
+      "fallback": "none",
+      "source_session_recalled": true,
+      "computation": {
+        "operation": "difference",
+        "reason": "numeric operands are invalid"
+      }
+    },
+    {
+      "question_id": "gpt4_59149c77",
+      "question_type": "temporal-reasoning",
+      "baseline_correct": false,
+      "candidate_correct": false,
+      "operation": "duration",
+      "fallback": "none",
+      "source_session_recalled": true,
+      "computation": {
+        "operation": "duration",
+        "reason": "a date operand or citation is invalid"
+      }
+    },
+    {
+      "question_id": "0db4c65d",
+      "question_type": "temporal-reasoning",
+      "baseline_correct": false,
+      "candidate_correct": true,
+      "operation": "duration",
+      "fallback": "none",
+      "source_session_recalled": true,
+      "computation": {
+        "operation": "duration",
+        "start": "2022-12-28",
+        "end": "2023-01-15",
+        "days": 18,
+        "requested_unit": "days",
+        "start_source": "Finished 'The Seven Husbands of Evelyn Hugo' [M1]",
+        "end_source": "Attended book reading event for 'The Silent Patient' [M2]"
+      }
+    },
+    {
+      "question_id": "gpt4_a1b77f9c",
+      "question_type": "temporal-reasoning",
+      "baseline_correct": false,
+      "candidate_correct": false,
+      "operation": "sum",
+      "fallback": "none",
+      "source_session_recalled": true,
+      "computation": {
+        "operation": "sum",
+        "reason": "numeric operands are invalid"
+      }
+    },
+    {
+      "question_id": "031748ae",
+      "question_type": "knowledge-update",
+      "baseline_correct": false,
+      "candidate_correct": false,
+      "operation": "lookup",
+      "fallback": "none",
+      "source_session_recalled": true,
+      "computation": {
+        "operation": "lookup"
+      }
+    },
+    {
+      "question_id": "60bf93ed_abs",
+      "question_type": "multi-session",
+      "baseline_correct": true,
+      "candidate_correct": true,
+      "operation": "lookup",
+      "fallback": "archive_wide",
+      "source_session_recalled": true,
+      "computation": null
+    },
+    {
+      "question_id": "7e00a6cb",
+      "question_type": "single-session-assistant",
+      "baseline_correct": true,
+      "candidate_correct": true,
+      "operation": "lookup",
+      "fallback": "none",
+      "source_session_recalled": true,
+      "computation": {
+        "operation": "lookup"
+      }
+    },
+    {
+      "question_id": "0e5e2d1a",
+      "question_type": "single-session-assistant",
+      "baseline_correct": false,
+      "candidate_correct": false,
+      "operation": "lookup",
+      "fallback": "source_local",
+      "source_session_recalled": true,
+      "computation": null
+    }
+  ]
+}

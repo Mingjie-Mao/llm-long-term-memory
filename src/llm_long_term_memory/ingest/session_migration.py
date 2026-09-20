@@ -5,7 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import datetime
 
-from llm_long_term_memory.evaluation.datasets.longmemeval import HaystackSession
+from llm_long_term_memory.conversation import ConversationSession
 from llm_long_term_memory.store import Session, SQLiteMemoryStore, Turn, scoped_session_id
 
 from .extract import _parse_date
@@ -20,7 +20,7 @@ class SessionMigrationReport:
 
 
 def migrate_scoped_sessions(
-    store: SQLiteMemoryStore, pairs: list[tuple[str, HaystackSession]]
+    store: SQLiteMemoryStore, pairs: list[tuple[str, ConversationSession]]
 ) -> SessionMigrationReport:
     """Copy completed source sessions under scoped ids and repoint provenance.
 

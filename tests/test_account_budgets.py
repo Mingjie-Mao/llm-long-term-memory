@@ -297,7 +297,7 @@ class RecordingAnswerer:
         self.fail = fail
         self.calls = 0
 
-    def answer(self, instance, *, limit=None):
+    def answer_request(self, request, *, limit=None, evidence_session_ids=()):
         from llm_long_term_memory.evaluation.runners.base import Answer
         from llm_long_term_memory.llm.usage import CallRecord
 
@@ -326,7 +326,7 @@ def test_answer_charges_retries_and_source_recovery_to_only_its_account(answer_s
     runner = RecordingAnswerer([(False, 10, 0), (True, 10, 2), (True, 30, 4)])
     answer_service._answerer = runner
     # Earlier calls in the shared tracker belong to other requests.
-    runner.answer(None)
+    runner.answer_request(None)
     answer_service.budgets.set_budget("alice", daily_calls=3)
 
     assert answer_service.answer("alice", "Where do I live?")["answer"] == "remembered"

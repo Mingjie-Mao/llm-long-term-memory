@@ -1,0 +1,141 @@
+{
+  "calls": 0,
+  "questions": 8,
+  "checks": {
+    "detail_target_routed": true,
+    "detail_target_source_contains_exact_day": true,
+    "recommendation_target_routed": true,
+    "recommendation_source_contains_exact_name": true,
+    "update_target_repaired": true,
+    "timeline_target_has_three_events": true,
+    "controls_have_no_update_suppression": true,
+    "controls_have_no_timeline_plan": true
+  },
+  "pass": true,
+  "expected_routes": {
+    "58ef2f1c": "detail",
+    "6a1eabeb": "update",
+    "gpt4_45189cb4": "timeline",
+    "778164c6": "detail"
+  },
+  "rows": [
+    {
+      "question_id": "45dc21b6",
+      "question_type": "knowledge-update",
+      "suppressed_update_ids": [],
+      "timeline_ids": [],
+      "detail_hydration_reason": null,
+      "detail_source_turns": [],
+      "detail_source_has_valentines_day": false,
+      "detail_source_has_mango_salsa": false,
+      "selected_before": 20,
+      "selected_after": 20,
+      "timeline": ""
+    },
+    {
+      "question_id": "58ef2f1c",
+      "question_type": "single-session-user",
+      "suppressed_update_ids": [],
+      "timeline_ids": [],
+      "detail_hydration_reason": "The question asks for an exact date, but structured memory has no day-level date.",
+      "detail_source_turns": [
+        "scoped-session-v1:8:58ef2f1canswer_59547700:2",
+        "scoped-session-v1:8:58ef2f1canswer_59547700:8",
+        "scoped-session-v1:8:58ef2f1canswer_59547700:9"
+      ],
+      "detail_source_has_valentines_day": true,
+      "detail_source_has_mango_salsa": false,
+      "selected_before": 20,
+      "selected_after": 20,
+      "timeline": ""
+    },
+    {
+      "question_id": "6613b389",
+      "question_type": "temporal-reasoning",
+      "suppressed_update_ids": [],
+      "timeline_ids": [],
+      "detail_hydration_reason": null,
+      "detail_source_turns": [],
+      "detail_source_has_valentines_day": false,
+      "detail_source_has_mango_salsa": false,
+      "selected_before": 20,
+      "selected_after": 20,
+      "timeline": ""
+    },
+    {
+      "question_id": "6a1eabeb",
+      "question_type": "knowledge-update",
+      "suppressed_update_ids": [
+        "mem_08d5559eea16c9f6"
+      ],
+      "timeline_ids": [],
+      "detail_hydration_reason": null,
+      "detail_source_turns": [],
+      "detail_source_has_valentines_day": false,
+      "detail_source_has_mango_salsa": false,
+      "selected_before": 20,
+      "selected_after": 19,
+      "timeline": "Query-time update check: an older related value was omitted because a newer retrieved fact explicitly replaces it."
+    },
+    {
+      "question_id": "778164c6",
+      "question_type": "single-session-assistant",
+      "suppressed_update_ids": [],
+      "timeline_ids": [],
+      "detail_hydration_reason": "The question asks for the exact identity of a prior recommendation; verify it against the located source conversation.",
+      "detail_source_turns": [
+        "scoped-session-v1:8:778164c6answer_ultrachat_399000:3",
+        "scoped-session-v1:8:778164c6answer_ultrachat_399000:2",
+        "scoped-session-v1:8:778164c6answer_ultrachat_399000:7"
+      ],
+      "detail_source_has_valentines_day": false,
+      "detail_source_has_mango_salsa": true,
+      "selected_before": 20,
+      "selected_after": 20,
+      "timeline": "Exact-reference rule: resolve every qualifier in the question jointly against the verbatim source evidence. Return the one candidate that satisfies all of them. Do not lead with, or present as the answer, a sibling candidate that matches only some qualifiers. If the question's wording conflicts with the source and no candidate satisfies every qualifier, treat the source as authoritative and resolve the reference using the most specific distinguishing attribute (for example, an ingredient or exact property), not a broad category such as cuisine or nationality. Answer with that resolved candidate directly."
+    },
+    {
+      "question_id": "a96c20ee",
+      "question_type": "multi-session",
+      "suppressed_update_ids": [],
+      "timeline_ids": [],
+      "detail_hydration_reason": null,
+      "detail_source_turns": [],
+      "detail_source_has_valentines_day": false,
+      "detail_source_has_mango_salsa": false,
+      "selected_before": 20,
+      "selected_after": 20,
+      "timeline": ""
+    },
+    {
+      "question_id": "d905b33f",
+      "question_type": "multi-session",
+      "suppressed_update_ids": [],
+      "timeline_ids": [],
+      "detail_hydration_reason": null,
+      "detail_source_turns": [],
+      "detail_source_has_valentines_day": false,
+      "detail_source_has_mango_salsa": false,
+      "selected_before": 20,
+      "selected_after": 20,
+      "timeline": ""
+    },
+    {
+      "question_id": "gpt4_45189cb4",
+      "question_type": "temporal-reasoning",
+      "suppressed_update_ids": [],
+      "timeline_ids": [
+        "mem_d1cdfa8ac5d5fbfb",
+        "mem_75628a948add40e3",
+        "mem_5c57a0eab222e46e"
+      ],
+      "detail_hydration_reason": null,
+      "detail_source_turns": [],
+      "detail_source_has_valentines_day": false,
+      "detail_source_has_mango_salsa": false,
+      "selected_before": 20,
+      "selected_after": 20,
+      "timeline": "Question-specific chronological evidence (oldest first; include every matching event).\nThe complete answer must include every event listed below in exactly this order; do not omit an event or demote it to a footnote.\nFor an event-list question, attending an event in person is one way of watching it; do not drop an attended event unless the question explicitly excludes it.\n- 2023-01-05: The user attended an NBA game between the Lakers and the Chicago Bulls at the Staples Center in LA on 2023-01-05.\n- 2023-01-14: The user watched the College Football National Championship game between Georgia and Alabama on 2023-01-14.\n- 2023-01-15: The user watched the Kansas City Chiefs defeat the Buffalo Bills in the NFL Divisional Round playoffs on 2023-01-15 at their friend Mike's place."
+    }
+  ]
+}

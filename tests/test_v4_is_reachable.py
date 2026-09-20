@@ -70,7 +70,7 @@ def test_the_derivation_reaches_the_row_notes():
 def test_the_derivation_is_reset_per_question():
     """Carrying the previous question's derivation into this row would be worse than
     recording nothing: it would look like evidence."""
-    assert "self._computation: dict | None = None" in inspect.getsource(MemoryRunner.answer)
+    assert "self._computation: dict | None = None" in inspect.getsource(MemoryRunner.answer_request)
 
 
 def test_the_v4_schema_carries_the_operands_the_code_needs():

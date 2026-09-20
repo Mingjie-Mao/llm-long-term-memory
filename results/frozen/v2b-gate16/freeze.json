@@ -1,0 +1,700 @@
+{
+  "captured_at_utc": "2026-09-16T09:13:21.571473+00:00",
+  "note": "Content-addressed v2 experiment freeze. Run this command without --capture to verify the same system before resuming or reporting.",
+  "system": {
+    "config": {
+      "path": "configs/v2b-batch8.yaml",
+      "resolved": {
+        "consolidation": false,
+        "consolidation_config": {
+          "min_cluster_size": 3,
+          "similarity_threshold": 0.84,
+          "source_strength_multiplier": 0.5
+        },
+        "context": {
+          "aggregate": "mean",
+          "include_superseded": false,
+          "max_sessions": 3,
+          "max_total_memories": 30,
+          "session_order": "chronological",
+          "window_radius": 1
+        },
+        "dataset_limit": 50,
+        "dataset_variant": "s",
+        "decay": {
+          "enabled": false,
+          "halflife_days": 60.0,
+          "max_memories_per_user": 0,
+          "reinforcement": 0.3
+        },
+        "description": "v2, with extraction batched 8 sessions per request instead of 15",
+        "fallback": {
+          "enabled": true,
+          "max_chars": 2400,
+          "max_turns": 3
+        },
+        "hydration": {
+          "allocation": "ranked",
+          "max_tokens": 800,
+          "neighbouring_sentences": 1
+        },
+        "ingest": {
+          "checkpoint_every": 5,
+          "dedupe_sessions": true,
+          "dedupe_similarity_threshold": 0.92,
+          "sessions_per_request": 8,
+          "two_stage": true
+        },
+        "models": {
+          "answerer": "gemini-3.5-flash-lite",
+          "embedder": "sentence-transformers/all-MiniLM-L6-v2",
+          "embedding_dim": 384,
+          "extractor": "gemini-3.1-flash-lite",
+          "judge": "gemma-4-31b-it"
+        },
+        "name": "v2b-batch8",
+        "pack": {
+          "enabled": false,
+          "token_budget": 2000,
+          "type_floors": {
+            "profile": 0.1,
+            "semantic": 0.3
+          },
+          "utility_model_path": null
+        },
+        "quota": {
+          "max_wait_seconds": 300.0,
+          "rpd": 500,
+          "rpm": 10,
+          "tpm": 250000
+        },
+        "retrieval": {
+          "candidate_limit": 50,
+          "recency_halflife_days": 30.0,
+          "rerank": {
+            "batch_size": 32,
+            "candidates": 50,
+            "enabled": false,
+            "model": "cross-encoder/ms-marco-MiniLM-L-6-v2"
+          },
+          "top_k": 20,
+          "weights": {
+            "bm25": 0.0,
+            "entity": 0.0,
+            "importance": 0.0,
+            "recency": 0.0,
+            "semantic": 1.0
+          }
+        },
+        "service": {
+          "top_k": 10
+        },
+        "temporal_resolution": true
+      },
+      "sha256": "a2919639e4b9a6df134d2262765b2491ce252189257e270c203b7da631421ef6"
+    },
+    "data": {
+      "dataset": {
+        "bytes": 277383467,
+        "path": "data/longmemeval_s_cleaned.json",
+        "sha256": "d6f21ea9d60a0d56f34a05b609c79c88a451d2ae03597821ea3d5a9678c3a442"
+      },
+      "manifest": {
+        "name": "v2b-gate16",
+        "path": "results/manifests/v2b-gate16.json",
+        "questions": 16,
+        "sha256": "31129e88209856434fc93b238a50abe191cec386648879e90f4476e1428a76d7",
+        "variant": "s"
+      }
+    },
+    "git_head_for_reference_only": "8a56859c724c1134286da3fe53544b22b41fc79b",
+    "ingest_runtime": {
+      "fingerprint": {
+        "dedup_scope": "namespace",
+        "dedup_threshold": "0.9200",
+        "extractor_version": "two-stage-p10-v2",
+        "model": "gemini-3.1-flash-lite",
+        "prompts": "017e6620b1b9",
+        "schema_version": "403d429afab1",
+        "sessions_per_request": "8"
+      },
+      "sessions_per_request": 8
+    },
+    "models": {
+      "answerer": "gemini-3.5-flash-lite",
+      "embedder": "sentence-transformers/all-MiniLM-L6-v2",
+      "embedding_dim": 384,
+      "extractor": "gemini-3.1-flash-lite",
+      "judge": "gemma-4-31b-it",
+      "limitation": "Hosted provider model ids are recorded aliases; their remote weights cannot be content-hashed by this client."
+    },
+    "pre_ingest_store_name": null,
+    "prompts": {
+      "answer_system_sha256": "03aebf745e140e7b40214a30ef710a5f43bdf2060741b6f5689810da52425c22",
+      "answer_version": "memory-aware-v2",
+      "extractor_sha256": "017e6620b1b970d02dc6bfc99584a0ac33f8ea2b64f9cb2bed13f8ee4df6112d",
+      "extractor_version": "two-stage-p10-v2",
+      "judge_system_sha256": "33cbffa141569b2284322a01f4890611704da1f719556b3900ff428f4c3e0507",
+      "judge_version": "lme-type-aware-v2",
+      "store_schema_sha256": "403d429afab1"
+    },
+    "protocol": {
+      "files": {
+        "results/prereg-v2b-gate16.md": {
+          "bytes": 3954,
+          "sha256": "c66ad2db714603333d1af02eebad4cddad63c83706777d894b0910468f53f38f"
+        }
+      },
+      "tree_sha256": "4abf41e4c6d4d983ccfc00bb67ec1148eaa3395cb7bb02cc00a15b29aa038934"
+    },
+    "runtime": {
+      "python": "3.12.13"
+    },
+    "schema_version": 5,
+    "source": {
+      "files": {
+        "pyproject.toml": {
+          "bytes": 4010,
+          "sha256": "870f538540dcb7fbbad62eddb8c96495edab2ed4bfb2d73ca3f6014164ed0a26"
+        },
+        "scripts/a2_preflight.py": {
+          "bytes": 28976,
+          "sha256": "c686cdec6c57bc7691ad8be8039eb4054281470cfeaa0d0b7acb0a5bd0eecf74"
+        },
+        "scripts/aggregate_validation.py": {
+          "bytes": 5857,
+          "sha256": "f304afe6c0f1a0bffb18e63aa2ddaeed8ff9695bbbd05dbb83cd63f91485cce3"
+        },
+        "scripts/audit_zero_yield.py": {
+          "bytes": 3875,
+          "sha256": "50d72f081d93f153b8f4f7801813f8e78596b478e8f54e2924441b7eb95929e1"
+        },
+        "scripts/batch_position_analyse.py": {
+          "bytes": 13688,
+          "sha256": "ea168a1757e31d21eb7d3fa4547863fe7ae217308954b36559475287b49e373a"
+        },
+        "scripts/batch_position_pilot.py": {
+          "bytes": 13233,
+          "sha256": "9db150464949dea8b690f8c6b2c049bc3aa7b965d0c8bedbe72318e211ec772c"
+        },
+        "scripts/check_ingest_state.py": {
+          "bytes": 2910,
+          "sha256": "6e0bdca2216d4caa9a421ae9ef7ec75bda2de0c04a8f3d1e24c42b3d82b39c2e"
+        },
+        "scripts/context_arms.py": {
+          "bytes": 5373,
+          "sha256": "cdfe4710c110685e1fe00398b83219a15b8bb091128bd583734e232ad048f086"
+        },
+        "scripts/counterfactual_qa.py": {
+          "bytes": 8964,
+          "sha256": "dbe42c1f95ae69ae5919a2d035ffc036554f83da37d1c932b8ac4ec03202dd95"
+        },
+        "scripts/fact_lineage.py": {
+          "bytes": 4894,
+          "sha256": "b09077a24f82d292b6dbc953265a2865266333b1615f6b16aecc229e5211780c"
+        },
+        "scripts/finalize_train150.py": {
+          "bytes": 15589,
+          "sha256": "fd6b7da32781a8e998343e16a571dd3f7e65faf86499704afaaa01462202fe8b"
+        },
+        "scripts/freeze.py": {
+          "bytes": 7757,
+          "sha256": "cdb41e4110cf664b16fbbe85a989348ec88bb791ac72141c4f495eb1d82ca69d"
+        },
+        "scripts/freeze_v2.py": {
+          "bytes": 10761,
+          "sha256": "52b624420e68fb96ae717648d7e18f5b01839d93ed7766b29e840230949b9921"
+        },
+        "scripts/heldout_report.py": {
+          "bytes": 5399,
+          "sha256": "d416ccd2f85e49190500e88cfac179de674734038d5be0c60707431a5af908cf"
+        },
+        "scripts/heldout_run.py": {
+          "bytes": 9334,
+          "sha256": "f56635e583170a7208fb085cd4e6ae09d654b20780bed5fa2fead49521249ec1"
+        },
+        "scripts/ku_oracle.py": {
+          "bytes": 5329,
+          "sha256": "3130d52b46e0305d5e1b3e380516a06fa18e0a8dc8e6d46a045228c3b287d6b0"
+        },
+        "scripts/migrate_scoped_sessions.py": {
+          "bytes": 3160,
+          "sha256": "c56033a9e44fdd5440b8698f6a5c0845197845e41826424b1cc9102b4ec3d8c3"
+        },
+        "scripts/project_v3_phase5_context.py": {
+          "bytes": 10311,
+          "sha256": "f30cb4c59c91d14c5fcc6efe29079861bcc5deafa4eaf4d8e77d2b6cbc03b4c8"
+        },
+        "scripts/record_golden.py": {
+          "bytes": 9917,
+          "sha256": "5075102d60b61bc852c326697ae994a5dc77e9a896a6b69dc947aac026aecc93"
+        },
+        "scripts/run_final_test.py": {
+          "bytes": 16475,
+          "sha256": "6a5791bb6c11e82a8c2191b9177727e3fbb844c5b042e98836c91521a9b7bb22"
+        },
+        "scripts/run_frozen_ingest.py": {
+          "bytes": 8859,
+          "sha256": "27d16029b25065e09212eaae1bafbf6eda4e22c4ccacb6b1202f9e2e2f8fab84"
+        },
+        "scripts/run_v3_answer_pilot.py": {
+          "bytes": 14040,
+          "sha256": "79d1d5d5bb24bb5be8037239efa3dc8724815c7a45e59460c1f90575c04b99ec"
+        },
+        "scripts/run_v3_dev60.py": {
+          "bytes": 22599,
+          "sha256": "8bbce8496a2b4eb854e729bd4fa9d1e4e432b5499d3fb3724709009afec85368"
+        },
+        "scripts/run_v3_phase3_tune.py": {
+          "bytes": 8543,
+          "sha256": "fb270f19464ccc1f5d3e9d817b8b7ad6a85c14992faf677299f1493daee52d05"
+        },
+        "scripts/run_v3_phase4_tune2.py": {
+          "bytes": 13787,
+          "sha256": "056896117858285201c67c3798677645b32c6d39e982a7e6bdc2fec5aabbccc0"
+        },
+        "scripts/run_v3_phase5_tune3.py": {
+          "bytes": 17024,
+          "sha256": "cf8f10a7a4361f7d89aa5d3950c79f2b1d1e1d2b9ef729da4162f882e7bea6a8"
+        },
+        "scripts/run_validation.py": {
+          "bytes": 13141,
+          "sha256": "209bfa878ac7ab0c8bec99210ba77425e3914e10172a19e3535f219498c8d1f8"
+        },
+        "scripts/session_recall.py": {
+          "bytes": 15012,
+          "sha256": "8a83f8557fac2834689c968eece695654779eaf494a9731789f32d3ee843bec2"
+        },
+        "scripts/stage_oracle.py": {
+          "bytes": 16827,
+          "sha256": "8bc30a8ad37e0b72d8da70caf849d3f028e0c8b09d1c144ee333cf1e25bef24a"
+        },
+        "scripts/targeted_batch1.py": {
+          "bytes": 7514,
+          "sha256": "ab91a253873a900567991b3b311582a091e69150b55e2f9981c7c957d5303717"
+        },
+        "src/llm_long_term_memory/__init__.py": {
+          "bytes": 22,
+          "sha256": "91447944015cec709e8aa7655f7e9d64e1e4508e7023a57fe3746911c0fc6fed"
+        },
+        "src/llm_long_term_memory/api/__init__.py": {
+          "bytes": 302,
+          "sha256": "79fd865e5cabc51b132aca4d0f7466a7f4f73bc6ccc8782b77fc4a18ec7b409a"
+        },
+        "src/llm_long_term_memory/api/app.py": {
+          "bytes": 19177,
+          "sha256": "e8d51c46c9adab8c0386c4a04d2050068d3dbf94ab1da4d7bb034efbe179cf24"
+        },
+        "src/llm_long_term_memory/api/budget.py": {
+          "bytes": 8672,
+          "sha256": "ef7d483a6fb8f8506da94ac85cdafa66d256a81b4326b4db658b5f3d715d3c65"
+        },
+        "src/llm_long_term_memory/api/golden.py": {
+          "bytes": 5133,
+          "sha256": "9528362554a5f6eb4ecdfb12514b1253bf6808b4168b97a64a00877061b832ba"
+        },
+        "src/llm_long_term_memory/api/identity.py": {
+          "bytes": 8157,
+          "sha256": "e9b6dc773c1dd4750b2978c318c78c56779922c6b7ef4edaa8a2c6596deaa92e"
+        },
+        "src/llm_long_term_memory/api/logging.py": {
+          "bytes": 3700,
+          "sha256": "d7195e067a4f702c497bffba0f989c54f000a50624422052e45e1e32c8efb53e"
+        },
+        "src/llm_long_term_memory/api/models.py": {
+          "bytes": 9625,
+          "sha256": "d251e16e89ab923032917362cb29ce32bc0cbfaaa2539e7a84eed87bd12f4274"
+        },
+        "src/llm_long_term_memory/api/service.py": {
+          "bytes": 56772,
+          "sha256": "164980aca86893cace93395103a475370b8c043a069c6ed35a17f2de3bedb966"
+        },
+        "src/llm_long_term_memory/cli.py": {
+          "bytes": 85043,
+          "sha256": "43896bbd2ea39d941b8d79d2eb74ba64c44703e382655e7865524870b10c5bed"
+        },
+        "src/llm_long_term_memory/config.py": {
+          "bytes": 9074,
+          "sha256": "36aea3e0e07a468dcefb52c8937f4561b444dc71cad595585bd78671b1aa3dfe"
+        },
+        "src/llm_long_term_memory/consolidate/__init__.py": {
+          "bytes": 186,
+          "sha256": "f3111475bfe6c03789c190f9916664ebd3e30cd5cbd371dffde3f788bb02e96e"
+        },
+        "src/llm_long_term_memory/consolidate/runner.py": {
+          "bytes": 6437,
+          "sha256": "f48cb275ce54e5262c5ba6398abec1e3abc68eedbb3565fb275ea7d1472b3d72"
+        },
+        "src/llm_long_term_memory/embed/__init__.py": {
+          "bytes": 52,
+          "sha256": "af891e000824548668d8bf9f111b5584b0ecfc9254b434f12ff5038df306670e"
+        },
+        "src/llm_long_term_memory/embed/encoder.py": {
+          "bytes": 1915,
+          "sha256": "6372ac41c3500b78cbf4bd0a7834e00ea845343800647ea0069cb934203dfd90"
+        },
+        "src/llm_long_term_memory/evaluation/__init__.py": {
+          "bytes": 179,
+          "sha256": "0f0e0f459fa36814d683c4e9602ca3d66d82c349442debe3c8d4ba062894fa44"
+        },
+        "src/llm_long_term_memory/evaluation/agreement.py": {
+          "bytes": 4857,
+          "sha256": "a96526386bb4f85ce47df2108d5543878d2223db86029ade837c8c97a1dcf49e"
+        },
+        "src/llm_long_term_memory/evaluation/budget.py": {
+          "bytes": 4303,
+          "sha256": "5012a65cf953338e51efdb658c10e6a2be302065d86fb008c1f750cb0ce6ff3b"
+        },
+        "src/llm_long_term_memory/evaluation/clustered.py": {
+          "bytes": 3287,
+          "sha256": "5d39e6e5931df4bd54d62a2a111af94712815688c06f660b32efaf27956794ed"
+        },
+        "src/llm_long_term_memory/evaluation/compare.py": {
+          "bytes": 6239,
+          "sha256": "6d3615bedadf1285932252963e08a867717fd1034b944e7cd8d40aaaa6a7e229"
+        },
+        "src/llm_long_term_memory/evaluation/context_selection.py": {
+          "bytes": 2317,
+          "sha256": "904ebb340fa543ba282a84aab1f8a7a73387785de03ea08b863b977311e3a510"
+        },
+        "src/llm_long_term_memory/evaluation/datasets/__init__.py": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "src/llm_long_term_memory/evaluation/datasets/longmemeval.py": {
+          "bytes": 11489,
+          "sha256": "533b6db665bc6586af5fe6932d0bba47cc82e39ce2db2dbac0dcbdc8c9ef77cb"
+        },
+        "src/llm_long_term_memory/evaluation/failures.py": {
+          "bytes": 3591,
+          "sha256": "12097341a7edf237c37434b2255974159dc84e3e5b53c22d2e90ad925b12f08b"
+        },
+        "src/llm_long_term_memory/evaluation/harness.py": {
+          "bytes": 14858,
+          "sha256": "439aba00caeb46570b7b7e5817410efb1460d5e5d69ce0b385807bec984a8519"
+        },
+        "src/llm_long_term_memory/evaluation/ingest_state.py": {
+          "bytes": 8044,
+          "sha256": "7c07664d78908432d8c481c0690a82a3374a9546996170c31c190792f4e98490"
+        },
+        "src/llm_long_term_memory/evaluation/judge.py": {
+          "bytes": 7343,
+          "sha256": "ef31114b620d0f44a8ce8fb750dca9aee2f09df06fc62dc07c20627174768334"
+        },
+        "src/llm_long_term_memory/evaluation/manifest.py": {
+          "bytes": 3305,
+          "sha256": "fb572884f27d2f6c0eee411649ad433468aad33d4128778d61a9345faefca8b1"
+        },
+        "src/llm_long_term_memory/evaluation/raw_recall.py": {
+          "bytes": 9886,
+          "sha256": "83c5d92205120f34415052718d003cd19436b9218763e0fe578a929c380c4a7f"
+        },
+        "src/llm_long_term_memory/evaluation/report.py": {
+          "bytes": 4372,
+          "sha256": "3b283ff7dd2fec19e08d87d0a8bfe5e6dfe7c6783dc15fc99aef0fe2c53a9043"
+        },
+        "src/llm_long_term_memory/evaluation/reproducibility.py": {
+          "bytes": 21529,
+          "sha256": "021f3fff22c8b92fa2916b17e3ca14eb5794a404f07e6baeacd6d8fde028d7df"
+        },
+        "src/llm_long_term_memory/evaluation/runners/base.py": {
+          "bytes": 4750,
+          "sha256": "8e2512022467d90210216b6f93bf5fdd9276f6b9624e9071f667153b1b6d6349"
+        },
+        "src/llm_long_term_memory/evaluation/runners/full_context.py": {
+          "bytes": 2481,
+          "sha256": "7f4ebe06a4e9dac252b6c7c76b2fa2a84d1bc4d22f7a62792cfa32e3757e62ac"
+        },
+        "src/llm_long_term_memory/evaluation/runners/memory.py": {
+          "bytes": 44080,
+          "sha256": "ae1b324fb4710457d22055b3a87d74d99dfb068066260d57ba664f870bc48196"
+        },
+        "src/llm_long_term_memory/evaluation/runners/naive_rag.py": {
+          "bytes": 4119,
+          "sha256": "45df4f8fab81552e7370e451a700198c8a0e8d0bd2fc030a5eb1214a8bbe0345"
+        },
+        "src/llm_long_term_memory/evaluation/runners/reasoning.py": {
+          "bytes": 5016,
+          "sha256": "affd09586928165ab50c976a96940890628f3331e8ac3672b1f42c34a85211c2"
+        },
+        "src/llm_long_term_memory/evaluation/runners/synthesis.py": {
+          "bytes": 21073,
+          "sha256": "26b7c58540c11179176a615cc62373ad4b72b4232860bf735f42074e4afa483c"
+        },
+        "src/llm_long_term_memory/evaluation/validation.py": {
+          "bytes": 29119,
+          "sha256": "96cc5c06005cc46c27c0495a1ca9ff6f76bf7010b9b7537950b6b5f38487c359"
+        },
+        "src/llm_long_term_memory/influence/__init__.py": {
+          "bytes": 563,
+          "sha256": "c0debd19831f641a24d8f506370a797e1bdfe5433cc26912c4077fb4d0958408"
+        },
+        "src/llm_long_term_memory/influence/features.py": {
+          "bytes": 3723,
+          "sha256": "63eaf428bafa3cab3487145429a607d5908d15bef74a21b318c185d5983a1cfd"
+        },
+        "src/llm_long_term_memory/influence/measure.py": {
+          "bytes": 5847,
+          "sha256": "0e5baadaf4856f6fdc24beb8a03dffad6f72795aecb517a3ebdd3a963f7d0dbd"
+        },
+        "src/llm_long_term_memory/influence/predictor.py": {
+          "bytes": 7183,
+          "sha256": "095b6329cfa5a041c6bd61206c631d5cc0296d657db584abb314874a753826ff"
+        },
+        "src/llm_long_term_memory/influence/runner.py": {
+          "bytes": 7438,
+          "sha256": "fe3c2eac4b8337b5e3745e5305d476c144a3b2a77c4a773adab6b760230b7b6c"
+        },
+        "src/llm_long_term_memory/ingest/__init__.py": {
+          "bytes": 2170,
+          "sha256": "8ce68f4b042e8f8727c21e7add389d648a1a3a5d40afdf888d7e18b9b3283210"
+        },
+        "src/llm_long_term_memory/ingest/coverage.py": {
+          "bytes": 8671,
+          "sha256": "e76afe424b763390f234cb6e24c4d681d3eb9b342c7ac605e63cb894f13300dc"
+        },
+        "src/llm_long_term_memory/ingest/dedup.py": {
+          "bytes": 8643,
+          "sha256": "878f231ddd203c6b6a9a27d91baca0603b0c8bb6550d590c831aa9e0f5ce7c0a"
+        },
+        "src/llm_long_term_memory/ingest/extract.py": {
+          "bytes": 12121,
+          "sha256": "c8d7162c0dbc21a7676c65c5807ec6270d23bd88581f3423c8d1580dbdf2cf7d"
+        },
+        "src/llm_long_term_memory/ingest/extract_facts.py": {
+          "bytes": 12423,
+          "sha256": "75dc631cdf117fa394e69833e077d9bf0d761aceebb55e427855f91b754f1a26"
+        },
+        "src/llm_long_term_memory/ingest/fidelity.py": {
+          "bytes": 9589,
+          "sha256": "74e506a39d76293c46d0c8c2448d74c4caceef453eccbb7a5abaab52117821b2"
+        },
+        "src/llm_long_term_memory/ingest/fingerprint.py": {
+          "bytes": 8907,
+          "sha256": "e5fe337fbeda2b48a78ba56767981d92fc4835a109cbbfc1d4557d2b0b3ef7ac"
+        },
+        "src/llm_long_term_memory/ingest/grounded.py": {
+          "bytes": 13992,
+          "sha256": "bdba0fb04dc85977bf1800a0b867ab8097e9edac956483fc9d5f6e347be7462a"
+        },
+        "src/llm_long_term_memory/ingest/keying.py": {
+          "bytes": 7022,
+          "sha256": "81976e0c95ef2b8c838acc5b6a6ccecfa743e1fa8698176461b38e06e7ce2e8e"
+        },
+        "src/llm_long_term_memory/ingest/pipeline.py": {
+          "bytes": 21756,
+          "sha256": "eafd8276b35c6d458651800c20f08e0a4f9c504dfda41cf675c56cf8742d6faf"
+        },
+        "src/llm_long_term_memory/ingest/provenance.py": {
+          "bytes": 2249,
+          "sha256": "2abdf1040b74e620a96a0ef5fd7c123e44762b7eed8dc06adf8d93af1d64de35"
+        },
+        "src/llm_long_term_memory/ingest/schemas.py": {
+          "bytes": 5584,
+          "sha256": "0c697bb7d569405e11adc439368a2ee65e661fc32e63b9f913cad235af914a3b"
+        },
+        "src/llm_long_term_memory/ingest/session_migration.py": {
+          "bytes": 5074,
+          "sha256": "1f6105ce97c9497aba7279153af6e8e1a189c8ef4d7248e577f9b06d2021ce3a"
+        },
+        "src/llm_long_term_memory/ingest/stage_b_quality.py": {
+          "bytes": 6015,
+          "sha256": "f83c275555f10b5cccf2ec3937f899de4ef402fdc0d8a512d02ad963b5f76b06"
+        },
+        "src/llm_long_term_memory/ingest/structure.py": {
+          "bytes": 6922,
+          "sha256": "5783646fe4e6f87ca5e71df9ea50474e64fa9cd3f19e2cc2f47085f23f487a76"
+        },
+        "src/llm_long_term_memory/ingest/temporal_gate.py": {
+          "bytes": 6166,
+          "sha256": "b54ee0f77145d571b8d97bb54007ab1b569d1160fa2c8b8619e23422e3b03ab1"
+        },
+        "src/llm_long_term_memory/ingest/temporal_pairs.py": {
+          "bytes": 5071,
+          "sha256": "fe20df2555b148871fcce4d7d96b9e2787a451118684582ccfe00cce110bd31f"
+        },
+        "src/llm_long_term_memory/ingest/two_stage.py": {
+          "bytes": 7282,
+          "sha256": "5cbc798cc514ba05683a90f90ab87000ab213a4cd603dcc25ed56ec9ab4e01c4"
+        },
+        "src/llm_long_term_memory/ingest/zero_yield.py": {
+          "bytes": 12234,
+          "sha256": "764fa251fda83760a2a7cbca5e831064879be26e8a4322f7ae4715fc6ba0a29b"
+        },
+        "src/llm_long_term_memory/ingest/zero_yield_report.py": {
+          "bytes": 12272,
+          "sha256": "b9c13eb62d0afd25d1e0bfa149c8ae56b4f10990047ef660c675c3ecf7f82174"
+        },
+        "src/llm_long_term_memory/lifecycle.py": {
+          "bytes": 2973,
+          "sha256": "4a64c42322155b22abade099835dad10234c4548e0a3d3096257458ec7b50e90"
+        },
+        "src/llm_long_term_memory/llm/__init__.py": {
+          "bytes": 598,
+          "sha256": "a719dba44408ddebe7a54e60679318c15c7f22075f206ad40cc743f71000fdd2"
+        },
+        "src/llm_long_term_memory/llm/client.py": {
+          "bytes": 17363,
+          "sha256": "cd6531ddbb478eb62482c8f70b56cf93b392542754421a657202ce15a640be5c"
+        },
+        "src/llm_long_term_memory/llm/rate_limiter.py": {
+          "bytes": 12950,
+          "sha256": "80db0a6656df4357c9a3421c4a8e5dd6289bc8155d490fda0e8b91ec0e8512fe"
+        },
+        "src/llm_long_term_memory/llm/usage.py": {
+          "bytes": 5433,
+          "sha256": "d007b1a704fb5836d75418d68eff2869f964c1149596c27f72ff33410cbda59c"
+        },
+        "src/llm_long_term_memory/locking.py": {
+          "bytes": 4610,
+          "sha256": "976b08e4fb15ef4a8b67b04aac1c4b22a355ea48c65c45da2f9cef9a07825684"
+        },
+        "src/llm_long_term_memory/mcp_server.py": {
+          "bytes": 8287,
+          "sha256": "58bf89c7fe52b76f7d854d5ca541ae1d871dadcebee1ec15d2c492bd2939baa7"
+        },
+        "src/llm_long_term_memory/pack/__init__.py": {
+          "bytes": 71,
+          "sha256": "6314d9522d97e57f53e74b16d1c447e906f937b081cf852c305b3f5e96100373"
+        },
+        "src/llm_long_term_memory/pack/budget.py": {
+          "bytes": 5739,
+          "sha256": "02865a9454518f139c2cd785bf925262931d3e8b9210903703b8f95269d67909"
+        },
+        "src/llm_long_term_memory/retrieve/__init__.py": {
+          "bytes": 860,
+          "sha256": "82764e6ade0aae89cc9f52672ca1bb8ee46300c1651d480073e4726e8c382424"
+        },
+        "src/llm_long_term_memory/retrieve/coherent.py": {
+          "bytes": 10365,
+          "sha256": "26d900c98f474dc1148d81140638a66c549692abc5d064fab41d03dfc28153eb"
+        },
+        "src/llm_long_term_memory/retrieve/fallback.py": {
+          "bytes": 7315,
+          "sha256": "26276540759a8d0d73ea365da130af7d7102112517c7d62afeb1d3d4d5eeaf52"
+        },
+        "src/llm_long_term_memory/retrieve/hybrid.py": {
+          "bytes": 9541,
+          "sha256": "9561e1392d5d6bc778b7c588b8cbbdc5a94c76bf120df6ad152b996a698075f0"
+        },
+        "src/llm_long_term_memory/retrieve/hydrate.py": {
+          "bytes": 6255,
+          "sha256": "45c2cc73e068a0f47871fb52345e91c5c6732d46e88f797a0fb364835c2304af"
+        },
+        "src/llm_long_term_memory/retrieve/relation_router.py": {
+          "bytes": 5736,
+          "sha256": "b2802caa1a3bb257ddb5a8306c583ffec1b99654adc86833c167ac80cce539cb"
+        },
+        "src/llm_long_term_memory/retrieve/rerank.py": {
+          "bytes": 5222,
+          "sha256": "3f01da0ae8cdbc43a1f33bb4f6727d9412a46934dd3d3f5f655b6af8e46ed97e"
+        },
+        "src/llm_long_term_memory/retrieve/scan.py": {
+          "bytes": 4122,
+          "sha256": "04563a1225f27996f96c1ac7f3638332b0e9204f97fbf65a802a3e53379c2836"
+        },
+        "src/llm_long_term_memory/runtime/__init__.py": {
+          "bytes": 62,
+          "sha256": "fcf6c207d57b149109d02510fabb9b77013902902d765b69f6f775b226036b6a"
+        },
+        "src/llm_long_term_memory/runtime/evidence_count.py": {
+          "bytes": 5806,
+          "sha256": "14d8126f27e1e907e6da3b2cc5223f0cc88091a0a02d98c31d4b435882af51e2"
+        },
+        "src/llm_long_term_memory/store/__init__.py": {
+          "bytes": 666,
+          "sha256": "e10e70d76ff923736ae9f95735408da3cde1172670e635cb706cc05252b70ab0"
+        },
+        "src/llm_long_term_memory/store/base.py": {
+          "bytes": 8134,
+          "sha256": "4f4e499365230ff38c429c3ee09d574c850af8429849314673d21c3c2390e19b"
+        },
+        "src/llm_long_term_memory/store/erasure.py": {
+          "bytes": 7523,
+          "sha256": "70cffce4d5833ca01c4419dd3581cf7a1121fbfa890581442bb41ba1f5d49c47"
+        },
+        "src/llm_long_term_memory/store/schema.sql": {
+          "bytes": 12085,
+          "sha256": "d367ff348f9cad8c265008e4b38b1315f0b2a0eb90bcbc6f167e0afb1ea2857d"
+        },
+        "src/llm_long_term_memory/store/session_keys.py": {
+          "bytes": 1324,
+          "sha256": "368900d823c3a914a2ee362b536cafa6a169bb19a1bd8dc3ed89a3943f69eb0f"
+        },
+        "src/llm_long_term_memory/store/sqlite.py": {
+          "bytes": 42406,
+          "sha256": "041333cee07972a55a8d95296a435a411f1c13d077a1fd64dff7920aa1ff10e1"
+        },
+        "src/llm_long_term_memory/store/vector.py": {
+          "bytes": 3559,
+          "sha256": "00a94dd796f4c9fbd5a172c4ade2ede30959cd55f74253d3bfdd2c684cbee646"
+        },
+        "src/llm_long_term_memory/temporal/__init__.py": {
+          "bytes": 156,
+          "sha256": "0faa6e1e4d871c5b862d19e9f9f815110f3db5fd71d38afb3bd26075b3fbdf71"
+        },
+        "src/llm_long_term_memory/temporal/resolve.py": {
+          "bytes": 14178,
+          "sha256": "d737fca74bbaaab82a70275df52e6b9e7496f01e5983252f098a624c2b6bdc25"
+        },
+        "uv.lock": {
+          "bytes": 537339,
+          "sha256": "d631ac3d3e4de3c822e49bed3e5cbe570bf1188e51a8201e926a4a7b0771ce7a"
+        }
+      },
+      "tree_sha256": "54a2a43d57fae18887e23570bb58d20c62bd2943f8b75d5cd2d6d06257c14f85"
+    },
+    "store": {
+      "checkpoint": {
+        "path": "stores/v2b-gate16-ingest.json",
+        "sha256": "cbeca57b7077daf276c907b28c27614acb447e69b5639e25f39b79fa999c3ead"
+      },
+      "database": {
+        "counts": {
+          "entities": 4925,
+          "evidence": 0,
+          "memories": 3055,
+          "memory_entities": 5941,
+          "meta": 2,
+          "sessions": 780,
+          "turns": 7952
+        },
+        "foreign_key_violations": 0,
+        "logical_sha256": "58e84789e350b79f51fc35a83b9004ba285e0041d96f34b4716e54e80b42081a",
+        "meta": {
+          "extractor_version": "two-stage-p10-v2",
+          "ingest_fingerprint": "{\"dedup_scope\": \"namespace\", \"dedup_threshold\": \"0.9200\", \"extractor_version\": \"two-stage-p10-v2\", \"model\": \"gemini-3.1-flash-lite\", \"prompts\": \"017e6620b1b9\", \"schema_version\": \"403d429afab1\", \"sessions_per_request\": \"8\"}"
+        },
+        "quick_check": "ok"
+      },
+      "index": {
+        "ids": 3055,
+        "ids_sha256": "c39b6a31f1ce1245cc818c2bac706dc37598f3feee6f9c309e5f5510dd6e8150",
+        "unique_ids": 3055,
+        "vectors_bytes": 4692608,
+        "vectors_sha256": "49ef61161ccedef02faddf4b199e79e2982afc58fed3af6b02614267ff3179d0",
+        "vectors_shape": [
+          3055,
+          384
+        ]
+      },
+      "name": "v2b-gate16",
+      "terminal": {
+        "blocked": 0,
+        "done": 780,
+        "expected": 780
+      },
+      "usage": {
+        "failures": 14,
+        "path": "results/raw/v2b-gate16.ingest.usage.json",
+        "requests": 246,
+        "sha256": "4bfe06aa6fb52faf680a7f3968e619dd07697f7bfc2c7306ca085d5c244bd7cf",
+        "tokens": 2419533
+      }
+    },
+    "variants": [
+      "two_stage_memory_only",
+      "two_stage_fallback"
+    ]
+  }
+}

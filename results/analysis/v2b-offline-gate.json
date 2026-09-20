@@ -1,0 +1,134 @@
+{
+  "calls": 0,
+  "cohort_sessions": 60,
+  "cohort_matches_archive": true,
+  "prompts_match_archive": true,
+  "fidelity": {
+    "batch15": {
+      "overall": 0.373134328358209,
+      "memories": 92,
+      "per_facet": {
+        "quantity": 0.4444444444444444,
+        "duration": 0.35714285714285715,
+        "money": 0.0,
+        "date": 0.0,
+        "relative_time": 0.25,
+        "proper_noun": 0.33962264150943394
+      },
+      "stated": {
+        "quantity": 54,
+        "duration": 14,
+        "money": 1,
+        "date": 0,
+        "relative_time": 12,
+        "proper_noun": 53
+      }
+    },
+    "batch8": {
+      "overall": 0.6492537313432836,
+      "memories": 223,
+      "per_facet": {
+        "quantity": 0.6666666666666666,
+        "duration": 0.7142857142857143,
+        "money": 0.0,
+        "date": 0.0,
+        "relative_time": 0.4166666666666667,
+        "proper_noun": 0.6792452830188679
+      },
+      "stated": {
+        "quantity": 54,
+        "duration": 14,
+        "money": 1,
+        "date": 0,
+        "relative_time": 12,
+        "proper_noun": 53
+      }
+    }
+  },
+  "facet_transitions": {
+    "date": {},
+    "duration": {
+      "gained": 6,
+      "lost": 1,
+      "missed_both": 3,
+      "retained_both": 4
+    },
+    "money": {
+      "missed_both": 1
+    },
+    "proper_noun": {
+      "gained": 19,
+      "lost": 1,
+      "missed_both": 16,
+      "retained_both": 17
+    },
+    "quantity": {
+      "gained": 14,
+      "lost": 2,
+      "missed_both": 16,
+      "retained_both": 22
+    },
+    "relative_time": {
+      "gained": 2,
+      "missed_both": 7,
+      "retained_both": 3
+    }
+  },
+  "lexical_support_floor": {
+    "batch15": {
+      "memories_scored": 92,
+      "empty_content_word_memories": 0,
+      "mean": 0.8508420323637714,
+      "median": 0.875,
+      "p10": 0.6,
+      "zero_overlap": 0,
+      "below_0_25": 0,
+      "below_0_50": 0
+    },
+    "batch8": {
+      "memories_scored": 223,
+      "empty_content_word_memories": 0,
+      "mean": 0.8626559904247537,
+      "median": 0.875,
+      "p10": 0.75,
+      "zero_overlap": 0,
+      "below_0_25": 0,
+      "below_0_50": 1
+    }
+  },
+  "literal_gold_overlap": {
+    "comparable_questions": 1,
+    "rows": [
+      {
+        "question_id": "00ca467f",
+        "question_type": "multi-session",
+        "gold": 2,
+        "batch15_literal_answer_present": true,
+        "batch15_evidence_memories": 11,
+        "batch8_literal_answer_present": true,
+        "batch8_evidence_memories": 20
+      }
+    ],
+    "interpretation": "Diagnostic only: the archived 60-session cohort was not sampled by question, so complete gold sessions overlap too few questions for an accuracy claim."
+  },
+  "raw_bm25": {
+    "available": true,
+    "store": "stores/two-stage-hydrated.db",
+    "store_memory_namespaces": 50,
+    "natural_questions": 48,
+    "recall_at_1": 0.4583333333333333,
+    "recall_at_2": 0.6458333333333334,
+    "recall_at_3": 0.6875,
+    "note": "Raw BM25 only. This says whether raw top-2 can add source evidence; it does not say whether the answerer will use it or whether every task has a single gold turn."
+  },
+  "existing_replay_decisions": {
+    "smaller_top_k": "Rejected as a general mechanism: archived context-arms reruns found flatN worse than flat20 on one target and no rescue on the other stable failures.",
+    "dense_raw_retrieval": "Not justified by the archived diagnostic: natural-query BM25 misses were mostly aggregation, temporal, or preference tasks rather than lexical misses.",
+    "raw_top2_parallel": "Still eligible for a gate16 evidence comparison because it is cheap, but must increase per-question source coverage before any answer calls."
+  },
+  "limits": [
+    "Lexical overlap is only a low-support screen; it is not an unsupported-fact or hallucination rate.",
+    "The fidelity ruler annotates quantities, durations, money, dates, relative time, and proper nouns; ordinary semantic facts have no offline gold labels here.",
+    "End-to-end promotion still requires the pre-registered gate16 candidate comparison."
+  ]
+}

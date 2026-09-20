@@ -30,11 +30,12 @@ import re
 import sqlite3
 import sys
 from collections import defaultdict
-from math import comb
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO / "src"))
+
+from llm_long_term_memory.stats import exact_mcnemar  # noqa: E402
 
 PILOT = REPO / "results" / "raw" / "batch-position-pilot.json"
 STORE = REPO / "stores" / "two-stage-p10.db"
@@ -118,13 +119,6 @@ STOPWORDS = set(
 
 def words(text: str) -> set[str]:
     return {w for w in re.findall(r"[a-z0-9']+", text.lower()) if w not in STOPWORDS and len(w) > 2}
-
-
-def exact_mcnemar(wins: int, losses: int) -> float:
-    n = wins + losses
-    if not n:
-        return 1.0
-    return min(1.0, 2 * sum(comb(n, k) for k in range(min(wins, losses) + 1)) / 2**n)
 
 
 def h(title: str) -> None:

@@ -52,7 +52,10 @@ def documents() -> list[Path]:
         encoding="utf-8",
     )
     if listing.returncode == 0 and listing.stdout.strip():
-        return sorted(REPO / name for name in listing.stdout.split())
+        # `git ls-files` still reports tracked files deleted in the working tree. That
+        # is useful for Git status and impossible to render; only check documents that
+        # exist in the current checkout.
+        return sorted(path for name in listing.stdout.split() if (path := REPO / name).is_file())
     return sorted(
         path for path in REPO.rglob("*.md") if not SKIP & set(path.relative_to(REPO).parts)
     )
@@ -105,5 +108,6 @@ def test_the_document_list_does_not_depend_on_what_is_lying_around():
     )  # fmt: skip
     if tracked.returncode != 0:
         pytest.skip("not a git checkout")
-    assert {p.relative_to(REPO).as_posix() for p in documents()} == set(tracked.stdout.split())
+    existing_tracked = {name for name in tracked.stdout.split() if (REPO / name).is_file()}
+    assert {p.relative_to(REPO).as_posix() for p in documents()} == existing_tracked
     assert not any("stores/" in p.as_posix() for p in documents())

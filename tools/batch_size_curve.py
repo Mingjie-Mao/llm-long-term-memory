@@ -205,22 +205,16 @@ def _outcomes(pairs: list) -> list[tuple[str, str, str, bool]]:
 def _mcnemar(a: list, b: list) -> dict:
     """Exact two-sided McNemar on the discordant specifics.
 
-    Concordant items carry no information about a difference, so the test is a sign
-    test on the rest. Exact rather than chi-square: the discordant counts here run
-    to single figures between adjacent arms, where the asymptotic form is not to be
-    trusted.
+    The pairing is this function's own — the rows are (session, facet, value, kept)
+    tuples, not question ids — so it counts the discordant items here and hands the
+    p-value to the one implementation the repository has.
     """
-    from math import comb
+    from llm_long_term_memory.stats import exact_mcnemar
 
     assert [r[:3] for r in a] == [r[:3] for r in b], "arms are not paired"
     gained = sum(1 for x, y in zip(a, b, strict=True) if not x[3] and y[3])
     lost = sum(1 for x, y in zip(a, b, strict=True) if x[3] and not y[3])
-    n = gained + lost
-    p = 1.0
-    if n:
-        tail = sum(comb(n, k) for k in range(min(gained, lost) + 1))
-        p = min(1.0, 2 * tail / 2**n)
-    return {"gained": gained, "lost": lost, "p": p}
+    return {"gained": gained, "lost": lost, "p": exact_mcnemar(gained, lost)}
 
 
 def _load_archive() -> dict:

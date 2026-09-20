@@ -152,6 +152,7 @@ def wired(tmp_path):
 
 
 def runner(store, index, client, **kw) -> MemoryRunner:
+    raw_fallback = kw.pop("raw_fallback", True)
     return MemoryRunner(
         client,
         model="m",
@@ -160,7 +161,7 @@ def runner(store, index, client, **kw) -> MemoryRunner:
         index=index,
         temporal=True,
         top_k=5,
-        raw_fallback=True,
+        raw_fallback=raw_fallback,
         **kw,
     )
 
@@ -300,6 +301,57 @@ def test_reasoned_fallback_keeps_operation_guide_on_second_pass(wired):
     assert MAYO_URL in answer.text
     assert "Required answer operation: direct" in client.calls[1]
     assert "The exact URL is absent" in client.calls[1]
+
+
+def test_v2c_fallback_keeps_exact_reference_rule_and_first_pass_context(wired):
+    store, index = wired
+    client = ScriptedClient(
+        {
+            "status": "need_source",
+            "reason": "The exact recommendation must be checked in source.",
+            "source_query": "Mayo Clinic posture video title",
+        },
+        "How to Sit Properly at a Desk to Avoid Back Pain",
+    )
+
+    v2c_runner = runner(store, index, client, answer_policy="v2c")
+    answer = v2c_runner.answer(instance("What was the title of the video you recommended?"))
+
+    assert "How to Sit Properly" in answer.text
+    assert "Exact-reference rule" in client.calls[0]
+    assert "Exact-reference rule" in client.calls[1]
+    assert "Question-specific verbatim source evidence" in client.calls[1]
+    assert "Additional verbatim source evidence" in client.calls[1]
+    assert "Final exact-reference reminder" in client.calls[1]
+    assert "do not force a match" in v2c_runner.answer_system
+    assert "which item was actually recommended" in v2c_runner.answer_system
+
+
+def test_v2d_memory_only_still_uses_a_structured_verdict_and_computes(wired):
+    store, index = wired
+    client = ScriptedClient(
+        {
+            "status": "answer",
+            "answer": "The model says two.",
+            "premise_status": "not_applicable",
+            "operation": "count",
+            "operand_values": ["Mayo Clinic video", "short instructional videos"],
+            "operand_labels": ["M1", "M2"],
+        }
+    )
+
+    answer = runner(
+        store,
+        index,
+        client,
+        answer_policy="v2d",
+        raw_fallback=False,
+    ).answer(instance("How many video-related items are recorded?"))
+
+    assert answer.text.startswith("2 distinct:")
+    assert answer.notes["synthesis_computation"]["count"] == 2
+    assert answer.notes["answer_policy"] == "v2d"
+    assert client.calls[0].count("[M1]") >= 1
 
 
 def test_runner_applies_configured_fallback_budgets(wired):
@@ -483,6 +535,152 @@ def test_source_local_turns_are_ordered_by_relevance_not_session_id(decoys):
 
     assert evidence.level == "source_local"
     assert MAYO_URL in evidence.turns[0].content, "the one turn kept must be the relevant one"
+
+
+def test_local_detail_search_can_reach_a_later_turn_in_the_located_session(wired):
+    store, _ = wired
+    store.add_session(
+        Session(
+            id="s3",
+            user_id="u1",
+            started_at=NOW,
+            turns=[
+                Turn(
+                    id="s3:0",
+                    session_id="s3",
+                    turn_index=0,
+                    role="user",
+                    content="I attended the fundraiser in February.",
+                    ts=NOW,
+                ),
+                Turn(
+                    id="s3:1",
+                    session_id="s3",
+                    turn_index=1,
+                    role="user",
+                    content="That fundraiser was specifically on Valentine's Day.",
+                    ts=NOW,
+                ),
+            ],
+        )
+    )
+    coarse = Memory(
+        id="m_coarse",
+        user_id="u1",
+        type="semantic",
+        content="The fundraiser was in February.",
+        token_count=6,
+        ingested_at=NOW,
+        valid_from=NOW,
+        source_session_id="s3",
+        source_turn_index=0,
+    )
+
+    evidence = RawFallback(store).recover_local_detail(
+        "u1", "When was the fundraiser Valentine's Day?", [coarse]
+    )
+
+    assert evidence.level == "source_local"
+    assert any("Valentine's Day" in turn.content for turn in evidence.turns)
+
+
+def test_local_detail_ranks_inside_sessions_before_large_archive_truncation(wired):
+    store, _ = wired
+    # Fill the global BM25 head with highly repetitive but unrelated sessions. The
+    # local turn would be below RawFallback.pool in a global-first implementation.
+    for i in range(20):
+        store.add_session(
+            Session(
+                id=f"noise-{i}",
+                user_id="u1",
+                started_at=NOW,
+                turns=[
+                    Turn(
+                        id=f"noise-{i}:0",
+                        session_id=f"noise-{i}",
+                        turn_index=0,
+                        role="assistant",
+                        content=("fundraiser exact date " * 20) + f"unrelated {i}",
+                        ts=NOW,
+                    )
+                ],
+            )
+        )
+    store.add_session(
+        Session(
+            id="local-date",
+            user_id="u1",
+            started_at=NOW,
+            turns=[
+                Turn(
+                    id="local-date:0",
+                    session_id="local-date",
+                    turn_index=0,
+                    role="user",
+                    content="The fundraiser's exact date was February 14.",
+                    ts=NOW,
+                )
+            ],
+        )
+    )
+    anchored = Memory(
+        id="local-memory",
+        user_id="u1",
+        type="semantic",
+        content="The fundraiser happened in February.",
+        token_count=6,
+        ingested_at=NOW,
+        source_session_id="local-date",
+        source_turn_index=0,
+    )
+
+    evidence = RawFallback(store, max_turns=1).recover_local_detail(
+        "u1", "fundraiser exact date", [anchored]
+    )
+
+    assert [turn.id for turn in evidence.turns] == ["local-date:0"]
+    assert "February 14" in evidence.turns[0].content
+
+
+def test_local_detail_keeps_the_relevant_tail_of_a_long_turn(wired):
+    store, _ = wired
+    long_text = ("General planning background. " * 70) + (
+        "The exact replacement filter cost was $47.50. Keep the receipt."
+    )
+    store.add_session(
+        Session(
+            id="long-source",
+            user_id="u1",
+            started_at=NOW,
+            turns=[
+                Turn(
+                    id="long-source:0",
+                    session_id="long-source",
+                    turn_index=0,
+                    role="assistant",
+                    content=long_text,
+                    ts=NOW,
+                )
+            ],
+        )
+    )
+    anchored = Memory(
+        id="long-memory",
+        user_id="u1",
+        type="semantic",
+        content="A replacement filter price was discussed.",
+        token_count=8,
+        ingested_at=NOW,
+        source_session_id="long-source",
+        source_turn_index=0,
+    )
+
+    evidence = RawFallback(store, max_turns=1).recover_local_detail(
+        "u1", "exact replacement filter cost", [anchored]
+    )
+
+    assert len(evidence.turns[0].content) < len(long_text)
+    assert "$47.50" in evidence.turns[0].content
 
 
 def test_a_query_with_no_searchable_terms_still_returns_the_anchored_turns(wired):

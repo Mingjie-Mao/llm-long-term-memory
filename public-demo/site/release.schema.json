@@ -18,7 +18,7 @@
       "const": "./release.schema.json"
     },
     "schema_version": {
-      "const": 1
+      "const": 2
     },
     "release": {
       "type": "string",
@@ -103,6 +103,7 @@
         "verified_at",
         "measured_tree_sha256",
         "tests",
+        "document_checks",
         "line_coverage",
         "ci_platforms"
       ],
@@ -113,7 +114,13 @@
         },
         "tests": {
           "type": "integer",
-          "minimum": 1
+          "minimum": 1,
+          "description": "Automated tests of the code, passed plus skipped. Schema 1 also counted one case per tracked Markdown document here, so the figure moved when documents were committed; those are `document_checks` from schema 2 on, and the two numbers are not comparable across the version."
+        },
+        "document_checks": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Tracked Markdown documents the suite renders and checks. Reported apart from `tests` because it counts what is in the repository, not what is checked about the code."
         },
         "line_coverage": {
           "type": "integer",

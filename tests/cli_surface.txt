@@ -1,0 +1,26 @@
+lltm data download :: --data-dir --force --variant
+lltm data plan :: --data-dir --rpd --variant
+lltm data stats :: --data-dir --limit --variant
+lltm doctor ::
+lltm eval agreement :: variant
+lltm eval budget-sweep :: --budgets --config|-c --fresh --limit --store-name --utility-model --variant
+lltm eval compare :: variant_a variant_b
+lltm eval failure-audit :: --config|-c --out variant
+lltm eval failure-report :: worksheet
+lltm eval freeze :: --exclude --force --n --note --seed --variant name
+lltm eval label :: --config|-c --n variant
+lltm eval repeat :: --config|-c --fresh --limit --runs --store-name variant
+lltm eval report :: --out variants
+lltm eval run :: --config|-c --fresh --label --limit --questions --rerank --store-name --top-k variant
+lltm eval variability :: variant
+lltm influence cost :: --leave-one-in --questions --top-k
+lltm influence fit :: --alpha --labels --out
+lltm influence measure :: --config|-c --fresh --leave-one-in --limit --out --store-name --variant
+lltm ingest coverage :: --config|-c --n --show-misses
+lltm ingest fidelity :: --batch --config|-c --grounded --holdout --min-score --sessions --show-misses --two-stage
+lltm ingest run :: --config|-c --fresh --limit --questions --sessions --store-name
+lltm ingest temporal-gate :: --config|-c --stability
+lltm lifecycle consolidate :: --config|-c --store-name --user-id
+lltm lifecycle run :: --config|-c --store-name --user-id
+lltm mcp :: --config|-c --store-name --transport
+lltm resolve :: --config|-c --store-name

@@ -108,10 +108,15 @@ def main() -> int:
     schema = json.loads((SITE / "release.schema.json").read_text(encoding="utf-8"))
     assert release["$schema"] == "./release.schema.json"
     assert schema["properties"]["schema_version"]["const"] == release["schema_version"]
-    assert release["schema_version"] == 1
+    assert release["schema_version"] == 2
     assert release["release"], "release manifest has no public release id"
     engineering = release["engineering"]
     assert engineering["tests"] > 0
+    # Schema 1 counted one case per tracked document inside `tests`, so the figure rose
+    # when documents were committed and said nothing about the code. They are separate
+    # from schema 2 on, and a page that showed one under the other's label would be
+    # restating the same defect in a new place.
+    assert engineering["document_checks"] >= 0
     # A figure the public repository cannot reproduce is not publishable. The digest is
     # what lets a reader check that the tree these numbers came from is the tree in front
     # of them — and unlike a commit SHA it survives an amend, a squash or a rebase.

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import re
 
-from llm_long_term_memory.evaluation.datasets.longmemeval import HaystackSession
+from llm_long_term_memory.conversation import ConversationSession
 from llm_long_term_memory.store import Memory
 
 _TOKEN = re.compile(r"[a-z0-9]+")
@@ -16,7 +16,7 @@ def _tokens(text: str) -> set[str]:
     return set(_TOKEN.findall(text.lower()))
 
 
-def source_span_for(statement: str, session: HaystackSession) -> tuple[int, int, int] | None:
+def source_span_for(statement: str, session: ConversationSession) -> tuple[int, int, int] | None:
     """Choose the most lexically supported verbatim sentence in a source session.
 
     The extractor does not supply character offsets, so this is an auditable anchor
@@ -51,7 +51,7 @@ def source_span_for(statement: str, session: HaystackSession) -> tuple[int, int,
     return -negative_turn, -negative_start, end
 
 
-def attach_source_span(memory: Memory, session: HaystackSession) -> Memory:
+def attach_source_span(memory: Memory, session: ConversationSession) -> Memory:
     """Mutate a new memory with its raw-session anchor and return it."""
     span = source_span_for(memory.content, session)
     if span is not None:

@@ -24,8 +24,8 @@ import json
 from dataclasses import dataclass, field
 from pathlib import Path
 
+from llm_long_term_memory.conversation import ConversationSession, ConversationSource
 from llm_long_term_memory.embed import Encoder
-from llm_long_term_memory.evaluation.datasets.longmemeval import HaystackSession, Instance
 from llm_long_term_memory.llm.client import ContentBlocked, DailyQuotaExhausted
 from llm_long_term_memory.store import MemoryStore, NumpyFlatIndex
 
@@ -99,7 +99,9 @@ class IngestProgress:
         tmp.replace(path)  # atomic, so a kill mid-write cannot corrupt the checkpoint
 
 
-def namespaced_sessions(instances: list[Instance]) -> list[tuple[str, HaystackSession]]:
+def namespaced_sessions(
+    sources: list[ConversationSource],
+) -> list[tuple[str, ConversationSession]]:
     """(namespace, session) pairs, one namespace per store.
 
     Deliberately not deduplicated across namespaces: a session appearing in two
@@ -110,11 +112,11 @@ def namespaced_sessions(instances: list[Instance]) -> list[tuple[str, HaystackSe
     conversation carries twenty questions over the same sessions, and keying on the
     question would extract that conversation twenty times into one store.
     """
-    out: list[tuple[str, HaystackSession]] = []
+    out: list[tuple[str, ConversationSession]] = []
     seen: set[tuple[str, str]] = set()
-    for inst in instances:
-        namespace = inst.store_namespace
-        for sess in inst.sessions:
+    for source in sources:
+        namespace = source.store_namespace
+        for sess in source.sessions:
             if (namespace, sess.session_id) in seen:
                 continue
             seen.add((namespace, sess.session_id))
@@ -123,11 +125,11 @@ def namespaced_sessions(instances: list[Instance]) -> list[tuple[str, HaystackSe
 
 
 def group_by_namespace(
-    pairs: list[tuple[str, HaystackSession]],
-) -> list[tuple[str, list[HaystackSession]]]:
+    pairs: list[tuple[str, ConversationSession]],
+) -> list[tuple[str, list[ConversationSession]]]:
     """Batches never straddle a namespace: extraction of one question's sessions
     must not attribute a fact to another question's user."""
-    groups: dict[str, list[HaystackSession]] = {}
+    groups: dict[str, list[ConversationSession]] = {}
     for ns, sess in pairs:
         groups.setdefault(ns, []).append(sess)
     return list(groups.items())
@@ -168,7 +170,7 @@ def resolved_sessions_per_request(configured: int, tpm: int) -> int:
     return fit_batch_size(configured, tpm, tokens_per_session=TOKENS_PER_SESSION)
 
 
-def _key(namespace: str, session: HaystackSession) -> str:
+def _key(namespace: str, session: ConversationSession) -> str:
     """Checkpoint key. Namespaced, because the same session in two questions is two
     separate units of work."""
     return f"{namespace}:{session.session_id}"
@@ -180,7 +182,7 @@ def batched(items: list, size: int):
 
 
 def namespace_batch_count(
-    pairs: list[tuple[str, HaystackSession]], sessions_per_request: int
+    pairs: list[tuple[str, ConversationSession]], sessions_per_request: int
 ) -> int:
     """Count batches using the same namespace boundary as the ingestion driver.
 
@@ -212,7 +214,13 @@ class ConfigurationMismatch(RuntimeError):
 class IngestionPipeline:
     source_label = "longmemeval"
     """Written as `<label>:<session id>` into each stored session's `source`, which is how a
-    store records the dataset its sessions came from."""
+    store records the dataset its sessions came from.
+
+    A benchmark's name as the default on a product class is an inversion, and it is kept
+    deliberately: `session_migration` selects on `source LIKE 'longmemeval:%'`, so changing
+    the default would strand the sessions in every existing store. Override it per corpus
+    instead. Nothing else in `ingest/` refers to the benchmark.
+    """
 
     def __init__(
         self,
@@ -245,7 +253,7 @@ class IngestionPipeline:
 
     def run(
         self,
-        pairs: list[tuple[str, HaystackSession]],
+        pairs: list[tuple[str, ConversationSession]],
         resume: bool = True,
         on_batch=None,
     ) -> IngestOutcome:
@@ -326,7 +334,7 @@ class IngestionPipeline:
 
         # Batches never straddle a namespace, so every fact in a call belongs to the
         # user the call is attributed to.
-        batches: list[tuple[str, list[HaystackSession]]] = []
+        batches: list[tuple[str, list[ConversationSession]]] = []
         for namespace, sessions in group_by_namespace(pending):
             batches += [
                 (namespace, chunk) for chunk in batched(sessions, self.sessions_per_request)
@@ -383,7 +391,7 @@ class IngestionPipeline:
         self._commit(progress)
         return IngestOutcome(progress, completed=True)
 
-    def _record_sessions(self, namespace: str, batch: list[HaystackSession]) -> None:
+    def _record_sessions(self, namespace: str, batch: list[ConversationSession]) -> None:
         """Register the source sessions before their memories reference them.
 
         `memories.source_session_id` is a real foreign key, which is what keeps
@@ -421,7 +429,7 @@ class IngestionPipeline:
             )
 
     def _ingest_batch(
-        self, namespace: str, batch: list[HaystackSession], progress: IngestProgress
+        self, namespace: str, batch: list[ConversationSession], progress: IngestProgress
     ) -> None:
         # The extractor stamps every memory it produces with this id, so it is set
         # per batch rather than per pipeline.

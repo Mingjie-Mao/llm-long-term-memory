@@ -116,3 +116,33 @@ def test_the_committed_manifest_records_a_digest_and_not_a_bare_commit():
     assert "source_commit" not in engineering
     reference = engineering.get("source_commit_for_reference")
     assert reference is None or re.fullmatch(r"[0-9a-f]{7,40}", reference)
+
+
+def test_the_public_test_count_excludes_the_per_document_checks():
+    """The figure the page shows must describe the code, not the repository.
+
+    Under schema 1 the test count included one case per tracked Markdown file, so
+    committing a batch of pre-registrations raised "tests" by 38 while nothing about
+    the engine had been tested. The documents are still checked and still reported;
+    they are simply not counted as tests of the code.
+    """
+    if not MANIFEST.is_file():
+        pytest.skip("no release manifest in this checkout")
+    manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
+    engineering = manifest["engineering"]
+
+    assert manifest["schema_version"] == 2, (
+        "the meaning of `tests` changed, so a consumer holding the old manifest must "
+        "not compare the two numbers as if they measured the same thing"
+    )
+    assert engineering["tests"] > 0
+    assert engineering["document_checks"] > 0
+
+
+def test_the_named_document_test_still_exists_to_be_excluded():
+    """The exclusion is by name, so a rename must fail here rather than silently
+    folding the document cases back into the engineering count."""
+    path, _, function = figures.DOCUMENT_TEST.partition("::")
+    source = (REPO / path).read_text(encoding="utf-8")
+    assert f"def {function}(" in source, f"{figures.DOCUMENT_TEST} no longer exists"
+    assert "parametrize" in source

@@ -10,6 +10,7 @@ from types import SimpleNamespace
 
 import pytest
 
+from llm_long_term_memory.conversation import AnswerRequest
 from llm_long_term_memory.evaluation.runners.synthesis import (
     SYNTHESIS_ANSWER_SYSTEM,
     SynthesisVerdict,
@@ -45,18 +46,15 @@ def _runner(payload: str):
     return runner
 
 
-class _Instance:
-    question = "what is currently true?"
-    question_date = "2026/01/01"
-    question_id = "q"
-    store_namespace = "q"
+def _request() -> AnswerRequest:
+    return AnswerRequest(question="what is currently true?", asked_on="2026/01/01", user_id="q")
 
 
 def test_an_empty_answer_falling_back_to_json_is_flagged():
     """The exact shape seen on the run: operation filled, answer empty."""
     payload = json.dumps({"status": "answer", "operation": "current_state", "answer": ""})
     runner = _runner(payload)
-    _, text, _, _ = runner._answer_with_fallback(_Instance(), "ctx", [])
+    _, text, _, _ = runner._answer_with_fallback(_request(), "ctx", [])
     assert runner._answer_was_raw_structure is True, "the defect must stay countable"
     # The structure itself no longer reaches the reader — see
     # test_raw_structure_never_reaches_the_reader — but the flag still records that the
@@ -69,7 +67,7 @@ def test_a_real_prose_answer_is_not_flagged():
         {"status": "answer", "operation": "current_state", "answer": "San Francisco."}
     )
     runner = _runner(payload)
-    _, text, _, _ = runner._answer_with_fallback(_Instance(), "ctx", [])
+    _, text, _, _ = runner._answer_with_fallback(_request(), "ctx", [])
     assert runner._answer_was_raw_structure is False
     assert text == "San Francisco."
 
@@ -82,7 +80,7 @@ def test_json_inside_the_answer_field_is_also_caught():
         {"status": "answer", "operation": "count", "answer": '```json\n{"items": []}\n```'}
     )
     runner = _runner(payload)
-    _, _, _, _ = runner._answer_with_fallback(_Instance(), "ctx", [])
+    _, _, _, _ = runner._answer_with_fallback(_request(), "ctx", [])
     assert runner._answer_was_raw_structure is True
 
 
@@ -100,7 +98,7 @@ def test_a_computed_answer_is_not_flagged_even_with_an_empty_answer_field():
         }
     )
     runner = _runner(payload)
-    _, text, _, _ = runner._answer_with_fallback(_Instance(), "ctx", [])
+    _, text, _, _ = runner._answer_with_fallback(_request(), "ctx", [])
     assert text == "18 days"
 
 
@@ -130,7 +128,7 @@ def test_raw_structure_never_reaches_the_reader():
     """
     payload = json.dumps({"status": "answer", "operation": "current_state", "answer": ""})
     runner = _runner(payload)
-    _, text, _, _ = runner._answer_with_fallback(_Instance(), "ctx", [])
+    _, text, _, _ = runner._answer_with_fallback(_request(), "ctx", [])
     assert not text.lstrip().startswith(("{", "```"))
     assert text == "I do not know."
     # Still flagged, so the prompt defect stays countable rather than being papered over.
@@ -149,7 +147,7 @@ def test_a_computed_answer_is_preferred_over_the_abstention():
         }
     )
     runner = _runner(payload)
-    _, text, _, _ = runner._answer_with_fallback(_Instance(), "ctx", [])
+    _, text, _, _ = runner._answer_with_fallback(_request(), "ctx", [])
     assert text == "18 days"
 
 
@@ -171,7 +169,7 @@ def test_a_good_reply_survives_even_when_the_model_also_emitted_structure():
         }
     )
     runner = _runner(payload)
-    _, text, _, _ = runner._answer_with_fallback(_Instance(), "ctx", [])
+    _, text, _, _ = runner._answer_with_fallback(_request(), "ctx", [])
     assert text == "The user taking painting classes came first."
     assert "I do not know" not in text
 
@@ -179,7 +177,7 @@ def test_a_good_reply_survives_even_when_the_model_also_emitted_structure():
 @pytest.mark.parametrize("payload", ['{"status": "unexpected"}', '{"status":', "```json\n{}\n```"])
 def test_invalid_verdict_structure_does_not_bypass_the_output_guard(payload):
     runner = _runner(payload)
-    _, text, _, _ = runner._answer_with_fallback(_Instance(), "ctx", [])
+    _, text, _, _ = runner._answer_with_fallback(_request(), "ctx", [])
     assert text == "I do not know."
     assert runner._answer_was_raw_structure is True
 
@@ -188,7 +186,7 @@ def test_invalid_verdict_structure_does_not_bypass_the_output_guard(payload):
 def test_no_source_does_not_return_structure_from_the_verdict_answer(status):
     runner = _runner(json.dumps({"status": status, "answer": '{"items": []}'}))
     runner.fallback = SimpleNamespace(recover=lambda *args: SimpleNamespace(used=False))
-    _, text, _, _ = runner._answer_with_fallback(_Instance(), "ctx", [])
+    _, text, _, _ = runner._answer_with_fallback(_request(), "ctx", [])
     assert text == "I do not know."
     assert runner._answer_was_raw_structure is True
 
@@ -215,7 +213,7 @@ def test_second_pass_is_checked_even_when_the_prompt_requests_prose(payload, exp
     runner.raw_fallback_max_chars = 2400
     evidence = SimpleNamespace(used=True, render=lambda **kwargs: "The raw source text.")
     runner.fallback = SimpleNamespace(recover=lambda *args: evidence)
-    _, text, _, _ = runner._answer_with_fallback(_Instance(), "ctx", [])
+    _, text, _, _ = runner._answer_with_fallback(_request(), "ctx", [])
     assert text == expected
     assert runner._answer_was_raw_structure is flagged
     assert len(calls) == 2, "output validation must not spend another model call"

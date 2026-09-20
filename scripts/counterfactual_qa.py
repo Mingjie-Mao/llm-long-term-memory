@@ -192,12 +192,12 @@ def main() -> int:
     out = REPO / "results" / "raw" / f"two_stage_hydrated.{LABEL}.jsonl"
     after = {
         json.loads(x)["question_id"]: json.loads(x)
-        for x in out.read_text().splitlines()
+        for x in out.read_text(encoding="utf-8").splitlines()
         if x.strip()
     }
     before = {
         json.loads(x)["question_id"]: json.loads(x)
-        for x in BASELINE.read_text().splitlines()
+        for x in BASELINE.read_text(encoding="utf-8").splitlines()
         if x.strip()
     }
 

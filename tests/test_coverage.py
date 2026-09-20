@@ -13,7 +13,7 @@ from llm_long_term_memory.evaluation.datasets.longmemeval import (
     HaystackTurn,
     Instance,
 )
-from llm_long_term_memory.ingest.coverage import (
+from llm_long_term_memory.evaluation.extraction_coverage import (
     UNMEASURABLE_TYPES,
     CoverageCase,
     CoverageReport,

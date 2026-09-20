@@ -3,7 +3,7 @@
 本文描述**当前工作区的真实实现**：数据怎么流动、存在哪里、哪些分支默认开着、哪些只是活在代码里。
 它不描述冻结实验运行时的源码快照，也不把尚未实现的分层计划画成现状。
 
-设计动机与实验结论见[项目报告](PROJECT_REPORT.zh-CN.md)，评测口径与最终结果见[评测说明](EVALUATION.md)，
+设计动机与实验结论见[项目报告](PROJECT_REPORT.md)，评测口径与最终结果见[评测说明](EVALUATION.md)，
 部署步骤见 [DEPLOY.md](../DEPLOY.md)。
 
 ## 图集
@@ -137,14 +137,30 @@ SQLite 保存源数据、状态、词法索引以及辅助关系。向量索引�
 | 入口 | 真实连接 | 写入/回答边界 |
 |---|---|---|
 | `lltm ingest run` | 配置 → Extractor/TwoStageExtractor → IngestionPipeline | 完整批量抽取、去重、持久化、可选时序消解与检查点 |
-| REST、Inspector、MCP | `MemoryService` | 共享搜索、读取、时间线、软遗忘和单轮抽取写入；REST 回答复用 MemoryRunner |
+| REST、Inspector、MCP | `MemoryService` | 共享搜索、读取、时间线、软遗忘和单轮抽取写入；REST 回答复用 MemoryRunner 的 `answer_request` 引擎 |
 | `demo-api/app.py` | `Playground` | 接收显式结构化事实，直接写入、嵌入和 resolve；原始 turns 单独写入；没有 LLM 抽取或自然语言回答 |
 
 `MemoryService.add_message()` 在配置 API key 后按需创建 `LiveTurnExtractor`，适配真实批量抽取器，并执行去重、出处关联、索引保存和可选时序消解；测试仍可注入 adapter。服务使用进程内 `RLock` 串行化共享资源访问，回答的 `limit` 作为参数传递。`/healthz` 在嵌入器不可用时返回 503，`/livez` 单独报告进程存活。上述修复于 2026-09-12 从未合入的审计分支接入当前工作区。
 
 REST 另有凭据身份边界、数据导出与命名空间硬删除，不能由“共享 MemoryService”推断这些 HTTP 功能已经暴露为 MCP 工具。参见 [identity.py](../src/llm_long_term_memory/api/identity.py) 和 [app.py](../src/llm_long_term_memory/api/app.py)。
 
-服务目前从 `evaluation/` 导入 `MemoryRunner`、`Instance` 和 prompt 版本，批处理也使用 LongMemEval 的类型。因此独立的 core/research 边界仍是目标，不是现状。
+core/research 边界已经部分建立，但尚未完成，下面是当前的准确状态。
+
+产品自有的对话类型在 [conversation.py](../src/llm_long_term_memory/conversation.py)：
+`ConversationTurn`、`ConversationSession`、`AnswerRequest` 和 `ConversationSource` 协议。
+LongMemEval 的 `HaystackTurn` / `HaystackSession` 继承前两者并加上基准自己的标签
+（`has_answer` 标记该轮是否含金标答案），依赖方向因此指向产品而非相反。回答契约
+——prompt、prompt 版本、结构化 verdict 和 `Answer` 记录——在
+[answering.py](../src/llm_long_term_memory/answering.py)，`evaluation/runners/base.py` 原样再导出。
+
+`MemoryRunner` 由此分成两半：`answer(instance)` 是评测适配器，`answer_request(request)` 是引擎，
+没有任何基准对象进入引擎。REST 回答走引擎，不再像以前那样构造一个 `answer=""`、
+`question_type="live"` 的假 `Instance`。ingest 全线不再依赖基准类型。
+
+仍然耦合的部分，以及为什么：`api/service.py` 仍按需 import `MemoryRunner`（引擎在物理上还位于
+`evaluation/runners/`），并为 golden run 指纹 import `JUDGE_PROMPT_VERSION`；
+`ingest/coverage.py` 和 `influence/runner.py` 确实按金标答案打分——它们是放错包的评测代码，
+不是 import 了基准的产品代码。
 
 评测由 `Runner.prepare()/answer()` 与 `Judge.grade()` 协作。full-context 基线使用完整会话；naive RAG 以**会话为块**取 top-5；MemoryRunner 复用已抽取的 store。普通回答不使用 gold labels；显式 oracle arm 是上限诊断。冻结、运行锁、检查点、usage 和 aggregate 由不同模块及脚本协作，不是独立在线服务。
 

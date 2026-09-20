@@ -14,7 +14,7 @@ import json
 from collections import Counter, defaultdict
 from dataclasses import asdict, dataclass
 
-from llm_long_term_memory.evaluation.datasets.longmemeval import HaystackSession, Instance
+from llm_long_term_memory.conversation import ConversationSession, ConversationSource
 from llm_long_term_memory.store import MemoryStore, external_session_id
 
 from .extract import _parse_date
@@ -135,7 +135,7 @@ class ZeroYieldReport:
         }
 
 
-def _format_issues(session: HaystackSession) -> tuple[str, ...]:
+def _format_issues(session: ConversationSession) -> tuple[str, ...]:
     issues: list[str] = []
     if _parse_date(session.date) is None:
         issues.append("invalid_date")
@@ -148,7 +148,7 @@ def _format_issues(session: HaystackSession) -> tuple[str, ...]:
     return tuple(issues)
 
 
-def _source_fingerprint(session: HaystackSession) -> str:
+def _source_fingerprint(session: ConversationSession) -> str:
     payload = {
         "date": session.date,
         "turns": [{"role": turn.role, "content": turn.content} for turn in session.turns],
@@ -158,7 +158,7 @@ def _source_fingerprint(session: HaystackSession) -> str:
     ).hexdigest()
 
 
-def _source_text_fingerprint(session: HaystackSession) -> str:
+def _source_text_fingerprint(session: ConversationSession) -> str:
     payload = [{"role": turn.role, "content": turn.content} for turn in session.turns]
     return hashlib.sha256(
         json.dumps(payload, ensure_ascii=False, sort_keys=True).encode("utf-8")
@@ -176,7 +176,7 @@ def memory_counts(store: MemoryStore, namespaces: set[str]) -> dict[tuple[str, s
 
 
 def audit_zero_yield(
-    instances: list[Instance],
+    sources: list[ConversationSource],
     progress: IngestProgress,
     counts: dict[tuple[str, str], int],
     *,
@@ -186,10 +186,10 @@ def audit_zero_yield(
     """Return evidence-backed categories for every terminal zero-yield session."""
     if batch_size < 1:
         raise ValueError("batch_size must be positive")
-    pairs = namespaced_sessions(instances)
+    pairs = namespaced_sessions(sources)
     blocked = progress.blocked_sessions
     terminal = progress.done_sessions | blocked
-    occurrences: dict[str, list[tuple[str, HaystackSession, str]]] = defaultdict(list)
+    occurrences: dict[str, list[tuple[str, ConversationSession, str]]] = defaultdict(list)
     positions: dict[str, int] = {}
     for namespace, sessions in group_by_namespace(pairs):
         for ordinal, session in enumerate(sessions):

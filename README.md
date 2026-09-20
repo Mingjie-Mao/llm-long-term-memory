@@ -1,86 +1,71 @@
-[![English](docs/badges/lang-en-active.svg)](README.md)[![中文](docs/badges/lang-zh-idle.svg)](README.zh-CN.md)
-
 # llm-long-term-memory
 
-A long-term memory engine for LLM applications: extract structured facts from past
-conversations, track how those facts change over time, and go back to the original turns
-when structured memory is missing a detail.
+一个面向 LLM 应用的长期记忆引擎：从历史对话中提取结构化事实，跟踪事实随时间的变化，并在结构化记忆缺少细节时回到原始对话恢复证据。
 
-It solves **long-term memory only**. It is not an agent's working memory, and it does not
-manage the current session's short-term context.
+它只解决**长期记忆**，不实现 Agent 的工作记忆，也不负责当前会话的短期上下文。
 
-[Live demo](https://lltm-memory.pages.dev) · [Architecture](docs/ARCHITECTURE.md) ·
-[Evaluation](docs/EVALUATION.md) · [Project report](docs/PROJECT_REPORT.md)
+[在线演示](https://lltm-memory.pages.dev) · [架构](docs/ARCHITECTURE.md) · [评测](docs/EVALUATION.md) · [实验索引](research/EXPERIMENT_INDEX.md) · [项目报告](docs/PROJECT_REPORT.md)
 
-> The demo runs the half that needs no LLM: local embeddings, cross-session retrieval and
-> temporal updates are real, facts are produced explicitly by browser sentence patterns,
-> and neither LLM extraction nor generated answers are shown.
+> 演示跑的是不带 LLM 的那半边：本地嵌入、跨会话检索和时间更新都是真的，事实由浏览器句式规则显式生成，不展示 LLM 自动抽取或生成答案。
 
-![System overview: conversations become structured memories while raw turns remain available for conditional source recovery](docs/figures/overview.svg)
+![系统总览：对话抽取与存储、独立问题查询、混合召回、候选记忆和条件原文回退](docs/figures/overview.zh-CN.svg)
 
-## Headline result
+## 核心结果
 
-The frozen v2 system on 100 unseen LongMemEval-S questions, one run per arm:
+冻结的 v2 在 100 道未见过的 LongMemEval-S 题目上，每臂一次：
 
-| Method | Accuracy | Median answer context |
+| 方法 | 正确率 | 中位回答上下文 |
 |---|---:|---:|
-| Full history | **86.0%** | 109,059 |
+| 整段历史 | **86.0%** | 109,059 |
 | **LLTM v2** | 72.0% | **574** |
-| Naive RAG | 65.0% | 12,763 |
+| naive RAG | 65.0% | 12,763 |
 
-**72% accuracy from roughly 1/190 of the context.** It is **not** shown to beat plain
-retrieval: +7 points over naive RAG at p = 0.3368. Full history beats it by 14 points at
-p = 0.0043.
+**用约 1/190 的上下文拿到 72% 的正确率。** 但它**没有**被证明显著优于 naive RAG：+7 个点，
+p = 0.3368；整段历史比它高 14 个点，p = 0.0043。
 
-Time is where the advantage is clearest — knowledge updates **75.0%**, temporal reasoning
-**74.1%**, against full history's 23.1% on temporal questions, because superseded facts
-are resolved into timelines before the model sees them rather than handed over to guess
-between.
+时间相关任务是目前最明确的优势——知识更新 **75.0%**、时间推理 **74.1%**，同期整段历史在
+时序题上只有 23.1%。
 
-Conventions, arms and statistics: [EVALUATION.md](docs/EVALUATION.md).
+完整口径、对照臂定义与统计结果见 [EVALUATION.md](docs/EVALUATION.md)。
 
-## How it works
+## 工作原理
 
 ```
-Conversation
+对话
   ↓
-Two-stage fact extraction
+两阶段事实抽取
   ↓
-Deduplication
+去重裁定
   ↓
-Temporal resolution
+时间状态更新
   ↓
-SQLite + vector index
+SQLite + 向量索引
   ↓
-Retrieval for this question
+按问题检索
   ↓
-Raw-conversation fallback when needed
+必要时回原始对话
   ↓
-Answer context
+回答上下文
 ```
 
-- **Structured facts** carry subject, attribute slot, value, scope, source and event time.
-- **Temporal state**: a new fact does not delete the old one, it closes the old one's
-  validity interval.
-- **History stays queryable**: `GET /v1/timeline` and `as_of()` replay past state.
-- **Hybrid recall**: semantic and BM25 both produce candidates; frozen v2 ranks on the
-  semantic signal alone — every other signal measured worse.
-- **Raw fallback**: when structured memory lacks a number, date or exact wording, the
-  original turns are searched again.
+- **结构化事实**：保存主体、属性槽位、值、范围、来源与事件时间。
+- **时间状态**：新事实不删除旧事实，而是关闭旧事实的有效区间。
+- **历史可回放**：`GET /v1/timeline` 与 `as_of()` 可以查询过去的状态。
+- **混合召回**：语义与 BM25 共同产生候选；冻结的 v2 最终排序只用语义信号（其余四路实测都更差）。
+- **原文回退**：结构化记忆缺少数字、日期或精确措辞时，重新搜索原始对话。
 
-Why it is built this way: [project report](docs/PROJECT_REPORT.md).
-Implementation: [ARCHITECTURE.md](docs/ARCHITECTURE.md).
+为什么这样设计，见[项目报告](docs/PROJECT_REPORT.md)；实现细节见 [ARCHITECTURE.md](docs/ARCHITECTURE.md)。
 
-## Quick start
+## 快速开始
 
-Python 3.11+ and [uv](https://docs.astral.sh/uv/):
+需要 Python 3.11+ 和 [uv](https://docs.astral.sh/uv/)：
 
 ```bash
 uv sync --group dev --extra api --extra llm --extra embed --extra mcp
 uv run uvicorn llm_long_term_memory.api.app:app --host 127.0.0.1 --port 8000
 ```
 
-Open <http://localhost:8000> for the inspector or <http://localhost:8000/docs> for the API.
+打开 <http://localhost:8000>（检查界面）或 <http://localhost:8000/docs>（接口文档）。
 
 ```bash
 curl -X POST http://localhost:8000/v1/memories/search \
@@ -88,61 +73,59 @@ curl -X POST http://localhost:8000/v1/memories/search \
   -d '{"user_id":"alice","query":"where do I live?","explain":true}'
 ```
 
-A fresh checkout ships no experiment database and no user data. Search needs only the
-local embedding model; `/v1/messages` and `/v1/answer` also need `GEMINI_API_KEY`.
+全新 checkout 不包含实验数据库或任何用户数据。检索只需要本地嵌入模型；
+`/v1/messages` 与 `/v1/answer` 另需 `GEMINI_API_KEY`。
 
 ## REST / MCP
 
 ```
-POST   /v1/messages           extract and store one turn
-POST   /v1/memories/search    ranked results, signals, provenance
-GET    /v1/memories           browse and inspect
-GET    /v1/timeline           full history of one attribute
-POST   /v1/raw/search         search the raw conversation archive
-POST   /v1/answer             answer online
-GET    /v1/export             export this namespace
-DELETE /v1/data               hard-delete this namespace's live data
+POST   /v1/messages           抽取并保存一轮消息
+POST   /v1/memories/search    排序结果、信号、出处
+GET    /v1/memories           浏览与检查
+GET    /v1/timeline           某个属性的完整变化史
+POST   /v1/raw/search         搜索原始对话档案
+POST   /v1/answer             在线回答
+GET    /v1/export             导出该命名空间的数据
+DELETE /v1/data               硬删除该命名空间的在线数据
 ```
 
 ```bash
 uv run lltm mcp
 ```
 
-Exposes `remember`, `search_memory`, `search_conversations`, `get_timeline` and `forget`,
-so another agent can use this as a standalone long-term memory tool. MCP stdio is for
-trusted local clients; its HTTP transport has no equivalent of the REST credential
-boundary and should stay on localhost.
+提供 `remember`、`search_memory`、`search_conversations`、`get_timeline`、`forget`，
+所以其他 agent 可以把它当成一个独立的长期记忆工具。MCP stdio 面向可信本地客户端；
+其 HTTP transport 没有等同 REST 的身份边界，应限制在本机。
 
-Auth, deletion semantics, account budgets and scheduled operations:
-[ARCHITECTURE.md](docs/ARCHITECTURE.md). Deployment: [DEPLOY.md](DEPLOY.md).
+认证、删除语义、账号额度与定时运维见 [ARCHITECTURE.md](docs/ARCHITECTURE.md)，
+部署见 [DEPLOY.md](DEPLOY.md)。
 
-## Limitations
+## 当前局限
 
-**The bottleneck is extraction, not retrieval.**
+**最大的瓶颈不是检索，是抽取。**
 
-- Detail retention is about 36.6%, and it is the first loss point for 10 of 14 analysed
-  failures.
-- Batch size dominates that number — 37.3% at fifteen sessions per extraction request
-  against 64.9% at eight. The candidate config is measured but has not replaced frozen v2.
-  See [the batch-size result](results/batch-size-result.md).
-- `event_time` is the session's date, not yet the fact's own.
-- No next-day test: nothing asks the same fact tomorrow in different words.
-- Full history is still more accurate on the frozen final test: 86% against 72%.
-- SQLite + a NumPy vector index is a research and integration prototype, not a
-  high-concurrency production store. Writes serialise within one process and the two
-  files can diverge.
-- Deduplication was not namespace-scoped; fixed 2026-09-16. **Stores built before the fix
-  cannot be resumed** — rebuild with `--fresh` or use a new store name.
+- 抽取保真度约 36.6%；已分析的 14 个失败里有 10 个首先发生在抽取阶段。
+- 批大小对抽取质量影响很大——每请求 15 个会话是 37.3%，8 个是 64.9%。候选配置已经测量，
+  但尚未替换冻结的 v2。见[批大小结果](results/batch-size-result.md)。
+- `event_time` 目前取的是会话日期，还不能表达事实自身的发生时间。
+- 尚未做"隔天换一种问法还能否找回来"的长期保持实验。
+- 整段历史在冻结终测上仍然更准：86% 对 72%。
+- SQLite + NumPy 向量索引是研究与集成原型，不是高并发生产存储；写入在单进程内串行，
+  两个文件可能彼此偏离。
+- 去重此前不按命名空间隔离，已于 2026-09-16 修复；**此前建的库不能续跑**，需 `--fresh`
+  重建或换库名。
 
-## Documentation
+## 文档
 
-| Document | Contents |
+| 文档 | 内容 |
 |---|---|
-| [PROJECT_REPORT.md](docs/PROJECT_REPORT.md) · [中文](docs/PROJECT_REPORT.zh-CN.md) | What the project solves, why it is designed this way, findings and open problems |
-| [ARCHITECTURE.md](docs/ARCHITECTURE.md) | System architecture, code mappings, auth and operational semantics |
-| [EVALUATION.md](docs/EVALUATION.md) | Splits, method and statistical results |
-| [DEPLOY.md](DEPLOY.md) | Deployment, backup and restore |
+| [PROJECT_REPORT.md](docs/PROJECT_REPORT.md) | 项目在解决什么、为什么这样设计、研究结论与当前问题 |
+| [ARCHITECTURE.md](docs/ARCHITECTURE.md) | 系统架构、代码定位、认证与运维语义 |
+| [EVALUATION.md](docs/EVALUATION.md) | 数据切分、实验方法与统计结果 |
+| [EXPERIMENT_INDEX.md](research/EXPERIMENT_INDEX.md) | 实验状态、证据入口与允许的后续动作 |
+| [REPOSITORY_AUDIT.md](docs/REPOSITORY_AUDIT.md) | 仓库行数来源、代码边界与瘦身计划 |
+| [DEPLOY.md](DEPLOY.md) | 部署、备份与恢复 |
 
-## License
+## 许可
 
 [MIT](LICENSE)

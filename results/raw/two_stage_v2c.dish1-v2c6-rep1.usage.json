@@ -1,0 +1,67 @@
+{
+  "summary": {
+    "total_requests": 4,
+    "total_tokens": 4103,
+    "failures": 1,
+    "by_role": {
+      "answerer": {
+        "role": "answerer",
+        "calls": 3,
+        "failures": 1,
+        "input_tokens": 3835,
+        "output_tokens": 32,
+        "p50_ms": 1095.5427922308445,
+        "p95_ms": 1493.3675830252469,
+        "max_ms": 1493.3675830252469
+      },
+      "judge": {
+        "role": "judge",
+        "calls": 1,
+        "failures": 0,
+        "input_tokens": 196,
+        "output_tokens": 40,
+        "p50_ms": 26334.839791990817,
+        "p95_ms": 26334.839791990817,
+        "max_ms": 26334.839791990817
+      }
+    }
+  },
+  "calls": [
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 1018.713291734457,
+      "ok": false,
+      "error": "ClientError: 400 INVALID_ARGUMENT. {'error': {'code': 400, 'message': 'Request contains an invalid argument.', 'status': 'INVALID_ARGUMENT'}}"
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 1663,
+      "output_tokens": 28,
+      "latency_ms": 1493.3675830252469,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 2172,
+      "output_tokens": 4,
+      "latency_ms": 1095.5427922308445,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 196,
+      "output_tokens": 40,
+      "latency_ms": 26334.839791990817,
+      "ok": true,
+      "error": null
+    }
+  ]
+}

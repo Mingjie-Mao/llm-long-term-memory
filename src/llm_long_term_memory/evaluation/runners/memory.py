@@ -21,6 +21,7 @@ from time import perf_counter
 
 import numpy as np
 
+from llm_long_term_memory.conversation import AnswerRequest
 from llm_long_term_memory.embed import Encoder
 from llm_long_term_memory.evaluation.datasets.longmemeval import Instance
 from llm_long_term_memory.llm.client import GeminiClient
@@ -57,6 +58,15 @@ from .synthesis import (
     SynthesisVerdict,
     compute,
     missing_field_is_narration,
+)
+from .v2c import V2C_ANSWER_PROMPT_VERSION, V2C_ANSWER_SYSTEM
+from .v2d import (
+    V2D_ANSWER_PROMPT_VERSION,
+    V2D_ANSWER_SYSTEM,
+    V2DVerdict,
+)
+from .v2d import (
+    compute as compute_v2d,
 )
 
 _TEMPLATE = """\
@@ -302,7 +312,14 @@ class MemoryRunner:
         if oracle_session_context and session_budget is None:
             raise ValueError("oracle_session_context requires a session_budget")
         self.oracle_session_context = oracle_session_context
-        if answer_policy not in {"v2", "reasoned_v3", "synthesis_v4", "synthesis_v4_enumerate"}:
+        if answer_policy not in {
+            "v2",
+            "v2c",
+            "v2d",
+            "reasoned_v3",
+            "synthesis_v4",
+            "synthesis_v4_enumerate",
+        }:
             raise ValueError(f"unknown answer policy {answer_policy!r}")
         self.answer_policy = answer_policy
         # Attempt 1 bundled three answerer changes and moved in two directions.
@@ -334,11 +351,13 @@ class MemoryRunner:
                 SYNTHESIS_ENUMERATE_PROMPT_VERSION,
                 EnumeratingSynthesisVerdict,
             ),
+            "v2c": (V2C_ANSWER_SYSTEM, V2C_ANSWER_PROMPT_VERSION, AnswerVerdict),
+            "v2d": (V2D_ANSWER_SYSTEM, V2D_ANSWER_PROMPT_VERSION, V2DVerdict),
         }[answer_policy]
         # Labels are rendered only for the arm that cites them. An arm that carries them
         # without using them would differ from its control by a changed context and
         # nothing else, which is a second variable bought for no mechanism.
-        self.label_context = answer_policy == "synthesis_v4_enumerate"
+        self.label_context = answer_policy in {"synthesis_v4_enumerate", "v2d"}
         self._context_labels: set[str] = set()
         self.retriever = HybridRetriever(
             store,
@@ -471,6 +490,37 @@ class MemoryRunner:
         return pack(candidates, utilities, self.token_budget, type_floors=self.type_floors)
 
     def answer(self, instance: Instance, *, limit: int | None = None) -> Answer:
+        """The evaluation interface: one benchmark instance in, one scored answer out.
+
+        Everything the engine below needs is the question, the day it is asked and the
+        tenant it is asked of. `answer_session_ids` is gold and is passed separately,
+        because only two things use it — the validation-only oracle context, and the
+        recall note the report is written from — and neither is part of answering.
+        """
+        return self.answer_request(
+            AnswerRequest(
+                question=instance.question,
+                asked_on=instance.question_date,
+                user_id=instance.store_namespace,
+            ),
+            limit=limit,
+            evidence_session_ids=tuple(instance.answer_session_ids),
+        )
+
+    def answer_request(
+        self,
+        request: AnswerRequest,
+        *,
+        limit: int | None = None,
+        evidence_session_ids: tuple[str, ...] = (),
+    ) -> Answer:
+        """Answer a live question. No benchmark object reaches this path.
+
+        This is the seam the product uses: the API used to fabricate an `Instance`
+        with an empty gold answer to get here, which made the answer path unreadable
+        without the benchmark and put a field named `answer` — meaning the correct
+        one — inside a live request.
+        """
         # Reset per question, not per runner. A derivation left over from the previous
         # question would be recorded against this one, and it would look plausible.
         self._computation: dict | None = None
@@ -482,22 +532,22 @@ class MemoryRunner:
 
             apply_decay(
                 self.store,
-                instance.store_namespace,
+                request.user_id,
                 now=now,
                 halflife_days=self.decay_halflife_days,
             )
         retrieval_started = perf_counter()
-        query_vector = self.encoder.encode_one(instance.question)
+        query_vector = self.encoder.encode_one(request.question)
         retrieved, trace = self._retrieve_with_trace(
             query_vector,
-            instance.question,
-            instance.store_namespace,
+            request.question,
+            request.user_id,
             limit=limit,
             # The question's own date, not the wall clock. On this benchmark the
             # difference is total: on a corpus measured against today, 0 of 2,550 memories
             # score above 0.01 at the shipped half-life; measured against the corpus
             # itself, 182 do.
-            as_of=_as_of(instance.question_date),
+            as_of=_as_of(request.asked_on),
         )
         retrieval_latency_ms = (perf_counter() - retrieval_started) * 1000
         selected = [hit.memory for hit in retrieved]
@@ -509,7 +559,7 @@ class MemoryRunner:
             # decides which conversations they belong to and hands over each one
             # whole, in the order it happened.
             by_session: dict[str, list[Memory]] = {}
-            for memory in self.store.iter_all(instance.store_namespace):
+            for memory in self.store.iter_all(request.user_id):
                 if memory.source_session_id:
                     by_session.setdefault(memory.source_session_id, []).append(memory)
             forced_sessions = None
@@ -519,7 +569,7 @@ class MemoryRunner:
                 }
                 forced_sessions = [
                     internal_by_external[session_id]
-                    for session_id in instance.answer_session_ids
+                    for session_id in evidence_session_ids
                     if session_id in internal_by_external
                 ]
             coherent = build_coherent_context(
@@ -541,32 +591,54 @@ class MemoryRunner:
         assembly_started = perf_counter()
         packed = None
         if self.token_budget:
-            packed = self._pack(selected, retrieved_by_id, instance.question)
+            packed = self._pack(selected, retrieved_by_id, request.question)
             selected = packed.selected
 
+        v2c_plan = None
+        if self.answer_policy in {"v2c", "v2d"}:
+            from .v2c import plan as plan_v2c
+
+            v2c_plan = plan_v2c(request.question, selected)
+            selected = v2c_plan.memories
+
         operation = (
-            reasoning_kind(instance.question) if self.answer_policy == "reasoned_v3" else None
+            reasoning_kind(request.question) if self.answer_policy == "reasoned_v3" else None
         )
         hydrate_for_reasoning = self.adaptive_reasoning_hydration and operation in {
             "temporal",
             "multi_session_aggregation",
             "current_state",
         }
-        context, hydration = self._assemble_context(selected, force_hydration=hydrate_for_reasoning)
+        hydrate_for_detail = False
+        context, hydration = self._assemble_context(
+            selected, force_hydration=hydrate_for_reasoning or hydrate_for_detail
+        )
+        if v2c_plan and v2c_plan.context_note:
+            context = f"{v2c_plan.context_note}\n\n{context}"
+        detail_evidence = None
+        if v2c_plan and v2c_plan.detail_hydration_reason and self.fallback is not None:
+            detail_evidence = self.fallback.recover_local_detail(
+                request.user_id, request.question, selected
+            )
+            if detail_evidence.used:
+                context = (
+                    f"{context}\n\nQuestion-specific verbatim source evidence:\n"
+                    f"{detail_evidence.render(max_chars=self.raw_fallback_max_chars)}"
+                )
         assembly_latency_ms = (perf_counter() - assembly_started) * 1000
-        if self.fallback is not None:
+        if self.fallback is not None or self.answer_policy == "v2d":
             completion, answer_text, verdict, raw_evidence = self._answer_with_fallback(
-                instance, context, selected
+                request, context, selected
             )
         else:
-            completion = self._complete(instance, context)
+            completion = self._complete(request, context)
             answer_text, verdict, raw_evidence = completion.text.strip(), None, None
         if self.decay_enabled:
             self.store.record_access(
                 [memory.id for memory in selected], now, reinforcement=self.reinforcement
             )
 
-        evidence = set(instance.answer_session_ids)
+        evidence = set(evidence_session_ids)
         candidate_sessions = _external_session_ids(trace.candidate_session_ids)
         ranked_sessions = _external_session_ids(hit.memory.source_session_id for hit in retrieved)
         selected_sessions = _external_session_ids(m.source_session_id for m in selected)
@@ -646,7 +718,7 @@ class MemoryRunner:
                     "ranked": bool(evidence & ranked_sessions),
                     "selected": bool(evidence & selected_sessions),
                     "hydrated": bool(evidence & hydrated_sessions)
-                    if self.evidence_hydration or hydrate_for_reasoning
+                    if self.evidence_hydration or hydrate_for_reasoning or hydrate_for_detail
                     else None,
                 },
                 "recall_coverage": {
@@ -654,7 +726,7 @@ class MemoryRunner:
                     "ranked": _session_coverage(evidence, ranked_sessions),
                     "selected": _session_coverage(evidence, selected_sessions),
                     "hydrated": _session_coverage(evidence, hydrated_sessions)
-                    if self.evidence_hydration or hydrate_for_reasoning
+                    if self.evidence_hydration or hydrate_for_reasoning or hydrate_for_detail
                     else None,
                 },
                 "all_source_sessions_recalled": (
@@ -684,6 +756,18 @@ class MemoryRunner:
                 ),
                 "answer_status": verdict.status if verdict else None,
                 "answer_policy": self.answer_policy,
+                "v2c": None
+                if v2c_plan is None
+                else {
+                    "suppressed_update_ids": v2c_plan.suppressed_update_ids,
+                    "timeline_ids": v2c_plan.timeline_ids,
+                    "detail_hydration_reason": v2c_plan.detail_hydration_reason,
+                    "detail_hydration_applied": bool(detail_evidence and detail_evidence.used),
+                    "detail_source_turns": [
+                        f"{external_session_id(turn.session_id)}:{turn.turn_index}"
+                        for turn in (detail_evidence.turns if detail_evidence else [])
+                    ],
+                },
                 "reasoning_kind": operation,
                 "answer_confidence": getattr(verdict, "confidence", None),
                 "answer_evidence_summary": getattr(verdict, "evidence_summary", None),
@@ -723,9 +807,21 @@ class MemoryRunner:
         )
 
     def answer_with_memories(self, instance: Instance, memories: list[Memory]) -> str:
-        """Answer a fixed memory set without retrieval or lifecycle side effects."""
+        """Answer a fixed memory set without retrieval or lifecycle side effects.
+
+        Influence measurement removes one memory at a time and asks again, so this
+        takes the set rather than finding it. It keeps the evaluation signature
+        because that is the only thing that calls it.
+        """
         context, _ = self._assemble_context(memories)
-        completion = self._complete(instance, context)
+        completion = self._complete(
+            AnswerRequest(
+                question=instance.question,
+                asked_on=instance.question_date,
+                user_id=instance.store_namespace,
+            ),
+            context,
+        )
         return completion.text.strip()
 
     def _assemble_context(
@@ -774,13 +870,13 @@ Question: {question}
             return "I do not know."
         return text or "I do not know."
 
-    def _answer_with_fallback(self, instance: Instance, context: str, selected: list[Memory]):
+    def _answer_with_fallback(self, request: AnswerRequest, context: str, selected: list[Memory]):
         """One LLM call when memory suffices, two when it does not.
 
         Both `need_source` and `no_evidence` can search the raw archive. A second
         model call is made only when that search recovers evidence.
         """
-        first = self._complete(instance, context, structured=True)
+        first = self._complete(request, context, structured=True)
         try:
             verdict = self.verdict_schema.model_validate_json(first.text)
         except ValueError:
@@ -818,8 +914,8 @@ Question: {question}
             return first, final, verdict, None
 
         evidence = self.fallback.recover(
-            instance.store_namespace,
-            verdict.source_query or instance.question,
+            request.user_id,
+            verdict.source_query or request.question,
             selected if verdict.status == "need_source" else [],
         )
         if not evidence.used:
@@ -833,15 +929,33 @@ Question: {question}
                 f"{context}\n\nThe first pass requested source because: "
                 f"{verdict.reason or 'the requested detail was missing'}\n\n"
                 f"Verbatim source evidence:\n{rendered_evidence}",
-                instance.question_date,
-                instance.question,
+                request.asked_on,
+                request.question,
+            )
+        elif self.answer_policy in {"v2c", "v2d"}:
+            # v2c's query-time rules and deterministic source hydration live in
+            # `context`. The generic fallback template used to discard both, so the
+            # final answerer never saw the very repair that triggered the second pass.
+            # Keep the complete first-pass evidence plan and add, rather than replace
+            # it with, fallback evidence.
+            prompt = _TEMPLATE.format(
+                context=(
+                    f"{context}\n\nThe first pass requested more source because: "
+                    f"{verdict.reason or 'the requested detail was missing'}\n\n"
+                    f"Additional verbatim source evidence:\n{rendered_evidence}\n\n"
+                    "Final exact-reference reminder: if no candidate satisfies every "
+                    "qualifier, do not force a match. State the source conflict and "
+                    "distinguish the candidates."
+                ),
+                date=request.asked_on,
+                question=request.question,
             )
         else:
             prompt = self._FALLBACK_TEMPLATE.format(
                 reason=verdict.reason or "the requested detail was missing",
                 evidence=rendered_evidence,
-                date=instance.question_date,
-                question=instance.question,
+                date=request.asked_on,
+                question=request.question,
             )
         second = self.client.generate(
             role="answerer",
@@ -852,7 +966,9 @@ Question: {question}
             # the model dutifully emitted JSON and it became the answer text on 9 of the
             # 18 leaked rows. The second pass only ever needs prose.
             system=(
-                ANSWER_SYSTEM
+                V2C_ANSWER_SYSTEM
+                if self.answer_policy == "v2d"
+                else ANSWER_SYSTEM
                 if self.answer_policy in {"synthesis_v4", "synthesis_v4_enumerate"}
                 else self.answer_system
             ),
@@ -874,6 +990,10 @@ Question: {question}
         earlier does not say which described event it belongs to — so its derivation is
         recorded and the wording is left alone.
         """
+        if self.answer_policy == "v2d":
+            result = compute_v2d(verdict, self._context_labels)
+            self._computation = result.detail
+            return result.answer if result.computed and result.answer else text
         if self.answer_policy not in {"synthesis_v4", "synthesis_v4_enumerate"}:
             return text
         result = compute(
@@ -885,14 +1005,14 @@ Question: {question}
             return result.answer
         return text
 
-    def _complete(self, instance: Instance, context: str, structured: bool = False):
+    def _complete(self, request: AnswerRequest, context: str, structured: bool = False):
         prompt = (
-            render_reasoned_prompt(context, instance.question_date, instance.question)
+            render_reasoned_prompt(context, request.asked_on, request.question)
             if self.answer_policy == "reasoned_v3"
             else _TEMPLATE.format(
                 context=context,
-                date=instance.question_date,
-                question=instance.question,
+                date=request.asked_on,
+                question=request.question,
             )
         )
         completion = self.client.generate(

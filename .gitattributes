@@ -31,6 +31,18 @@
 # Evidence: probe sets, archived runs, freezes, manifests, audit records.
 results/** -text
 
+# GitHub language statistics should not count machine-produced evidence as product
+# source. Markdown protocols and hand-written result reports remain ordinary text; only
+# generated data, rows, plots, arrays, and frozen source bundles are marked generated.
+results/**/*.json linguist-generated=true
+results/**/*.jsonl linguist-generated=true
+results/**/*.csv linguist-generated=true
+results/**/*.svg linguist-generated=true
+results/**/*.npy linguist-generated=true
+results/**/source.tar.gz linguist-generated=true
+docs/figures/**/*.svg linguist-generated=true
+docs/badges/*.svg linguist-generated=true
+
 # Source, tests and configuration. The freeze manifests record a digest per source file
 # and `verify` refuses a run whose frozen source no longer matches; `tests/**` is here
 # because `release.json`'s `measured_tree_sha256` covers it, and a Windows checkout that

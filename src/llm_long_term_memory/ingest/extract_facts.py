@@ -26,7 +26,7 @@ from typing import Literal
 
 from pydantic import BaseModel, Field, field_validator
 
-from llm_long_term_memory.evaluation.datasets.longmemeval import HaystackSession
+from llm_long_term_memory.conversation import ConversationSession
 from llm_long_term_memory.llm.client import GeminiClient
 
 #   two-stage-v1   user-profile framing; subject derived from a string prefix
@@ -231,7 +231,7 @@ class FactsResult(BaseModel):
     sessions: list[SessionFacts] = Field(default_factory=list)
 
 
-def render_batch(sessions: list[HaystackSession]) -> str:
+def render_batch(sessions: list[ConversationSession]) -> str:
     blocks = []
     for i, sess in enumerate(sessions):
         turns = "\n".join(f"{t.role}: {t.content}" for t in sess.turns)
@@ -258,7 +258,7 @@ class FactExtractor:
         self.model = model
         self.chars_per_token = chars_per_token
 
-    def extract(self, sessions: list[HaystackSession]) -> FactExtractionOutcome:
+    def extract(self, sessions: list[ConversationSession]) -> FactExtractionOutcome:
         if not sessions:
             return FactExtractionOutcome({}, 0)
 

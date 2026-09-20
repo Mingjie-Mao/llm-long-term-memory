@@ -24,6 +24,14 @@ away. That is a real and common failure mode, it is invisible end-to-end until i
 has already cost accuracy, and this catches it for a few requests. Read movement in
 the number, not its level, and never tune the extraction prompt to raise it past
 the point where the details are being kept.
+
+
+This measures extraction against the benchmark's gold answers, so it is
+evaluation, not ingestion, and it lived under `ingest/` only because it is run
+before an ingest. Nothing in `ingest/` imports the benchmark any more; this was
+the last thing there that did, and moving it made the statement true rather than
+nearly true. `lltm ingest coverage` is unchanged: where the code lives is not
+where the operator looks for it.
 """
 
 from __future__ import annotations

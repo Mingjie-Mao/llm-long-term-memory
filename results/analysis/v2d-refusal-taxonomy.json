@@ -1,0 +1,163 @@
+{
+  "rows": "results/raw/two_stage_v2d.v2d-gate16.jsonl",
+  "questions": 16,
+  "computed": 2,
+  "no_calculation_requested": 3,
+  "no_computation_record": 2,
+  "refused": 9,
+  "refused_and_wrong": 6,
+  "by_cause": {
+    "unclassifiable_legacy_row": 9
+  },
+  "by_operation": {
+    "average": 1,
+    "count": 4,
+    "difference": 1,
+    "duration": 1,
+    "sum": 2
+  },
+  "unclassifiable": 9,
+  "diagnosable": 0,
+  "per_question": {
+    "001be529": {
+      "outcome": "no_calculation_requested",
+      "operation": "lookup",
+      "correct": true
+    },
+    "2e6d26dc": {
+      "outcome": "refused",
+      "operation": "count",
+      "reason": "an item has no valid source label",
+      "cause": "unclassifiable_legacy_row",
+      "could_be": [
+        "member_text_empty",
+        "label_not_in_context"
+      ],
+      "correct": true
+    },
+    "d23cf73b": {
+      "outcome": "refused",
+      "operation": "count",
+      "reason": "an item has no valid source label",
+      "cause": "unclassifiable_legacy_row",
+      "could_be": [
+        "member_text_empty",
+        "label_not_in_context"
+      ],
+      "correct": false
+    },
+    "d682f1a2": {
+      "outcome": "refused",
+      "operation": "count",
+      "reason": "an item has no valid source label",
+      "cause": "unclassifiable_legacy_row",
+      "could_be": [
+        "member_text_empty",
+        "label_not_in_context"
+      ],
+      "correct": false
+    },
+    "gpt4_d12ceb0e": {
+      "outcome": "refused",
+      "operation": "average",
+      "reason": "numeric operands are invalid",
+      "cause": "unclassifiable_legacy_row",
+      "could_be": [
+        "operand_arrays_misaligned",
+        "numeric_unparseable",
+        "label_not_in_context",
+        "too_few_operands"
+      ],
+      "correct": false
+    },
+    "9d25d4e0": {
+      "outcome": "refused",
+      "operation": "count",
+      "reason": "an item has no valid source label",
+      "cause": "unclassifiable_legacy_row",
+      "could_be": [
+        "member_text_empty",
+        "label_not_in_context"
+      ],
+      "correct": false
+    },
+    "gpt4_2f91af09": {
+      "outcome": "computed",
+      "operation": "sum",
+      "correct": true
+    },
+    "1192316e": {
+      "outcome": "refused",
+      "operation": "sum",
+      "reason": "numeric operands are invalid",
+      "cause": "unclassifiable_legacy_row",
+      "could_be": [
+        "operand_arrays_misaligned",
+        "numeric_unparseable",
+        "label_not_in_context",
+        "too_few_operands"
+      ],
+      "correct": true
+    },
+    "c18a7dc8": {
+      "outcome": "refused",
+      "operation": "difference",
+      "reason": "numeric operands are invalid",
+      "cause": "unclassifiable_legacy_row",
+      "could_be": [
+        "operand_arrays_misaligned",
+        "numeric_unparseable",
+        "label_not_in_context",
+        "too_few_operands"
+      ],
+      "correct": true
+    },
+    "gpt4_59149c77": {
+      "outcome": "refused",
+      "operation": "duration",
+      "reason": "a date operand or citation is invalid",
+      "cause": "unclassifiable_legacy_row",
+      "could_be": [
+        "date_unparseable",
+        "label_not_in_context"
+      ],
+      "correct": false
+    },
+    "0db4c65d": {
+      "outcome": "computed",
+      "operation": "duration",
+      "correct": true
+    },
+    "gpt4_a1b77f9c": {
+      "outcome": "refused",
+      "operation": "sum",
+      "reason": "numeric operands are invalid",
+      "cause": "unclassifiable_legacy_row",
+      "could_be": [
+        "operand_arrays_misaligned",
+        "numeric_unparseable",
+        "label_not_in_context",
+        "too_few_operands"
+      ],
+      "correct": false
+    },
+    "031748ae": {
+      "outcome": "no_calculation_requested",
+      "operation": "lookup",
+      "correct": false
+    },
+    "60bf93ed_abs": {
+      "outcome": "no_computation_record",
+      "correct": true
+    },
+    "7e00a6cb": {
+      "outcome": "no_calculation_requested",
+      "operation": "lookup",
+      "correct": true
+    },
+    "0e5e2d1a": {
+      "outcome": "no_computation_record",
+      "correct": false
+    }
+  }
+}

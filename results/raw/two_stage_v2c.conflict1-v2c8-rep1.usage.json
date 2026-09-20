@@ -1,0 +1,76 @@
+{
+  "summary": {
+    "total_requests": 5,
+    "total_tokens": 2056,
+    "failures": 3,
+    "by_role": {
+      "answerer": {
+        "role": "answerer",
+        "calls": 2,
+        "failures": 1,
+        "input_tokens": 1722,
+        "output_tokens": 67,
+        "p50_ms": 1084.5596250146627,
+        "p95_ms": 2102.706290781498,
+        "max_ms": 2102.706290781498
+      },
+      "judge": {
+        "role": "judge",
+        "calls": 3,
+        "failures": 2,
+        "input_tokens": 242,
+        "output_tokens": 25,
+        "p50_ms": 22746.615750249475,
+        "p95_ms": 40337.03833306208,
+        "max_ms": 40337.03833306208
+      }
+    }
+  },
+  "calls": [
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 1084.5596250146627,
+      "ok": false,
+      "error": "ClientError: 400 INVALID_ARGUMENT. {'error': {'code': 400, 'message': 'Request contains an invalid argument.', 'status': 'INVALID_ARGUMENT'}}"
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 1722,
+      "output_tokens": 67,
+      "latency_ms": 2102.706290781498,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 945.138375274837,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 40337.03833306208,
+      "ok": false,
+      "error": "ServerError: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 242,
+      "output_tokens": 25,
+      "latency_ms": 22746.615750249475,
+      "ok": true,
+      "error": null
+    }
+  ]
+}

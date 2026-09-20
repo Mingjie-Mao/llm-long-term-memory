@@ -1,0 +1,121 @@
+{
+  "decision": "PASS",
+  "questions": 48,
+  "correct": 37,
+  "configured_judge_accuracy": 0.7708333333333334,
+  "invalid_items": [
+    "778164c6"
+  ],
+  "valid_item_accuracy": 0.7659574468085106,
+  "type_accuracy": {
+    "knowledge-update": 0.875,
+    "multi-session": 0.5833333333333334,
+    "single-session-assistant": 0.8333333333333334,
+    "single-session-preference": 1.0,
+    "single-session-user": 0.8333333333333334,
+    "temporal-reasoning": 0.75
+  },
+  "median_context_tokens": 636,
+  "source_session_recall": 0.9583333333333334,
+  "fallback_levels": {
+    "none": 38,
+    "archive_wide": 9,
+    "source_local": 1
+  },
+  "checks": {
+    "overall": true,
+    "knowledge-update": true,
+    "multi-session": true,
+    "single-session-assistant": true,
+    "single-session-preference": true,
+    "single-session-user": true,
+    "temporal-reasoning": true,
+    "median_context_tokens": true,
+    "source_session_recall": true
+  },
+  "thresholds": {
+    "overall": 0.75,
+    "knowledge-update": 0.875,
+    "temporal-reasoning": 0.75,
+    "multi-session": 0.5,
+    "single-session-assistant": 0.75,
+    "single-session-preference": 0.75,
+    "single-session-user": 0.75,
+    "median_context_tokens_max": 900,
+    "source_session_recall": 0.95
+  },
+  "failure_taxonomy": {
+    "false_premise": [
+      "0ddfec37_abs",
+      "gpt4_70e84552_abs"
+    ],
+    "composition_or_arithmetic": [
+      "a4996e51",
+      "a9f6b44c",
+      "d905b33f",
+      "gpt4_2f8be40d",
+      "gpt4_74aed68e",
+      "gpt4_7a0daae1"
+    ],
+    "source_detail_selection": [
+      "58ef2f1c",
+      "dd2973ad"
+    ],
+    "retrieval_miss": [
+      "e48988bc"
+    ]
+  },
+  "comparison": {
+    "v2_control_majority_accuracy": 0.6875,
+    "v3_reasoned_majority_accuracy": 0.7291666666666666,
+    "delta_vs_v2_control_majority": 0.08333333333333337,
+    "delta_vs_v3_reasoned_majority": 0.04166666666666674,
+    "note": "v2c.8 is one run; archived comparators are three-run majority results."
+  },
+  "usage": {
+    "ingest_increment": {
+      "total_requests": 474,
+      "total_tokens": 4802473,
+      "failures": 31,
+      "by_role": {
+        "extractor": {
+          "role": "extractor",
+          "calls": 474,
+          "failures": 31,
+          "input_tokens": 4116896,
+          "output_tokens": 685577,
+          "p50_ms": 6083.311915863305,
+          "p95_ms": 13975.961583200842,
+          "max_ms": 53509.25908284262
+        }
+      }
+    },
+    "qa": {
+      "total_requests": 192,
+      "total_tokens": 93160,
+      "failures": 82,
+      "by_role": {
+        "answerer": {
+          "role": "answerer",
+          "calls": 67,
+          "failures": 5,
+          "input_tokens": 77987,
+          "output_tokens": 2989,
+          "p50_ms": 1240.6468749977648,
+          "p95_ms": 10851.40687506646,
+          "max_ms": 19837.976041715592
+        },
+        "judge": {
+          "role": "judge",
+          "calls": 125,
+          "failures": 77,
+          "input_tokens": 10599,
+          "output_tokens": 1585,
+          "p50_ms": 8029.0235839784145,
+          "p95_ms": 31819.445707835257,
+          "max_ms": 49265.27649955824
+        }
+      }
+    }
+  }
+}

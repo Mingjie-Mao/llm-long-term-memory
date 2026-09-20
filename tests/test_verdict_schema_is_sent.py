@@ -12,9 +12,11 @@ construction. Eight of the nine gates tested something; that one did not.
 
 from __future__ import annotations
 
+from llm_long_term_memory.conversation import AnswerRequest
 from llm_long_term_memory.evaluation.runners.base import AnswerVerdict
 from llm_long_term_memory.evaluation.runners.reasoning import ReasonedAnswerVerdict
 from llm_long_term_memory.evaluation.runners.synthesis import SynthesisVerdict
+from llm_long_term_memory.evaluation.runners.v2d import V2DVerdict
 
 
 class _RecordingClient:
@@ -49,14 +51,13 @@ def _runner(policy: str):
         "v2": AnswerVerdict,
         "reasoned_v3": ReasonedAnswerVerdict,
         "synthesis_v4": SynthesisVerdict,
+        "v2d": V2DVerdict,
     }[policy]
     return runner
 
 
-class _Instance:
-    question = "how many?"
-    question_date = "2026/01/01"
-    question_id = "q1"
+def _request() -> AnswerRequest:
+    return AnswerRequest(question="how many?", asked_on="2026/01/01", user_id="q1")
 
 
 def test_each_policy_sends_the_schema_it_parses_with():
@@ -64,16 +65,17 @@ def test_each_policy_sends_the_schema_it_parses_with():
         ("v2", AnswerVerdict),
         ("reasoned_v3", ReasonedAnswerVerdict),
         ("synthesis_v4", SynthesisVerdict),
+        ("v2d", V2DVerdict),
     ):
         runner = _runner(policy)
-        runner._complete(_Instance(), "some context", structured=True)
+        runner._complete(_request(), "some context", structured=True)
         sent = runner.client.calls[-1].get("schema")
         assert sent is expected, f"{policy} sent {sent}, parses with {expected}"
 
 
 def test_an_unstructured_call_sends_no_schema():
     runner = _runner("v2")
-    runner._complete(_Instance(), "some context")
+    runner._complete(_request(), "some context")
     assert "schema" not in runner.client.calls[-1]
 
 
@@ -82,3 +84,4 @@ def test_the_subclasses_really_do_add_fields():
     base = set(AnswerVerdict.model_fields)
     assert set(ReasonedAnswerVerdict.model_fields) - base
     assert set(SynthesisVerdict.model_fields) - base
+    assert set(V2DVerdict.model_fields) - base

@@ -40,7 +40,10 @@ def _invoke_ingest(monkeypatch, tmp_path, outcome: IngestOutcome | BaseException
     monkeypatch.setenv("LLTM_STORE_DIR", str(tmp_path / "stores"))
     monkeypatch.setenv("LLTM_RESULTS_DIR", str(tmp_path / "results"))
     monkeypatch.setattr(embed_module, "Encoder", StubEncoder)
-    monkeypatch.setattr("llm_long_term_memory.cli.lme.load", lambda *args, **kwargs: [_instance()])
+    monkeypatch.setattr(
+        "llm_long_term_memory.evaluation.datasets.longmemeval.load",
+        lambda *args, **kwargs: [_instance()],
+    )
 
     class StubPipeline:
         def __init__(self, *args, **kwargs):
@@ -91,7 +94,7 @@ def test_ingest_cli_reports_a_concurrent_writer_without_a_traceback(monkeypatch,
         raise AlreadyRunning("another ingest owns this store")
         yield
 
-    monkeypatch.setattr("llm_long_term_memory.cli.exclusive", occupied)
+    monkeypatch.setattr("llm_long_term_memory.commands.common.exclusive", occupied)
     result = _invoke_ingest(
         monkeypatch,
         tmp_path,

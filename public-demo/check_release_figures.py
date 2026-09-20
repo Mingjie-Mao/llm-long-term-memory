@@ -73,14 +73,46 @@ def measure() -> dict[str, int]:
         print("FAIL: could not read a coverage total")
         print(run.stdout[-1500:])
         raise SystemExit(1)
-    # The public label is "automated tests", not "passed tests". Four optional
+    # The public label is "automated tests", not "passed tests". Some optional
     # artifact replays require a private store absent from CI. Count those collected
     # tests too, while requiring a successful suite exit above on every platform.
     skipped = re.search(r"(\d+) skipped", run.stdout)
+    collected = int(passed.group(1)) + (int(skipped.group(1)) if skipped else 0)
+    documents = document_checks()
     return {
-        "tests": int(passed.group(1)) + (int(skipped.group(1)) if skipped else 0),
+        # Engineering tests only. The figure used to include one case per tracked
+        # Markdown file, so committing a batch of pre-registrations raised "tests" by
+        # 38 while nothing about the engine had been tested — the number tracked what
+        # was in the repository, not what was checked about the code. Reported
+        # separately rather than dropped: the documents really are checked.
+        "tests": collected - documents,
+        "document_checks": documents,
         "line_coverage": int(total.group(1)),
     }
+
+
+# The one test parametrised over every tracked document. Named rather than matched by
+# pattern: if it is renamed, this must fail loudly instead of quietly counting its
+# cases as engineering tests again.
+DOCUMENT_TEST = "tests/test_markdown_renders.py::test_no_emphasis_marker_survives_rendering"
+
+
+def document_checks() -> int:
+    """How many documents the suite renders and checks, counted without running them."""
+    python = str(PYTHON) if PYTHON.exists() else sys.executable
+    run = subprocess.run(
+        [python, "-m", "pytest", DOCUMENT_TEST, "--collect-only", "-p", "no:cacheprovider"],
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        cwd=REPO,
+    )
+    found = re.search(r"(\d+) tests? collected", run.stdout)
+    if run.returncode != 0 or not found:
+        print(f"FAIL: could not count the document checks via {DOCUMENT_TEST}")
+        print(run.stdout[-1500:])
+        raise SystemExit(1)
+    return int(found.group(1))
 
 
 # What the figures are a measurement *of*. Deliberately excludes `release.json` itself:

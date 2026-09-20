@@ -80,9 +80,12 @@ function renderMetrics() {
         ? `在这 ${result.questions} 题上，${acc}% 与 ${rag}% 的差距未达统计显著。`
         : `The ${acc}% vs ${rag}% difference was not statistically significant on this ${result.questions}-question test.`);
 
+  // Two figures, not one. Until schema 2 the test count also included one case per
+  // tracked Markdown file, so committing a batch of pre-registrations raised the
+  // number the page showed while nothing about the engine had been tested.
   $("releaseMeta").textContent = lang === "zh"
-    ? `发布 ${release} · ${engineering.tests} 项测试 · ${engineering.verified_at} 核验`
-    : `Release ${release} · ${engineering.tests} tests · verified ${engineering.verified_at}`;
+    ? `发布 ${release} · ${engineering.tests} 项测试 · ${engineering.document_checks} 篇文档核查 · ${engineering.verified_at} 核验`
+    : `Release ${release} · ${engineering.tests} tests · ${engineering.document_checks} documents checked · verified ${engineering.verified_at}`;
   // The reference commit is a convenience and may not survive a history rewrite, so the
   // link degrades to the repository rather than to a 404 when it is absent.
   const commit = engineering.source_commit_for_reference;

@@ -21,7 +21,7 @@ from __future__ import annotations
 
 from datetime import datetime
 
-from llm_long_term_memory.evaluation.datasets.longmemeval import HaystackSession
+from llm_long_term_memory.conversation import ConversationSession
 from llm_long_term_memory.llm.client import GeminiClient
 from llm_long_term_memory.store import Memory
 
@@ -83,7 +83,7 @@ class TwoStageExtractor:
         self._facts = FactExtractor(client, model, chars_per_token)
         self._keyer = FactKeyer(client, model, chars_per_token)
 
-    def extract(self, sessions: list[HaystackSession]) -> ExtractionOutcome:
+    def extract(self, sessions: list[ConversationSession]) -> ExtractionOutcome:
         outcome = self._facts.extract(sessions)
         if not outcome.by_session:
             return ExtractionOutcome([], outcome.dropped_bad_index, requests=1)

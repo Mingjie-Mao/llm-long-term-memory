@@ -1,0 +1,282 @@
+{
+  "questions": 16,
+  "targeted_gate_not_accuracy_estimate": true,
+  "baseline": {
+    "final_majority_correct": 9,
+    "memory_only_proxy_majority_correct": 8,
+    "memory_only_proxy_caveat": "Correct final answers with fallback_level=none; pre-fallback drafts were not saved."
+  },
+  "comparisons": {
+    "memory_only": {
+      "n": 16,
+      "old_correct": 8,
+      "new_correct": 9,
+      "wins": [
+        "1f2b8d4f",
+        "57f827a0",
+        "6a1eabeb",
+        "a96c20ee"
+      ],
+      "losses": [
+        "3a704032",
+        "58ef2f1c",
+        "gpt4_45189cb4"
+      ],
+      "ties": 9,
+      "net": 1,
+      "exact_mcnemar_p": 1.0
+    },
+    "final": {
+      "n": 16,
+      "old_correct": 9,
+      "new_correct": 10,
+      "wins": [
+        "1f2b8d4f",
+        "778164c6",
+        "d905b33f"
+      ],
+      "losses": [
+        "58ef2f1c",
+        "gpt4_45189cb4"
+      ],
+      "ties": 11,
+      "net": 1,
+      "exact_mcnemar_p": 1.0
+    }
+  },
+  "raw_fallback_effect": [
+    {
+      "question_id": "57f827a0",
+      "fallback_level": "archive_wide",
+      "memory_only_correct": true,
+      "final_correct": false
+    },
+    {
+      "question_id": "778164c6",
+      "fallback_level": "source_local",
+      "memory_only_correct": false,
+      "final_correct": true
+    },
+    {
+      "question_id": "d905b33f",
+      "fallback_level": "source_local",
+      "memory_only_correct": false,
+      "final_correct": true
+    },
+    {
+      "question_id": "gpt4_7a0daae1",
+      "fallback_level": "source_local",
+      "memory_only_correct": false,
+      "final_correct": false
+    }
+  ],
+  "repeat_ids": [
+    "1f2b8d4f",
+    "3a704032",
+    "57f827a0",
+    "58ef2f1c",
+    "6a1eabeb",
+    "778164c6",
+    "a96c20ee",
+    "d905b33f",
+    "gpt4_45189cb4"
+  ],
+  "rows": [
+    {
+      "question_id": "1f2b8d4f",
+      "question_type": "multi-session",
+      "baseline_memory_proxy": false,
+      "baseline_final": false,
+      "candidate_memory_only": true,
+      "candidate_final": true,
+      "fallback_level": "none"
+    },
+    {
+      "question_id": "3a704032",
+      "question_type": "multi-session",
+      "baseline_memory_proxy": true,
+      "baseline_final": true,
+      "candidate_memory_only": false,
+      "candidate_final": true,
+      "fallback_level": "none"
+    },
+    {
+      "question_id": "45dc21b6",
+      "question_type": "knowledge-update",
+      "baseline_memory_proxy": true,
+      "baseline_final": true,
+      "candidate_memory_only": true,
+      "candidate_final": true,
+      "fallback_level": "none"
+    },
+    {
+      "question_id": "561fabcd",
+      "question_type": "single-session-assistant",
+      "baseline_memory_proxy": true,
+      "baseline_final": true,
+      "candidate_memory_only": true,
+      "candidate_final": true,
+      "fallback_level": "none"
+    },
+    {
+      "question_id": "57f827a0",
+      "question_type": "single-session-preference",
+      "baseline_memory_proxy": false,
+      "baseline_final": false,
+      "candidate_memory_only": true,
+      "candidate_final": false,
+      "fallback_level": "archive_wide"
+    },
+    {
+      "question_id": "58ef2f1c",
+      "question_type": "single-session-user",
+      "baseline_memory_proxy": true,
+      "baseline_final": true,
+      "candidate_memory_only": false,
+      "candidate_final": false,
+      "fallback_level": "none"
+    },
+    {
+      "question_id": "6613b389",
+      "question_type": "temporal-reasoning",
+      "baseline_memory_proxy": true,
+      "baseline_final": true,
+      "candidate_memory_only": true,
+      "candidate_final": true,
+      "fallback_level": "none"
+    },
+    {
+      "question_id": "6a1eabeb",
+      "question_type": "knowledge-update",
+      "baseline_memory_proxy": false,
+      "baseline_final": false,
+      "candidate_memory_only": true,
+      "candidate_final": false,
+      "fallback_level": "none"
+    },
+    {
+      "question_id": "6e984301",
+      "question_type": "temporal-reasoning",
+      "baseline_memory_proxy": false,
+      "baseline_final": false,
+      "candidate_memory_only": false,
+      "candidate_final": false,
+      "fallback_level": "none"
+    },
+    {
+      "question_id": "778164c6",
+      "question_type": "single-session-assistant",
+      "baseline_memory_proxy": false,
+      "baseline_final": false,
+      "candidate_memory_only": false,
+      "candidate_final": true,
+      "fallback_level": "source_local"
+    },
+    {
+      "question_id": "95228167",
+      "question_type": "single-session-preference",
+      "baseline_memory_proxy": true,
+      "baseline_final": true,
+      "candidate_memory_only": true,
+      "candidate_final": true,
+      "fallback_level": "none"
+    },
+    {
+      "question_id": "a82c026e",
+      "question_type": "single-session-user",
+      "baseline_memory_proxy": true,
+      "baseline_final": true,
+      "candidate_memory_only": true,
+      "candidate_final": true,
+      "fallback_level": "none"
+    },
+    {
+      "question_id": "a96c20ee",
+      "question_type": "multi-session",
+      "baseline_memory_proxy": false,
+      "baseline_final": true,
+      "candidate_memory_only": true,
+      "candidate_final": true,
+      "fallback_level": "none"
+    },
+    {
+      "question_id": "d905b33f",
+      "question_type": "multi-session",
+      "baseline_memory_proxy": false,
+      "baseline_final": false,
+      "candidate_memory_only": false,
+      "candidate_final": true,
+      "fallback_level": "source_local"
+    },
+    {
+      "question_id": "gpt4_45189cb4",
+      "question_type": "temporal-reasoning",
+      "baseline_memory_proxy": true,
+      "baseline_final": true,
+      "candidate_memory_only": false,
+      "candidate_final": false,
+      "fallback_level": "none"
+    },
+    {
+      "question_id": "gpt4_7a0daae1",
+      "question_type": "temporal-reasoning",
+      "baseline_memory_proxy": false,
+      "baseline_final": false,
+      "candidate_memory_only": false,
+      "candidate_final": false,
+      "fallback_level": "source_local"
+    }
+  ],
+  "repeat_comparisons": {
+    "memory_only": {
+      "n": 9,
+      "old_correct": 3,
+      "new_correct": 3,
+      "wins": [
+        "1f2b8d4f",
+        "57f827a0",
+        "a96c20ee"
+      ],
+      "losses": [
+        "3a704032",
+        "58ef2f1c",
+        "gpt4_45189cb4"
+      ],
+      "ties": 3,
+      "net": 0,
+      "exact_mcnemar_p": 1.0
+    },
+    "final": {
+      "n": 9,
+      "old_correct": 4,
+      "new_correct": 6,
+      "wins": [
+        "1f2b8d4f",
+        "57f827a0",
+        "778164c6",
+        "d905b33f"
+      ],
+      "losses": [
+        "58ef2f1c",
+        "gpt4_45189cb4"
+      ],
+      "ties": 3,
+      "net": 2,
+      "exact_mcnemar_p": 0.6875
+    }
+  },
+  "repeat_stability": {
+    "memory_only": {
+      "agreements": 8,
+      "n": 9
+    },
+    "final": {
+      "agreements": 8,
+      "n": 9
+    }
+  },
+  "promotion": {
+    "decision": "stop_no_48",
+    "reason": "The discordant-row repeat did not reproduce a positive memory-only net; the preregistered promotion rule requires memory-only improvement."
+  }
+}

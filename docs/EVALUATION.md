@@ -1,7 +1,7 @@
 # 评测说明
 
 本文是这个项目的评测口径：题集怎么切、指标怎么算、统计怎么读、最终结果是哪几个数字。
-设计动机见[项目报告](PROJECT_REPORT.zh-CN.md)，实现细节见[架构说明](ARCHITECTURE.md)。
+设计动机见[项目报告](PROJECT_REPORT.md)，实现细节见[架构说明](ARCHITECTURE.md)。
 
 ## 数据与切分
 

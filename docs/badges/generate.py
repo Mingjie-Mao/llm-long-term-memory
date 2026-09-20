@@ -1,10 +1,10 @@
-"""Rebuild the README language buttons.
+"""Rebuild the legacy bilingual README language buttons.
 
     python3 docs/badges/generate.py
 
-Four files, because a two-button switch needs each button in both states: the language
-you are reading is filled, the one you can switch to is grey. `README.md` uses
-`lang-en-active` + `lang-zh-idle`; `README.zh-CN.md` uses the other pair.
+The canonical README and project report became Chinese-only in 2026-09, so no current
+page references these files. The generator remains temporarily for auditability until
+the unused badge assets are explicitly approved for cleanup.
 
 Drawn here rather than fetched from a badge service for the same reason the architecture
 atlas is: the repository renders its own images. A shields.io URL would put the top line
