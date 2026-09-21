@@ -684,7 +684,7 @@ def test_write_path_persists_a_turn_and_indexes_extracted_memories(client):
     service = get_service()
 
     class StubExtractor:
-        def extract_turn(self, *, user_id, session_id, role, content, now):
+        def extract_turn(self, *, user_id, session_id, role, content, now, context_turns=()):
             assert user_id == "alice"
             assert role == "user"
             assert content == "I adopted a cat."

@@ -68,7 +68,7 @@ class ScriptedExtractor:
         self.calls = 0
         self.fail_next = False
 
-    def extract_turn(self, *, user_id, session_id, role, content, now):
+    def extract_turn(self, *, user_id, session_id, role, content, now, context_turns=()):
         self.calls += 1
         if self.fail_next:
             self.fail_next = False

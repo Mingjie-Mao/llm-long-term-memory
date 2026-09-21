@@ -21,6 +21,7 @@ from __future__ import annotations
 import hashlib
 import json
 import uuid
+from collections.abc import Sequence
 from dataclasses import asdict, dataclass, is_dataclass
 from datetime import UTC, datetime, timedelta
 from functools import wraps
@@ -148,6 +149,31 @@ class LiveTurnExtractor:
     The REST and MCP surfaces accept one turn, while the research extractor accepts
     a list of sessions. Keeping this adapter explicit prevents tests from inventing
     an ``extract_turn`` method that no production class implements.
+
+    **Preceding turns are shown, and this is not optional.** A turn arrives on its own
+    and refers to what came before it:
+
+        assistant: I'd recommend the Sony WH-1000XM6.
+        user:      I bought the Sony one you recommended yesterday.
+
+    Extracting the second turn alone can only produce "the user bought the Sony one",
+    which names nothing and answers nothing later. The batch ingestion path never had
+    this problem — it sees a whole conversation at once — so the loss is specific to
+    the live surface and invisible in every benchmark number this project reports.
+
+    The preceding turns are passed as part of the same session, which is also how the
+    extractor already reads a conversation, so no prompt changes and no extractor
+    version moves. The cost is that facts from those turns are extracted again; they
+    are already in the store from when those turns were written, and the deduplicator
+    this class already runs is what drops them. `usage["duplicates_dropped"]` therefore
+    rises with the window, which is the honest place to read the price.
+    """
+
+    CONTEXT_TURNS = 4
+    """How many preceding turns to show. Four covers the ordinary case — a
+    recommendation, an acknowledgement, a follow-up, a reply — without turning every
+    live write into a re-extraction of the whole conversation. It is a class attribute
+    so a deployment can lower it to 0 and get exactly the previous behaviour.
     """
 
     def __init__(self, batch_extractor, deduplicator, encoder, usage) -> None:
@@ -157,19 +183,30 @@ class LiveTurnExtractor:
         self.usage = usage
 
     def extract_turn(
-        self, *, user_id: str, session_id: str, role: str, content: str, now: datetime
+        self,
+        *,
+        user_id: str,
+        session_id: str,
+        role: str,
+        content: str,
+        now: datetime,
+        context_turns: Sequence[Any] = (),
     ) -> TurnExtractionOutcome:
         from llm_long_term_memory.conversation import ConversationSession, ConversationTurn
         from llm_long_term_memory.llm import UsageTracker
 
         started = len(self.usage.records)
         self.batch_extractor.user_id = user_id
+        window = list(context_turns)[-self.CONTEXT_TURNS :] if self.CONTEXT_TURNS else []
         extracted = self.batch_extractor.extract(
             [
                 ConversationSession(
                     session_id=session_id,
                     date=now.strftime("%Y-%m-%d %H:%M"),
-                    turns=[ConversationTurn(role=role, content=content)],
+                    turns=[
+                        *(ConversationTurn(role=t.role, content=t.content) for t in window),
+                        ConversationTurn(role=role, content=content),
+                    ],
                 )
             ]
         )
@@ -1026,7 +1063,14 @@ class MemoryService:
 
         try:
             outcome = self.extractor.extract_turn(
-                user_id=user_id, session_id=session_id, role=role, content=content, now=now
+                user_id=user_id,
+                session_id=session_id,
+                role=role,
+                content=content,
+                now=now,
+                # The turns already on this session, so a pronoun or "the Sony one"
+                # can be resolved against what it refers to.
+                context_turns=existing.turns if existing else (),
             )
         except Exception:
             # The turn is written before extraction so that a success cannot leave memories

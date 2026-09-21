@@ -34,7 +34,7 @@ class _Encoder:
 
 
 class _Extractor:
-    def extract_turn(self, *, user_id, session_id, role, content, now):
+    def extract_turn(self, *, user_id, session_id, role, content, now, context_turns=()):
         return TurnExtractionOutcome(
             [
                 Memory(
