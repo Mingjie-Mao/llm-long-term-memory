@@ -290,6 +290,47 @@ def _specificity_outcomes(pairs: list) -> list[tuple[str, str, str, bool]]:
     return rows
 
 
+def _grounding_failures(checkpoint: dict, sessions: list) -> list[dict]:
+    """Registered gate 3, checked from the checkpoint rather than assumed.
+
+    `run` only accepts a repair fact that is span-anchored to a user turn and whose
+    span and content both contain a baseline-missing specificity, so this should
+    always come back empty. It is verified anyway: a gate enforced at write time and
+    never evidenced is indistinguishable, in the artifact, from one nobody ran. Every
+    accepted memory is re-checked against the raw turn it names.
+    """
+    from llm_long_term_memory.ingest.grounded import normalise
+
+    by_id = {session.session_id: session for session in sessions}
+    failures = []
+    for session_id, row in checkpoint["repairs"].items():
+        session = by_id[session_id]
+        missing = {normalise(value) for value in row.get("missing", [])}
+        for memory in row["memories"]:
+            index = memory.get("source_turn_index")
+            start = memory.get("source_char_start")
+            end = memory.get("source_char_end")
+            problem = None
+            if index is None or start is None or end is None:
+                problem = "no turn index or source offsets"
+            elif not 0 <= index < len(session.turns):
+                problem = f"turn index {index} is outside the session"
+            elif session.turns[index].role != "user":
+                problem = f"turn {index} is a {session.turns[index].role} turn"
+            else:
+                span = normalise(session.turns[index].content[start:end])
+                content = normalise(memory["content"])
+                if not span:
+                    problem = f"offsets {start}:{end} select nothing in turn {index}"
+                elif not any(value in span and value in content for value in missing):
+                    problem = "no baseline-missing specificity is in both the span and the content"
+            if problem:
+                failures.append(
+                    {"session_id": session_id, "memory_id": memory["id"], "problem": problem}
+                )
+    return failures
+
+
 def score(checkpoint: dict | None = None, sessions: list | None = None) -> int:
     from llm_long_term_memory.ingest.fidelity import score_sessions
 
@@ -322,6 +363,7 @@ def score(checkpoint: dict | None = None, sessions: list | None = None) -> int:
         before[3] and not after[3]
         for before, after in zip(baseline_outcomes, candidate_outcomes, strict=True)
     )
+    grounding_failures = _grounding_failures(checkpoint, sessions)
     repair_calls = sum(row["called"] for row in checkpoint["repairs"].values())
     added_memories = sum(len(row["memories"]) for row in checkpoint["repairs"].values())
     delta = candidate_report.overall - baseline_report.overall
@@ -329,6 +371,7 @@ def score(checkpoint: dict | None = None, sessions: list | None = None) -> int:
         "fidelity_gain_at_least_10pp": delta >= 0.10,
         "at_least_10_gains": gained >= 10,
         "zero_losses": lost == 0,
+        "every_repair_is_grounded_in_a_user_span": not grounding_failures,
         "repair_calls_at_most_half": repair_calls <= SESSIONS / 2,
         "added_memories_at_most_one_per_session": added_memories <= SESSIONS,
         "cohort_complete": len(checkpoint["repairs"]) == SESSIONS,
@@ -361,6 +404,7 @@ def score(checkpoint: dict | None = None, sessions: list | None = None) -> int:
         "repair_calls": repair_calls,
         "added_memories": added_memories,
         "gates": gates,
+        "grounding_failures": grounding_failures,
         "usage_path": str(USAGE.relative_to(REPO)),
     }
     RESULT.parent.mkdir(parents=True, exist_ok=True)
@@ -375,7 +419,8 @@ def score(checkpoint: dict | None = None, sessions: list | None = None) -> int:
         f"- delta: {delta:+.1%}\n"
         f"- paired specifics: {gained} gains / {lost} losses\n"
         f"- repair calls: {repair_calls}/{SESSIONS}\n"
-        f"- added memories: {added_memories} ({added_memories / SESSIONS:.2f}/session)\n\n"
+        f"- added memories: {added_memories} ({added_memories / SESSIONS:.2f}/session)\n"
+        f"- grounding failures among accepted repairs: {len(grounding_failures)}\n\n"
         "## Registered gates\n\n"
         + "\n".join(
             f"- {'PASS' if passed else 'FAIL'} — `{name}`" for name, passed in gates.items()
