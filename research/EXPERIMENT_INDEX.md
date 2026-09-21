@@ -37,7 +37,7 @@
 | 实验 | 状态与用途 | 证据 |
 |---|---|---|
 | 抽取批大小 | 完成；batch size 是因果变量，但**效应量依赖队列**（见下），且不能直接等同于 QA 提升 | [预注册](../results/prereg-batch-size.md) · [结果](../results/batch-size-result.md) · [v2b 决策](../results/v2b-gate16-decision.md) |
-| 具体信息修复试点 | 进行中；预注册于 2026-09-19，2026-09-22 在注册队列上执行 | [预注册](../results/prereg-specificity-repair-pilot.md) · [工具](../tools/specificity_repair_pilot.py) |
+| 具体信息修复试点 | 通过 `PASS_TO_QA_GATE`；44.8% → 59.3%（+14.5pp），21 胜 0 负，25/60 触发修复，新增 0.33 条/会话，grounding 失败 0。**仅为抽取侧机制结果，不是 QA 结果** | [预注册](../results/prereg-specificity-repair-pilot.md) · [结果](../results/analysis/specificity-repair-pilot.md) · [工具](../tools/specificity_repair_pilot.py) |
 | 检索权重扫描 | 完成；当前语料中仅语义排序优于加入 BM25、importance、entity 等组合 | [结果](../results/retrieval-weights.md) |
 | 早期 heldout 方差 | 历史证据；用于说明重复运行波动，不作为当前终测 | [报告](../results/heldout-variance.md) |
 
@@ -68,17 +68,20 @@ McNemar 为 41 胜 4 负、p=9.3e-09。批大小当初是被免费层每天 500 
 |---|---:|---:|---:|
 | 留出集前 60 会话（批大小试点） | 37.3% | 64.9% | +27.6pp |
 | v2b 重建的 780 会话库（gate16） | 39.8% | 47.5% | +7.7pp |
+| 留出集第 61–120 会话（修复试点基线） | — | **44.8%** | — |
 
-两个数都在仓库里，差近四倍，原因未查清。因此可靠的说法是「batch size 是因果变量」，
-不是「换上 batch 8 就有 64.9%」。同时 v2b gate 的结论是 `STOP_NO_48`：抽取质量涨了，QA 没跟上。
+三次 batch-8 测量分别是 64.9%、47.5%、44.8%。**64.9% 才是离群值，不是常态。**
+因此可靠的说法是「batch size 是因果变量」，不是「换上 batch 8 就有 64.9%」；
+对外引用时应给区间而不是单点。同时 v2b gate 的结论是 `STOP_NO_48`：抽取质量涨了，QA 没跟上。
 
 尺子本身测的是**可直接匹配的具体信息召回**：`three months` 存成 `3 months` 算作丢失，所以它
 低估语义保真度；但批大小对照是同一把尺子上的配对比较，差距是真的。
 
 ### 已确定的执行顺序
 
-1. **具体信息修复试点**（进行中）——已预注册，离线可行性为 64.9% → 82.8%，加法式只补漏、
-   不改写已有事实，归因最干净；
+1. **具体信息修复试点**——✅ 2026-09-22 完成，`PASS_TO_QA_GATE`。44.8% → 59.3%，21 胜 0 负，
+   41 次请求、0 失败。离线可行性曾预计 64.9% → 82.8%，实测的起点和终点都更低，但**方向和零损失
+   的结构性保证都复现了**；
 2. **拆分 `event_time` 与观察时间**——生产抽取器 `extract.py` 与 `structure.py` 仍把会话日期
    当作事件时间。`GroundedExtractor` 已实现正确拆分（解析不出置 None），但只在
    `lltm ingest fidelity --grounded` 上，不在生产路径。v2c 在 reasoning-48 的错题

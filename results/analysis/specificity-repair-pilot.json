@@ -1,0 +1,98 @@
+{
+  "experiment": "specificity-repair-pilot",
+  "class": "development",
+  "decision": "PASS_TO_QA_GATE",
+  "git_sha": "0f94126bcfc97ecd0ae308fc7e481c4ee5094ad0",
+  "cohort_sha256": "b5e44123130561410ac181397d1853068136a82ebf98dfffbef293540977ba2e",
+  "sessions": 60,
+  "offset": 60,
+  "model": "gemini-3.1-flash-lite",
+  "baseline": {
+    "overall": 0.4482758620689655,
+    "memories": 351,
+    "per_facet": {
+      "quantity": {
+        "facet": "quantity",
+        "stated": 62,
+        "retained": 23
+      },
+      "duration": {
+        "facet": "duration",
+        "stated": 14,
+        "retained": 5
+      },
+      "money": {
+        "facet": "money",
+        "stated": 16,
+        "retained": 10
+      },
+      "date": {
+        "facet": "date",
+        "stated": 0,
+        "retained": 0
+      },
+      "relative_time": {
+        "facet": "relative_time",
+        "stated": 13,
+        "retained": 2
+      },
+      "proper_noun": {
+        "facet": "proper_noun",
+        "stated": 40,
+        "retained": 25
+      }
+    }
+  },
+  "candidate": {
+    "overall": 0.593103448275862,
+    "memories": 371,
+    "per_facet": {
+      "quantity": {
+        "facet": "quantity",
+        "stated": 62,
+        "retained": 33
+      },
+      "duration": {
+        "facet": "duration",
+        "stated": 14,
+        "retained": 8
+      },
+      "money": {
+        "facet": "money",
+        "stated": 16,
+        "retained": 10
+      },
+      "date": {
+        "facet": "date",
+        "stated": 0,
+        "retained": 0
+      },
+      "relative_time": {
+        "facet": "relative_time",
+        "stated": 13,
+        "retained": 7
+      },
+      "proper_noun": {
+        "facet": "proper_noun",
+        "stated": 40,
+        "retained": 28
+      }
+    }
+  },
+  "delta": 0.1448275862068965,
+  "gained": 21,
+  "lost": 0,
+  "repair_calls": 25,
+  "added_memories": 20,
+  "gates": {
+    "fidelity_gain_at_least_10pp": true,
+    "at_least_10_gains": true,
+    "zero_losses": true,
+    "every_repair_is_grounded_in_a_user_span": true,
+    "repair_calls_at_most_half": true,
+    "added_memories_at_most_one_per_session": true,
+    "cohort_complete": true
+  },
+  "grounding_failures": [],
+  "usage_path": "results/raw/specificity-repair-pilot.usage.json"
+}
