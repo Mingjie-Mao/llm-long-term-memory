@@ -159,6 +159,13 @@ def _build(
         # multi-session counting/arithmetic.
         "two_stage_v2d_memory_only",
         "two_stage_v2d",
+        # v5.0. Everything v2c does, plus verbatim turns from the sessions retrieval
+        # already selected, attached before the first answer call instead of after a
+        # refusal. `_fixed` spends the same budget on every question; `_planned` spends
+        # by what the question asks for. The registered comparison for both is the v2c
+        # arm, so the raw windows are the only difference.
+        "two_stage_v5_fixed",
+        "two_stage_v5_planned",
         # v3 research arm: same v2 store/retrieval/fallback, with an explicit
         # evidence/check/calculation answer policy. It never uses benchmark labels.
         "two_stage_reasoned",
@@ -269,6 +276,13 @@ def _build(
             if variant in {"two_stage_coherent", "two_stage_coherent_oracle"}
             else None,
             oracle_session_context=variant == "two_stage_coherent_oracle",
+            # The fixed arm spends exactly what the conditional path spends
+            # (`fallback.max_turns`), so the only difference from v2c is *when* the
+            # raw turns arrive, not how many.
+            parallel_raw_windows=(
+                cfg.fallback.max_turns if variant.startswith("two_stage_v5") else 0
+            ),
+            parallel_raw_planned=variant == "two_stage_v5_planned",
             answer_policy={
                 "two_stage_reasoned": "reasoned_v3",
                 "two_stage_reasoned_evidence": "reasoned_v3",
@@ -280,6 +294,10 @@ def _build(
                 "two_stage_v2c": "v2c",
                 "two_stage_v2d_memory_only": "v2d",
                 "two_stage_v2d": "v2d",
+                # v5.0 changes the evidence, not the answering policy: the comparison
+                # against v2c is only meaningful while everything else is v2c.
+                "two_stage_v5_fixed": "v2c",
+                "two_stage_v5_planned": "v2c",
             }.get(variant, "v2"),
             timeline_rendering=variant
             not in {

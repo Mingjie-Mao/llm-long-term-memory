@@ -286,6 +286,8 @@ class MemoryRunner:
         raw_fallback: bool = False,
         raw_fallback_max_turns: int = 3,
         raw_fallback_max_chars: int = 2400,
+        parallel_raw_windows: int = 0,
+        parallel_raw_planned: bool = False,
         session_budget: SessionBudget | None = None,
         oracle_session_context: bool = False,
         answer_policy: str = "v2",
@@ -401,6 +403,25 @@ class MemoryRunner:
             from llm_long_term_memory.retrieve.fallback import RawFallback
 
             self.fallback = RawFallback(store, max_turns=raw_fallback_max_turns)
+
+        # v5.0. Raw conversation stops being a second pass paid for on demand and
+        # becomes evidence the first call already has. The offline gate found three of
+        # v2c's eleven failures were a sentence the extractor dropped from a session
+        # retrieval had already selected — "I just received my new tennis racket
+        # today", "up to 50 hours per week", "February 14th" — and in thirty-eight of
+        # forty-eight questions no raw turn reached the reader at all.
+        #
+        # Deliberately `recover_local_detail`: it ranks turns inside the located
+        # sessions and never falls through to another conversation. Archive-wide
+        # retrieval is what v2b measured as noisy, and it stays where it is, behind the
+        # answerer's own request.
+        self.parallel_raw = None
+        self.parallel_raw_planned = parallel_raw_planned
+        self.parallel_raw_windows = max(0, parallel_raw_windows)
+        if self.parallel_raw_windows:
+            from llm_long_term_memory.retrieve.fallback import RawFallback
+
+            self.parallel_raw = RawFallback(store, max_turns=self.parallel_raw_windows)
         self.extractor_version = (
             store.get_meta("extractor_version") if hasattr(store, "get_meta") else None
         )
@@ -625,6 +646,25 @@ class MemoryRunner:
                     f"{context}\n\nQuestion-specific verbatim source evidence:\n"
                     f"{detail_evidence.render(max_chars=self.raw_fallback_max_chars)}"
                 )
+        parallel_evidence = None
+        if self.parallel_raw is not None:
+            windows = self._parallel_raw_budget(request.question)
+            if windows:
+                self.parallel_raw.max_turns = windows
+                parallel_evidence = self.parallel_raw.recover_local_detail(
+                    request.user_id, request.question, selected
+                )
+                if parallel_evidence.used:
+                    # Labelled as the conversation itself, and placed after the
+                    # structured facts rather than instead of them. The point of the
+                    # arm is that both are present on the first call; burying the
+                    # memories under transcript would be a slide back into naive RAG,
+                    # which `two_stage_hydrated` already measured as three times the
+                    # context for no gain.
+                    context = (
+                        f"{context}\n\nVerbatim turns from those same conversations:\n"
+                        f"{parallel_evidence.render(max_chars=self.raw_fallback_max_chars)}"
+                    )
         assembly_latency_ms = (perf_counter() - assembly_started) * 1000
         if self.fallback is not None or self.answer_policy == "v2d":
             completion, answer_text, verdict, raw_evidence = self._answer_with_fallback(
@@ -637,6 +677,16 @@ class MemoryRunner:
             self.store.record_access(
                 [memory.id for memory in selected], now, reinforcement=self.reinforcement
             )
+
+        parallel_notes = {
+            "parallel_raw_windows": self.parallel_raw_windows,
+            "parallel_raw_planned": self.parallel_raw_planned,
+            "parallel_raw_level": parallel_evidence.level if parallel_evidence else None,
+            "parallel_raw_turns": len(parallel_evidence.turns) if parallel_evidence else 0,
+            "parallel_raw_sessions": sorted({turn.session_id for turn in parallel_evidence.turns})
+            if parallel_evidence
+            else [],
+        }
 
         evidence = set(evidence_session_ids)
         candidate_sessions = _external_session_ids(trace.candidate_session_ids)
@@ -769,6 +819,7 @@ class MemoryRunner:
                     ],
                 },
                 "reasoning_kind": operation,
+                **parallel_notes,
                 "answer_confidence": getattr(verdict, "confidence", None),
                 "answer_evidence_summary": getattr(verdict, "evidence_summary", None),
                 "answer_calculation": getattr(verdict, "calculation", None),
@@ -805,6 +856,34 @@ class MemoryRunner:
                 "answerer_api_latency_ms": completion.api_latency_ms,
             },
         )
+
+    def _parallel_raw_budget(self, question: str) -> int:
+        """How many verbatim turns to attach before the first call.
+
+        Fixed by default, so the arm changes exactly one thing. The planned variant
+        spends by what the question asks for: an aggregation has to enumerate members
+        across conversations and a lookup needs one sentence, and the registered
+        comparison between the two is whether the extra tokens buy anything.
+        """
+        if not self.parallel_raw_planned:
+            return self.parallel_raw_windows
+        kind = reasoning_kind(question)
+        # Measured, not guessed. Replaying the three recoverable failures against the
+        # committed store showed where each sentence sits in the source-local ranking:
+        # the tennis-racket turn is reachable at two windows, the Valentine's Day turn
+        # at three, and the "up to 50 hours per week" turn not until six — it is an
+        # assistant summary that ranks sixth among the turns of the twelve sessions the
+        # question selected. Rendering caps each turn at its query-relevant window, so
+        # six windows cost about 2,500 characters rather than the 9,400 the raw turns
+        # hold. An aggregation is also the kind that has to enumerate across
+        # conversations, which is why it is the one that gets the wider budget.
+        return {
+            "direct": 2,
+            "preference_application": 2,
+            "temporal": 3,
+            "current_state": 3,
+            "multi_session_aggregation": 6,
+        }.get(kind, self.parallel_raw_windows)
 
     def answer_with_memories(self, instance: Instance, memories: list[Memory]) -> str:
         """Answer a fixed memory set without retrieval or lifecycle side effects.

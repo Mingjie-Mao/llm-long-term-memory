@@ -1,0 +1,4269 @@
+{
+  "rows": "results/raw/two_stage_v2c.reasoning48-v2c8.jsonl",
+  "store": "stores/v2c-reasoning48.db",
+  "questions": 48,
+  "correct": 37,
+  "raw_never_reached_the_reader": 38,
+  "headroom": {
+    "match_strength": {
+      "none": 2,
+      "numeric": 2
+    },
+    "wrong_total": 11,
+    "wrong_measurable": 4,
+    "wrong_unmeasurable": 7,
+    "already_in_context": [],
+    "repack_only": [],
+    "source_local_raw": [],
+    "archive_wide_raw": [
+      "e48988bc",
+      "gpt4_7a0daae1"
+    ],
+    "nowhere": [
+      "58ef2f1c",
+      "gpt4_74aed68e"
+    ]
+  },
+  "audit": {
+    "by_cause": {
+      "local_raw": 3,
+      "reader": 6,
+      "repack": 1,
+      "retrieval": 1
+    },
+    "reachable_by_v5_0": 3,
+    "reachable_by_v5_1": 1,
+    "not_reachable_by_either": 7,
+    "per_question": {
+      "0ddfec37_abs": {
+        "cause": "reader",
+        "note": "answered with a count instead of declining a false premise"
+      },
+      "58ef2f1c": {
+        "cause": "local_raw",
+        "note": "structured kept 'February 2023'; the raw turn says the dinner was \"back on Valentine's Day\", which the gold states as February 14th. The evidence is a raw turn of a selected session, but reaching the gold from it also needs the reader to know the date of Valentine's Day"
+      },
+      "a4996e51": {
+        "cause": "local_raw",
+        "note": "'up to 50 hours per week' is an assistant turn; the surviving memory says 40-45 and was not selected"
+      },
+      "a9f6b44c": {
+        "cause": "reader",
+        "note": "listed the qualifying events and never produced the count"
+      },
+      "d905b33f": {
+        "cause": "reader",
+        "note": "$24 and the original price were both in context; read it as 30 -> 30"
+      },
+      "dd2973ad": {
+        "cause": "reader",
+        "note": "the 2 AM memory was selected; the answer still said it did not know"
+      },
+      "e48988bc": {
+        "cause": "retrieval",
+        "note": "the gold session was never found"
+      },
+      "gpt4_2f8be40d": {
+        "cause": "reader",
+        "note": "counted four weddings where the gold names three"
+      },
+      "gpt4_70e84552_abs": {
+        "cause": "reader",
+        "note": "answered instead of declining a false premise"
+      },
+      "gpt4_74aed68e": {
+        "cause": "repack",
+        "note": "the dated 'February 14' memory was in the store and unselected; the undated restatement carried the session date instead"
+      },
+      "gpt4_7a0daae1": {
+        "cause": "local_raw",
+        "note": "'I just received my new tennis racket today' is a raw turn of a session that was selected; only assistant recommendations were extracted from it"
+      }
+    }
+  },
+  "coverage": {
+    "sessions_in_context_total": 528,
+    "memories_in_context": 958,
+    "memories_in_those_sessions": 2949,
+    "mean_fraction_of_session_shown": 0.447,
+    "sessions_shown_at_most_a_quarter": 200
+  },
+  "per_question": [
+    {
+      "question_id": "06db6396",
+      "question_type": "knowledge-update",
+      "correct": true,
+      "measurable": true,
+      "fallback_level": "none",
+      "raw_reached_the_reader": false,
+      "all_source_sessions_recalled": true,
+      "gold_in_selected": true,
+      "gold_in_selected_kind": "exact",
+      "gold_in_store": true,
+      "gold_in_store_kind": "exact",
+      "gold_in_local_raw": true,
+      "gold_in_local_raw_kind": "exact",
+      "gold_in_all_raw": true,
+      "gold_in_all_raw_kind": "exact",
+      "sessions_in_context": 12,
+      "session_coverage": [
+        {
+          "session_id": "scoped-session-v1:8:06db63963dcf1e0b_2",
+          "memories_in_store": 8,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:06db639657144028_1",
+          "memories_in_store": 5,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:06db63966be54739_2",
+          "memories_in_store": 51,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:06db63966ebdc1fe_2",
+          "memories_in_store": 4,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:06db63968235b87d",
+          "memories_in_store": 3,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:06db639684d7650f_2",
+          "memories_in_store": 6,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:06db6396answer_da72b1b4_1",
+          "memories_in_store": 3,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:06db6396answer_da72b1b4_2",
+          "memories_in_store": 3,
+          "memories_in_context": 3,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:06db6396sharegpt_2pwdGxJ_16",
+          "memories_in_store": 3,
+          "memories_in_context": 1,
+          "turns_in_store": 2
+        },
+        {
+          "session_id": "scoped-session-v1:8:06db6396sharegpt_SwdaeDm_15",
+          "memories_in_store": 3,
+          "memories_in_context": 2,
+          "turns_in_store": 11
+        },
+        {
+          "session_id": "scoped-session-v1:8:06db6396sharegpt_bA6P6oG_0",
+          "memories_in_store": 3,
+          "memories_in_context": 3,
+          "turns_in_store": 6
+        },
+        {
+          "session_id": "scoped-session-v1:8:06db6396ultrachat_279487",
+          "memories_in_store": 18,
+          "memories_in_context": 1,
+          "turns_in_store": 14
+        }
+      ],
+      "context_tokens": 640
+    },
+    {
+      "question_id": "0ddfec37_abs",
+      "question_type": "knowledge-update",
+      "correct": false,
+      "measurable": false,
+      "fallback_level": "archive_wide",
+      "raw_reached_the_reader": true,
+      "all_source_sessions_recalled": true,
+      "gold_in_selected": null,
+      "gold_in_selected_kind": null,
+      "gold_in_store": null,
+      "gold_in_store_kind": null,
+      "gold_in_local_raw": null,
+      "gold_in_local_raw_kind": null,
+      "gold_in_all_raw": null,
+      "gold_in_all_raw_kind": null,
+      "sessions_in_context": 16,
+      "session_coverage": [
+        {
+          "session_id": "scoped-session-v1:12:0ddfec37_abs25572732",
+          "memories_in_store": 8,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:12:0ddfec37_abs261efbe2_2",
+          "memories_in_store": 4,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:12:0ddfec37_abs3a11533e",
+          "memories_in_store": 7,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:12:0ddfec37_abs4fb01417_2",
+          "memories_in_store": 4,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:12:0ddfec37_abs6de70f46_1",
+          "memories_in_store": 6,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:12:0ddfec37_abs6eb55dc4_2",
+          "memories_in_store": 1,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:12:0ddfec37_abs8e10bf6b_1",
+          "memories_in_store": 1,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:12:0ddfec37_absanswer_a22b654d_abs_1",
+          "memories_in_store": 2,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:12:0ddfec37_absanswer_a22b654d_abs_2",
+          "memories_in_store": 5,
+          "memories_in_context": 3,
+          "turns_in_store": 10
+        },
+        {
+          "session_id": "scoped-session-v1:12:0ddfec37_abscb24e5d5_1",
+          "memories_in_store": 3,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:12:0ddfec37_absce6cae1b_2",
+          "memories_in_store": 1,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:12:0ddfec37_abse1b8999c_3",
+          "memories_in_store": 3,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:12:0ddfec37_abse3e061c4",
+          "memories_in_store": 3,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:12:0ddfec37_abssharegpt_RMZlUp6_0",
+          "memories_in_store": 1,
+          "memories_in_context": 1,
+          "turns_in_store": 6
+        },
+        {
+          "session_id": "scoped-session-v1:12:0ddfec37_absultrachat_157835",
+          "memories_in_store": 5,
+          "memories_in_context": 1,
+          "turns_in_store": 6
+        },
+        {
+          "session_id": "scoped-session-v1:12:0ddfec37_absultrachat_200650",
+          "memories_in_store": 2,
+          "memories_in_context": 2,
+          "turns_in_store": 14
+        }
+      ],
+      "context_tokens": 793
+    },
+    {
+      "question_id": "0e4e4c46",
+      "question_type": "knowledge-update",
+      "correct": true,
+      "measurable": true,
+      "fallback_level": "none",
+      "raw_reached_the_reader": false,
+      "all_source_sessions_recalled": true,
+      "gold_in_selected": true,
+      "gold_in_selected_kind": "exact",
+      "gold_in_store": true,
+      "gold_in_store_kind": "exact",
+      "gold_in_local_raw": true,
+      "gold_in_local_raw_kind": "exact",
+      "gold_in_all_raw": true,
+      "gold_in_all_raw_kind": "exact",
+      "sessions_in_context": 14,
+      "session_coverage": [
+        {
+          "session_id": "scoped-session-v1:8:0e4e4c460773943b",
+          "memories_in_store": 6,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:0e4e4c4611e9d591_1",
+          "memories_in_store": 7,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:0e4e4c4660876def_2",
+          "memories_in_store": 4,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:0e4e4c469f1c9048",
+          "memories_in_store": 10,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:0e4e4c46answer_f2f998c7_1",
+          "memories_in_store": 4,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:0e4e4c46answer_f2f998c7_2",
+          "memories_in_store": 9,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:0e4e4c46b7702ee4_1",
+          "memories_in_store": 3,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:0e4e4c46cbd08e3c_abs_2",
+          "memories_in_store": 11,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:0e4e4c46debc34d7_1",
+          "memories_in_store": 12,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:0e4e4c46sharegpt_1YtwybC_15",
+          "memories_in_store": 3,
+          "memories_in_context": 2,
+          "turns_in_store": 5
+        },
+        {
+          "session_id": "scoped-session-v1:8:0e4e4c46ultrachat_274273",
+          "memories_in_store": 4,
+          "memories_in_context": 3,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:0e4e4c46ultrachat_280826",
+          "memories_in_store": 2,
+          "memories_in_context": 1,
+          "turns_in_store": 14
+        },
+        {
+          "session_id": "scoped-session-v1:8:0e4e4c46ultrachat_467820",
+          "memories_in_store": 1,
+          "memories_in_context": 1,
+          "turns_in_store": 6
+        },
+        {
+          "session_id": "scoped-session-v1:8:0e4e4c46ultrachat_59250",
+          "memories_in_store": 1,
+          "memories_in_context": 1,
+          "turns_in_store": 10
+        }
+      ],
+      "context_tokens": 707
+    },
+    {
+      "question_id": "15745da0_abs",
+      "question_type": "single-session-user",
+      "correct": true,
+      "measurable": false,
+      "fallback_level": "archive_wide",
+      "raw_reached_the_reader": true,
+      "all_source_sessions_recalled": true,
+      "gold_in_selected": null,
+      "gold_in_selected_kind": null,
+      "gold_in_store": null,
+      "gold_in_store_kind": null,
+      "gold_in_local_raw": null,
+      "gold_in_local_raw_kind": null,
+      "gold_in_all_raw": null,
+      "gold_in_all_raw_kind": null,
+      "sessions_in_context": 11,
+      "session_coverage": [
+        {
+          "session_id": "scoped-session-v1:12:15745da0_abs375e27b9_2",
+          "memories_in_store": 4,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:12:15745da0_abs565929a2_2",
+          "memories_in_store": 4,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:12:15745da0_abs5e0e1fd8_3",
+          "memories_in_store": 4,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:12:15745da0_abs9b638f21_4",
+          "memories_in_store": 6,
+          "memories_in_context": 3,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:12:15745da0_absanswer_586de428_abs",
+          "memories_in_store": 5,
+          "memories_in_context": 4,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:12:15745da0_abse839253d",
+          "memories_in_store": 5,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:12:15745da0_abssharegpt_8Zlz9hb_0",
+          "memories_in_store": 2,
+          "memories_in_context": 1,
+          "turns_in_store": 20
+        },
+        {
+          "session_id": "scoped-session-v1:12:15745da0_abssharegpt_DnHQB23_0",
+          "memories_in_store": 2,
+          "memories_in_context": 1,
+          "turns_in_store": 4
+        },
+        {
+          "session_id": "scoped-session-v1:12:15745da0_abssharegpt_JSxa86k_19",
+          "memories_in_store": 2,
+          "memories_in_context": 1,
+          "turns_in_store": 7
+        },
+        {
+          "session_id": "scoped-session-v1:12:15745da0_abssharegpt_uWIv8BW_0",
+          "memories_in_store": 2,
+          "memories_in_context": 1,
+          "turns_in_store": 24
+        },
+        {
+          "session_id": "scoped-session-v1:12:15745da0_absultrachat_499527",
+          "memories_in_store": 1,
+          "memories_in_context": 1,
+          "turns_in_store": 6
+        }
+      ],
+      "context_tokens": 1301
+    },
+    {
+      "question_id": "1c0ddc50",
+      "question_type": "single-session-preference",
+      "correct": true,
+      "measurable": false,
+      "fallback_level": "none",
+      "raw_reached_the_reader": false,
+      "all_source_sessions_recalled": true,
+      "gold_in_selected": null,
+      "gold_in_selected_kind": null,
+      "gold_in_store": null,
+      "gold_in_store_kind": null,
+      "gold_in_local_raw": null,
+      "gold_in_local_raw_kind": null,
+      "gold_in_all_raw": null,
+      "gold_in_all_raw_kind": null,
+      "sessions_in_context": 8,
+      "session_coverage": [
+        {
+          "session_id": "scoped-session-v1:8:1c0ddc50187b4852_1",
+          "memories_in_store": 2,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:1c0ddc502aa70c9c_1",
+          "memories_in_store": 6,
+          "memories_in_context": 5,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:1c0ddc502f0c1f4e",
+          "memories_in_store": 4,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:1c0ddc5099883f38_1",
+          "memories_in_store": 7,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:1c0ddc50a0aa5035",
+          "memories_in_store": 15,
+          "memories_in_context": 7,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:1c0ddc50answer_8da8c7e0",
+          "memories_in_store": 5,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:1c0ddc50sharegpt_ikJXzOG_0",
+          "memories_in_store": 1,
+          "memories_in_context": 1,
+          "turns_in_store": 4
+        },
+        {
+          "session_id": "scoped-session-v1:8:1c0ddc50ultrachat_472385",
+          "memories_in_store": 1,
+          "memories_in_context": 1,
+          "turns_in_store": 10
+        }
+      ],
+      "context_tokens": 683
+    },
+    {
+      "question_id": "1f2b8d4f",
+      "question_type": "multi-session",
+      "correct": true,
+      "measurable": false,
+      "fallback_level": "none",
+      "raw_reached_the_reader": false,
+      "all_source_sessions_recalled": true,
+      "gold_in_selected": null,
+      "gold_in_selected_kind": null,
+      "gold_in_store": null,
+      "gold_in_store_kind": null,
+      "gold_in_local_raw": null,
+      "gold_in_local_raw_kind": null,
+      "gold_in_all_raw": null,
+      "gold_in_all_raw_kind": null,
+      "sessions_in_context": 10,
+      "session_coverage": [
+        {
+          "session_id": "scoped-session-v1:8:1f2b8d4f0bd59f15_3",
+          "memories_in_store": 4,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:1f2b8d4f23759615_1",
+          "memories_in_store": 7,
+          "memories_in_context": 3,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:1f2b8d4f628c958c_1",
+          "memories_in_store": 3,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:1f2b8d4f9e96d5b9_1",
+          "memories_in_store": 2,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:1f2b8d4fanswer_d8454588_1",
+          "memories_in_store": 3,
+          "memories_in_context": 3,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:1f2b8d4fanswer_d8454588_2",
+          "memories_in_store": 2,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:1f2b8d4fb5c147c7_2",
+          "memories_in_store": 3,
+          "memories_in_context": 3,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:1f2b8d4fsharegpt_OHIxTQm_22",
+          "memories_in_store": 1,
+          "memories_in_context": 1,
+          "turns_in_store": 8
+        },
+        {
+          "session_id": "scoped-session-v1:8:1f2b8d4fsharegpt_vGxp8Hq_0",
+          "memories_in_store": 5,
+          "memories_in_context": 3,
+          "turns_in_store": 8
+        },
+        {
+          "session_id": "scoped-session-v1:8:1f2b8d4fultrachat_503496",
+          "memories_in_store": 4,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        }
+      ],
+      "context_tokens": 648
+    },
+    {
+      "question_id": "3a704032",
+      "question_type": "multi-session",
+      "correct": true,
+      "measurable": false,
+      "fallback_level": "none",
+      "raw_reached_the_reader": false,
+      "all_source_sessions_recalled": true,
+      "gold_in_selected": null,
+      "gold_in_selected_kind": null,
+      "gold_in_store": null,
+      "gold_in_store_kind": null,
+      "gold_in_local_raw": null,
+      "gold_in_local_raw_kind": null,
+      "gold_in_all_raw": null,
+      "gold_in_all_raw_kind": null,
+      "sessions_in_context": 8,
+      "session_coverage": [
+        {
+          "session_id": "scoped-session-v1:8:3a7040327712aded",
+          "memories_in_store": 5,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:3a704032answer_c2204106_1",
+          "memories_in_store": 12,
+          "memories_in_context": 5,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:3a704032answer_c2204106_2",
+          "memories_in_store": 5,
+          "memories_in_context": 4,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:3a704032answer_c2204106_3",
+          "memories_in_store": 5,
+          "memories_in_context": 4,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:3a704032bc542ef7_2",
+          "memories_in_store": 4,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:3a704032be24e3db_2",
+          "memories_in_store": 4,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:3a704032e91e8a2e_1",
+          "memories_in_store": 5,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:3a704032f5c7d070_4",
+          "memories_in_store": 5,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        }
+      ],
+      "context_tokens": 606
+    },
+    {
+      "question_id": "45dc21b6",
+      "question_type": "knowledge-update",
+      "correct": true,
+      "measurable": true,
+      "fallback_level": "none",
+      "raw_reached_the_reader": false,
+      "all_source_sessions_recalled": true,
+      "gold_in_selected": true,
+      "gold_in_selected_kind": "exact",
+      "gold_in_store": true,
+      "gold_in_store_kind": "exact",
+      "gold_in_local_raw": true,
+      "gold_in_local_raw_kind": "exact",
+      "gold_in_all_raw": true,
+      "gold_in_all_raw_kind": "exact",
+      "sessions_in_context": 10,
+      "session_coverage": [
+        {
+          "session_id": "scoped-session-v1:8:45dc21b60ad56ba6",
+          "memories_in_store": 3,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:45dc21b62f57c190_1",
+          "memories_in_store": 16,
+          "memories_in_context": 4,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:45dc21b65934b91f",
+          "memories_in_store": 7,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:45dc21b65cbfaf3e_1",
+          "memories_in_store": 17,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:45dc21b68acb29f9_1",
+          "memories_in_store": 3,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:45dc21b6answer_07664d43_1",
+          "memories_in_store": 5,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:45dc21b6answer_07664d43_2",
+          "memories_in_store": 6,
+          "memories_in_context": 3,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:45dc21b6b45291a9",
+          "memories_in_store": 5,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:45dc21b6eb34144a_2",
+          "memories_in_store": 9,
+          "memories_in_context": 4,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:45dc21b6f43d9ae5",
+          "memories_in_store": 2,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        }
+      ],
+      "context_tokens": 623
+    },
+    {
+      "question_id": "46a3abf7",
+      "question_type": "multi-session",
+      "correct": true,
+      "measurable": false,
+      "fallback_level": "none",
+      "raw_reached_the_reader": false,
+      "all_source_sessions_recalled": true,
+      "gold_in_selected": null,
+      "gold_in_selected_kind": null,
+      "gold_in_store": null,
+      "gold_in_store_kind": null,
+      "gold_in_local_raw": null,
+      "gold_in_local_raw_kind": null,
+      "gold_in_all_raw": null,
+      "gold_in_all_raw_kind": null,
+      "sessions_in_context": 11,
+      "session_coverage": [
+        {
+          "session_id": "scoped-session-v1:8:46a3abf728eb86ab",
+          "memories_in_store": 20,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:46a3abf72917b130_1",
+          "memories_in_store": 4,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:46a3abf784715fa7_1",
+          "memories_in_store": 3,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:46a3abf7a95bedca",
+          "memories_in_store": 3,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:46a3abf7answer_c65042d7_1",
+          "memories_in_store": 4,
+          "memories_in_context": 3,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:46a3abf7answer_c65042d7_2",
+          "memories_in_store": 4,
+          "memories_in_context": 3,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:46a3abf7answer_c65042d7_3",
+          "memories_in_store": 7,
+          "memories_in_context": 4,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:46a3abf7be133e38_1",
+          "memories_in_store": 8,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:46a3abf7e224317f_2",
+          "memories_in_store": 6,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:46a3abf7sharegpt_4N3wNeE_11",
+          "memories_in_store": 1,
+          "memories_in_context": 1,
+          "turns_in_store": 3
+        },
+        {
+          "session_id": "scoped-session-v1:8:46a3abf7ultrachat_406179",
+          "memories_in_store": 1,
+          "memories_in_context": 1,
+          "turns_in_store": 14
+        }
+      ],
+      "context_tokens": 590
+    },
+    {
+      "question_id": "50635ada",
+      "question_type": "knowledge-update",
+      "correct": true,
+      "measurable": true,
+      "fallback_level": "none",
+      "raw_reached_the_reader": false,
+      "all_source_sessions_recalled": true,
+      "gold_in_selected": true,
+      "gold_in_selected_kind": "exact",
+      "gold_in_store": true,
+      "gold_in_store_kind": "exact",
+      "gold_in_local_raw": true,
+      "gold_in_local_raw_kind": "exact",
+      "gold_in_all_raw": true,
+      "gold_in_all_raw_kind": "exact",
+      "sessions_in_context": 11,
+      "session_coverage": [
+        {
+          "session_id": "scoped-session-v1:8:50635ada03f76b6b",
+          "memories_in_store": 5,
+          "memories_in_context": 3,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:50635ada35bc3132_2",
+          "memories_in_store": 2,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:50635ada390e092d_1",
+          "memories_in_store": 3,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:50635ada42bcee92_2",
+          "memories_in_store": 16,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:50635ada55cc1ba3_2",
+          "memories_in_store": 7,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:50635ada8930493f_3",
+          "memories_in_store": 3,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:50635ada9f9b402a_5",
+          "memories_in_store": 5,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:50635adaadd7cc1e",
+          "memories_in_store": 2,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:50635adaanswer_dcd74827_1",
+          "memories_in_store": 6,
+          "memories_in_context": 5,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:50635adaanswer_dcd74827_2",
+          "memories_in_store": 3,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:50635adab6f35f3a_1",
+          "memories_in_store": 3,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        }
+      ],
+      "context_tokens": 564
+    },
+    {
+      "question_id": "561fabcd",
+      "question_type": "single-session-assistant",
+      "correct": true,
+      "measurable": true,
+      "fallback_level": "none",
+      "raw_reached_the_reader": false,
+      "all_source_sessions_recalled": true,
+      "gold_in_selected": true,
+      "gold_in_selected_kind": "exact",
+      "gold_in_store": true,
+      "gold_in_store_kind": "exact",
+      "gold_in_local_raw": true,
+      "gold_in_local_raw_kind": "exact",
+      "gold_in_all_raw": true,
+      "gold_in_all_raw_kind": "exact",
+      "sessions_in_context": 10,
+      "session_coverage": [
+        {
+          "session_id": "scoped-session-v1:8:561fabcd226fa428_2",
+          "memories_in_store": 8,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:561fabcd33da50d0_5",
+          "memories_in_store": 3,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:561fabcd83fb74bf_1",
+          "memories_in_store": 3,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:561fabcd9a992902",
+          "memories_in_store": 4,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:561fabcdaee13015_3",
+          "memories_in_store": 3,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:561fabcdanswer_sharegpt_hChsWOp_97",
+          "memories_in_store": 3,
+          "memories_in_context": 3,
+          "turns_in_store": 17
+        },
+        {
+          "session_id": "scoped-session-v1:8:561fabcdd75f4fb5_1",
+          "memories_in_store": 20,
+          "memories_in_context": 6,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:561fabcdsharegpt_4JbliRS_0",
+          "memories_in_store": 4,
+          "memories_in_context": 2,
+          "turns_in_store": 6
+        },
+        {
+          "session_id": "scoped-session-v1:8:561fabcdultrachat_194831",
+          "memories_in_store": 2,
+          "memories_in_context": 1,
+          "turns_in_store": 10
+        },
+        {
+          "session_id": "scoped-session-v1:8:561fabcdultrachat_516079",
+          "memories_in_store": 2,
+          "memories_in_context": 1,
+          "turns_in_store": 14
+        }
+      ],
+      "context_tokens": 613
+    },
+    {
+      "question_id": "57f827a0",
+      "question_type": "single-session-preference",
+      "correct": true,
+      "measurable": false,
+      "fallback_level": "none",
+      "raw_reached_the_reader": false,
+      "all_source_sessions_recalled": true,
+      "gold_in_selected": null,
+      "gold_in_selected_kind": null,
+      "gold_in_store": null,
+      "gold_in_store_kind": null,
+      "gold_in_local_raw": null,
+      "gold_in_local_raw_kind": null,
+      "gold_in_all_raw": null,
+      "gold_in_all_raw_kind": null,
+      "sessions_in_context": 9,
+      "session_coverage": [
+        {
+          "session_id": "scoped-session-v1:8:57f827a06e110a53_1",
+          "memories_in_store": 4,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:57f827a0answer_1bde8d3b",
+          "memories_in_store": 7,
+          "memories_in_context": 5,
+          "turns_in_store": 14
+        },
+        {
+          "session_id": "scoped-session-v1:8:57f827a0c8a64300",
+          "memories_in_store": 3,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:57f827a0d0f42e3f",
+          "memories_in_store": 4,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:57f827a0e85e0eaf_1",
+          "memories_in_store": 3,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:57f827a0e9ad5914_1",
+          "memories_in_store": 56,
+          "memories_in_context": 4,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:57f827a0ultrachat_142447",
+          "memories_in_store": 6,
+          "memories_in_context": 2,
+          "turns_in_store": 14
+        },
+        {
+          "session_id": "scoped-session-v1:8:57f827a0ultrachat_2904",
+          "memories_in_store": 9,
+          "memories_in_context": 2,
+          "turns_in_store": 10
+        },
+        {
+          "session_id": "scoped-session-v1:8:57f827a0ultrachat_550529",
+          "memories_in_store": 4,
+          "memories_in_context": 2,
+          "turns_in_store": 6
+        }
+      ],
+      "context_tokens": 636
+    },
+    {
+      "question_id": "58470ed2",
+      "question_type": "single-session-assistant",
+      "correct": true,
+      "measurable": true,
+      "fallback_level": "archive_wide",
+      "raw_reached_the_reader": true,
+      "all_source_sessions_recalled": false,
+      "gold_in_selected": false,
+      "gold_in_selected_kind": null,
+      "gold_in_store": false,
+      "gold_in_store_kind": null,
+      "gold_in_local_raw": false,
+      "gold_in_local_raw_kind": null,
+      "gold_in_all_raw": true,
+      "gold_in_all_raw_kind": "tokens",
+      "sessions_in_context": 10,
+      "session_coverage": [
+        {
+          "session_id": "scoped-session-v1:8:58470ed2020149a5_1",
+          "memories_in_store": 8,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:58470ed22f2884ad_3",
+          "memories_in_store": 5,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:58470ed28ca0085a_3",
+          "memories_in_store": 3,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:58470ed2b6018747_4",
+          "memories_in_store": 24,
+          "memories_in_context": 10,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:58470ed2ff49b5a5_3",
+          "memories_in_store": 11,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:58470ed2sharegpt_1EZ78Ms_0",
+          "memories_in_store": 3,
+          "memories_in_context": 1,
+          "turns_in_store": 8
+        },
+        {
+          "session_id": "scoped-session-v1:8:58470ed2sharegpt_6QUDIXG_104",
+          "memories_in_store": 3,
+          "memories_in_context": 1,
+          "turns_in_store": 8
+        },
+        {
+          "session_id": "scoped-session-v1:8:58470ed2sharegpt_siSd9ET_0",
+          "memories_in_store": 6,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:58470ed2sharegpt_xSFBEuR_0",
+          "memories_in_store": 1,
+          "memories_in_context": 1,
+          "turns_in_store": 2
+        },
+        {
+          "session_id": "scoped-session-v1:8:58470ed2ultrachat_478785",
+          "memories_in_store": 5,
+          "memories_in_context": 1,
+          "turns_in_store": 14
+        }
+      ],
+      "context_tokens": 1175
+    },
+    {
+      "question_id": "58ef2f1c",
+      "question_type": "single-session-user",
+      "correct": false,
+      "measurable": true,
+      "fallback_level": "none",
+      "raw_reached_the_reader": false,
+      "all_source_sessions_recalled": true,
+      "gold_in_selected": false,
+      "gold_in_selected_kind": null,
+      "gold_in_store": false,
+      "gold_in_store_kind": null,
+      "gold_in_local_raw": false,
+      "gold_in_local_raw_kind": null,
+      "gold_in_all_raw": true,
+      "gold_in_all_raw_kind": "numeric",
+      "sessions_in_context": 12,
+      "session_coverage": [
+        {
+          "session_id": "scoped-session-v1:8:58ef2f1c13f3da23_3",
+          "memories_in_store": 8,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:58ef2f1c705b5399_1",
+          "memories_in_store": 8,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:58ef2f1canswer_59547700",
+          "memories_in_store": 6,
+          "memories_in_context": 6,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:58ef2f1cb546cb39_2",
+          "memories_in_store": 5,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:58ef2f1ce82ce7cd_1",
+          "memories_in_store": 3,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:58ef2f1ced9482a2_2",
+          "memories_in_store": 4,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:58ef2f1cf1fe6512_3",
+          "memories_in_store": 6,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:58ef2f1cfa668463",
+          "memories_in_store": 5,
+          "memories_in_context": 4,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:58ef2f1cultrachat_243813",
+          "memories_in_store": 2,
+          "memories_in_context": 1,
+          "turns_in_store": 8
+        },
+        {
+          "session_id": "scoped-session-v1:8:58ef2f1cultrachat_246324",
+          "memories_in_store": 2,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:58ef2f1cultrachat_477344",
+          "memories_in_store": 2,
+          "memories_in_context": 1,
+          "turns_in_store": 10
+        },
+        {
+          "session_id": "scoped-session-v1:8:58ef2f1cultrachat_95431",
+          "memories_in_store": 2,
+          "memories_in_context": 1,
+          "turns_in_store": 14
+        }
+      ],
+      "context_tokens": 1061
+    },
+    {
+      "question_id": "6613b389",
+      "question_type": "temporal-reasoning",
+      "correct": true,
+      "measurable": true,
+      "fallback_level": "none",
+      "raw_reached_the_reader": false,
+      "all_source_sessions_recalled": true,
+      "gold_in_selected": true,
+      "gold_in_selected_kind": "exact",
+      "gold_in_store": true,
+      "gold_in_store_kind": "exact",
+      "gold_in_local_raw": true,
+      "gold_in_local_raw_kind": "exact",
+      "gold_in_all_raw": true,
+      "gold_in_all_raw_kind": "exact",
+      "sessions_in_context": 13,
+      "session_coverage": [
+        {
+          "session_id": "scoped-session-v1:8:6613b3891a65880d",
+          "memories_in_store": 4,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:6613b3892366adbc",
+          "memories_in_store": 1,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:6613b389268be669_1",
+          "memories_in_store": 4,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:6613b3892780323d_3",
+          "memories_in_store": 4,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:6613b38986c8f348_1",
+          "memories_in_store": 5,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:6613b389a8ef396f_1",
+          "memories_in_store": 12,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:6613b389answer_aaf71ce2_1",
+          "memories_in_store": 4,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:6613b389answer_aaf71ce2_2",
+          "memories_in_store": 4,
+          "memories_in_context": 4,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:6613b389answer_aaf71ce2_3",
+          "memories_in_store": 3,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:6613b389deb6dd25",
+          "memories_in_store": 3,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:6613b389f1163e57",
+          "memories_in_store": 5,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:6613b389f1cc1ddb_1",
+          "memories_in_store": 1,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:6613b389ffde9da9_3",
+          "memories_in_store": 17,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        }
+      ],
+      "context_tokens": 495
+    },
+    {
+      "question_id": "6a1eabeb",
+      "question_type": "knowledge-update",
+      "correct": true,
+      "measurable": true,
+      "fallback_level": "none",
+      "raw_reached_the_reader": false,
+      "all_source_sessions_recalled": true,
+      "gold_in_selected": true,
+      "gold_in_selected_kind": "numeric",
+      "gold_in_store": true,
+      "gold_in_store_kind": "numeric",
+      "gold_in_local_raw": true,
+      "gold_in_local_raw_kind": "numeric",
+      "gold_in_all_raw": true,
+      "gold_in_all_raw_kind": "numeric",
+      "sessions_in_context": 10,
+      "session_coverage": [
+        {
+          "session_id": "scoped-session-v1:8:6a1eabeb4aaf678f_3",
+          "memories_in_store": 6,
+          "memories_in_context": 6,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:6a1eabeb4c49e37f",
+          "memories_in_store": 3,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:6a1eabeb6c456a5d",
+          "memories_in_store": 3,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:6a1eabeb6da0bba2_1",
+          "memories_in_store": 5,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:6a1eabeb86b8dc6e",
+          "memories_in_store": 4,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:6a1eabeb9b3a7f2c_1",
+          "memories_in_store": 2,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:6a1eabeb9f80607d",
+          "memories_in_store": 15,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:6a1eabebanswer_a25d4a91_1",
+          "memories_in_store": 3,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:6a1eabebanswer_a25d4a91_2",
+          "memories_in_store": 2,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:6a1eabebd03995c6",
+          "memories_in_store": 4,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        }
+      ],
+      "context_tokens": 505
+    },
+    {
+      "question_id": "6aeb4375_abs",
+      "question_type": "knowledge-update",
+      "correct": true,
+      "measurable": false,
+      "fallback_level": "archive_wide",
+      "raw_reached_the_reader": true,
+      "all_source_sessions_recalled": true,
+      "gold_in_selected": null,
+      "gold_in_selected_kind": null,
+      "gold_in_store": null,
+      "gold_in_store_kind": null,
+      "gold_in_local_raw": null,
+      "gold_in_local_raw_kind": null,
+      "gold_in_all_raw": null,
+      "gold_in_all_raw_kind": null,
+      "sessions_in_context": 8,
+      "session_coverage": [
+        {
+          "session_id": "scoped-session-v1:12:6aeb4375_abs24cb335f",
+          "memories_in_store": 5,
+          "memories_in_context": 3,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:12:6aeb4375_abs9205e608_1",
+          "memories_in_store": 7,
+          "memories_in_context": 4,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:12:6aeb4375_absa5286353_1",
+          "memories_in_store": 3,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:12:6aeb4375_absanswer_3f9693b7_abs_1",
+          "memories_in_store": 7,
+          "memories_in_context": 5,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:12:6aeb4375_absanswer_3f9693b7_abs_2",
+          "memories_in_store": 4,
+          "memories_in_context": 3,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:12:6aeb4375_absc6c5bb8b_1",
+          "memories_in_store": 2,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:12:6aeb4375_absultrachat_181672",
+          "memories_in_store": 4,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:12:6aeb4375_absultrachat_281078",
+          "memories_in_store": 4,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        }
+      ],
+      "context_tokens": 1198
+    },
+    {
+      "question_id": "6b168ec8",
+      "question_type": "single-session-user",
+      "correct": true,
+      "measurable": true,
+      "fallback_level": "none",
+      "raw_reached_the_reader": false,
+      "all_source_sessions_recalled": true,
+      "gold_in_selected": true,
+      "gold_in_selected_kind": "exact",
+      "gold_in_store": true,
+      "gold_in_store_kind": "exact",
+      "gold_in_local_raw": true,
+      "gold_in_local_raw_kind": "exact",
+      "gold_in_all_raw": true,
+      "gold_in_all_raw_kind": "exact",
+      "sessions_in_context": 13,
+      "session_coverage": [
+        {
+          "session_id": "scoped-session-v1:8:6b168ec802f0738e_1",
+          "memories_in_store": 7,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:6b168ec832cf110f_1",
+          "memories_in_store": 4,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:6b168ec8388c5534_1",
+          "memories_in_store": 3,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:6b168ec8443688cc_2",
+          "memories_in_store": 3,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:6b168ec865bc93cf_2",
+          "memories_in_store": 5,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:6b168ec89272a6a2_1",
+          "memories_in_store": 3,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:6b168ec8afffd8ec_3",
+          "memories_in_store": 3,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:6b168ec8answer_e623ae87",
+          "memories_in_store": 5,
+          "memories_in_context": 5,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:6b168ec8b729da5f_1",
+          "memories_in_store": 5,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:6b168ec8sharegpt_hUhgRkO_0",
+          "memories_in_store": 3,
+          "memories_in_context": 2,
+          "turns_in_store": 4
+        },
+        {
+          "session_id": "scoped-session-v1:8:6b168ec8ultrachat_377741",
+          "memories_in_store": 7,
+          "memories_in_context": 1,
+          "turns_in_store": 10
+        },
+        {
+          "session_id": "scoped-session-v1:8:6b168ec8ultrachat_414934",
+          "memories_in_store": 1,
+          "memories_in_context": 1,
+          "turns_in_store": 14
+        },
+        {
+          "session_id": "scoped-session-v1:8:6b168ec8ultrachat_82263",
+          "memories_in_store": 2,
+          "memories_in_context": 1,
+          "turns_in_store": 10
+        }
+      ],
+      "context_tokens": 628
+    },
+    {
+      "question_id": "6e984301",
+      "question_type": "temporal-reasoning",
+      "correct": true,
+      "measurable": true,
+      "fallback_level": "none",
+      "raw_reached_the_reader": false,
+      "all_source_sessions_recalled": true,
+      "gold_in_selected": true,
+      "gold_in_selected_kind": "exact",
+      "gold_in_store": true,
+      "gold_in_store_kind": "exact",
+      "gold_in_local_raw": true,
+      "gold_in_local_raw_kind": "exact",
+      "gold_in_all_raw": true,
+      "gold_in_all_raw_kind": "exact",
+      "sessions_in_context": 9,
+      "session_coverage": [
+        {
+          "session_id": "scoped-session-v1:8:6e9843010daaefa7_1",
+          "memories_in_store": 2,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:6e98430131903f54",
+          "memories_in_store": 8,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:6e984301535ce50e_2",
+          "memories_in_store": 11,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:6e98430188a7faa7_1",
+          "memories_in_store": 9,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:6e984301answer_88841f26_1",
+          "memories_in_store": 13,
+          "memories_in_context": 9,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:6e984301answer_88841f26_2",
+          "memories_in_store": 2,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:6e984301b38766c1_2",
+          "memories_in_store": 2,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:6e984301e1527aa0",
+          "memories_in_store": 28,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:6e984301ultrachat_475380",
+          "memories_in_store": 2,
+          "memories_in_context": 2,
+          "turns_in_store": 14
+        }
+      ],
+      "context_tokens": 606
+    },
+    {
+      "question_id": "7401057b",
+      "question_type": "knowledge-update",
+      "correct": true,
+      "measurable": true,
+      "fallback_level": "none",
+      "raw_reached_the_reader": false,
+      "all_source_sessions_recalled": true,
+      "gold_in_selected": true,
+      "gold_in_selected_kind": "exact",
+      "gold_in_store": true,
+      "gold_in_store_kind": "exact",
+      "gold_in_local_raw": true,
+      "gold_in_local_raw_kind": "exact",
+      "gold_in_all_raw": true,
+      "gold_in_all_raw_kind": "exact",
+      "sessions_in_context": 9,
+      "session_coverage": [
+        {
+          "session_id": "scoped-session-v1:8:7401057b1450ffad",
+          "memories_in_store": 4,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:7401057b307ada00",
+          "memories_in_store": 6,
+          "memories_in_context": 3,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:7401057b30f20967_2",
+          "memories_in_store": 26,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:7401057b42e69993_1",
+          "memories_in_store": 13,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:7401057b5e906cb0_1",
+          "memories_in_store": 3,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:7401057banswer_94650bfa_1",
+          "memories_in_store": 4,
+          "memories_in_context": 4,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:7401057banswer_94650bfa_2",
+          "memories_in_store": 6,
+          "memories_in_context": 4,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:7401057bc38a915a_1",
+          "memories_in_store": 5,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:7401057be28f75f4",
+          "memories_in_store": 4,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        }
+      ],
+      "context_tokens": 566
+    },
+    {
+      "question_id": "778164c6",
+      "question_type": "single-session-assistant",
+      "correct": true,
+      "measurable": true,
+      "fallback_level": "none",
+      "raw_reached_the_reader": false,
+      "all_source_sessions_recalled": true,
+      "gold_in_selected": false,
+      "gold_in_selected_kind": null,
+      "gold_in_store": false,
+      "gold_in_store_kind": null,
+      "gold_in_local_raw": true,
+      "gold_in_local_raw_kind": "exact",
+      "gold_in_all_raw": true,
+      "gold_in_all_raw_kind": "exact",
+      "sessions_in_context": 9,
+      "session_coverage": [
+        {
+          "session_id": "scoped-session-v1:8:778164c635201d43",
+          "memories_in_store": 16,
+          "memories_in_context": 3,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:778164c6answer_ultrachat_399000",
+          "memories_in_store": 3,
+          "memories_in_context": 3,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:778164c6b605741a_1",
+          "memories_in_store": 5,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:778164c6c15dadce_4",
+          "memories_in_store": 3,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:778164c6c6bd5277",
+          "memories_in_store": 27,
+          "memories_in_context": 5,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:778164c6sharegpt_WXCvFir_11",
+          "memories_in_store": 11,
+          "memories_in_context": 2,
+          "turns_in_store": 13
+        },
+        {
+          "session_id": "scoped-session-v1:8:778164c6sharegpt_mWsFRK3_127",
+          "memories_in_store": 7,
+          "memories_in_context": 1,
+          "turns_in_store": 27
+        },
+        {
+          "session_id": "scoped-session-v1:8:778164c6ultrachat_144598",
+          "memories_in_store": 3,
+          "memories_in_context": 2,
+          "turns_in_store": 10
+        },
+        {
+          "session_id": "scoped-session-v1:8:778164c6ultrachat_346016",
+          "memories_in_store": 4,
+          "memories_in_context": 2,
+          "turns_in_store": 14
+        }
+      ],
+      "context_tokens": 1146
+    },
+    {
+      "question_id": "7a8d0b71",
+      "question_type": "single-session-assistant",
+      "correct": true,
+      "measurable": true,
+      "fallback_level": "none",
+      "raw_reached_the_reader": false,
+      "all_source_sessions_recalled": true,
+      "gold_in_selected": true,
+      "gold_in_selected_kind": "exact",
+      "gold_in_store": true,
+      "gold_in_store_kind": "exact",
+      "gold_in_local_raw": true,
+      "gold_in_local_raw_kind": "exact",
+      "gold_in_all_raw": true,
+      "gold_in_all_raw_kind": "exact",
+      "sessions_in_context": 12,
+      "session_coverage": [
+        {
+          "session_id": "scoped-session-v1:8:7a8d0b710479bc75_1",
+          "memories_in_store": 5,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:7a8d0b71147ab7e9_5",
+          "memories_in_store": 4,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:7a8d0b711e26715f",
+          "memories_in_store": 3,
+          "memories_in_context": 3,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:7a8d0b71369695b4_1",
+          "memories_in_store": 3,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:7a8d0b717a8f5003",
+          "memories_in_store": 7,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:7a8d0b71881d8e9b_1",
+          "memories_in_store": 6,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:7a8d0b718969b3ca_2",
+          "memories_in_store": 6,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:7a8d0b71answer_sharegpt_i0tMT9q_9",
+          "memories_in_store": 3,
+          "memories_in_context": 3,
+          "turns_in_store": 5
+        },
+        {
+          "session_id": "scoped-session-v1:8:7a8d0b71c14e3f09_2",
+          "memories_in_store": 17,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:7a8d0b71f07752be_1",
+          "memories_in_store": 4,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:7a8d0b71f20e72e4_2",
+          "memories_in_store": 2,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:7a8d0b71ultrachat_115445",
+          "memories_in_store": 1,
+          "memories_in_context": 1,
+          "turns_in_store": 10
+        }
+      ],
+      "context_tokens": 541
+    },
+    {
+      "question_id": "8a2466db",
+      "question_type": "single-session-preference",
+      "correct": true,
+      "measurable": false,
+      "fallback_level": "none",
+      "raw_reached_the_reader": false,
+      "all_source_sessions_recalled": true,
+      "gold_in_selected": null,
+      "gold_in_selected_kind": null,
+      "gold_in_store": null,
+      "gold_in_store_kind": null,
+      "gold_in_local_raw": null,
+      "gold_in_local_raw_kind": null,
+      "gold_in_all_raw": null,
+      "gold_in_all_raw_kind": null,
+      "sessions_in_context": 8,
+      "session_coverage": [
+        {
+          "session_id": "scoped-session-v1:8:8a2466db6a5b5a78",
+          "memories_in_store": 5,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:8a2466db6dcf5fa0_1",
+          "memories_in_store": 9,
+          "memories_in_context": 3,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:8a2466db898bef66",
+          "memories_in_store": 3,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:8a2466dbanswer_edb03329",
+          "memories_in_store": 19,
+          "memories_in_context": 9,
+          "turns_in_store": 18
+        },
+        {
+          "session_id": "scoped-session-v1:8:8a2466dbb67748d1_1",
+          "memories_in_store": 5,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:8a2466dbd8b3e1c8_2",
+          "memories_in_store": 3,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:8a2466dbsharegpt_osTHjYi_0",
+          "memories_in_store": 2,
+          "memories_in_context": 2,
+          "turns_in_store": 4
+        },
+        {
+          "session_id": "scoped-session-v1:8:8a2466dbultrachat_69749",
+          "memories_in_store": 11,
+          "memories_in_context": 2,
+          "turns_in_store": 6
+        }
+      ],
+      "context_tokens": 756
+    },
+    {
+      "question_id": "8ebdbe50",
+      "question_type": "single-session-user",
+      "correct": true,
+      "measurable": true,
+      "fallback_level": "none",
+      "raw_reached_the_reader": false,
+      "all_source_sessions_recalled": true,
+      "gold_in_selected": true,
+      "gold_in_selected_kind": "exact",
+      "gold_in_store": true,
+      "gold_in_store_kind": "exact",
+      "gold_in_local_raw": true,
+      "gold_in_local_raw_kind": "exact",
+      "gold_in_all_raw": true,
+      "gold_in_all_raw_kind": "exact",
+      "sessions_in_context": 11,
+      "session_coverage": [
+        {
+          "session_id": "scoped-session-v1:8:8ebdbe5001e806f0_1",
+          "memories_in_store": 4,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:8ebdbe50326f41d8",
+          "memories_in_store": 5,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:8ebdbe50407dd888",
+          "memories_in_store": 4,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:8ebdbe50795534dc_3",
+          "memories_in_store": 5,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:8ebdbe5090f16f14_2",
+          "memories_in_store": 4,
+          "memories_in_context": 3,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:8ebdbe5094e2773e",
+          "memories_in_store": 5,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:8ebdbe50answer_8ad8a34f",
+          "memories_in_store": 7,
+          "memories_in_context": 4,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:8ebdbe50b53f447a_1",
+          "memories_in_store": 3,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:8ebdbe50d87ea945",
+          "memories_in_store": 4,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:8ebdbe50sharegpt_QgPR6sN_15",
+          "memories_in_store": 5,
+          "memories_in_context": 2,
+          "turns_in_store": 9
+        },
+        {
+          "session_id": "scoped-session-v1:8:8ebdbe50sharegpt_c0PdB3l_0",
+          "memories_in_store": 4,
+          "memories_in_context": 2,
+          "turns_in_store": 6
+        }
+      ],
+      "context_tokens": 590
+    },
+    {
+      "question_id": "95228167",
+      "question_type": "single-session-preference",
+      "correct": true,
+      "measurable": false,
+      "fallback_level": "none",
+      "raw_reached_the_reader": false,
+      "all_source_sessions_recalled": true,
+      "gold_in_selected": null,
+      "gold_in_selected_kind": null,
+      "gold_in_store": null,
+      "gold_in_store_kind": null,
+      "gold_in_local_raw": null,
+      "gold_in_local_raw_kind": null,
+      "gold_in_all_raw": null,
+      "gold_in_all_raw_kind": null,
+      "sessions_in_context": 13,
+      "session_coverage": [
+        {
+          "session_id": "scoped-session-v1:8:95228167084802f9_2",
+          "memories_in_store": 14,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:9522816757d6e39b_2",
+          "memories_in_store": 5,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:952281675d8c99d3_3",
+          "memories_in_store": 13,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:952281678d77be9a_2",
+          "memories_in_store": 10,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:952281679f80607d",
+          "memories_in_store": 2,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:95228167aa71db11_1",
+          "memories_in_store": 5,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:95228167aec83540_1",
+          "memories_in_store": 4,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:95228167answer_5e613445",
+          "memories_in_store": 2,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:95228167b916da64_2",
+          "memories_in_store": 5,
+          "memories_in_context": 4,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:95228167c34b6a1c_1",
+          "memories_in_store": 22,
+          "memories_in_context": 3,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:95228167cb88f886_1",
+          "memories_in_store": 3,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:95228167e2691068",
+          "memories_in_store": 6,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:95228167ultrachat_262230",
+          "memories_in_store": 1,
+          "memories_in_context": 1,
+          "turns_in_store": 8
+        }
+      ],
+      "context_tokens": 653
+    },
+    {
+      "question_id": "982b5123",
+      "question_type": "temporal-reasoning",
+      "correct": true,
+      "measurable": true,
+      "fallback_level": "archive_wide",
+      "raw_reached_the_reader": true,
+      "all_source_sessions_recalled": true,
+      "gold_in_selected": false,
+      "gold_in_selected_kind": null,
+      "gold_in_store": false,
+      "gold_in_store_kind": null,
+      "gold_in_local_raw": false,
+      "gold_in_local_raw_kind": null,
+      "gold_in_all_raw": true,
+      "gold_in_all_raw_kind": "tokens",
+      "sessions_in_context": 10,
+      "session_coverage": [
+        {
+          "session_id": "scoped-session-v1:8:982b512307ba9acd_2",
+          "memories_in_store": 3,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:982b5123359a2a0d",
+          "memories_in_store": 4,
+          "memories_in_context": 3,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:982b512391168bd2_1",
+          "memories_in_store": 5,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:982b51239a955705",
+          "memories_in_store": 3,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:982b5123a916670f_1",
+          "memories_in_store": 3,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:982b5123answer_ab603dd5_1",
+          "memories_in_store": 7,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:982b5123answer_ab603dd5_2",
+          "memories_in_store": 9,
+          "memories_in_context": 5,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:982b5123bf8ab267",
+          "memories_in_store": 7,
+          "memories_in_context": 3,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:982b5123e94b6708",
+          "memories_in_store": 1,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:982b5123f89f184e_1",
+          "memories_in_store": 6,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        }
+      ],
+      "context_tokens": 1148
+    },
+    {
+      "question_id": "9a707b82",
+      "question_type": "temporal-reasoning",
+      "correct": true,
+      "measurable": true,
+      "fallback_level": "none",
+      "raw_reached_the_reader": false,
+      "all_source_sessions_recalled": true,
+      "gold_in_selected": true,
+      "gold_in_selected_kind": "exact",
+      "gold_in_store": true,
+      "gold_in_store_kind": "exact",
+      "gold_in_local_raw": true,
+      "gold_in_local_raw_kind": "exact",
+      "gold_in_all_raw": true,
+      "gold_in_all_raw_kind": "exact",
+      "sessions_in_context": 7,
+      "session_coverage": [
+        {
+          "session_id": "scoped-session-v1:8:9a707b8268d35085_1",
+          "memories_in_store": 3,
+          "memories_in_context": 3,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:9a707b827a4d00b3_2",
+          "memories_in_store": 5,
+          "memories_in_context": 4,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:9a707b82990f3ef9_2",
+          "memories_in_store": 9,
+          "memories_in_context": 5,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:9a707b82answer_dba89488_1",
+          "memories_in_store": 3,
+          "memories_in_context": 3,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:9a707b82answer_dba89488_2",
+          "memories_in_store": 4,
+          "memories_in_context": 3,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:9a707b82fab41c07",
+          "memories_in_store": 4,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:9a707b82ultrachat_466884",
+          "memories_in_store": 3,
+          "memories_in_context": 1,
+          "turns_in_store": 14
+        }
+      ],
+      "context_tokens": 530
+    },
+    {
+      "question_id": "a4996e51",
+      "question_type": "multi-session",
+      "correct": false,
+      "measurable": false,
+      "fallback_level": "none",
+      "raw_reached_the_reader": false,
+      "all_source_sessions_recalled": true,
+      "gold_in_selected": null,
+      "gold_in_selected_kind": null,
+      "gold_in_store": null,
+      "gold_in_store_kind": null,
+      "gold_in_local_raw": null,
+      "gold_in_local_raw_kind": null,
+      "gold_in_all_raw": null,
+      "gold_in_all_raw_kind": null,
+      "sessions_in_context": 12,
+      "session_coverage": [
+        {
+          "session_id": "scoped-session-v1:8:a4996e51252715f8_3",
+          "memories_in_store": 3,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:a4996e5128a64f28_2",
+          "memories_in_store": 4,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:a4996e515dbb6a80_2",
+          "memories_in_store": 9,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:a4996e51answer_feb5f98a_1",
+          "memories_in_store": 4,
+          "memories_in_context": 3,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:a4996e51answer_feb5f98a_2",
+          "memories_in_store": 4,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:a4996e51b1d9eb66_3",
+          "memories_in_store": 6,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:a4996e51bb236214",
+          "memories_in_store": 8,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:a4996e51c1dac02f",
+          "memories_in_store": 8,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:a4996e51eea3e4be_2",
+          "memories_in_store": 11,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:a4996e51sharegpt_tvcY0lQ_0",
+          "memories_in_store": 4,
+          "memories_in_context": 1,
+          "turns_in_store": 14
+        },
+        {
+          "session_id": "scoped-session-v1:8:a4996e51ultrachat_506025",
+          "memories_in_store": 1,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:a4996e51ultrachat_64410",
+          "memories_in_store": 7,
+          "memories_in_context": 2,
+          "turns_in_store": 6
+        }
+      ],
+      "context_tokens": 518
+    },
+    {
+      "question_id": "a82c026e",
+      "question_type": "single-session-user",
+      "correct": true,
+      "measurable": true,
+      "fallback_level": "none",
+      "raw_reached_the_reader": false,
+      "all_source_sessions_recalled": true,
+      "gold_in_selected": true,
+      "gold_in_selected_kind": "exact",
+      "gold_in_store": true,
+      "gold_in_store_kind": "exact",
+      "gold_in_local_raw": true,
+      "gold_in_local_raw_kind": "exact",
+      "gold_in_all_raw": true,
+      "gold_in_all_raw_kind": "exact",
+      "sessions_in_context": 13,
+      "session_coverage": [
+        {
+          "session_id": "scoped-session-v1:8:a82c026e1a693999_4",
+          "memories_in_store": 11,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:a82c026e23c0f73a_1",
+          "memories_in_store": 9,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:a82c026e3009ba66_2",
+          "memories_in_store": 7,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:a82c026e516b0aae_1",
+          "memories_in_store": 5,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:a82c026e661e2cf8_2",
+          "memories_in_store": 7,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:a82c026e752392bb_3",
+          "memories_in_store": 4,
+          "memories_in_context": 4,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:a82c026ea31b0b32_1",
+          "memories_in_store": 4,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:a82c026ea6c41826_3",
+          "memories_in_store": 3,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:a82c026eanswer_787e6a6d",
+          "memories_in_store": 3,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:a82c026eccaabf0b_1",
+          "memories_in_store": 4,
+          "memories_in_context": 4,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:a82c026ed9727262_4",
+          "memories_in_store": 4,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:a82c026esharegpt_MBVSMQO_45",
+          "memories_in_store": 7,
+          "memories_in_context": 1,
+          "turns_in_store": 17
+        },
+        {
+          "session_id": "scoped-session-v1:8:a82c026esharegpt_u71pVhw_0",
+          "memories_in_store": 1,
+          "memories_in_context": 1,
+          "turns_in_store": 2
+        }
+      ],
+      "context_tokens": 678
+    },
+    {
+      "question_id": "a96c20ee",
+      "question_type": "multi-session",
+      "correct": true,
+      "measurable": false,
+      "fallback_level": "none",
+      "raw_reached_the_reader": false,
+      "all_source_sessions_recalled": true,
+      "gold_in_selected": null,
+      "gold_in_selected_kind": null,
+      "gold_in_store": null,
+      "gold_in_store_kind": null,
+      "gold_in_local_raw": null,
+      "gold_in_local_raw_kind": null,
+      "gold_in_all_raw": null,
+      "gold_in_all_raw_kind": null,
+      "sessions_in_context": 15,
+      "session_coverage": [
+        {
+          "session_id": "scoped-session-v1:8:a96c20ee01d4b26b_2",
+          "memories_in_store": 3,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:a96c20ee0a513c02_1",
+          "memories_in_store": 31,
+          "memories_in_context": 3,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:a96c20ee18cfdd41_1",
+          "memories_in_store": 9,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:a96c20ee1b51fb71_1",
+          "memories_in_store": 2,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:a96c20ee3e19c52e_3",
+          "memories_in_store": 8,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:a96c20ee896bcc41",
+          "memories_in_store": 4,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:a96c20ee9ca3534f_1",
+          "memories_in_store": 5,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:a96c20eeaf843d70",
+          "memories_in_store": 3,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:a96c20eeanswer_ef84b994_1",
+          "memories_in_store": 6,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:a96c20eeanswer_ef84b994_2",
+          "memories_in_store": 1,
+          "memories_in_context": 1,
+          "turns_in_store": 10
+        },
+        {
+          "session_id": "scoped-session-v1:8:a96c20eeb8620ffe_2",
+          "memories_in_store": 4,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:a96c20eec69eb8ee_4",
+          "memories_in_store": 6,
+          "memories_in_context": 3,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:a96c20eesharegpt_00qHEQ6_0",
+          "memories_in_store": 1,
+          "memories_in_context": 1,
+          "turns_in_store": 2
+        },
+        {
+          "session_id": "scoped-session-v1:8:a96c20eesharegpt_HxYsSjW_0",
+          "memories_in_store": 1,
+          "memories_in_context": 1,
+          "turns_in_store": 2
+        },
+        {
+          "session_id": "scoped-session-v1:8:a96c20eeultrachat_286736",
+          "memories_in_store": 5,
+          "memories_in_context": 1,
+          "turns_in_store": 10
+        }
+      ],
+      "context_tokens": 645
+    },
+    {
+      "question_id": "a9f6b44c",
+      "question_type": "multi-session",
+      "correct": false,
+      "measurable": false,
+      "fallback_level": "none",
+      "raw_reached_the_reader": false,
+      "all_source_sessions_recalled": true,
+      "gold_in_selected": null,
+      "gold_in_selected_kind": null,
+      "gold_in_store": null,
+      "gold_in_store_kind": null,
+      "gold_in_local_raw": null,
+      "gold_in_local_raw_kind": null,
+      "gold_in_all_raw": null,
+      "gold_in_all_raw_kind": null,
+      "sessions_in_context": 5,
+      "session_coverage": [
+        {
+          "session_id": "scoped-session-v1:8:a9f6b44c837f258b",
+          "memories_in_store": 6,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:a9f6b44canswer_cc021f81_1",
+          "memories_in_store": 4,
+          "memories_in_context": 3,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:a9f6b44canswer_cc021f81_2",
+          "memories_in_store": 7,
+          "memories_in_context": 6,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:a9f6b44canswer_cc021f81_3",
+          "memories_in_store": 11,
+          "memories_in_context": 9,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:a9f6b44cec8d10c7_2",
+          "memories_in_store": 5,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        }
+      ],
+      "context_tokens": 543
+    },
+    {
+      "question_id": "af8d2e46",
+      "question_type": "single-session-user",
+      "correct": true,
+      "measurable": true,
+      "fallback_level": "archive_wide",
+      "raw_reached_the_reader": true,
+      "all_source_sessions_recalled": true,
+      "gold_in_selected": true,
+      "gold_in_selected_kind": "exact",
+      "gold_in_store": true,
+      "gold_in_store_kind": "exact",
+      "gold_in_local_raw": true,
+      "gold_in_local_raw_kind": "exact",
+      "gold_in_all_raw": true,
+      "gold_in_all_raw_kind": "exact",
+      "sessions_in_context": 12,
+      "session_coverage": [
+        {
+          "session_id": "scoped-session-v1:8:af8d2e4613047a02",
+          "memories_in_store": 3,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:af8d2e4633c3b457",
+          "memories_in_store": 8,
+          "memories_in_context": 7,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:af8d2e463a1ea336_7",
+          "memories_in_store": 5,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:af8d2e4643668d77_1",
+          "memories_in_store": 9,
+          "memories_in_context": 3,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:af8d2e467f61409f",
+          "memories_in_store": 7,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:af8d2e4682a89303",
+          "memories_in_store": 4,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:af8d2e46answer_82a04f59",
+          "memories_in_store": 1,
+          "memories_in_context": 1,
+          "turns_in_store": 10
+        },
+        {
+          "session_id": "scoped-session-v1:8:af8d2e46bdd64321",
+          "memories_in_store": 3,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:af8d2e46deb12028_4",
+          "memories_in_store": 3,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:af8d2e46ultrachat_164840",
+          "memories_in_store": 1,
+          "memories_in_context": 1,
+          "turns_in_store": 6
+        },
+        {
+          "session_id": "scoped-session-v1:8:af8d2e46ultrachat_178033",
+          "memories_in_store": 5,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:af8d2e46ultrachat_392096",
+          "memories_in_store": 8,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        }
+      ],
+      "context_tokens": 1070
+    },
+    {
+      "question_id": "b759caee",
+      "question_type": "single-session-assistant",
+      "correct": true,
+      "measurable": true,
+      "fallback_level": "none",
+      "raw_reached_the_reader": false,
+      "all_source_sessions_recalled": true,
+      "gold_in_selected": true,
+      "gold_in_selected_kind": "exact",
+      "gold_in_store": true,
+      "gold_in_store_kind": "exact",
+      "gold_in_local_raw": true,
+      "gold_in_local_raw_kind": "exact",
+      "gold_in_all_raw": true,
+      "gold_in_all_raw_kind": "exact",
+      "sessions_in_context": 12,
+      "session_coverage": [
+        {
+          "session_id": "scoped-session-v1:8:b759caee0bad887e_2",
+          "memories_in_store": 9,
+          "memories_in_context": 3,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:b759caee191f4c9b_2",
+          "memories_in_store": 4,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:b759caee3a757e4a",
+          "memories_in_store": 6,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:b759caee6be2f065_1",
+          "memories_in_store": 4,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:b759caeeabecc1b6",
+          "memories_in_store": 5,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:b759caeeanswer_sharegpt_2BSXlAr_0",
+          "memories_in_store": 3,
+          "memories_in_context": 3,
+          "turns_in_store": 2
+        },
+        {
+          "session_id": "scoped-session-v1:8:b759caeed3575920",
+          "memories_in_store": 3,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:b759caeef55fee5b_4",
+          "memories_in_store": 5,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:b759caeefcae5c39_1",
+          "memories_in_store": 4,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:b759caeeffa51434_3",
+          "memories_in_store": 6,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:b759caeeultrachat_45704",
+          "memories_in_store": 2,
+          "memories_in_context": 1,
+          "turns_in_store": 8
+        },
+        {
+          "session_id": "scoped-session-v1:8:b759caeeultrachat_555476",
+          "memories_in_store": 18,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        }
+      ],
+      "context_tokens": 532
+    },
+    {
+      "question_id": "bc149d6b",
+      "question_type": "multi-session",
+      "correct": true,
+      "measurable": false,
+      "fallback_level": "none",
+      "raw_reached_the_reader": false,
+      "all_source_sessions_recalled": true,
+      "gold_in_selected": null,
+      "gold_in_selected_kind": null,
+      "gold_in_store": null,
+      "gold_in_store_kind": null,
+      "gold_in_local_raw": null,
+      "gold_in_local_raw_kind": null,
+      "gold_in_all_raw": null,
+      "gold_in_all_raw_kind": null,
+      "sessions_in_context": 11,
+      "session_coverage": [
+        {
+          "session_id": "scoped-session-v1:8:bc149d6b05be3ff0_3",
+          "memories_in_store": 5,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:bc149d6b4f435d20_2",
+          "memories_in_store": 2,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:bc149d6b7211c69e",
+          "memories_in_store": 2,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:bc149d6b86935301_2",
+          "memories_in_store": 3,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:bc149d6b93a7a1bb_1",
+          "memories_in_store": 7,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:bc149d6b9806001e",
+          "memories_in_store": 9,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:bc149d6b9bfd836a",
+          "memories_in_store": 5,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:bc149d6banswer_92147866_1",
+          "memories_in_store": 6,
+          "memories_in_context": 5,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:bc149d6banswer_92147866_2",
+          "memories_in_store": 5,
+          "memories_in_context": 2,
+          "turns_in_store": 10
+        },
+        {
+          "session_id": "scoped-session-v1:8:bc149d6bdcb18b9b_1",
+          "memories_in_store": 6,
+          "memories_in_context": 4,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:bc149d6bsharegpt_bmEgv3O_12",
+          "memories_in_store": 5,
+          "memories_in_context": 1,
+          "turns_in_store": 6
+        }
+      ],
+      "context_tokens": 543
+    },
+    {
+      "question_id": "c8090214",
+      "question_type": "temporal-reasoning",
+      "correct": true,
+      "measurable": true,
+      "fallback_level": "none",
+      "raw_reached_the_reader": false,
+      "all_source_sessions_recalled": true,
+      "gold_in_selected": false,
+      "gold_in_selected_kind": null,
+      "gold_in_store": true,
+      "gold_in_store_kind": "numeric",
+      "gold_in_local_raw": true,
+      "gold_in_local_raw_kind": "numeric",
+      "gold_in_all_raw": true,
+      "gold_in_all_raw_kind": "numeric",
+      "sessions_in_context": 9,
+      "session_coverage": [
+        {
+          "session_id": "scoped-session-v1:8:c8090214162ad3bf_1",
+          "memories_in_store": 10,
+          "memories_in_context": 6,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:c80902149252145e_1",
+          "memories_in_store": 5,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:c80902149b4f5c73",
+          "memories_in_store": 4,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:c8090214answer_70dc7d08_1",
+          "memories_in_store": 4,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:c8090214answer_70dc7d08_2",
+          "memories_in_store": 3,
+          "memories_in_context": 3,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:c8090214be32ad25_3",
+          "memories_in_store": 5,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:c8090214c21c9d97",
+          "memories_in_store": 17,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:c8090214d6c6dadf",
+          "memories_in_store": 7,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:c8090214sharegpt_yXAlFu3_0",
+          "memories_in_store": 3,
+          "memories_in_context": 2,
+          "turns_in_store": 8
+        }
+      ],
+      "context_tokens": 523
+    },
+    {
+      "question_id": "c8090214_abs",
+      "question_type": "temporal-reasoning",
+      "correct": true,
+      "measurable": false,
+      "fallback_level": "archive_wide",
+      "raw_reached_the_reader": true,
+      "all_source_sessions_recalled": true,
+      "gold_in_selected": null,
+      "gold_in_selected_kind": null,
+      "gold_in_store": null,
+      "gold_in_store_kind": null,
+      "gold_in_local_raw": null,
+      "gold_in_local_raw_kind": null,
+      "gold_in_all_raw": null,
+      "gold_in_all_raw_kind": null,
+      "sessions_in_context": 16,
+      "session_coverage": [
+        {
+          "session_id": "scoped-session-v1:12:c8090214_abs298382a6_2",
+          "memories_in_store": 8,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:12:c8090214_abs536c3cdd",
+          "memories_in_store": 2,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:12:c8090214_abs61a989b5_2",
+          "memories_in_store": 42,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:12:c8090214_abs64c71782",
+          "memories_in_store": 3,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:12:c8090214_abs65c21f34_1",
+          "memories_in_store": 4,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:12:c8090214_absanswer_70dc7d08_abs_1",
+          "memories_in_store": 2,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:12:c8090214_absanswer_70dc7d08_abs_2",
+          "memories_in_store": 2,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:12:c8090214_absb192ae00_1",
+          "memories_in_store": 7,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:12:c8090214_absb8adda7f_1",
+          "memories_in_store": 13,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:12:c8090214_absca3aa07f_1",
+          "memories_in_store": 3,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:12:c8090214_abscad5dca8_2",
+          "memories_in_store": 3,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:12:c8090214_absd4f02577_2",
+          "memories_in_store": 6,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:12:c8090214_absd6f5639a_3",
+          "memories_in_store": 4,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:12:c8090214_abse006c650_1",
+          "memories_in_store": 3,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:12:c8090214_absf10be626",
+          "memories_in_store": 5,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:12:c8090214_absultrachat_228381",
+          "memories_in_store": 5,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        }
+      ],
+      "context_tokens": 817
+    },
+    {
+      "question_id": "d905b33f",
+      "question_type": "multi-session",
+      "correct": false,
+      "measurable": false,
+      "fallback_level": "source_local",
+      "raw_reached_the_reader": true,
+      "all_source_sessions_recalled": true,
+      "gold_in_selected": null,
+      "gold_in_selected_kind": null,
+      "gold_in_store": null,
+      "gold_in_store_kind": null,
+      "gold_in_local_raw": null,
+      "gold_in_local_raw_kind": null,
+      "gold_in_all_raw": null,
+      "gold_in_all_raw_kind": null,
+      "sessions_in_context": 11,
+      "session_coverage": [
+        {
+          "session_id": "scoped-session-v1:8:d905b33f2d364fb0",
+          "memories_in_store": 5,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:d905b33f3301f749_1",
+          "memories_in_store": 9,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:d905b33f549b442a_1",
+          "memories_in_store": 1,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:d905b33f6e672b84_3",
+          "memories_in_store": 3,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:d905b33f7613d5ec_2",
+          "memories_in_store": 7,
+          "memories_in_context": 5,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:d905b33f85736a07_2",
+          "memories_in_store": 5,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:d905b33f8cfa91c3_2",
+          "memories_in_store": 5,
+          "memories_in_context": 3,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:d905b33f9334f70b_1",
+          "memories_in_store": 4,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:d905b33fa9b7f49e_1",
+          "memories_in_store": 2,
+          "memories_in_context": 1,
+          "turns_in_store": 10
+        },
+        {
+          "session_id": "scoped-session-v1:8:d905b33fanswer_85a77c48_1",
+          "memories_in_store": 4,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:d905b33fanswer_85a77c48_2",
+          "memories_in_store": 4,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        }
+      ],
+      "context_tokens": 870
+    },
+    {
+      "question_id": "dd2973ad",
+      "question_type": "multi-session",
+      "correct": false,
+      "measurable": false,
+      "fallback_level": "archive_wide",
+      "raw_reached_the_reader": true,
+      "all_source_sessions_recalled": true,
+      "gold_in_selected": null,
+      "gold_in_selected_kind": null,
+      "gold_in_store": null,
+      "gold_in_store_kind": null,
+      "gold_in_local_raw": null,
+      "gold_in_local_raw_kind": null,
+      "gold_in_all_raw": null,
+      "gold_in_all_raw_kind": null,
+      "sessions_in_context": 16,
+      "session_coverage": [
+        {
+          "session_id": "scoped-session-v1:8:dd2973ad072fac63_1",
+          "memories_in_store": 4,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:dd2973ad0f73eee7_2",
+          "memories_in_store": 5,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:dd2973ad32c0dae1_3",
+          "memories_in_store": 5,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:dd2973ad41743aae_1",
+          "memories_in_store": 4,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:dd2973ad56266c38_1",
+          "memories_in_store": 6,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:dd2973ad5b8ef613_4",
+          "memories_in_store": 4,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:dd2973ad6551be60_3",
+          "memories_in_store": 6,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:dd2973ad98c198fb",
+          "memories_in_store": 3,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:dd2973adanswer_f9de4602_1",
+          "memories_in_store": 4,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:dd2973adanswer_f9de4602_2",
+          "memories_in_store": 3,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:dd2973adbc542ef7_2",
+          "memories_in_store": 4,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:dd2973ade5f08e40",
+          "memories_in_store": 3,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:dd2973adsharegpt_3M5Jh8E_0",
+          "memories_in_store": 1,
+          "memories_in_context": 1,
+          "turns_in_store": 2
+        },
+        {
+          "session_id": "scoped-session-v1:8:dd2973adultrachat_203871",
+          "memories_in_store": 5,
+          "memories_in_context": 1,
+          "turns_in_store": 14
+        },
+        {
+          "session_id": "scoped-session-v1:8:dd2973adultrachat_404693",
+          "memories_in_store": 3,
+          "memories_in_context": 1,
+          "turns_in_store": 6
+        },
+        {
+          "session_id": "scoped-session-v1:8:dd2973adultrachat_478199",
+          "memories_in_store": 1,
+          "memories_in_context": 1,
+          "turns_in_store": 10
+        }
+      ],
+      "context_tokens": 922
+    },
+    {
+      "question_id": "e48988bc",
+      "question_type": "single-session-assistant",
+      "correct": false,
+      "measurable": true,
+      "fallback_level": "none",
+      "raw_reached_the_reader": false,
+      "all_source_sessions_recalled": false,
+      "gold_in_selected": false,
+      "gold_in_selected_kind": null,
+      "gold_in_store": false,
+      "gold_in_store_kind": null,
+      "gold_in_local_raw": false,
+      "gold_in_local_raw_kind": null,
+      "gold_in_all_raw": true,
+      "gold_in_all_raw_kind": "exact",
+      "sessions_in_context": 12,
+      "session_coverage": [
+        {
+          "session_id": "scoped-session-v1:8:e48988bc0eb28b73_1",
+          "memories_in_store": 4,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:e48988bc32fbfe26_1",
+          "memories_in_store": 12,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:e48988bc476b1cbb",
+          "memories_in_store": 4,
+          "memories_in_context": 4,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:e48988bc5b73c489_2",
+          "memories_in_store": 4,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:e48988bc6e110a53_1",
+          "memories_in_store": 9,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:e48988bc8fb3fe3a_3",
+          "memories_in_store": 18,
+          "memories_in_context": 4,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:e48988bce388463b_1",
+          "memories_in_store": 5,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:e48988bcultrachat_238317",
+          "memories_in_store": 2,
+          "memories_in_context": 1,
+          "turns_in_store": 10
+        },
+        {
+          "session_id": "scoped-session-v1:8:e48988bcultrachat_307163",
+          "memories_in_store": 8,
+          "memories_in_context": 2,
+          "turns_in_store": 14
+        },
+        {
+          "session_id": "scoped-session-v1:8:e48988bcultrachat_402904",
+          "memories_in_store": 2,
+          "memories_in_context": 1,
+          "turns_in_store": 6
+        },
+        {
+          "session_id": "scoped-session-v1:8:e48988bcultrachat_58258",
+          "memories_in_store": 6,
+          "memories_in_context": 1,
+          "turns_in_store": 14
+        },
+        {
+          "session_id": "scoped-session-v1:8:e48988bcultrachat_99935",
+          "memories_in_store": 10,
+          "memories_in_context": 1,
+          "turns_in_store": 14
+        }
+      ],
+      "context_tokens": 753
+    },
+    {
+      "question_id": "eac54add",
+      "question_type": "temporal-reasoning",
+      "correct": true,
+      "measurable": true,
+      "fallback_level": "none",
+      "raw_reached_the_reader": false,
+      "all_source_sessions_recalled": true,
+      "gold_in_selected": false,
+      "gold_in_selected_kind": null,
+      "gold_in_store": true,
+      "gold_in_store_kind": "tokens",
+      "gold_in_local_raw": true,
+      "gold_in_local_raw_kind": "tokens",
+      "gold_in_all_raw": true,
+      "gold_in_all_raw_kind": "tokens",
+      "sessions_in_context": 15,
+      "session_coverage": [
+        {
+          "session_id": "scoped-session-v1:8:eac54add072fac63_1",
+          "memories_in_store": 2,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:eac54add17cb8d2f_4",
+          "memories_in_store": 11,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:eac54add1fb3bbed_1",
+          "memories_in_store": 7,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:eac54add2ea6fda4_1",
+          "memories_in_store": 4,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:eac54add369695b4_2",
+          "memories_in_store": 3,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:eac54add577da76d_2",
+          "memories_in_store": 1,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:eac54add773aebbd_3",
+          "memories_in_store": 8,
+          "memories_in_context": 4,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:eac54add7966888b_2",
+          "memories_in_store": 13,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:eac54add79987901_2",
+          "memories_in_store": 8,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:eac54add8f2e0a53_2",
+          "memories_in_store": 3,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:eac54addanswer_0d4d0348_1",
+          "memories_in_store": 4,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:eac54addanswer_0d4d0348_2",
+          "memories_in_store": 3,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:eac54addc3023a45_5",
+          "memories_in_store": 3,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:eac54adde552e1f9_2",
+          "memories_in_store": 3,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:8:eac54addultrachat_85948",
+          "memories_in_store": 5,
+          "memories_in_context": 1,
+          "turns_in_store": 14
+        }
+      ],
+      "context_tokens": 545
+    },
+    {
+      "question_id": "gpt4_194be4b3",
+      "question_type": "multi-session",
+      "correct": true,
+      "measurable": false,
+      "fallback_level": "none",
+      "raw_reached_the_reader": false,
+      "all_source_sessions_recalled": true,
+      "gold_in_selected": null,
+      "gold_in_selected_kind": null,
+      "gold_in_store": null,
+      "gold_in_store_kind": null,
+      "gold_in_local_raw": null,
+      "gold_in_local_raw_kind": null,
+      "gold_in_all_raw": null,
+      "gold_in_all_raw_kind": null,
+      "sessions_in_context": 6,
+      "session_coverage": [
+        {
+          "session_id": "scoped-session-v1:13:gpt4_194be4b3212ce1f4_4",
+          "memories_in_store": 5,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:13:gpt4_194be4b3answer_3826dc55_1",
+          "memories_in_store": 7,
+          "memories_in_context": 4,
+          "turns_in_store": 10
+        },
+        {
+          "session_id": "scoped-session-v1:13:gpt4_194be4b3answer_3826dc55_2",
+          "memories_in_store": 7,
+          "memories_in_context": 5,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:13:gpt4_194be4b3answer_3826dc55_3",
+          "memories_in_store": 3,
+          "memories_in_context": 3,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:13:gpt4_194be4b3answer_3826dc55_4",
+          "memories_in_store": 4,
+          "memories_in_context": 1,
+          "turns_in_store": 8
+        },
+        {
+          "session_id": "scoped-session-v1:13:gpt4_194be4b3answer_3826dc55_5",
+          "memories_in_store": 8,
+          "memories_in_context": 6,
+          "turns_in_store": 11
+        }
+      ],
+      "context_tokens": 647
+    },
+    {
+      "question_id": "gpt4_2f8be40d",
+      "question_type": "multi-session",
+      "correct": false,
+      "measurable": false,
+      "fallback_level": "none",
+      "raw_reached_the_reader": false,
+      "all_source_sessions_recalled": true,
+      "gold_in_selected": null,
+      "gold_in_selected_kind": null,
+      "gold_in_store": null,
+      "gold_in_store_kind": null,
+      "gold_in_local_raw": null,
+      "gold_in_local_raw_kind": null,
+      "gold_in_all_raw": null,
+      "gold_in_all_raw_kind": null,
+      "sessions_in_context": 9,
+      "session_coverage": [
+        {
+          "session_id": "scoped-session-v1:13:gpt4_2f8be40d1d6e01e8",
+          "memories_in_store": 6,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:13:gpt4_2f8be40d70764af1_3",
+          "memories_in_store": 2,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:13:gpt4_2f8be40d81b971b8_2",
+          "memories_in_store": 9,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:13:gpt4_2f8be40dacda6a4e_4",
+          "memories_in_store": 3,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:13:gpt4_2f8be40danswer_e7b0637e_1",
+          "memories_in_store": 5,
+          "memories_in_context": 5,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:13:gpt4_2f8be40danswer_e7b0637e_2",
+          "memories_in_store": 3,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:13:gpt4_2f8be40danswer_e7b0637e_3",
+          "memories_in_store": 8,
+          "memories_in_context": 7,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:13:gpt4_2f8be40dfb2368b8_1",
+          "memories_in_store": 4,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:13:gpt4_2f8be40dultrachat_217382",
+          "memories_in_store": 6,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        }
+      ],
+      "context_tokens": 633
+    },
+    {
+      "question_id": "gpt4_45189cb4",
+      "question_type": "temporal-reasoning",
+      "correct": true,
+      "measurable": true,
+      "fallback_level": "none",
+      "raw_reached_the_reader": false,
+      "all_source_sessions_recalled": true,
+      "gold_in_selected": true,
+      "gold_in_selected_kind": "tokens",
+      "gold_in_store": true,
+      "gold_in_store_kind": "tokens",
+      "gold_in_local_raw": true,
+      "gold_in_local_raw_kind": "tokens",
+      "gold_in_all_raw": true,
+      "gold_in_all_raw_kind": "tokens",
+      "sessions_in_context": 11,
+      "session_coverage": [
+        {
+          "session_id": "scoped-session-v1:13:gpt4_45189cb40479bc75_2",
+          "memories_in_store": 9,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:13:gpt4_45189cb422452c22",
+          "memories_in_store": 1,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:13:gpt4_45189cb45c16fe0b_1",
+          "memories_in_store": 4,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:13:gpt4_45189cb46593cb8b_1",
+          "memories_in_store": 8,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:13:gpt4_45189cb48dd672a3_4",
+          "memories_in_store": 5,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:13:gpt4_45189cb4answer_e6c20e52_1",
+          "memories_in_store": 7,
+          "memories_in_context": 4,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:13:gpt4_45189cb4answer_e6c20e52_2",
+          "memories_in_store": 2,
+          "memories_in_context": 1,
+          "turns_in_store": 8
+        },
+        {
+          "session_id": "scoped-session-v1:13:gpt4_45189cb4answer_e6c20e52_3",
+          "memories_in_store": 3,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:13:gpt4_45189cb4c9d35c00_2",
+          "memories_in_store": 3,
+          "memories_in_context": 1,
+          "turns_in_store": 10
+        },
+        {
+          "session_id": "scoped-session-v1:13:gpt4_45189cb4dc3ee1d1_1",
+          "memories_in_store": 5,
+          "memories_in_context": 4,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:13:gpt4_45189cb4ebf5b3bc_2",
+          "memories_in_store": 4,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        }
+      ],
+      "context_tokens": 779
+    },
+    {
+      "question_id": "gpt4_70e84552_abs",
+      "question_type": "temporal-reasoning",
+      "correct": false,
+      "measurable": false,
+      "fallback_level": "none",
+      "raw_reached_the_reader": false,
+      "all_source_sessions_recalled": true,
+      "gold_in_selected": null,
+      "gold_in_selected_kind": null,
+      "gold_in_store": null,
+      "gold_in_store_kind": null,
+      "gold_in_local_raw": null,
+      "gold_in_local_raw_kind": null,
+      "gold_in_all_raw": null,
+      "gold_in_all_raw_kind": null,
+      "sessions_in_context": 12,
+      "session_coverage": [
+        {
+          "session_id": "scoped-session-v1:17:gpt4_70e84552_abs0dc2efcc_1",
+          "memories_in_store": 5,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:17:gpt4_70e84552_abs430d0a87_2",
+          "memories_in_store": 2,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:17:gpt4_70e84552_absanswer_b3070ec4_abs_1",
+          "memories_in_store": 7,
+          "memories_in_context": 6,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:17:gpt4_70e84552_absanswer_b3070ec4_abs_2",
+          "memories_in_store": 2,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:17:gpt4_70e84552_absbef12e17",
+          "memories_in_store": 4,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:17:gpt4_70e84552_absd4f7a065_3",
+          "memories_in_store": 6,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:17:gpt4_70e84552_abse2cd250e_2",
+          "memories_in_store": 3,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:17:gpt4_70e84552_absf6ba44fe_1",
+          "memories_in_store": 5,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:17:gpt4_70e84552_abssharegpt_1QRbXta_0",
+          "memories_in_store": 1,
+          "memories_in_context": 1,
+          "turns_in_store": 8
+        },
+        {
+          "session_id": "scoped-session-v1:17:gpt4_70e84552_abssharegpt_EypOKzQ_0",
+          "memories_in_store": 3,
+          "memories_in_context": 2,
+          "turns_in_store": 8
+        },
+        {
+          "session_id": "scoped-session-v1:17:gpt4_70e84552_abssharegpt_J8ak3Zd_0",
+          "memories_in_store": 7,
+          "memories_in_context": 1,
+          "turns_in_store": 6
+        },
+        {
+          "session_id": "scoped-session-v1:17:gpt4_70e84552_absultrachat_367973",
+          "memories_in_store": 1,
+          "memories_in_context": 1,
+          "turns_in_store": 8
+        }
+      ],
+      "context_tokens": 557
+    },
+    {
+      "question_id": "gpt4_731e37d7",
+      "question_type": "multi-session",
+      "correct": true,
+      "measurable": false,
+      "fallback_level": "none",
+      "raw_reached_the_reader": false,
+      "all_source_sessions_recalled": true,
+      "gold_in_selected": null,
+      "gold_in_selected_kind": null,
+      "gold_in_store": null,
+      "gold_in_store_kind": null,
+      "gold_in_local_raw": null,
+      "gold_in_local_raw_kind": null,
+      "gold_in_all_raw": null,
+      "gold_in_all_raw_kind": null,
+      "sessions_in_context": 12,
+      "session_coverage": [
+        {
+          "session_id": "scoped-session-v1:13:gpt4_731e37d7267a912c",
+          "memories_in_store": 18,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:13:gpt4_731e37d7859fc064_1",
+          "memories_in_store": 4,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:13:gpt4_731e37d7answer_826d51da_1",
+          "memories_in_store": 4,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:13:gpt4_731e37d7answer_826d51da_2",
+          "memories_in_store": 1,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:13:gpt4_731e37d7answer_826d51da_3",
+          "memories_in_store": 5,
+          "memories_in_context": 5,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:13:gpt4_731e37d7answer_826d51da_4",
+          "memories_in_store": 1,
+          "memories_in_context": 1,
+          "turns_in_store": 10
+        },
+        {
+          "session_id": "scoped-session-v1:13:gpt4_731e37d7baa5b468_3",
+          "memories_in_store": 4,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:13:gpt4_731e37d7c566edbb_3",
+          "memories_in_store": 5,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:13:gpt4_731e37d7ed9dad6c_2",
+          "memories_in_store": 4,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:13:gpt4_731e37d7sharegpt_Yuw2LhQ_25",
+          "memories_in_store": 3,
+          "memories_in_context": 2,
+          "turns_in_store": 13
+        },
+        {
+          "session_id": "scoped-session-v1:13:gpt4_731e37d7sharegpt_vonEwUo_17",
+          "memories_in_store": 1,
+          "memories_in_context": 1,
+          "turns_in_store": 17
+        },
+        {
+          "session_id": "scoped-session-v1:13:gpt4_731e37d7ultrachat_70896",
+          "memories_in_store": 12,
+          "memories_in_context": 1,
+          "turns_in_store": 10
+        }
+      ],
+      "context_tokens": 559
+    },
+    {
+      "question_id": "gpt4_74aed68e",
+      "question_type": "temporal-reasoning",
+      "correct": false,
+      "measurable": true,
+      "fallback_level": "none",
+      "raw_reached_the_reader": false,
+      "all_source_sessions_recalled": false,
+      "gold_in_selected": false,
+      "gold_in_selected_kind": null,
+      "gold_in_store": true,
+      "gold_in_store_kind": "numeric",
+      "gold_in_local_raw": true,
+      "gold_in_local_raw_kind": "tokens",
+      "gold_in_all_raw": true,
+      "gold_in_all_raw_kind": "tokens",
+      "sessions_in_context": 10,
+      "session_coverage": [
+        {
+          "session_id": "scoped-session-v1:13:gpt4_74aed68e15519944_2",
+          "memories_in_store": 4,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:13:gpt4_74aed68e25b3e36c_2",
+          "memories_in_store": 5,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:13:gpt4_74aed68e318048af_2",
+          "memories_in_store": 3,
+          "memories_in_context": 3,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:13:gpt4_74aed68e48cb014c",
+          "memories_in_store": 13,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:13:gpt4_74aed68e50d66391_6",
+          "memories_in_store": 3,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:13:gpt4_74aed68e69a9211c_1",
+          "memories_in_store": 5,
+          "memories_in_context": 4,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:13:gpt4_74aed68e7a7a4bf0_4",
+          "memories_in_store": 10,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:13:gpt4_74aed68eanswer_aed8cf17_2",
+          "memories_in_store": 12,
+          "memories_in_context": 4,
+          "turns_in_store": 10
+        },
+        {
+          "session_id": "scoped-session-v1:13:gpt4_74aed68ed6956a2e_1",
+          "memories_in_store": 6,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:13:gpt4_74aed68edb2f2ed2",
+          "memories_in_store": 6,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        }
+      ],
+      "context_tokens": 591
+    },
+    {
+      "question_id": "gpt4_78cf46a3",
+      "question_type": "temporal-reasoning",
+      "correct": true,
+      "measurable": true,
+      "fallback_level": "none",
+      "raw_reached_the_reader": false,
+      "all_source_sessions_recalled": true,
+      "gold_in_selected": true,
+      "gold_in_selected_kind": "tokens",
+      "gold_in_store": true,
+      "gold_in_store_kind": "tokens",
+      "gold_in_local_raw": true,
+      "gold_in_local_raw_kind": "tokens",
+      "gold_in_all_raw": true,
+      "gold_in_all_raw_kind": "tokens",
+      "sessions_in_context": 12,
+      "session_coverage": [
+        {
+          "session_id": "scoped-session-v1:13:gpt4_78cf46a327099532_2",
+          "memories_in_store": 9,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:13:gpt4_78cf46a342b45f6e_2",
+          "memories_in_store": 6,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:13:gpt4_78cf46a352b19cba_1",
+          "memories_in_store": 5,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:13:gpt4_78cf46a35e7e7e35_1",
+          "memories_in_store": 3,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:13:gpt4_78cf46a37fd52e1c_2",
+          "memories_in_store": 2,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:13:gpt4_78cf46a3908f1f08",
+          "memories_in_store": 5,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:13:gpt4_78cf46a3answer_5a78688d_1",
+          "memories_in_store": 7,
+          "memories_in_context": 3,
+          "turns_in_store": 10
+        },
+        {
+          "session_id": "scoped-session-v1:13:gpt4_78cf46a3answer_5a78688d_2",
+          "memories_in_store": 1,
+          "memories_in_context": 1,
+          "turns_in_store": 10
+        },
+        {
+          "session_id": "scoped-session-v1:13:gpt4_78cf46a3bca74787",
+          "memories_in_store": 3,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:13:gpt4_78cf46a3dbf5ebf8",
+          "memories_in_store": 3,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:13:gpt4_78cf46a3sharegpt_Fakxkr4_10",
+          "memories_in_store": 2,
+          "memories_in_context": 2,
+          "turns_in_store": 4
+        },
+        {
+          "session_id": "scoped-session-v1:13:gpt4_78cf46a3sharegpt_rx39ipj_0",
+          "memories_in_store": 6,
+          "memories_in_context": 1,
+          "turns_in_store": 34
+        }
+      ],
+      "context_tokens": 584
+    },
+    {
+      "question_id": "gpt4_7a0daae1",
+      "question_type": "temporal-reasoning",
+      "correct": false,
+      "measurable": true,
+      "fallback_level": "archive_wide",
+      "raw_reached_the_reader": true,
+      "all_source_sessions_recalled": true,
+      "gold_in_selected": false,
+      "gold_in_selected_kind": null,
+      "gold_in_store": true,
+      "gold_in_store_kind": "numeric",
+      "gold_in_local_raw": true,
+      "gold_in_local_raw_kind": "numeric",
+      "gold_in_all_raw": true,
+      "gold_in_all_raw_kind": "exact",
+      "sessions_in_context": 13,
+      "session_coverage": [
+        {
+          "session_id": "scoped-session-v1:13:gpt4_7a0daae1014a5d36",
+          "memories_in_store": 8,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:13:gpt4_7a0daae12ff297a8_1",
+          "memories_in_store": 5,
+          "memories_in_context": 3,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:13:gpt4_7a0daae17c08d74b_2",
+          "memories_in_store": 30,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:13:gpt4_7a0daae1819dfad7_2",
+          "memories_in_store": 5,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:13:gpt4_7a0daae185846900_5",
+          "memories_in_store": 1,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:13:gpt4_7a0daae188088faf",
+          "memories_in_store": 5,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:13:gpt4_7a0daae18c68df0d_1",
+          "memories_in_store": 7,
+          "memories_in_context": 2,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:13:gpt4_7a0daae1answer_4d5490f1_1",
+          "memories_in_store": 8,
+          "memories_in_context": 3,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:13:gpt4_7a0daae1answer_4d5490f1_2",
+          "memories_in_store": 3,
+          "memories_in_context": 3,
+          "turns_in_store": 10
+        },
+        {
+          "session_id": "scoped-session-v1:13:gpt4_7a0daae1bf3aebdb_2",
+          "memories_in_store": 3,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:13:gpt4_7a0daae1fba28a35_2",
+          "memories_in_store": 4,
+          "memories_in_context": 1,
+          "turns_in_store": 12
+        },
+        {
+          "session_id": "scoped-session-v1:13:gpt4_7a0daae1sharegpt_CIPQtDW_0",
+          "memories_in_store": 1,
+          "memories_in_context": 1,
+          "turns_in_store": 10
+        },
+        {
+          "session_id": "scoped-session-v1:13:gpt4_7a0daae1sharegpt_E4dE92x_0",
+          "memories_in_store": 2,
+          "memories_in_context": 1,
+          "turns_in_store": 2
+        }
+      ],
+      "context_tokens": 1135
+    }
+  ]
+}

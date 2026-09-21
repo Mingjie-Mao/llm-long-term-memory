@@ -35,7 +35,8 @@ def register_run_commands(
                 "two_stage_coherent_oracle | two_stage_memory_only | two_stage_reasoned | "
                 "two_stage_reasoned_evidence | two_stage_synthesis | "
                 "two_stage_v2c_memory_only | two_stage_v2c | "
-                "two_stage_v2d_memory_only | two_stage_v2d. "
+                "two_stage_v2d_memory_only | two_stage_v2d | "
+                "two_stage_v5_fixed | two_stage_v5_planned. "
                 "The chronomem* names belong to the frozen v1 run and are kept so its "
                 "rows are not overwritten by a re-measurement of a different pipeline."
             ),
