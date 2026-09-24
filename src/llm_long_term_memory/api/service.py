@@ -33,7 +33,6 @@ from typing import Any
 from llm_long_term_memory.answering import ANSWER_PROMPT_VERSION
 from llm_long_term_memory.api.budget import AccountBudgets, BudgetExceeded
 from llm_long_term_memory.config import ExperimentConfig, Settings
-from llm_long_term_memory.evaluation.judge import JUDGE_PROMPT_VERSION
 from llm_long_term_memory.retrieve import EvidenceHydrator, HybridRetriever
 from llm_long_term_memory.store import (
     ErasureJournal,
@@ -287,6 +286,10 @@ class MemoryService:
             self.settings.store_dir / f"{store_name}-index",
             dim=dim or self.config.models.embedding_dim,
         )
+        # SQLite and the flat index are separate resources. Refuse to serve a
+        # partially committed generation instead of silently losing memories or
+        # returning orphan vectors. Empty/empty is a valid fresh service.
+        self.index.validate_ids(self.store.memory_ids())
         # Only the write path needs this, and it needs an API key. Read-only
         # deployments and the whole test suite work without one.
         self.extractor = extractor
@@ -428,16 +431,15 @@ class MemoryService:
     def answerer(self):
         """The live answer path, or None when no credential is configured.
 
-        Reuses `MemoryRunner` — the same object the benchmark harness drives — so a
-        live answer in the inspector goes through exactly the code that produced the
-        recorded results. A second implementation here would let the demo and the
-        measurements drift apart, which is the one thing a demo must not do.
+        Uses the stable product `AnswerEngine`. Evaluation runners may wrap the same
+        retrieval and answering primitives with gold-only diagnostics, but the live
+        API does not depend on benchmark instances or judge prompts.
         """
         if self._answerer is None and self.settings.has_api_key:
-            from llm_long_term_memory.evaluation.runners.memory import MemoryRunner
+            from llm_long_term_memory.runtime import AnswerEngine
 
             client = self._get_live_client()
-            self._answerer = MemoryRunner(
+            self._answerer = AnswerEngine(
                 client,
                 model=self.config.models.answerer,
                 encoder=self.encoder,
@@ -547,6 +549,8 @@ class MemoryService:
         same failure as an unversioned result table, and this project has already
         been bitten by prompt drift making numbers incomparable.
         """
+        from llm_long_term_memory.evaluation.judge import JUDGE_PROMPT_VERSION
+
         from .golden import fingerprint, load_runs, store_state
 
         run = load_runs().get(name)
@@ -1181,10 +1185,17 @@ class MemoryService:
                     "subject": m.subject,
                     "predicate": m.predicate,
                     "object": m.object,
+                    "target_object": m.target_object,
+                    "update_op": m.update_op,
                     "scope": m.scope,
                     "status": m.status,
                     "source_role": m.source_role,
+                    # Both times, and the caller can tell them apart: `event_time` is
+                    # null unless the fact stated one, `observed_at` is when it was
+                    # said. An export that showed only the first would look like the
+                    # timeline had gone blank.
                     "event_time": m.event_time.isoformat() if m.event_time else None,
+                    "observed_at": m.observed_at.isoformat() if m.observed_at else None,
                     "valid_from": m.valid_from.isoformat() if m.valid_from else None,
                     "valid_to": m.valid_to.isoformat() if m.valid_to else None,
                     "superseded_by": m.superseded_by,

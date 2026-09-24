@@ -87,6 +87,18 @@ def ingest_run(
             index=index,
             threshold=cfg.ingest.dedupe_similarity_threshold,
         )
+        repair = None
+        if cfg.ingest.specificity_repair:
+            from llm_long_term_memory.ingest.grounded import GroundedExtractor
+            from llm_long_term_memory.ingest.repair import SpecificityRepair
+
+            repair = SpecificityRepair(GroundedExtractor(client, cfg.models.extractor))
+            console.print(
+                "[yellow]specificity repair on[/yellow] [dim]— one grounded call for "
+                "each session that lost a specific; measured 44.8% -> 59.3% retention "
+                "on its registered cohort[/dim]"
+            )
+
         resolver = TemporalResolver(store) if cfg.temporal_resolution else None
         from llm_long_term_memory.ingest.pipeline import fit_batch_size
 
@@ -113,6 +125,7 @@ def ingest_run(
             checkpoint_path=settings.store_dir / f"{store_name}-ingest.json",
             sessions_per_request=per_request,
             checkpoint_every=cfg.ingest.checkpoint_every,
+            repair=repair,
         )
 
         with console.status("Loading corpus…"):
@@ -211,6 +224,16 @@ def ingest_run(
         t.add_row("superseded", f"{p.superseded:,}")
         t.add_row("extraction requests", f"{p.extraction_requests:,}")
         t.add_row("adjudication requests", f"{p.adjudication_requests:,}")
+        if repair is not None:
+            # Reported whether or not it fired. A repair that silently did nothing and
+            # one that was never switched on look identical in the totals otherwise.
+            called = p.repair_requests
+            sessions_done = max(1, len(p.done_sessions))
+            t.add_row("repair requests", f"{called:,} ({called / sessions_done:.0%} of sessions)")
+            t.add_row(
+                "repair memories",
+                f"{p.repair_memories:,} ({p.repair_memories / sessions_done:.2f}/session)",
+            )
         if p.memories_written:
             t.add_row(
                 "memories / session", f"{p.memories_written / max(1, len(p.done_sessions)):.1f}"

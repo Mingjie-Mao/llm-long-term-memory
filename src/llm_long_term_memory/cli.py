@@ -166,6 +166,11 @@ def _build(
         # arm, so the raw windows are the only difference.
         "two_stage_v5_fixed",
         "two_stage_v5_planned",
+        # v2e. Everything v2c does, with one change: a fact that states no date is
+        # shown as "mentioned <date>" rather than "since <date>", so a mention date
+        # stops reading as the day the fact became true. Requires a store whose
+        # `event_time` means what it says — see tools/backfill_event_time.py.
+        "two_stage_v2e",
         # v3 research arm: same v2 store/retrieval/fallback, with an explicit
         # evidence/check/calculation answer policy. It never uses benchmark labels.
         "two_stage_reasoned",
@@ -209,6 +214,10 @@ def _build(
                 f"the {stem!r} memory store is empty — run `lltm ingest run "
                 f"--store-name {stem}` first"
             )
+        try:
+            index.validate_ids(store.memory_ids())
+        except ValueError as exc:
+            raise typer.BadParameter(str(exc)) from exc
         reranker = None
         if cfg.retrieval.rerank.enabled:
             from llm_long_term_memory.retrieve import CrossEncoderReranker
@@ -283,6 +292,7 @@ def _build(
                 cfg.fallback.max_turns if variant.startswith("two_stage_v5") else 0
             ),
             parallel_raw_planned=variant == "two_stage_v5_planned",
+            date_provenance=variant == "two_stage_v2e",
             answer_policy={
                 "two_stage_reasoned": "reasoned_v3",
                 "two_stage_reasoned_evidence": "reasoned_v3",
@@ -298,6 +308,9 @@ def _build(
                 # against v2c is only meaningful while everything else is v2c.
                 "two_stage_v5_fixed": "v2c",
                 "two_stage_v5_planned": "v2c",
+                # v2e changes the rendering, not the policy: the comparison against
+                # v2c is only meaningful while everything else is v2c.
+                "two_stage_v2e": "v2c",
             }.get(variant, "v2"),
             timeline_rendering=variant
             not in {

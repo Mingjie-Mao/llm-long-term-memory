@@ -1,0 +1,1453 @@
+{
+  "summary": {
+    "total_requests": 158,
+    "total_tokens": 98812,
+    "failures": 48,
+    "by_role": {
+      "answerer": {
+        "role": "answerer",
+        "calls": 64,
+        "failures": 2,
+        "input_tokens": 83131,
+        "output_tokens": 3348,
+        "p50_ms": 1277.975541073829,
+        "p95_ms": 1792.4547498114407,
+        "max_ms": 2515.495332889259
+      },
+      "judge": {
+        "role": "judge",
+        "calls": 94,
+        "failures": 46,
+        "input_tokens": 10834,
+        "output_tokens": 1499,
+        "p50_ms": 25172.857000026852,
+        "p95_ms": 41256.17662491277,
+        "max_ms": 62001.330125145614
+      }
+    }
+  },
+  "calls": [
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 815.1866672560573,
+      "ok": false,
+      "error": "ClientError: 400 INVALID_ARGUMENT. {'error': {'code': 400, 'message': 'Request contains an invalid argument.', 'status': 'INVALID_ARGUMENT'}}"
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 1225,
+      "output_tokens": 30,
+      "latency_ms": 1308.2002908922732,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 1675.584124866873,
+      "ok": false,
+      "error": "ServerError: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 32824.13570769131,
+      "ok": false,
+      "error": "ServerError: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 176,
+      "output_tokens": 36,
+      "latency_ms": 23361.23629193753,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 1199,
+      "output_tokens": 23,
+      "latency_ms": 1847.6049159653485,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 1573,
+      "output_tokens": 49,
+      "latency_ms": 1152.370790950954,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 1394.264207687229,
+      "ok": false,
+      "error": "ServerError: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 218,
+      "output_tokens": 39,
+      "latency_ms": 32050.66637508571,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 1280,
+      "output_tokens": 32,
+      "latency_ms": 2515.495332889259,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 181,
+      "output_tokens": 31,
+      "latency_ms": 38139.561666641384,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 1263,
+      "output_tokens": 31,
+      "latency_ms": 1154.9283750355244,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 1921,
+      "output_tokens": 43,
+      "latency_ms": 1221.5941660106182,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 1416.8869168497622,
+      "ok": false,
+      "error": "ServerError: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 1551.1412089690566,
+      "ok": false,
+      "error": "ServerError: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 1567.474708892405,
+      "ok": false,
+      "error": "ServerError: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 202,
+      "output_tokens": 32,
+      "latency_ms": 40829.352042172104,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 1210,
+      "output_tokens": 63,
+      "latency_ms": 1460.4610418900847,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 323,
+      "output_tokens": 36,
+      "latency_ms": 26382.27554084733,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 1224,
+      "output_tokens": 43,
+      "latency_ms": 1275.3893327899277,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 200,
+      "output_tokens": 30,
+      "latency_ms": 40894.490625243634,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 1134,
+      "output_tokens": 48,
+      "latency_ms": 1285.0447078235447,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 1864.9145825766027,
+      "ok": false,
+      "error": "ServerError: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 194,
+      "output_tokens": 34,
+      "latency_ms": 22260.65795868635,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 1133,
+      "output_tokens": 29,
+      "latency_ms": 1089.5788338966668,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 176,
+      "output_tokens": 29,
+      "latency_ms": 29338.192166294903,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 1171,
+      "output_tokens": 69,
+      "latency_ms": 1135.1933754049242,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 25172.857000026852,
+      "ok": false,
+      "error": "ServerError: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 225,
+      "output_tokens": 27,
+      "latency_ms": 37596.486958209425,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 1161,
+      "output_tokens": 35,
+      "latency_ms": 1438.716541044414,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 1596.2334582582116,
+      "ok": false,
+      "error": "ServerError: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 187,
+      "output_tokens": 27,
+      "latency_ms": 34316.18775008246,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 1209,
+      "output_tokens": 69,
+      "latency_ms": 1347.7123328484595,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 236,
+      "output_tokens": 28,
+      "latency_ms": 19739.166208077222,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 1146,
+      "output_tokens": 79,
+      "latency_ms": 1175.5014169029891,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 323,
+      "output_tokens": 36,
+      "latency_ms": 37973.37995795533,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 1148,
+      "output_tokens": 32,
+      "latency_ms": 1594.8258750140667,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 1711,
+      "output_tokens": 37,
+      "latency_ms": 954.4225409626961,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 244,
+      "output_tokens": 23,
+      "latency_ms": 18664.94704177603,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 1742,
+      "output_tokens": 58,
+      "latency_ms": 1151.7791668884456,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 210,
+      "output_tokens": 41,
+      "latency_ms": 27744.697666727006,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 1135,
+      "output_tokens": 48,
+      "latency_ms": 1199.6040418744087,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 200,
+      "output_tokens": 31,
+      "latency_ms": 29271.751790773124,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 1102,
+      "output_tokens": 35,
+      "latency_ms": 1315.007375087589,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 1366.5475421585143,
+      "ok": false,
+      "error": "ServerError: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 200,
+      "output_tokens": 31,
+      "latency_ms": 30181.18679104373,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 1292,
+      "output_tokens": 19,
+      "latency_ms": 1192.514916881919,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 1879,
+      "output_tokens": 32,
+      "latency_ms": 1201.3511671684682,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 1131.3218749128282,
+      "ok": false,
+      "error": "ServerError: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 1774.2169173434377,
+      "ok": false,
+      "error": "ServerError: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 193,
+      "output_tokens": 26,
+      "latency_ms": 41256.17662491277,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 1211,
+      "output_tokens": 42,
+      "latency_ms": 1294.994667172432,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 183,
+      "output_tokens": 36,
+      "latency_ms": 52018.920542206615,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 1175,
+      "output_tokens": 53,
+      "latency_ms": 1331.8021669983864,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 208,
+      "output_tokens": 27,
+      "latency_ms": 41059.99241722748,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 1188,
+      "output_tokens": 33,
+      "latency_ms": 1086.1316248774529,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 1567.3617497086525,
+      "ok": false,
+      "error": "ServerError: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 186,
+      "output_tokens": 35,
+      "latency_ms": 62001.330125145614,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 1758,
+      "output_tokens": 66,
+      "latency_ms": 1679.5344999991357,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 2100.559125188738,
+      "ok": false,
+      "error": "ServerError: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 1261.4112496376038,
+      "ok": false,
+      "error": "ServerError: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 1358.6268341168761,
+      "ok": false,
+      "error": "ServerError: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 241,
+      "output_tokens": 25,
+      "latency_ms": 24022.285582963377,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 1154,
+      "output_tokens": 37,
+      "latency_ms": 1375.7097078487277,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 209,
+      "output_tokens": 30,
+      "latency_ms": 36770.7994999364,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 1187,
+      "output_tokens": 103,
+      "latency_ms": 1466.7998752556741,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 324,
+      "output_tokens": 37,
+      "latency_ms": 23172.060708049685,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 1115,
+      "output_tokens": 33,
+      "latency_ms": 1074.9296247959137,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 176,
+      "output_tokens": 26,
+      "latency_ms": 28362.8169586882,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 1251,
+      "output_tokens": 115,
+      "latency_ms": 1436.8697497993708,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 976.9092500209808,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 32243.255625013262,
+      "ok": false,
+      "error": "ServerError: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 369,
+      "output_tokens": 51,
+      "latency_ms": 30840.81520885229,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 1209,
+      "output_tokens": 33,
+      "latency_ms": 1657.0062921382487,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 1965,
+      "output_tokens": 55,
+      "latency_ms": 1082.2086660191417,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 221,
+      "output_tokens": 33,
+      "latency_ms": 29443.545209243894,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 1056,
+      "output_tokens": 33,
+      "latency_ms": 1047.47354099527,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 186,
+      "output_tokens": 28,
+      "latency_ms": 25701.44220814109,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 1135,
+      "output_tokens": 33,
+      "latency_ms": 1343.2737081311643,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 184,
+      "output_tokens": 30,
+      "latency_ms": 37638.23195779696,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 1397,
+      "output_tokens": 32,
+      "latency_ms": 1244.8168331757188,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 179,
+      "output_tokens": 38,
+      "latency_ms": 41639.34662519023,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 1250,
+      "output_tokens": 49,
+      "latency_ms": 1274.8101251199841,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 1294.6970420889556,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 29325.578916817904,
+      "ok": false,
+      "error": "ServerError: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 197,
+      "output_tokens": 26,
+      "latency_ms": 18522.349041886628,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 1091,
+      "output_tokens": 83,
+      "latency_ms": 1311.1582919955254,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 17406.222583260387,
+      "ok": false,
+      "error": "ServerError: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 1124.1612075828016,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 1407.6126660220325,
+      "ok": false,
+      "error": "ServerError: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 1714.1353329643607,
+      "ok": false,
+      "error": "ServerError: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 231,
+      "output_tokens": 33,
+      "latency_ms": 29760.031084064394,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 1143,
+      "output_tokens": 39,
+      "latency_ms": 1227.3201253265142,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 1873,
+      "output_tokens": 31,
+      "latency_ms": 959.9822922609746,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 200,
+      "output_tokens": 29,
+      "latency_ms": 25027.474167291075,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 1156,
+      "output_tokens": 55,
+      "latency_ms": 1221.5756247751415,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 1739,
+      "output_tokens": 30,
+      "latency_ms": 988.3300000801682,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 26519.30220797658,
+      "ok": false,
+      "error": "ServerError: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 18208.016165997833,
+      "ok": false,
+      "error": "ServerError: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 227,
+      "output_tokens": 25,
+      "latency_ms": 37067.127582617104,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 1161,
+      "output_tokens": 52,
+      "latency_ms": 1514.0555831603706,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 206,
+      "output_tokens": 29,
+      "latency_ms": 24467.621584422886,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 1166,
+      "output_tokens": 57,
+      "latency_ms": 1792.4547498114407,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 18148.909290786833,
+      "ok": false,
+      "error": "ServerError: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 1728.707917034626,
+      "ok": false,
+      "error": "ServerError: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 226,
+      "output_tokens": 35,
+      "latency_ms": 32693.290874827653,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 1151,
+      "output_tokens": 26,
+      "latency_ms": 1121.5927079319954,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 1631,
+      "output_tokens": 53,
+      "latency_ms": 1267.1270002610981,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 218,
+      "output_tokens": 34,
+      "latency_ms": 25842.7763748914,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 1169,
+      "output_tokens": 63,
+      "latency_ms": 1277.975541073829,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 1654,
+      "output_tokens": 88,
+      "latency_ms": 1871.7364580370486,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 1637.2199160978198,
+      "ok": false,
+      "error": "ServerError: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 1450.264375191182,
+      "ok": false,
+      "error": "ServerError: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 256,
+      "output_tokens": 31,
+      "latency_ms": 39555.65045773983,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 1156,
+      "output_tokens": 49,
+      "latency_ms": 1373.03183414042,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 1683,
+      "output_tokens": 119,
+      "latency_ms": 1367.0944580808282,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 1328.8855832070112,
+      "ok": false,
+      "error": "ServerError: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 291,
+      "output_tokens": 31,
+      "latency_ms": 58007.05299992114,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 1361,
+      "output_tokens": 58,
+      "latency_ms": 1638.0332503467798,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 1942,
+      "output_tokens": 25,
+      "latency_ms": 1011.3068339414895,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 1713.8143749907613,
+      "ok": false,
+      "error": "ServerError: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 215,
+      "output_tokens": 21,
+      "latency_ms": 37601.49870812893,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 1178,
+      "output_tokens": 38,
+      "latency_ms": 1417.4546250142157,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 194,
+      "output_tokens": 31,
+      "latency_ms": 31745.806249789894,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 1225,
+      "output_tokens": 60,
+      "latency_ms": 1130.1701250486076,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 267,
+      "output_tokens": 24,
+      "latency_ms": 28986.66641721502,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 1168,
+      "output_tokens": 61,
+      "latency_ms": 1492.358666844666,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 1822,
+      "output_tokens": 95,
+      "latency_ms": 1237.923583947122,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 1546.1871246807277,
+      "ok": false,
+      "error": "ServerError: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 1317.1533332206309,
+      "ok": false,
+      "error": "ServerError: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 276,
+      "output_tokens": 26,
+      "latency_ms": 37731.34804191068,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 1437,
+      "output_tokens": 116,
+      "latency_ms": 1421.46012512967,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 25164.389832876623,
+      "ok": false,
+      "error": "ServerError: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 20038.45537500456,
+      "ok": false,
+      "error": "ServerError: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 1635.9079997055233,
+      "ok": false,
+      "error": "ServerError: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 28781.53591696173,
+      "ok": false,
+      "error": "ServerError: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 1390.1543337851763,
+      "ok": false,
+      "error": "ServerError: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 835.2646250277758,
+      "ok": false,
+      "error": "ClientError: 400 INVALID_ARGUMENT. {'error': {'code': 400, 'message': 'Request contains an invalid argument.', 'status': 'INVALID_ARGUMENT'}}"
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 1437,
+      "output_tokens": 120,
+      "latency_ms": 1477.7543330565095,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 39000.794667284936,
+      "ok": false,
+      "error": "ServerError: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 298,
+      "output_tokens": 31,
+      "latency_ms": 33521.6117920354,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 1193,
+      "output_tokens": 48,
+      "latency_ms": 1531.9384578615427,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 1908,
+      "output_tokens": 66,
+      "latency_ms": 1210.1331669837236,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 233,
+      "output_tokens": 35,
+      "latency_ms": 22214.225875213742,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 1167,
+      "output_tokens": 115,
+      "latency_ms": 1719.1534996964037,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 31781.626208219677,
+      "ok": false,
+      "error": "ServerError: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 1328.5360420122743,
+      "ok": false,
+      "error": "ServerError: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 26902.554583270103,
+      "ok": false,
+      "error": "ServerError: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 267,
+      "output_tokens": 34,
+      "latency_ms": 32000.676166731864,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 1244,
+      "output_tokens": 37,
+      "latency_ms": 1182.948375120759,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 215,
+      "output_tokens": 33,
+      "latency_ms": 29924.513458739966,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 1197,
+      "output_tokens": 81,
+      "latency_ms": 1340.046291705221,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 1755.6018340401351,
+      "ok": false,
+      "error": "ServerError: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 239,
+      "output_tokens": 29,
+      "latency_ms": 25778.2022501342,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 1170,
+      "output_tokens": 62,
+      "latency_ms": 1261.5893753245473,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 33409.87633401528,
+      "ok": false,
+      "error": "ServerError: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 1334.6564997918904,
+      "ok": false,
+      "error": "ServerError: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 224,
+      "output_tokens": 29,
+      "latency_ms": 61015.85791725665,
+      "ok": true,
+      "error": null
+    }
+  ]
+}

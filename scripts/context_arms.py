@@ -98,7 +98,7 @@ def main() -> int:
 
             coherent = [m for m in svc.store.iter_all(qid) if m.source_session_id in gold_sessions]
             coherent.sort(
-                key=lambda m: (m.event_time or m.valid_from or "", m.source_turn_index or 0)
+                key=lambda m: (m.occurred_at or m.valid_from or "", m.source_turn_index or 0)
             )
             n = len(coherent)
 

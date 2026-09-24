@@ -66,18 +66,18 @@ def _norm(text: str) -> str:
 def _searchable(m: Memory) -> str:
     """Everything the store actually knows about a memory, not just its prose.
 
-    `event_time` matters here: a temporal question's gold answer is often a date
+    `occurred_at` matters here: a temporal question's gold answer is often a date
     ("March 2026") that the content sentence never spells out because it is held in
     the structured column instead. Searching only `content` scores the store as
     having lost information it is in fact holding.
     """
     parts = [m.content, m.subject or "", m.predicate or "", m.object or ""]
-    if m.event_time:
+    if m.occurred_at:
         parts += [
-            m.event_time.strftime("%Y %m %d"),
-            m.event_time.strftime("%B %Y"),
-            m.event_time.strftime("%B %d %Y"),
-            m.event_time.strftime("%b"),
+            m.occurred_at.strftime("%Y %m %d"),
+            m.occurred_at.strftime("%B %Y"),
+            m.occurred_at.strftime("%B %d %Y"),
+            m.occurred_at.strftime("%b"),
         ]
     return " ".join(parts)
 

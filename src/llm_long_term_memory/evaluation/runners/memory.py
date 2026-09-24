@@ -147,6 +147,7 @@ def render_grouped(
     temporal: bool,
     timelines_enabled: bool = True,
     labels: dict[str, str] | None = None,
+    mark_unstated: bool = False,
 ) -> str:
     """Group memories by scope under headings, preserving rank order within a group.
 
@@ -161,7 +162,9 @@ def render_grouped(
     prefix = [timelines] if timelines else []
 
     if not any(memory.scope for memory in memories):
-        flat = "\n".join(render_memory(memory, temporal, tag(memory)) for memory in memories)
+        flat = "\n".join(
+            render_memory(memory, temporal, tag(memory), mark_unstated) for memory in memories
+        )
         return "\n\n".join([*prefix, flat]) if flat else "\n\n".join(prefix)
 
     by_scope: dict[str, list[Memory]] = {}
@@ -172,13 +175,13 @@ def render_grouped(
     for scope, heading in _SCOPE_HEADINGS:
         group = by_scope.pop(scope, None)
         if group:
-            lines = "\n".join(render_memory(m, temporal, tag(m)) for m in group)
+            lines = "\n".join(render_memory(m, temporal, tag(m), mark_unstated) for m in group)
             blocks.append(f"{heading}:\n{lines}")
     # Anything left: unscoped memories, plus any scope the model invented that the
     # validator let through.
     leftovers = [m for group in by_scope.values() for m in group]
     if leftovers:
-        lines = "\n".join(render_memory(m, temporal, tag(m)) for m in leftovers)
+        lines = "\n".join(render_memory(m, temporal, tag(m), mark_unstated) for m in leftovers)
         blocks.append(f"{_UNSCOPED_HEADING}:\n{lines}")
     return "\n\n".join([*prefix, *blocks])
 
@@ -219,11 +222,11 @@ def render_timelines(
             continue
         ordered = sorted(
             group,
-            key=lambda m: (m.valid_from or m.event_time or datetime.max, m.id),
+            key=lambda m: (m.valid_from or m.occurred_at or datetime.max, m.id),
         )
         lines = []
         for memory in ordered:
-            when = memory.valid_from or memory.event_time
+            when = memory.valid_from or memory.occurred_at
             stamp = f"{when:%Y-%m-%d}" if when else "date unknown"
             mark = "[CURRENT]" if memory.status == "active" and not memory.valid_to else "[was]"
             # Chain members are labelled too. A count question can have a member that is
@@ -239,16 +242,32 @@ def render_timelines(
     return "\n\n".join(blocks), remaining
 
 
-def render_memory(memory: Memory, temporal: bool, label: str = "") -> str:
+def render_memory(
+    memory: Memory, temporal: bool, label: str = "", mark_unstated: bool = False
+) -> str:
+    """One memory as a context line.
+
+    `mark_unstated` is the v2e difference and nothing else changes with it. `valid_from`
+    is the date a fact was *stated*, so an undated fact has always rendered as
+    "(since <the day it was mentioned>)" — which reads as the day it became true. On
+    every one of the thirty temporal questions in reasoning-48 some selected evidence
+    is undated, so a reader asked "how many days between X and Y" is routinely given a
+    mention date wearing an event date's clothes. Saying "mentioned" instead is the
+    whole mechanism.
+
+    Off by default, because turning it on changes the context of every recorded arm.
+    """
     # The label is a citation handle, not content. It goes first so that a model working
     # through the context in order reads it before the sentence it belongs to.
     tag = f"[{label}] " if label else ""
     if not temporal:
         return f"- {tag}{memory.content}"
 
-    start = memory.valid_from or memory.event_time
+    start = memory.valid_from or memory.occurred_at
     if start and memory.valid_to:
         window = f"({start:%Y-%m-%d} to {memory.valid_to:%Y-%m-%d}, no longer current)"
+    elif start and mark_unstated and not memory.event_time_is_stated:
+        window = f"(mentioned {start:%Y-%m-%d}; the fact states no date)"
     elif start:
         window = f"(since {start:%Y-%m-%d})"
     else:
@@ -288,6 +307,7 @@ class MemoryRunner:
         raw_fallback_max_chars: int = 2400,
         parallel_raw_windows: int = 0,
         parallel_raw_planned: bool = False,
+        date_provenance: bool = False,
         session_budget: SessionBudget | None = None,
         oracle_session_context: bool = False,
         answer_policy: str = "v2",
@@ -415,6 +435,9 @@ class MemoryRunner:
         # sessions and never falls through to another conversation. Archive-wide
         # retrieval is what v2b measured as noisy, and it stays where it is, behind the
         # answerer's own request.
+        # v2e. Say which dates the facts state and which are only when they were
+        # mentioned. Nothing else about the arm differs from v2c.
+        self.date_provenance = date_provenance
         self.parallel_raw = None
         self.parallel_raw_planned = parallel_raw_planned
         self.parallel_raw_windows = max(0, parallel_raw_windows)
@@ -910,7 +933,9 @@ class MemoryRunner:
         # Recorded per question so `_apply_computation` can resolve citations against the
         # context this answer actually saw, rather than against whatever is in scope now.
         self._context_labels = set(labels.values()) if labels else set()
-        body = render_grouped(memories, self.temporal, self.timeline_rendering, labels)
+        body = render_grouped(
+            memories, self.temporal, self.timeline_rendering, labels, self.date_provenance
+        )
         context = f"{TEMPORAL_NOTE}\n\n{body}" if self.temporal else body
         hydration = HydrationResult()
         if self.evidence_hydration or force_hydration:

@@ -36,7 +36,7 @@ def register_run_commands(
                 "two_stage_reasoned_evidence | two_stage_synthesis | "
                 "two_stage_v2c_memory_only | two_stage_v2c | "
                 "two_stage_v2d_memory_only | two_stage_v2d | "
-                "two_stage_v5_fixed | two_stage_v5_planned. "
+                "two_stage_v5_fixed | two_stage_v5_planned | two_stage_v2e. "
                 "The chronomem* names belong to the frozen v1 run and are kept so its "
                 "rows are not overwritten by a re-measurement of a different pipeline."
             ),
@@ -72,6 +72,11 @@ def register_run_commands(
                 "file is excluded from the default results table."
             ),
         ),
+        experiment_class: str = typer.Option(
+            "regression",
+            "--experiment-class",
+            help="regression | development | unseen; legacy manifests permit regression only",
+        ),
     ) -> None:
         """Evaluate one variant on LongMemEval. Resumes automatically if interrupted."""
         from llm_long_term_memory.evaluation.harness import run_eval
@@ -84,9 +89,17 @@ def register_run_commands(
 
         with console.status("Loading dataset…"):
             if questions:
-                from llm_long_term_memory.evaluation.manifest import load_manifest
+                from llm_long_term_memory.evaluation.manifest import load_manifest, require_claim
 
                 manifest = load_manifest(questions)
+                if experiment_class not in {"regression", "development", "unseen"}:
+                    raise typer.BadParameter(
+                        "experiment class must be regression, development or unseen"
+                    )
+                try:
+                    require_claim(manifest, experiment_class)
+                except ValueError as exc:
+                    raise typer.BadParameter(str(exc)) from exc
                 every = manifest_instances(manifest, settings)
                 by_id = {instance.question_id: instance for instance in every}
                 unknown = [
@@ -109,7 +122,7 @@ def register_run_commands(
         output = settings.results_dir / "raw" / f"{stem}.jsonl"
         runner.name = stem
         console.print(
-            f"[bold]{stem}[/bold] · {len(instances)} questions · "
+            f"[bold]{stem}[/bold] · {experiment_class} · {len(instances)} questions · "
             f"answerer={cfg.models.answerer} judge={cfg.models.judge} · "
             f"top_k={cfg.retrieval.top_k} rerank={cfg.retrieval.rerank.enabled}\n"
             f"[dim]→ {output}[/dim]\n"

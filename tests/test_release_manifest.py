@@ -61,15 +61,16 @@ def test_the_digest_moves_when_measured_code_moves():
     assert figures.measured_tree() == before
 
 
-def test_the_digest_lists_files_through_git_not_the_working_tree():
+def test_the_digest_lists_publishable_files_through_git_not_a_glob():
     """A glob picks up whatever is on this machine. `tests/data/*.py` exists here, is
     matched by `.gitignore`, has never been committed and is imported by nothing — under
-    a glob it made the digest differ from every clean checkout by construction."""
+    a glob it made the digest differ from every clean checkout by construction. Legitimate
+    non-ignored additions are included so an update remains valid after they are staged."""
     listed = figures.measured_files()
 
     assert listed, "no measured files"
     assert all(not name.startswith("tests/data/") for name in listed), (
-        "the digest is covering files git does not track"
+        "the digest is covering files Git marks ignored"
     )
     assert listed == sorted(listed), "listing order must be stable across platforms"
 

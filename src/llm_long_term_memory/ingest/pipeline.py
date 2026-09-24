@@ -27,7 +27,7 @@ from pathlib import Path
 from llm_long_term_memory.conversation import ConversationSession, ConversationSource
 from llm_long_term_memory.embed import Encoder
 from llm_long_term_memory.llm.client import ContentBlocked, DailyQuotaExhausted
-from llm_long_term_memory.store import MemoryStore, NumpyFlatIndex
+from llm_long_term_memory.store import Memory, MemoryStore, NumpyFlatIndex
 
 from . import fingerprint
 from .dedup import Deduplicator
@@ -43,6 +43,8 @@ class IngestProgress:
     bad_session_index: int = 0
     extraction_requests: int = 0
     adjudication_requests: int = 0
+    repair_requests: int = 0
+    repair_memories: int = 0
     superseded: int = 0
     undated: int = 0
     blocked_sessions: set[str] = field(default_factory=set)
@@ -62,6 +64,8 @@ class IngestProgress:
             "bad_session_index": self.bad_session_index,
             "extraction_requests": self.extraction_requests,
             "adjudication_requests": self.adjudication_requests,
+            "repair_requests": self.repair_requests,
+            "repair_memories": self.repair_memories,
             "superseded": self.superseded,
             "undated": self.undated,
         }
@@ -86,6 +90,8 @@ class IngestProgress:
             "bad_session_index",
             "extraction_requests",
             "adjudication_requests",
+            "repair_requests",
+            "repair_memories",
             "superseded",
             "undated",
         ):
@@ -234,6 +240,7 @@ class IngestionPipeline:
         checkpoint_every: int = 5,
         resolver=None,
         config_spec: fingerprint.IngestSpec | None = None,
+        repair=None,
     ) -> None:
         self.extractor = extractor
         self.deduplicator = deduplicator
@@ -250,6 +257,12 @@ class IngestionPipeline:
         # Preflight validates a store against the *configuration*; this is what
         # makes that validation mean something about the run — see `run()`.
         self.config_spec = config_spec
+        # `SpecificityRepair`, or None. It spends one request per session that lost a
+        # specific, so it is never on unless the configuration asks; `_ingest_batch`
+        # runs it after extraction and hands its output through the same dedup, index
+        # and temporal path as everything else, because a repaired memory that skipped
+        # deduplication would be a second copy of a fact the store already holds.
+        self.repair = repair
 
     def run(
         self,
@@ -286,6 +299,7 @@ class IngestionPipeline:
                 self.extractor,
                 sessions_per_request=self.sessions_per_request,
                 dedup=self.deduplicator,
+                repair=self.repair,
             )
             # The second layer. Preflight compares the store against a fingerprint
             # derived from configuration, which is only evidence about this run if
@@ -445,6 +459,12 @@ class IngestionPipeline:
                 memory.source_session_id = scoped_session_id(namespace, memory.source_session_id)
         progress.extraction_requests += outcome.requests
         progress.bad_session_index += outcome.dropped_bad_index
+
+        if self.repair is not None:
+            outcome.memories.extend(
+                self._repair_batch(namespace, batch, outcome.memories, progress)
+            )
+
         if not outcome.memories:
             return
 
@@ -469,6 +489,38 @@ class IngestionPipeline:
             stats = self.resolver.resolve_memories(deduped.kept)
             progress.superseded += stats.superseded
             progress.undated += stats.skipped_undated
+
+    def _repair_batch(
+        self,
+        namespace: str,
+        batch: list[ConversationSession],
+        extracted: list[Memory],
+        progress: IngestProgress,
+    ) -> list[Memory]:
+        """One conditional grounded call per session that lost a specific.
+
+        Grouped by the *scoped* session id, because `_ingest_batch` has already
+        rewritten the extractor's ids by this point and matching on the raw one would
+        compare every session against an empty memory set and call for all of them.
+        """
+        from llm_long_term_memory.store import scoped_session_id
+
+        by_session: dict[str, list[Memory]] = {}
+        for memory in extracted:
+            if memory.source_session_id:
+                by_session.setdefault(memory.source_session_id, []).append(memory)
+
+        recovered: list[Memory] = []
+        for session in batch:
+            scoped = scoped_session_id(namespace, session.session_id)
+            outcome = self.repair.repair(session, by_session.get(scoped, []), namespace)
+            if outcome.called:
+                progress.repair_requests += 1
+            for memory in outcome.memories:
+                memory.source_session_id = scoped
+                recovered.append(memory)
+        progress.repair_memories += len(recovered)
+        return recovered
 
     def _commit(self, progress: IngestProgress) -> None:
         self.index.save()

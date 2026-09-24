@@ -1,0 +1,185 @@
+{
+  "experiment": "batch8-cohort-attribution-v1",
+  "class": "development",
+  "model": "gemini-3.1-flash-lite",
+  "provider_calls": 0,
+  "gates": {
+    "A_matches_history": true,
+    "B_matches_history": true,
+    "C_matches_history": true
+  },
+  "cohorts": {
+    "A_first60_extraction": {
+      "source": "archived batch8 extraction",
+      "sessions": 60,
+      "memories": 223,
+      "memories_per_session": 3.716666666666667,
+      "specifics": 134,
+      "specifics_kept": 87,
+      "recall": 0.6492537313432836,
+      "facets": {
+        "quantity": {
+          "stated": 54,
+          "kept": 36,
+          "recall": 0.6666666666666666
+        },
+        "duration": {
+          "stated": 14,
+          "kept": 10,
+          "recall": 0.7142857142857143
+        },
+        "money": {
+          "stated": 1,
+          "kept": 0,
+          "recall": 0.0
+        },
+        "date": {
+          "stated": 0,
+          "kept": 0,
+          "recall": 0.0
+        },
+        "relative_time": {
+          "stated": 12,
+          "kept": 5,
+          "recall": 0.4166666666666667
+        },
+        "proper_noun": {
+          "stated": 53,
+          "kept": 36,
+          "recall": 0.6792452830188679
+        }
+      },
+      "median_source_chars": 12837.5,
+      "median_user_assertion_chars": 703.0,
+      "total_source_chars": 666699,
+      "total_user_assertion_chars": 60805,
+      "sessions_without_specifics": 22
+    },
+    "B_second60_extraction": {
+      "source": "pilot baseline extraction",
+      "sessions": 60,
+      "memories": 351,
+      "memories_per_session": 5.85,
+      "specifics": 145,
+      "specifics_kept": 65,
+      "recall": 0.4482758620689655,
+      "facets": {
+        "quantity": {
+          "stated": 62,
+          "kept": 23,
+          "recall": 0.3709677419354839
+        },
+        "duration": {
+          "stated": 14,
+          "kept": 5,
+          "recall": 0.35714285714285715
+        },
+        "money": {
+          "stated": 16,
+          "kept": 10,
+          "recall": 0.625
+        },
+        "date": {
+          "stated": 0,
+          "kept": 0,
+          "recall": 0.0
+        },
+        "relative_time": {
+          "stated": 13,
+          "kept": 2,
+          "recall": 0.15384615384615385
+        },
+        "proper_noun": {
+          "stated": 40,
+          "kept": 25,
+          "recall": 0.625
+        }
+      },
+      "median_source_chars": 9270.5,
+      "median_user_assertion_chars": 472.0,
+      "total_source_chars": 563606,
+      "total_user_assertion_chars": 64729,
+      "sessions_without_specifics": 25
+    },
+    "C_gate16_store": {
+      "source": "built store after deduplication",
+      "sessions": 780,
+      "memories": 3055,
+      "memories_per_session": 3.9166666666666665,
+      "specifics": 2338,
+      "specifics_kept": 1110,
+      "recall": 0.47476475620188197,
+      "facets": {
+        "quantity": {
+          "stated": 852,
+          "kept": 416,
+          "recall": 0.48826291079812206
+        },
+        "duration": {
+          "stated": 178,
+          "kept": 82,
+          "recall": 0.4606741573033708
+        },
+        "money": {
+          "stated": 97,
+          "kept": 60,
+          "recall": 0.6185567010309279
+        },
+        "date": {
+          "stated": 17,
+          "kept": 3,
+          "recall": 0.17647058823529413
+        },
+        "relative_time": {
+          "stated": 183,
+          "kept": 44,
+          "recall": 0.24043715846994534
+        },
+        "proper_noun": {
+          "stated": 1011,
+          "kept": 505,
+          "recall": 0.49950544015825915
+        }
+      },
+      "median_source_chars": 9776.0,
+      "median_user_assertion_chars": 701.5,
+      "total_source_chars": 7811279,
+      "total_user_assertion_chars": 707103,
+      "sessions_without_specifics": 277
+    }
+  },
+  "session_id_overlap": {
+    "A_first60_extraction__B_second60_extraction": 0,
+    "A_first60_extraction__C_gate16_store": 1,
+    "B_second60_extraction__C_gate16_store": 1
+  },
+  "C_reweighted_to_A_facet_mix": {
+    "recall_on_shared_facets": 0.4686061665403268,
+    "target_specifics_covered": 134,
+    "target_specifics_total": 134,
+    "facets_without_source_support": []
+  },
+  "C_reweighted_to_B_facet_mix": {
+    "recall_on_shared_facets": 0.48085894175631216,
+    "target_specifics_covered": 145,
+    "target_specifics_total": 145,
+    "facets_without_source_support": []
+  },
+  "A_reweighted_to_C_facet_mix": {
+    "recall_on_shared_facets": 0.6282248333799796,
+    "target_specifics_covered": 2321,
+    "target_specifics_total": 2338,
+    "facets_without_source_support": [
+      "date"
+    ]
+  },
+  "B_reweighted_to_C_facet_mix": {
+    "recall_on_shared_facets": 0.47405850532283805,
+    "target_specifics_covered": 2321,
+    "target_specifics_total": 2338,
+    "facets_without_source_support": [
+      "date"
+    ]
+  },
+  "limitation": "The three readings use different sessions. C has no archived pre-dedup extraction for those same sessions, so cohort and pipeline effects cannot be causally separated from these artifacts."
+}

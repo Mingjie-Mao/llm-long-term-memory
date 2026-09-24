@@ -39,6 +39,11 @@ def test_roundtrip_preserves_all_fields(store):
         object="PyTorch",
         importance=0.8,
         event_time=NOW,
+        observed_at=NOW,
+        event_time_expression="on January 1, 2026",
+        event_time_source_expression="January 1, 2026",
+        event_time_estimate=NOW,
+        event_time_precision="day",
         valid_from=NOW,
         source_turn_index=3,
         source_char_start=12,
@@ -54,6 +59,11 @@ def test_roundtrip_preserves_all_fields(store):
     assert got.predicate == "prefers_framework"
     assert got.importance == pytest.approx(0.8)
     assert got.event_time == NOW
+    assert got.observed_at == NOW
+    assert got.event_time_expression == "on January 1, 2026"
+    assert got.event_time_source_expression == "January 1, 2026"
+    assert got.event_time_estimate == NOW
+    assert got.event_time_precision == "day"
     assert (got.source_turn_index, got.source_char_start, got.source_char_end) == (3, 12, 40)
     assert got.entities == ["PyTorch"]
     assert got.is_current
@@ -152,6 +162,22 @@ def test_initialize_migrates_a_v1_database_with_no_update_op(tmp_path):
     store.add_memories([mem("m1", "the user moved to Sydney", update_op="replaces")])
     assert store.get("m1").update_op == "replaces"
     store.close()
+
+
+def test_target_object_round_trips_and_old_stores_gain_the_column(tmp_path):
+    path = tmp_path / "target.db"
+    migrated = SQLiteMemoryStore(path)
+    migrated.initialize()
+    item = mem("m1", "sold the Honda")
+    item.update_op = "removes"
+    item.object = ""
+    item.target_object = "Honda Civic"
+    migrated.add_memories([item])
+
+    assert migrated.get("m1").target_object == "Honda Civic"
+    columns = {row[1] for row in migrated._conn.execute("PRAGMA table_info(memories)")}
+    assert "target_object" in columns
+    migrated.close()
 
 
 def test_eviction_hides_memory_but_preserves_it_for_audit(store):

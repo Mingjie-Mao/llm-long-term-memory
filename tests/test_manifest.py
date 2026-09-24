@@ -7,7 +7,7 @@ import json
 import pytest
 
 from llm_long_term_memory.evaluation.datasets.longmemeval import Instance, stratify
-from llm_long_term_memory.evaluation.manifest import Manifest, load_manifest
+from llm_long_term_memory.evaluation.manifest import Manifest, load_manifest, require_claim
 
 
 def instance(qid: str, qtype: str) -> Instance:
@@ -79,3 +79,22 @@ def test_duplicate_ids_are_rejected(tmp_path):
 
     with pytest.raises(ValueError, match="more than once"):
         load_manifest(path)
+
+
+def test_legacy_manifests_are_regression_evidence(tmp_path):
+    path = tmp_path / "spent.json"
+    path.write_text(json.dumps({"question_ids": ["q1"]}), encoding="utf-8")
+
+    manifest = load_manifest(path)
+
+    assert manifest.exposure == "regression"
+    with pytest.raises(ValueError, match="cannot be reported as unseen"):
+        require_claim(manifest, "unseen")
+
+
+def test_an_explicit_unseen_manifest_allows_weaker_claims():
+    manifest = Manifest("new", "s", 0, ("q",), exposure="unseen")
+
+    require_claim(manifest, "unseen")
+    require_claim(manifest, "development")
+    require_claim(manifest, "regression")

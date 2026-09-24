@@ -60,40 +60,28 @@ let manifest = null;
 
 function renderMetrics() {
   if (!manifest) return;
-  const { result, engineering, release } = manifest;
+  const { result, release } = manifest;
   const acc = result.accuracy;
-  const ctx = result.median_context_tokens;
   const rag = result.naive_rag_accuracy;
-  const ragCtx = result.naive_rag_median_context_tokens;
+  const full = result.full_context_accuracy;
 
-  // One sentence. Everything that qualifies it goes in the footnote below, and
-  // everything else lives in the repository.
   $("headline").textContent = lang === "zh"
-    ? `在 LongMemEval-S 的 100 题终测上准确率 ${acc}%，上下文中位数 ${ctx.toLocaleString()} token；naive RAG 为 ${rag}%，用 ${ragCtx.toLocaleString()} token。`
-    : `${acc}% accuracy on LongMemEval-S test100 with ${ctx.toLocaleString()} median context tokens, versus ${rag}% for naive RAG using ${ragCtx.toLocaleString()} tokens.`;
+    ? `冻结 v2：${acc}% 正确率；naive RAG ${rag}%，整段历史 ${full}%。`
+    : `Frozen v2: ${acc}% accuracy; naive RAG ${rag}%, full history ${full}%.`;
 
   $("footnote").textContent = result.significant_vs_naive_rag
     ? (lang === "zh"
-        ? `在这 ${result.questions} 题上，${acc}% 与 ${rag}% 的差距达到统计显著。`
-        : `The ${acc}% vs ${rag}% difference was statistically significant on this ${result.questions}-question test.`)
+        ? `LongMemEval-S ${result.questions} 题，每臂一次；相对 naive RAG 的差异显著（p=${result.vs_naive_rag_p_value}）。`
+        : `LongMemEval-S, ${result.questions} questions, one run per arm; the difference from naive RAG was significant (p=${result.vs_naive_rag_p_value}).`)
     : (lang === "zh"
-        ? `在这 ${result.questions} 题上，${acc}% 与 ${rag}% 的差距未达统计显著。`
-        : `The ${acc}% vs ${rag}% difference was not statistically significant on this ${result.questions}-question test.`);
+        ? `LongMemEval-S ${result.questions} 题，每臂一次；相对 naive RAG 的差异不显著（p=${result.vs_naive_rag_p_value}）。`
+        : `LongMemEval-S, ${result.questions} questions, one run per arm; the difference from naive RAG was not significant (p=${result.vs_naive_rag_p_value}).`);
 
-  // Two figures, not one. Until schema 2 the test count also included one case per
-  // tracked Markdown file, so committing a batch of pre-registrations raised the
-  // number the page showed while nothing about the engine had been tested.
   $("releaseMeta").textContent = lang === "zh"
-    ? `发布 ${release} · ${engineering.tests} 项测试 · ${engineering.document_checks} 篇文档核查 · ${engineering.verified_at} 核验`
-    : `Release ${release} · ${engineering.tests} tests · ${engineering.document_checks} documents checked · verified ${engineering.verified_at}`;
-  // The reference commit is a convenience and may not survive a history rewrite, so the
-  // link degrades to the repository rather than to a 404 when it is absent.
-  const commit = engineering.source_commit_for_reference;
+    ? `${release} · 历史终测`
+    : `${release} · archived final test`;
   const link = $("releaseCommit");
-  link.textContent = commit ? commit.slice(0, 7) : "source";
-  link.href = commit
-    ? `https://github.com/Mingjie-Mao/llm-long-term-memory/commit/${commit}`
-    : "https://github.com/Mingjie-Mao/llm-long-term-memory";
+  link.textContent = lang === "zh" ? "实验报告" : "full report";
 }
 
 async function loadManifest() {
@@ -151,7 +139,7 @@ function statusText() {
   if (kind === "up") {
     return lang === "zh" ? `引擎就绪 · 编码器 ${value}` : `Engine ready · encoder ${value}`;
   }
-  return lang === "zh" ? `引擎不可用：${value}` : `Engine unavailable: ${value}`;
+  return lang === "zh" ? "引擎暂不可用，请重试。" : "Engine unavailable. Please retry.";
 }
 
 function setStatus(state, message) {
@@ -199,8 +187,8 @@ async function connect() {
     $("tryNewConversation").hidden = !(health.capabilities || []).includes("conversations");
     setStatus("up", statusText());
     setReady(true);
-  } catch (error) {
-    statusKey = { kind: "down", value: error.message };
+  } catch {
+    statusKey = { kind: "down", value: "" };
     setStatus("down", statusText());
   }
 }

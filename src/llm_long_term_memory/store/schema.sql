@@ -46,6 +46,7 @@ CREATE TABLE IF NOT EXISTS memories (
     subject         TEXT,
     predicate       TEXT,
     object          TEXT,
+    target_object   TEXT,
 
     -- Who said it. Orthogonal to `subject`, and the pair is what makes
     -- "what did you recommend?" answerable at all: that question filters on
@@ -63,6 +64,11 @@ CREATE TABLE IF NOT EXISTS memories (
 
     -- Temporal axis 1: when the fact holds in the world.
     event_time      TEXT,
+    observed_at     TEXT,
+    event_time_expression TEXT,
+    event_time_source_expression TEXT,
+    event_time_estimate TEXT,
+    event_time_precision TEXT,
     valid_from      TEXT,
     valid_to        TEXT,               -- NULL => still true
 
@@ -78,13 +84,13 @@ CREATE TABLE IF NOT EXISTS memories (
 
     -- What Stage B said this fact does to earlier facts on the same key:
     -- coexists | replaces | removes | none. Stored raw rather than collapsed into
-    -- `replaces_previous` because `removes` ends an attribute with no successor,
-    -- which is a different timeline shape from a replacement and will need its own
-    -- handling. Keeping the distinction now avoids re-ingesting to recover it.
+    -- `replaces_previous` because `removes` ends an attribute with no successor.
+    -- The resolver handles that shape directly; `target_object` identifies the
+    -- value it closes while `object` is reserved for a successor value.
     update_op         TEXT NOT NULL DEFAULT 'coexists',
 
     superseded_by   TEXT REFERENCES memories(id),
-    status          TEXT NOT NULL DEFAULT 'active',  -- active|superseded|evicted
+    status          TEXT NOT NULL DEFAULT 'active',  -- active|superseded|historical|evicted
 
     -- Decay / reinforcement (P5). `strength` decays with time since last access and
     -- is bumped on retrieval; eviction sorts on strength * importance.

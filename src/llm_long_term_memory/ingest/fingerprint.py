@@ -87,6 +87,17 @@ class IngestSpec:
     prompts: str
     sessions_per_request: str
     dedup_threshold: str | None = None
+    specificity_repair: str = "off"
+    """The conditional grounded repair, and the prompts it would run with.
+
+    In the fingerprint because it changes *which memories get written*: a store built
+    without it is not the same system as one built with it, and resuming one into the
+    other would leave rows from two extraction policies with nothing to tell them
+    apart — the failure this module exists to prevent. Every fingerprint already on
+    disk lacks the key, so `differences()` reports it and refuses the resume rather
+    than silently mixing.
+    """
+
     dedup_scope: str = "namespace"
     """Which memories deduplication is allowed to compare a candidate against.
 
@@ -113,6 +124,10 @@ class IngestSpec:
             "sessions_per_request": self.sessions_per_request,
             "prompts": self.prompts,
         }
+        if self.specificity_repair != "off":
+            # Omitted when off, so a fingerprint written before this existed still
+            # matches a run that does not use it, and no store needs rebuilding.
+            fp["specificity_repair"] = self.specificity_repair
         if self.dedup_threshold is not None:
             fp["dedup_threshold"] = self.dedup_threshold
             # Only meaningful where deduplication runs at all, and kept beside the
@@ -126,7 +141,9 @@ def _threshold(value: Any) -> str | None:
     return None if value is None else f"{float(value):.4f}"
 
 
-def from_runtime(extractor: Any, *, sessions_per_request: int, dedup: Any = None) -> IngestSpec:
+def from_runtime(
+    extractor: Any, *, sessions_per_request: int, dedup: Any = None, repair: Any = None
+) -> IngestSpec:
     """The spec of the objects that are about to write rows.
 
     Reads the live instances rather than the configuration that produced them, so a
@@ -145,7 +162,17 @@ def from_runtime(extractor: Any, *, sessions_per_request: int, dedup: Any = None
         # Read off the live object for the same reason `prompts` is: a deduplicator
         # built with a different comparison rule then fingerprints as what it is.
         dedup_scope=str(getattr(dedup, "scope", "namespace")),
+        specificity_repair=_repair(repair),
     )
+
+
+def _repair(repair: Any) -> str:
+    """The live repair object's identity, or `off`."""
+    if repair is None:
+        return "off"
+    prompts = getattr(repair, "prompt_texts", None)
+    version = str(getattr(repair, "version", "unversioned"))
+    return f"{version}:{digest(*prompts())}" if callable(prompts) else version
 
 
 def from_config(cfg: Any, *, sessions_per_request: int) -> IngestSpec:
@@ -156,6 +183,7 @@ def from_config(cfg: Any, *, sessions_per_request: int) -> IngestSpec:
     Callers resolve it with `pipeline.resolved_sessions_per_request` so that the
     cap is applied identically on both sides.
     """
+    from . import repair as repair_module
     from .extract import Extractor
     from .two_stage import TwoStageExtractor
 
@@ -169,6 +197,11 @@ def from_config(cfg: Any, *, sessions_per_request: int) -> IngestSpec:
         # Unconditional, because ingestion builds a Deduplicator unconditionally.
         # `ingest.dedupe_sessions` is a corpus-planning flag and does not gate it.
         dedup_threshold=_threshold(cfg.ingest.dedupe_similarity_threshold),
+        specificity_repair=(
+            f"{repair_module.REPAIR_VERSION}:{digest(*repair_module.GroundedExtractor.prompt_texts())}"
+            if cfg.ingest.specificity_repair
+            else "off"
+        ),
     )
 
 

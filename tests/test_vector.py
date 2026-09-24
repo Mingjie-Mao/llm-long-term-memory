@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import json
+
 import numpy as np
 import pytest
 
@@ -65,3 +67,22 @@ def test_shape_mismatch_is_rejected(tmp_path):
         idx.add(["a"], np.array([[1, 0]], dtype=np.float32))
     with pytest.raises(ValueError, match="ids but"):
         idx.add(["a", "b"], np.array([[1, 0, 0]], dtype=np.float32))
+
+
+def test_committed_generation_detects_a_torn_pair(tmp_path):
+    path = tmp_path / "idx"
+    index = NumpyFlatIndex(path, dim=2)
+    index.add(["a"], np.array([[1, 0]], dtype=np.float32))
+    index.save()
+    path.with_suffix(".ids.json").write_text(json.dumps(["other"]), encoding="utf-8")
+
+    with pytest.raises(ValueError, match="generation is incomplete"):
+        NumpyFlatIndex(path, dim=2)
+
+
+def test_index_validates_exactly_against_database_ids(tmp_path):
+    index = NumpyFlatIndex(tmp_path / "idx", dim=2)
+    index.add(["a", "orphan"], np.array([[1, 0], [0, 1]], dtype=np.float32))
+
+    with pytest.raises(ValueError, match="1 memories lack vectors and 1 vectors lack memories"):
+        index.validate_ids({"a", "missing"})

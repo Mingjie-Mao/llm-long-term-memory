@@ -451,10 +451,74 @@ def test_a_removal_is_not_folded_into_the_value_it_ends(store):
     removed = fact("sold", "Honda Civic", 7, predicate="car", replaces_previous=True)
     removed.content = "The user sold their Honda Civic"
     removed.update_op = "removes"
+    removed.target_object = "Honda Civic"
+    removed.object = ""
     store.add_memories([owned, removed])
 
     TemporalResolver(store).resolve_all("u1")
 
     assert store.get("owned").status == "superseded"
     assert store.get("owned").superseded_by == "sold"
-    assert store.get("sold").status == "active"
+    assert store.get("sold").status == "historical"
+    assert current(store, "car") == []
+
+
+def test_a_termination_targets_one_coexisting_value_without_becoming_current(store):
+    """Removing Nike must not hide Adidas or turn Nike into a successor value."""
+    nike = fact(
+        "nike",
+        "Nike Air Zoom Pegasus 38",
+        1,
+        predicate="running_shoes",
+        replaces_previous=False,
+    )
+    adidas = fact(
+        "adidas", "Adidas Ultraboost 22", 2, predicate="running_shoes", replaces_previous=False
+    )
+    removed = fact("removed", "", 3, predicate="running_shoes", replaces_previous=True)
+    removed.content = "The user replaced their Nike Air Zoom Pegasus 38 shoes."
+    removed.update_op = "removes"
+    removed.target_object = "Nike Air Zoom Pegasus 38"
+    store.add_memories([nike, adidas, removed])
+
+    TemporalResolver(store).resolve_all("u1")
+
+    assert store.get("nike").status == "superseded"
+    assert store.get("adidas").status == "active"
+    assert store.get("removed").status == "historical"
+    assert current(store, "running_shoes") == ["adidas ultraboost 22"]
+
+
+def test_the_measured_legacy_nike_sentence_is_replayed_as_a_termination(store):
+    """Old stores have no target_object and contain the known wrong REPLACE verdict."""
+    adidas = fact(
+        "adidas", "Adidas Ultraboost 22", 1, predicate="running_shoes", replaces_previous=False
+    )
+    legacy = fact(
+        "legacy", "Nike Air Zoom Pegasus 38", 2, predicate="running_shoes", replaces_previous=True
+    )
+    legacy.content = "The user replaced their Nike Air Zoom Pegasus 38 shoes around February 10."
+    legacy.update_op = "replaces"
+    legacy.target_object = None
+    store.add_memories([adidas, legacy])
+
+    TemporalResolver(store).resolve_all("u1")
+
+    assert store.get("adidas").status == "active"
+    assert store.get("legacy").status == "historical"
+
+
+def test_an_ambiguous_termination_hides_nothing(store):
+    first = fact("first", "red shoes", 1, predicate="shoes", replaces_previous=False)
+    second = fact("second", "blue shoes", 2, predicate="shoes", replaces_previous=False)
+    removed = fact("removed", "", 3, predicate="shoes", replaces_previous=True)
+    removed.content = "The user stopped wearing those shoes."
+    removed.update_op = "removes"
+    removed.target_object = None
+    store.add_memories([first, second, removed])
+
+    stats = TemporalResolver(store).resolve_all("u1")
+
+    assert stats.skipped_ambiguous == 1
+    assert current(store, "shoes") == ["blue shoes", "red shoes"]
+    assert store.get("removed").status == "historical"

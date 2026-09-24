@@ -25,6 +25,7 @@ from llm_long_term_memory.conversation import ConversationSession
 from llm_long_term_memory.llm.client import GeminiClient
 from llm_long_term_memory.store import Memory
 
+from .event_time import temporal_evidence
 from .extract import ExtractionOutcome, _parse_date, memory_id
 from .extract_facts import _PROMPT as FACTS_PROMPT
 from .extract_facts import EXTRACTOR_VERSION, FACTS_SYSTEM, FactExtractor, FactLine
@@ -133,8 +134,9 @@ class TwoStageExtractor:
     def _build(
         self, line: FactLine, keying: Keying, session_id: str, session_date: str, now: datetime
     ) -> Memory:
-        event_time = _parse_date(session_date)
         fact = line.content
+        observed_at = _parse_date(session_date)
+        temporal = temporal_evidence(fact, observed_at)
         # `subject` and `source_role` come from Stage A, which is the only stage that
         # sees the conversation. This used to be
         #     subject = "assistant" if fact.startswith("the assistant") else "user"
@@ -143,10 +145,8 @@ class TwoStageExtractor:
         # fact about the user, so "what was Andy wearing?" could never be answered
         # (results/assistant-gap.md).
 
-        # `removes` closes an earlier fact just as `replaces` does; what differs is
-        # that no successor value follows. The resolver acts on the boolean today,
-        # so both set it, and `update_op` preserves which one it was for when the
-        # removal case gets its own timeline handling.
+        # Kept for old-store compatibility. New resolution uses `update_op` and
+        # `target_object`, so a removal cannot masquerade as a successor value.
         closes_earlier = keying.update_op in (UpdateOp.REPLACES, UpdateOp.REMOVES)
 
         return Memory(
@@ -158,11 +158,16 @@ class TwoStageExtractor:
             subject=line.subject,
             predicate=keying.temporal_key,
             object=keying.object,
+            target_object=keying.target_object,
             source_role=line.source_role,
             scope=line.scope or None,
             importance=infer_importance(fact),
-            event_time=event_time,
-            valid_from=event_time,
+            event_time=temporal.exact,
+            observed_at=observed_at,
+            event_time_expression=temporal.expression,
+            event_time_estimate=temporal.estimate,
+            event_time_precision=temporal.precision,
+            valid_from=observed_at,
             valid_to=None,
             ingested_at=now,
             update_op=str(keying.update_op),

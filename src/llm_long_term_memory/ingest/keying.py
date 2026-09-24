@@ -81,8 +81,13 @@ subscription", "finished the course".
 - `none` — not a trackable attribute: a one-off observation, something about the \
 assistant, an opinion.
 
-**object** — the value this fact assigns to the key, in a few words. Empty for \
-`none`.
+**object** — the new value this fact establishes, in a few words. Empty for `none` \
+and `removes`.
+
+**target_object** — the old value explicitly ended by `replaces` or `removes`. \
+Leave it empty when the old value is not named. Never copy a removed value into \
+`object`: "replaced my Nike shoes" removes Nike and establishes no new value, while \
+"replaced Nike with Adidas" targets Nike and establishes Adidas.
 
 ## Worked examples
 
@@ -114,6 +119,7 @@ class KeyedFact(BaseModel):
     temporal_key: str = Field(description="snake_case attribute name")
     update_op: UpdateOp = UpdateOp.COEXISTS
     object: str = ""
+    target_object: str = ""
 
 
 class KeyingResult(BaseModel):
@@ -125,6 +131,7 @@ class Keying:
     temporal_key: str
     update_op: UpdateOp
     object: str
+    target_object: str = ""
 
     @property
     def replaces_previous(self) -> bool:
@@ -135,7 +142,7 @@ class Keying:
         return self.update_op is not UpdateOp.NONE and self.temporal_key not in ("", "none")
 
 
-DEFAULT = Keying(temporal_key="states", update_op=UpdateOp.NONE, object="")
+DEFAULT = Keying(temporal_key="states", update_op=UpdateOp.NONE, object="", target_object="")
 
 
 class FactKeyer:
@@ -178,6 +185,7 @@ class FactKeyer:
                     temporal_key=_normalise(item.temporal_key),
                     update_op=item.update_op,
                     object=item.object.strip(),
+                    target_object=item.target_object.strip(),
                 )
         return out
 

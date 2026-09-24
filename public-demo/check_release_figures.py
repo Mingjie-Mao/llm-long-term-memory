@@ -129,17 +129,15 @@ _MEASURED_SUFFIX = (".py", ".toml")
 
 
 def measured_files() -> list[str]:
-    """The measured files, as git sees them.
+    """The measured files in Git's publishable inventory.
 
-    Listed by `git ls-files` rather than by globbing the working tree. A glob picks up
-    whatever happens to be on this machine, so an untracked file makes the digest differ
-    from every other checkout by construction — which is exactly what happened here:
-    `tests/data/*.py` is matched by the `data/` line in `.gitignore`, exists locally, has
-    never been committed, and is imported by nothing. The digest has to describe what was
-    published, not what is lying around.
+    Include tracked files and non-ignored files pending their first commit. This keeps an
+    update made before staging stable after the same tree is committed, while Git's ignore
+    rules still exclude machine-local files such as `tests/data/*.py`. A filesystem glob
+    cannot make that distinction.
     """
     listed = subprocess.run(
-        ["git", "ls-files", "-z", *MEASURED],
+        ["git", "ls-files", "-z", "--cached", "--others", "--exclude-standard", *MEASURED],
         capture_output=True,
         text=True,
         encoding="utf-8",
@@ -149,29 +147,6 @@ def measured_files() -> list[str]:
         print("FAIL: could not list the measured files with git")
         print(listed.stderr[-500:])
         raise SystemExit(1)
-    return sorted(
-        name for name in listed.stdout.split("\0") if name and name.endswith(_MEASURED_SUFFIX)
-    )
-
-
-def untracked_measured() -> list[str]:
-    """Measured-looking files git does not track yet.
-
-    The digest covers what is published, so a new test file is invisible to it until it
-    is staged. That is correct and quietly misleading: `--update` appears to succeed while
-    recording a tree that omits the file just added. Reported rather than silently
-    included, because including it would put the digest back in the state where no other
-    checkout can reproduce it.
-    """
-    listed = subprocess.run(
-        ["git", "ls-files", "-z", "--others", "--exclude-standard", *MEASURED],
-        capture_output=True,
-        text=True,
-        encoding="utf-8",
-        cwd=REPO,
-    )
-    if listed.returncode != 0:
-        return []
     return sorted(
         name for name in listed.stdout.split("\0") if name and name.endswith(_MEASURED_SUFFIX)
     )
@@ -237,8 +212,6 @@ def main() -> int:
         print(f"updated: {actual} on {claimed['verified_at']}")
         print(f"  measured tree: {tree[:16]}…")
         print(f"  reference commit: {claimed['source_commit_for_reference']}")
-        for name in untracked_measured():
-            print(f"  NOTE: {name} is untracked and is not in the digest; stage it and re-run")
         return 0
 
     for key, (was, now) in drift.items():

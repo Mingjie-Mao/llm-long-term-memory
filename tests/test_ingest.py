@@ -124,8 +124,12 @@ def test_extraction_attaches_the_right_session_date_and_id():
 
     (m,) = outcome.memories
     assert m.source_session_id == "s1", "must map to the session it named, not the first"
-    assert m.event_time == datetime(2026, 3, 12, 14, 0)
-    assert m.valid_from == m.event_time
+    # The conversation's date is when it was *said*. The fact states no time of its
+    # own, so `event_time` stays None rather than borrowing one that would rank.
+    assert m.observed_at == datetime(2026, 3, 12, 14, 0)
+    assert m.event_time is None
+    assert m.occurred_at == m.observed_at, "ordering still has a time to use"
+    assert m.valid_from == m.observed_at
     assert m.valid_to is None, "a new fact is open-ended until something supersedes it"
     assert m.predicate == "uses_tool", "normalized on the way in"
     assert m.entities == ["PyTorch"]

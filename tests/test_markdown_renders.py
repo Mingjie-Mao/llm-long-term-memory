@@ -9,8 +9,8 @@ The mistake is invisible to the author, because the sentence is correct and the 
 obvious; it only shows up once rendered. `docs/history/REPORT.zh-CN.md` carried 58 of them.
 The fix is always the same: put the punctuation outside the emphasis, `**未晋级**。结果`.
 
-This renders every tracked Markdown file and fails on a surviving asterisk, so the next
-Chinese document cannot reintroduce it silently.
+This renders every tracked or non-ignored pending Markdown file and fails on a
+surviving asterisk, so the next Chinese document cannot reintroduce it silently.
 """
 
 from __future__ import annotations
@@ -32,8 +32,7 @@ _CODE = re.compile(r"<code>.*?</code>|<pre.*?</pre>", re.S)
 
 
 def documents() -> list[Path]:
-    """Every Markdown file **git tracks**, which is what the docstring above always
-    claimed and the implementation did not do.
+    """Every publishable Markdown file, including files pending their first commit.
 
     Walking the working tree instead swept up whatever happened to be on disk: six
     `README.md` files inside downloaded encoder directories under the ignored `stores/`
@@ -45,17 +44,18 @@ def documents() -> list[Path]:
     own documents.
     """
     listing = subprocess.run(
-        ["git", "ls-files", "*.md"],
+        ["git", "ls-files", "-z", "--cached", "--others", "--exclude-standard", "--", "*.md"],
         cwd=REPO,
         capture_output=True,
         text=True,
         encoding="utf-8",
     )
     if listing.returncode == 0 and listing.stdout.strip():
-        # `git ls-files` still reports tracked files deleted in the working tree. That
-        # is useful for Git status and impossible to render; only check documents that
-        # exist in the current checkout.
-        return sorted(path for name in listing.stdout.split() if (path := REPO / name).is_file())
+        # Git reports tracked files deleted in the working tree too. Only render files
+        # present now; pending non-ignored files should count before and after commit.
+        return sorted(
+            path for name in listing.stdout.split("\0") if name and (path := REPO / name).is_file()
+        )
     return sorted(
         path for path in REPO.rglob("*.md") if not SKIP & set(path.relative_to(REPO).parts)
     )
@@ -102,12 +102,17 @@ def test_the_document_list_does_not_depend_on_what_is_lying_around():
     recorded number that CI could never reproduce."""
     import subprocess
 
-    tracked = subprocess.run(
-        ["git", "ls-files", "*.md"],
-        cwd=REPO, capture_output=True, text=True, encoding="utf-8",
-    )  # fmt: skip
-    if tracked.returncode != 0:
+    publishable = subprocess.run(
+        ["git", "ls-files", "-z", "--cached", "--others", "--exclude-standard", "--", "*.md"],
+        cwd=REPO,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+    )
+    if publishable.returncode != 0:
         pytest.skip("not a git checkout")
-    existing_tracked = {name for name in tracked.stdout.split() if (REPO / name).is_file()}
-    assert {p.relative_to(REPO).as_posix() for p in documents()} == existing_tracked
+    existing_publishable = {
+        name for name in publishable.stdout.split("\0") if name and (REPO / name).is_file()
+    }
+    assert {p.relative_to(REPO).as_posix() for p in documents()} == existing_publishable
     assert not any("stores/" in p.as_posix() for p in documents())

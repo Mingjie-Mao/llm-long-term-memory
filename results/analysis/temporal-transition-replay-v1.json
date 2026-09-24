@@ -1,0 +1,399 @@
+{
+  "experiment": "temporal-transition-replay-v1",
+  "class": "regression",
+  "source_store": "stores/v2b-gate16-repair.db",
+  "model_calls": 0,
+  "memories": 3299,
+  "changed": [
+    {
+      "id": "mem_21c3f82d1b4e6459",
+      "before": {
+        "user_id": "a82c026e",
+        "content": "The user plans to pack a messenger bag inside their duffel bag.",
+        "predicate": "packing_list",
+        "object": "messenger bag",
+        "target_object": null,
+        "update_op": "coexists",
+        "status": "superseded",
+        "superseded_by": "mem_a5305df6171c2f8d",
+        "valid_to": "2023-05-25T23:43:00"
+      },
+      "after": {
+        "user_id": "a82c026e",
+        "content": "The user plans to pack a messenger bag inside their duffel bag.",
+        "predicate": "packing_list",
+        "object": "messenger bag",
+        "target_object": null,
+        "update_op": "coexists",
+        "status": "active",
+        "superseded_by": null,
+        "valid_to": null
+      }
+    },
+    {
+      "id": "mem_2f635055da453625",
+      "before": {
+        "user_id": "a82c026e",
+        "content": "The user got rid of their old Adidas sneakers about a month before May 24, 2023.",
+        "predicate": "footwear",
+        "object": "Adidas sneakers",
+        "target_object": null,
+        "update_op": "removes",
+        "status": "active",
+        "superseded_by": null,
+        "valid_to": null
+      },
+      "after": {
+        "user_id": "a82c026e",
+        "content": "The user got rid of their old Adidas sneakers about a month before May 24, 2023.",
+        "predicate": "footwear",
+        "object": "Adidas sneakers",
+        "target_object": null,
+        "update_op": "removes",
+        "status": "historical",
+        "superseded_by": null,
+        "valid_to": "2023-05-23T19:31:00"
+      }
+    },
+    {
+      "id": "mem_5578a76d73641c27",
+      "before": {
+        "user_id": "57f827a0",
+        "content": "The user's book club fizzled out a few months before May 2023.",
+        "predicate": "book_club",
+        "object": "fizzled out",
+        "target_object": null,
+        "update_op": "removes",
+        "status": "active",
+        "superseded_by": null,
+        "valid_to": null
+      },
+      "after": {
+        "user_id": "57f827a0",
+        "content": "The user's book club fizzled out a few months before May 2023.",
+        "predicate": "book_club",
+        "object": "fizzled out",
+        "target_object": null,
+        "update_op": "removes",
+        "status": "historical",
+        "superseded_by": null,
+        "valid_to": "2023-05-21T00:21:00"
+      }
+    },
+    {
+      "id": "mem_60552b94c1a3218f",
+      "before": {
+        "user_id": "95228167",
+        "content": "Val left the spacing service after 24 years to be with Odyl.",
+        "predicate": "employment_status",
+        "object": "left spacing service",
+        "target_object": null,
+        "update_op": "removes",
+        "status": "active",
+        "superseded_by": null,
+        "valid_to": null
+      },
+      "after": {
+        "user_id": "95228167",
+        "content": "Val left the spacing service after 24 years to be with Odyl.",
+        "predicate": "employment_status",
+        "object": "left spacing service",
+        "target_object": null,
+        "update_op": "removes",
+        "status": "historical",
+        "superseded_by": null,
+        "valid_to": "2023-05-30T13:27:00"
+      }
+    },
+    {
+      "id": "mem_6a9ad79b93de0250",
+      "before": {
+        "user_id": "58ef2f1c",
+        "content": "The user attends a comedy writing workshop on Sundays.",
+        "predicate": "comedy_writing_workshop",
+        "object": "Sundays",
+        "target_object": null,
+        "update_op": "coexists",
+        "status": "superseded",
+        "superseded_by": "mem_7d2b6d8606ac490c",
+        "valid_to": "2023-04-02T16:02:00"
+      },
+      "after": {
+        "user_id": "58ef2f1c",
+        "content": "The user attends a comedy writing workshop on Sundays.",
+        "predicate": "comedy_writing_workshop",
+        "object": "Sundays",
+        "target_object": null,
+        "update_op": "coexists",
+        "status": "active",
+        "superseded_by": null,
+        "valid_to": null
+      }
+    },
+    {
+      "id": "mem_6f3cc56a023fc60f",
+      "before": {
+        "user_id": "3a704032",
+        "content": "The user attended a study group from late November until January.",
+        "predicate": "study_group",
+        "object": "attended study group",
+        "target_object": null,
+        "update_op": "removes",
+        "status": "active",
+        "superseded_by": null,
+        "valid_to": null
+      },
+      "after": {
+        "user_id": "3a704032",
+        "content": "The user attended a study group from late November until January.",
+        "predicate": "study_group",
+        "object": "attended study group",
+        "target_object": null,
+        "update_op": "removes",
+        "status": "historical",
+        "superseded_by": null,
+        "valid_to": "2023-05-27T01:18:00"
+      }
+    },
+    {
+      "id": "mem_7bad79839d31968c",
+      "before": {
+        "user_id": "57f827a0",
+        "content": "The user replaced their bathroom light fixture on Sunday, May 7, 2023.",
+        "predicate": "home_maintenance",
+        "object": "bathroom light fixture",
+        "target_object": null,
+        "update_op": "replaces",
+        "status": "active",
+        "superseded_by": null,
+        "valid_to": null
+      },
+      "after": {
+        "user_id": "57f827a0",
+        "content": "The user replaced their bathroom light fixture on Sunday, May 7, 2023.",
+        "predicate": "home_maintenance",
+        "object": "bathroom light fixture",
+        "target_object": null,
+        "update_op": "replaces",
+        "status": "historical",
+        "superseded_by": null,
+        "valid_to": "2023-05-07T00:00:00"
+      }
+    },
+    {
+      "id": "mem_7d2b6d8606ac490c",
+      "before": {
+        "user_id": "58ef2f1c",
+        "content": "The user completed a stand-up comedy writing workshop at a local comedy club and wrote five new jokes.",
+        "predicate": "comedy_writing_workshop",
+        "object": "completed workshop",
+        "target_object": null,
+        "update_op": "removes",
+        "status": "active",
+        "superseded_by": null,
+        "valid_to": null
+      },
+      "after": {
+        "user_id": "58ef2f1c",
+        "content": "The user completed a stand-up comedy writing workshop at a local comedy club and wrote five new jokes.",
+        "predicate": "comedy_writing_workshop",
+        "object": "completed workshop",
+        "target_object": null,
+        "update_op": "removes",
+        "status": "historical",
+        "superseded_by": null,
+        "valid_to": "2023-04-02T16:02:00"
+      }
+    },
+    {
+      "id": "mem_7eb5e4262d66d4a2",
+      "before": {
+        "user_id": "d905b33f",
+        "content": "The user cancelled a FarmFresh subscription on January 5, 2023.",
+        "predicate": "subscription",
+        "object": "FarmFresh",
+        "target_object": null,
+        "update_op": "removes",
+        "status": "superseded",
+        "superseded_by": "mem_f2425825074736ca",
+        "valid_to": "2023-05-24T22:49:00"
+      },
+      "after": {
+        "user_id": "d905b33f",
+        "content": "The user cancelled a FarmFresh subscription on January 5, 2023.",
+        "predicate": "subscription",
+        "object": "FarmFresh",
+        "target_object": null,
+        "update_op": "removes",
+        "status": "historical",
+        "superseded_by": null,
+        "valid_to": "2023-01-05T00:00:00"
+      }
+    },
+    {
+      "id": "mem_8dbcde069a62fce2",
+      "before": {
+        "user_id": "6e984301",
+        "content": "The user replaced their Nike Air Zoom Pegasus 38 shoes around February 10, 2023.",
+        "predicate": "running_shoes",
+        "object": "Nike Air Zoom Pegasus 38",
+        "target_object": null,
+        "update_op": "removes",
+        "status": "active",
+        "superseded_by": null,
+        "valid_to": null
+      },
+      "after": {
+        "user_id": "6e984301",
+        "content": "The user replaced their Nike Air Zoom Pegasus 38 shoes around February 10, 2023.",
+        "predicate": "running_shoes",
+        "object": "Nike Air Zoom Pegasus 38",
+        "target_object": null,
+        "update_op": "removes",
+        "status": "historical",
+        "superseded_by": null,
+        "valid_to": "2023-02-10T00:00:00"
+      }
+    },
+    {
+      "id": "mem_a5305df6171c2f8d",
+      "before": {
+        "user_id": "a82c026e",
+        "content": "The user decided not to pack a portable stove for their trip.",
+        "predicate": "packing_list",
+        "object": "portable stove",
+        "target_object": null,
+        "update_op": "removes",
+        "status": "active",
+        "superseded_by": null,
+        "valid_to": null
+      },
+      "after": {
+        "user_id": "a82c026e",
+        "content": "The user decided not to pack a portable stove for their trip.",
+        "predicate": "packing_list",
+        "object": "portable stove",
+        "target_object": null,
+        "update_op": "removes",
+        "status": "historical",
+        "superseded_by": null,
+        "valid_to": "2023-05-25T23:43:00"
+      }
+    },
+    {
+      "id": "mem_a91e0e9a85a6b9d1",
+      "before": {
+        "user_id": "gpt4_7a0daae1",
+        "content": "The user's museum membership expired in December 2022.",
+        "predicate": "museum_membership",
+        "object": "expired December 2022",
+        "target_object": null,
+        "update_op": "removes",
+        "status": "active",
+        "superseded_by": null,
+        "valid_to": null
+      },
+      "after": {
+        "user_id": "gpt4_7a0daae1",
+        "content": "The user's museum membership expired in December 2022.",
+        "predicate": "museum_membership",
+        "object": "expired December 2022",
+        "target_object": null,
+        "update_op": "removes",
+        "status": "historical",
+        "superseded_by": null,
+        "valid_to": "2023-03-17T01:36:00"
+      }
+    },
+    {
+      "id": "mem_ac9ddfe4df29924a",
+      "before": {
+        "user_id": "6e984301",
+        "content": "The user completed a 6-week swimming program and swam 10 laps without stopping on 2023-03-04.",
+        "predicate": "swimming_program",
+        "object": "completed",
+        "target_object": null,
+        "update_op": "removes",
+        "status": "active",
+        "superseded_by": null,
+        "valid_to": null
+      },
+      "after": {
+        "user_id": "6e984301",
+        "content": "The user completed a 6-week swimming program and swam 10 laps without stopping on 2023-03-04.",
+        "predicate": "swimming_program",
+        "object": "completed",
+        "target_object": null,
+        "update_op": "removes",
+        "status": "historical",
+        "superseded_by": null,
+        "valid_to": "2023-03-04T00:00:00"
+      }
+    },
+    {
+      "id": "mem_af327665fd4c7814",
+      "before": {
+        "user_id": "6e984301",
+        "content": "The user has been using Adidas Ultraboost 22 shoes for daily runs since February 10, 2023.",
+        "predicate": "running_shoes",
+        "object": "Adidas Ultraboost 22",
+        "target_object": null,
+        "update_op": "coexists",
+        "status": "superseded",
+        "superseded_by": "mem_8dbcde069a62fce2",
+        "valid_to": "2023-02-10T00:00:00"
+      },
+      "after": {
+        "user_id": "6e984301",
+        "content": "The user has been using Adidas Ultraboost 22 shoes for daily runs since February 10, 2023.",
+        "predicate": "running_shoes",
+        "object": "Adidas Ultraboost 22",
+        "target_object": null,
+        "update_op": "coexists",
+        "status": "active",
+        "superseded_by": null,
+        "valid_to": null
+      }
+    },
+    {
+      "id": "mem_f2425825074736ca",
+      "before": {
+        "user_id": "d905b33f",
+        "content": "The user decided to cancel a $50 monthly beauty box subscription.",
+        "predicate": "subscription",
+        "object": "beauty box",
+        "target_object": null,
+        "update_op": "removes",
+        "status": "active",
+        "superseded_by": null,
+        "valid_to": null
+      },
+      "after": {
+        "user_id": "d905b33f",
+        "content": "The user decided to cancel a $50 monthly beauty box subscription.",
+        "predicate": "subscription",
+        "object": "beauty box",
+        "target_object": null,
+        "update_op": "removes",
+        "status": "historical",
+        "superseded_by": null,
+        "valid_to": "2023-05-24T22:49:00"
+      }
+    }
+  ],
+  "changed_count": 15,
+  "first_replay": {
+    "writes": 15,
+    "superseded": 0,
+    "terminated": 12,
+    "ambiguous": 3
+  },
+  "second_replay_writes": 0,
+  "gates": {
+    "no_active_removal": true,
+    "known_nike_is_not_current": true,
+    "known_adidas_is_current": true,
+    "idempotent_second_replay": true
+  },
+  "decision": "PASS"
+}

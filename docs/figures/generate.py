@@ -764,9 +764,9 @@ def temporal(chinese=False):
             "may fold into the earliest interval owner.",
         ),
         tr(
-            "无日期的事实原样留着不解析。event_time 目前来自会话日期；ingested_at 记录到达时间。",
-            "Undated facts are left unresolved. event_time currently comes from the"
-            " session date; ingested_at records arrival time.",
+            "event_time 仅取明确到天的事实日期；无日期时不猜。ingested_at 记录写入时间。",
+            "event_time uses stated day-precise fact dates; otherwise it stays unresolved."
+            " ingested_at records writes.",
         ),
         tr(
             "这是一个解释性示例，不是实验结果，也不表示已具备完整的事务时间历史。",

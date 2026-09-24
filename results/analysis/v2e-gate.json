@@ -1,0 +1,75 @@
+{
+  "experiment": "v2e-reasoning48",
+  "class": "development",
+  "baseline_rows": "results/raw/two_stage_v2c.reasoning48-v2c8.jsonl",
+  "candidate_rows": "results/raw/two_stage_v2e.v2e-reasoning48.jsonl",
+  "questions": 48,
+  "baseline_correct": 37,
+  "candidate_correct": 37,
+  "wins": [
+    "0ddfec37_abs",
+    "a9f6b44c",
+    "dd2973ad",
+    "e48988bc",
+    "gpt4_70e84552_abs"
+  ],
+  "losses": [
+    "0e4e4c46",
+    "3a704032",
+    "6e984301",
+    "982b5123",
+    "gpt4_731e37d7"
+  ],
+  "ties": 38,
+  "net": 0,
+  "exact_mcnemar_p": 1.0,
+  "by_type": {
+    "knowledge-update": {
+      "n": 8,
+      "baseline": 7,
+      "candidate": 7
+    },
+    "multi-session": {
+      "n": 12,
+      "baseline": 7,
+      "candidate": 7
+    },
+    "single-session-assistant": {
+      "n": 6,
+      "baseline": 5,
+      "candidate": 6
+    },
+    "single-session-preference": {
+      "n": 4,
+      "baseline": 4,
+      "candidate": 4
+    },
+    "single-session-user": {
+      "n": 6,
+      "baseline": 5,
+      "candidate": 5
+    },
+    "temporal-reasoning": {
+      "n": 12,
+      "baseline": 9,
+      "candidate": 8
+    }
+  },
+  "median_context_baseline": 634.5,
+  "median_context_candidate": 691.5,
+  "context_drift": 0.08983451536643026,
+  "marker_reached": 48,
+  "temporal_questions": 12,
+  "temporal_losses": [
+    "6e984301",
+    "982b5123"
+  ],
+  "temporal_without_marker": [],
+  "gates": {
+    "net_positive": false,
+    "no_temporal_regression": false,
+    "marker_reached_every_temporal_question": true,
+    "context_within_10_percent": true
+  },
+  "decision": "STOP"
+}

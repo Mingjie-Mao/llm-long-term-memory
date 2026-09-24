@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ChronoMem — temporal long-term memory for AI agents</title>
-<meta name="description" content="A temporal long-term memory layer for AI agents that remembers, updates, and retrieves user-specific facts across conversations.">
+<title>ChronoMem — long-term memory across conversations</title>
+<meta name="description" content="Store user facts across conversations, track changes, and retrieve source evidence.">
 <link rel="stylesheet" href="./styles.css">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ctext y='26' font-size='26'%3E🧠%3C/text%3E%3C/svg%3E">
 </head>
@@ -22,8 +22,10 @@
 <main id="main">
 
   <h1 id="hero-title"
-      data-zh="一个面向 AI Agent 的时序长期记忆层：跨对话记住、更新并检索用户的事实。"
-      data-en="A temporal long-term memory layer for AI agents that remembers, updates, and retrieves user-specific facts across conversations.">A temporal long-term memory layer for AI agents that remembers, updates, and retrieves user-specific facts across conversations.</h1>
+      data-zh="跨对话记住事实，也记住事实何时改变。"
+      data-en="Remember facts across conversations—and when they change.">Remember facts across conversations—and when they change.</h1>
+  <p class="hero-note" data-zh="这里演示写入、检索和时间状态。事实由句式规则生成；不运行 LLM 抽取或回答。"
+     data-en="This demo shows writes, retrieval, and fact updates. Sentence patterns create the facts; no LLM extracts or answers here.">This demo shows writes, retrieval, and fact updates. Sentence patterns create the facts; no LLM extracts or answers here.</p>
 
   <!-- ------------------------------------------------------ the worked example -->
   <section class="demo" aria-labelledby="walk-title">
@@ -69,7 +71,8 @@
   <section class="demo" aria-labelledby="try-title">
     <div class="demo-head">
       <h2 id="try-title" data-zh="自己试" data-en="Try it yourself">Try it yourself</h2>
-      <p class="lede" data-zh="说几句关于你自己的话，改变其中一件，再问回来。然后开一段新对话再问：之前的聊天不会带过去，答案只能来自记忆。" data-en="State a few things about yourself, change one of them, then ask. Then start a new conversation and ask again: the earlier chat stays behind, so the answer can only come from memory.">State a few things about yourself, change one of them, then ask. Then start a new conversation and ask again: the earlier chat stays behind, so the answer can only come from memory.</p>
+      <p class="lede" data-zh="写入一件事，换个说法更新它，再开新对话提问。"
+         data-en="Add a fact, update it, then ask in a new conversation.">Add a fact, update it, then ask in a new conversation.</p>
     </div>
 
     <div class="split">
@@ -109,16 +112,16 @@
     <p class="headline" id="headline">—</p>
     <p class="footnote" id="footnote">—</p>
     <p class="provenance">
-      <span id="releaseMeta" role="status" aria-live="polite">Loading release provenance…</span>
-      <span aria-hidden="true"> · </span><a href="./release.json" data-zh="发布清单" data-en="release manifest">release manifest</a>
-      <span aria-hidden="true"> · </span><a id="releaseCommit" href="https://github.com/Mingjie-Mao/llm-long-term-memory" rel="noopener">source</a>
+      <span id="releaseMeta" role="status" aria-live="polite">Loading results…</span>
+      <span aria-hidden="true"> · </span><a href="./release.json" data-zh="数据" data-en="data">data</a>
+      <span aria-hidden="true"> · </span><a id="releaseCommit" href="https://github.com/Mingjie-Mao/llm-long-term-memory/blob/main/results/final/test100-aggregate.md" rel="noopener" data-zh="实验报告" data-en="full report">full report</a>
     </p>
   </section>
 
   <footer class="foot">
-    <p data-zh="演示会话在 60 分钟后失效并被清除，这是访问期限，不是生产环境的留存保证。"
-       data-en="A demo session expires and is swept after 60 minutes. That is an access expiry, not a production retention guarantee.">A demo session expires and is swept after 60 minutes. That is an access expiry, not a production retention guarantee.</p>
-    <p><a href="https://github.com/Mingjie-Mao/llm-long-term-memory" rel="noopener" data-zh="方法、实验与限制都在仓库里。" data-en="Method, experiments and limitations are in the repository.">Method, experiments and limitations are in the repository.</a></p>
+    <p data-zh="演示会话 60 分钟后过期；这不是生产留存保证。"
+       data-en="Demo sessions expire after 60 minutes; this is not a production retention guarantee.">Demo sessions expire after 60 minutes; this is not a production retention guarantee.</p>
+    <p><a href="https://github.com/Mingjie-Mao/llm-long-term-memory" rel="noopener" data-zh="代码与限制" data-en="Code and limitations">Code and limitations</a></p>
   </footer>
 </main>
 

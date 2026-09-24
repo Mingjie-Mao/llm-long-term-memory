@@ -121,7 +121,7 @@ def _when(memory: Memory) -> datetime:
     match = _ISO_DATE.search(memory.content)
     if match:
         return datetime(*(int(part) for part in match.groups()))
-    return memory.event_time or memory.valid_from or datetime.max
+    return memory.occurred_at or memory.valid_from or datetime.max
 
 
 def _relevant(question_tokens: set[str], memory: Memory, minimum: int = 2) -> bool:
@@ -144,12 +144,12 @@ def _update_suppression(question: str, memories: list[Memory]) -> tuple[list[Mem
     for newer in replacers:
         if not _relevant(question_tokens, newer):
             continue
-        newer_time = newer.event_time or newer.valid_from
+        newer_time = newer.occurred_at or newer.valid_from
         newer_tokens = _tokens(f"{newer.content} {newer.object or ''}")
         for older in memories:
             if older.id == newer.id or older.subject != newer.subject:
                 continue
-            older_time = older.event_time or older.valid_from
+            older_time = older.occurred_at or older.valid_from
             if newer_time and older_time and older_time >= newer_time:
                 continue
             if not _relevant(question_tokens, older):

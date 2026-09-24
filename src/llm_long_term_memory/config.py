@@ -90,6 +90,17 @@ class IngestConfig(BaseModel):
     """Stage A emits bare fact strings and Stage B structures them with rules,
     instead of asking for nine fields per memory in one call. A config flag rather
     than a replacement so the two can be compared on the same sessions."""
+    specificity_repair: bool = False
+    """After a batch is extracted, give one grounded call to each session that lost a
+    specific the user stated, and add back only facts anchored to an exact span of a
+    user turn.
+
+    Off by default because it costs up to one request per session, the same order as
+    the batched extraction it supplements. It changes what gets written, so it is part
+    of the ingest fingerprint: a store built without it will not resume with it.
+    Measured in `results/prereg-specificity-repair-pilot.md` — 44.8% to 59.3% on the
+    registered cohort, 21 specifics gained and 0 lost."""
+
     checkpoint_every: int = 25
 
 

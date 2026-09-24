@@ -25,9 +25,11 @@ _SCHEMA = Path(__file__).with_name("schema.sql")
 _FTS_TOKEN = re.compile(r"[A-Za-z0-9_]+")
 
 _MEMORY_COLUMNS = (
-    "id, user_id, type, content, subject, predicate, object, source_role, scope, "
+    "id, user_id, type, content, subject, predicate, object, target_object, source_role, scope, "
     "importance, confidence, "
-    "event_time, valid_from, valid_to, ingested_at, update_op, replaces_previous, "
+    "event_time, observed_at, event_time_expression, event_time_source_expression, "
+    "event_time_estimate, "
+    "event_time_precision, valid_from, valid_to, ingested_at, update_op, replaces_previous, "
     "superseded_by, status, "
     "strength, "
     "access_count, last_accessed_at, strength_updated_at, token_count, source_session_id, "
@@ -35,8 +37,27 @@ _MEMORY_COLUMNS = (
 )
 
 
+_MEMORY_COLUMN_LIST = tuple(name.strip() for name in _MEMORY_COLUMNS.split(","))
+
+
 def _dt(value: datetime | None) -> str | None:
     return value.isoformat() if value else None
+
+
+def _optional(row: sqlite3.Row, name: str):
+    """A column a pre-migration store may not have.
+
+    Every column with an entry in `_migrate` is read through this, because a
+    read-only open skips migration by design and must still be able to replay the
+    store. `stores/two-stage.db` predates `source_role` and was unreadable read-only
+    for exactly this reason; narrowing the projection without also softening the
+    reader would have moved the failure rather than fixed it.
+
+    `sqlite3.Row` supports `in` over its *values*, not its keys, so the membership
+    test has to go through `keys()` explicitly.
+    """
+    columns = row.keys()
+    return row[name] if name in columns else None
 
 
 def _parse(value: str | None) -> datetime | None:
@@ -66,14 +87,33 @@ class SQLiteMemoryStore:
             self.path.parent.mkdir(parents=True, exist_ok=True)
             self._conn = sqlite3.connect(self.path, check_same_thread=False)
         self._conn.row_factory = sqlite3.Row
+        # The full projection until `initialize` narrows it. Before the read path was
+        # made tolerant of missing columns this was a module constant, so a store that
+        # was read without being initialised still worked; leaving the attribute unset
+        # would have turned that into an AttributeError on a path nothing announces.
+        self._read_columns = _MEMORY_COLUMNS
 
     def initialize(self) -> None:
         if self.read_only:
             self._conn.execute("SELECT id FROM memories LIMIT 0")
+            self._read_columns = self._present_columns()
             return
         self._conn.executescript(_SCHEMA.read_text(encoding="utf-8"))
         self._migrate()
         self._conn.commit()
+        self._read_columns = self._present_columns()
+
+    def _present_columns(self) -> str:
+        """The projection to read with, narrowed to what this database actually has.
+
+        A read-only open skips migration — correctly, since it must not write — so a
+        store created before a column existed is opened without it. Selecting the
+        column list unconditionally would turn every such open into
+        `no such column`, which is how adding a field breaks the replay of a run that
+        was already finished. The missing field reads as None, which is what it is.
+        """
+        have = {row["name"] for row in self._conn.execute("PRAGMA table_info(memories)")}
+        return ", ".join(name for name in _MEMORY_COLUMN_LIST if name in have)
 
     def _migrate(self) -> None:
         """Apply additive migrations to stores created by earlier project phases.
@@ -91,6 +131,8 @@ class SQLiteMemoryStore:
             self._conn.execute(
                 "ALTER TABLE memories ADD COLUMN update_op TEXT NOT NULL DEFAULT 'coexists'"
             )
+        if "target_object" not in columns:
+            self._conn.execute("ALTER TABLE memories ADD COLUMN target_object TEXT")
         if "strength_updated_at" not in columns:
             self._conn.execute("ALTER TABLE memories ADD COLUMN strength_updated_at TEXT")
         if "source_turn_index" not in columns:
@@ -117,6 +159,33 @@ class SQLiteMemoryStore:
             )
         if "scope" not in columns:
             self._conn.execute("ALTER TABLE memories ADD COLUMN scope TEXT")
+
+        # `event_time` used to be the conversation's date for every memory, which is
+        # the time the fact was *said*, not the time it happened. Splitting them is
+        # what lets "I replaced the plugs on February 14", restated in a March
+        # conversation, stop looking like a March event.
+        #
+        # The backfill is a derivation, not a guess: the old code had exactly one
+        # source for that column, so on a pre-migration row `event_time` provably is
+        # the observation time. `event_time` is deliberately *not* cleared. The value
+        # is unchanged by copying it, nothing is lost either way, and blanking a
+        # column across every existing research store to tidy a semantic boundary is
+        # not a trade this project makes. The cost is that on those rows a stated time
+        # cannot be told from an assumed one — which was already true, because the old
+        # code never recorded the difference.
+        if "observed_at" not in columns:
+            self._conn.execute("ALTER TABLE memories ADD COLUMN observed_at TEXT")
+            self._conn.execute(
+                "UPDATE memories SET observed_at = event_time WHERE observed_at IS NULL"
+            )
+        if "event_time_expression" not in columns:
+            self._conn.execute("ALTER TABLE memories ADD COLUMN event_time_expression TEXT")
+        if "event_time_source_expression" not in columns:
+            self._conn.execute("ALTER TABLE memories ADD COLUMN event_time_source_expression TEXT")
+        if "event_time_estimate" not in columns:
+            self._conn.execute("ALTER TABLE memories ADD COLUMN event_time_estimate TEXT")
+        if "event_time_precision" not in columns:
+            self._conn.execute("ALTER TABLE memories ADD COLUMN event_time_precision TEXT")
 
         # Idempotency keys gained a request fingerprint and an explicit state. Existing
         # rows are rows whose reply was already recorded, so they backfill to 'done' — the
@@ -502,11 +571,17 @@ class SQLiteMemoryStore:
                 m.subject,
                 m.predicate,
                 m.object,
+                m.target_object,
                 m.source_role,
                 m.scope,
                 m.importance,
                 m.confidence,
                 _dt(m.event_time),
+                _dt(m.observed_at),
+                m.event_time_expression,
+                m.event_time_source_expression,
+                _dt(m.event_time_estimate),
+                m.event_time_precision,
                 _dt(m.valid_from),
                 _dt(m.valid_to),
                 _dt(m.ingested_at or datetime.now()),
@@ -569,32 +644,38 @@ class SQLiteMemoryStore:
             subject=row["subject"],
             predicate=row["predicate"],
             object=row["object"],
-            source_role=row["source_role"] or "user",
-            scope=row["scope"],
+            target_object=_optional(row, "target_object"),
+            source_role=_optional(row, "source_role") or "user",
+            scope=_optional(row, "scope"),
             importance=row["importance"],
             confidence=row["confidence"],
             event_time=_parse(row["event_time"]),
+            observed_at=_parse(_optional(row, "observed_at")),
+            event_time_expression=_optional(row, "event_time_expression"),
+            event_time_source_expression=_optional(row, "event_time_source_expression"),
+            event_time_estimate=_parse(_optional(row, "event_time_estimate")),
+            event_time_precision=_optional(row, "event_time_precision"),
             valid_from=_parse(row["valid_from"]),
             valid_to=_parse(row["valid_to"]),
             ingested_at=_parse(row["ingested_at"]),
-            update_op=row["update_op"],
+            update_op=_optional(row, "update_op") or "coexists",
             replaces_previous=bool(row["replaces_previous"]),
             superseded_by=row["superseded_by"],
             status=row["status"],
             strength=row["strength"],
             access_count=row["access_count"],
             last_accessed_at=_parse(row["last_accessed_at"]),
-            strength_updated_at=_parse(row["strength_updated_at"]),
+            strength_updated_at=_parse(_optional(row, "strength_updated_at")),
             source_session_id=row["source_session_id"],
-            source_turn_index=row["source_turn_index"],
-            source_char_start=row["source_char_start"],
-            source_char_end=row["source_char_end"],
+            source_turn_index=_optional(row, "source_turn_index"),
+            source_char_start=_optional(row, "source_char_start"),
+            source_char_end=_optional(row, "source_char_end"),
             entities=entities,
         )
 
     def get(self, memory_id: str) -> Memory | None:
         row = self._conn.execute(
-            f"SELECT {_MEMORY_COLUMNS} FROM memories WHERE id = ?", (memory_id,)
+            f"SELECT {self._read_columns} FROM memories WHERE id = ?", (memory_id,)
         ).fetchone()
         return self._row_to_memory(row) if row else None
 
@@ -603,7 +684,7 @@ class SQLiteMemoryStore:
             return []
         marks = ",".join(["?"] * len(memory_ids))
         rows = self._conn.execute(
-            f"SELECT {_MEMORY_COLUMNS} FROM memories WHERE id IN ({marks})", memory_ids
+            f"SELECT {self._read_columns} FROM memories WHERE id IN ({marks})", memory_ids
         ).fetchall()
         by_id = {r["id"]: self._row_to_memory(r) for r in rows}
         # Preserve caller ordering — retrieval passes ids in ranked order.
@@ -611,7 +692,7 @@ class SQLiteMemoryStore:
 
     def iter_active(self, user_id: str) -> list[Memory]:
         rows = self._conn.execute(
-            f"SELECT {_MEMORY_COLUMNS} FROM memories WHERE user_id = ? AND status = 'active'",
+            f"SELECT {self._read_columns} FROM memories WHERE user_id = ? AND status = 'active'",
             (user_id,),
         ).fetchall()
         return [self._row_to_memory(r) for r in rows]
@@ -640,7 +721,7 @@ class SQLiteMemoryStore:
         value never held.
         """
         rows = self._conn.execute(
-            f"SELECT {_MEMORY_COLUMNS} FROM memories WHERE user_id = ?", (user_id,)
+            f"SELECT {self._read_columns} FROM memories WHERE user_id = ?", (user_id,)
         ).fetchall()
         return [self._row_to_memory(r) for r in rows]
 
@@ -675,7 +756,7 @@ class SQLiteMemoryStore:
         if not include_superseded:
             clause += " AND status = 'active'"
         rows = self._conn.execute(
-            f"SELECT {_MEMORY_COLUMNS} FROM memories WHERE user_id = ? AND subject = ? "
+            f"SELECT {self._read_columns} FROM memories WHERE user_id = ? AND subject = ? "
             f"AND predicate = ?{clause}",
             (user_id, subject, predicate),
         ).fetchall()
@@ -690,6 +771,9 @@ class SQLiteMemoryStore:
         50-namespace store silently resolves nothing and reports success.
         """
         return [r[0] for r in self._conn.execute("SELECT DISTINCT user_id FROM memories")]
+
+    def memory_ids(self) -> set[str]:
+        return {row[0] for row in self._conn.execute("SELECT id FROM memories")}
 
     def predicate_keys(self, user_id: str) -> list[tuple[str, str]]:
         """Every (subject, predicate) pair present, for a full re-resolution pass."""
@@ -834,6 +918,15 @@ class SQLiteMemoryStore:
             self._conn.execute(
                 "UPDATE memories SET status='active', superseded_by=NULL, valid_to=NULL WHERE id=?",
                 (memory_id,),
+            )
+
+    def mark_historical(self, memory_id: str, at: datetime) -> None:
+        """Keep a transition event for audit without exposing it as current state."""
+        with self._conn:
+            self._conn.execute(
+                "UPDATE memories SET status='historical', superseded_by=NULL, valid_to=? "
+                "WHERE id=?",
+                (_dt(at), memory_id),
             )
 
     def set_validity(self, memory_id: str, valid_to: datetime | None) -> None:

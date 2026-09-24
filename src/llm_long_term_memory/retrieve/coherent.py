@@ -80,7 +80,7 @@ class CoherentContext:
 
 
 def _event_key(memory: Memory) -> tuple[str, int]:
-    stamp = memory.event_time or memory.valid_from
+    stamp = memory.occurred_at or memory.valid_from
     return (str(stamp) if stamp else "", memory.source_turn_index or 0)
 
 

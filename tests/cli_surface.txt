@@ -11,7 +11,7 @@ lltm eval freeze :: --exclude --force --n --note --seed --variant name
 lltm eval label :: --config|-c --n variant
 lltm eval repeat :: --config|-c --fresh --limit --runs --store-name variant
 lltm eval report :: --out variants
-lltm eval run :: --config|-c --fresh --label --limit --questions --rerank --store-name --top-k variant
+lltm eval run :: --config|-c --experiment-class --fresh --label --limit --questions --rerank --store-name --top-k variant
 lltm eval variability :: variant
 lltm influence cost :: --leave-one-in --questions --top-k
 lltm influence fit :: --alpha --labels --out
@@ -21,6 +21,7 @@ lltm ingest fidelity :: --batch --config|-c --grounded --holdout --min-score --s
 lltm ingest run :: --config|-c --fresh --limit --questions --sessions --store-name
 lltm ingest temporal-gate :: --config|-c --stability
 lltm lifecycle consolidate :: --config|-c --store-name --user-id
+lltm lifecycle rebuild-index :: --config|-c --store-name
 lltm lifecycle run :: --config|-c --store-name --user-id
 lltm mcp :: --config|-c --store-name --transport
 lltm resolve :: --config|-c --store-name

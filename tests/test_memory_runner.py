@@ -165,7 +165,13 @@ def test_render_marks_a_closed_window_as_stale():
 def test_render_admits_when_a_date_is_unknown():
     undated = fact("a", "The user uses Keras")
     undated.valid_from = None
+    # All three, not just `event_time`. A memory with no stated time still has the
+    # date of the conversation it came from, and `occurred_at` finds it — so nulling
+    # only `event_time` would leave this asserting something the renderer no longer
+    # decides on, and it would pass for the wrong reason.
     undated.event_time = None
+    undated.observed_at = None
+    assert undated.occurred_at is None
     assert "date unknown" in render_memory(undated, temporal=True)
 
 

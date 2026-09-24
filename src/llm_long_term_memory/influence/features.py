@@ -112,7 +112,7 @@ def build(
     content = memory.content
     words = _tokens(content)
 
-    when = memory.event_time or memory.ingested_at
+    when = memory.occurred_at or memory.ingested_at
     age = (now - when).days if when else 0.0
 
     others = [m for m in neighbours if m.id != memory.id]

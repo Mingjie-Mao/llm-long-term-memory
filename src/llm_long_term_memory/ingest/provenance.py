@@ -7,6 +7,8 @@ import re
 from llm_long_term_memory.conversation import ConversationSession
 from llm_long_term_memory.store import Memory
 
+from .event_time import temporal_evidence
+
 _TOKEN = re.compile(r"[a-z0-9]+")
 _SENTENCE = re.compile(r"[^.!?]+(?:[.!?]+|$)")
 _NUMBER = re.compile(r"\d")
@@ -56,4 +58,8 @@ def attach_source_span(memory: Memory, session: ConversationSession) -> Memory:
     span = source_span_for(memory.content, session)
     if span is not None:
         memory.source_turn_index, memory.source_char_start, memory.source_char_end = span
+        turn_index, start, end = span
+        source_text = session.turns[turn_index].content[start:end]
+        source_time = temporal_evidence(source_text, memory.observed_at)
+        memory.event_time_source_expression = source_time.expression
     return memory

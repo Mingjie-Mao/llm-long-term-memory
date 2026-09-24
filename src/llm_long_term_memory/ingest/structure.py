@@ -24,6 +24,7 @@ from datetime import datetime
 
 from llm_long_term_memory.store import Memory, MemoryType
 
+from .event_time import temporal_evidence
 from .extract import _parse_date, memory_id
 
 # Ordered: the first match wins, so more specific patterns come first.
@@ -179,7 +180,8 @@ def structure(
     text = fact.strip()
     subject = "assistant" if _ASSISTANT.match(text) else "user"
     predicate = infer_predicate(text)
-    event_time = _parse_date(session_date)
+    observed_at = _parse_date(session_date)
+    temporal = temporal_evidence(text, observed_at)
 
     return Memory(
         id=memory_id(user_id, session_id, text),
@@ -191,8 +193,12 @@ def structure(
         predicate=predicate,
         object=infer_object(text, predicate),
         importance=infer_importance(text),
-        event_time=event_time,
-        valid_from=event_time,
+        event_time=temporal.exact,
+        observed_at=observed_at,
+        event_time_expression=temporal.expression,
+        event_time_estimate=temporal.estimate,
+        event_time_precision=temporal.precision,
+        valid_from=observed_at,
         valid_to=None,
         ingested_at=now or datetime.now(),
         replaces_previous=bool(_REPLACES.search(text)),

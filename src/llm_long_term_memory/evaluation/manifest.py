@@ -28,6 +28,9 @@ from __future__ import annotations
 import json
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Literal
+
+Exposure = Literal["unseen", "development", "regression"]
 
 
 @dataclass(frozen=True, slots=True)
@@ -38,6 +41,13 @@ class Manifest:
     seed: int
     question_ids: tuple[str, ...]
     note: str = ""
+    exposure: Exposure = "regression"
+    """How this question set may be described now, not when it was first created.
+
+    Legacy manifests default to regression because every LongMemEval question in this
+    repository has been inspected. A new unseen claim therefore requires an explicit
+    manifest field rather than inheriting a historical name such as `test100`.
+    """
 
     def __len__(self) -> int:
         return len(self.question_ids)
@@ -49,6 +59,7 @@ class Manifest:
             "seed": self.seed,
             "n": len(self.question_ids),
             "note": self.note,
+            "exposure": self.exposure,
             "question_ids": list(self.question_ids),
         }
 
@@ -79,6 +90,7 @@ def load_manifest(path: str | Path) -> Manifest:
             seed=int(data.get("seed", 0)),
             question_ids=ids,
             note=data.get("note", ""),
+            exposure=data.get("exposure", "regression"),
         )
 
     ids = tuple(
@@ -89,3 +101,13 @@ def load_manifest(path: str | Path) -> Manifest:
     if len(set(ids)) != len(ids):
         raise ValueError(f"{p} lists a question id more than once")
     return Manifest(name=p.stem, variant="s", seed=0, question_ids=ids)
+
+
+def require_claim(manifest: Manifest, claim: Exposure) -> None:
+    """Refuse to promote an exposed set through a command-line label."""
+    order = {"regression": 0, "development": 1, "unseen": 2}
+    if order[claim] > order[manifest.exposure]:
+        raise ValueError(
+            f"manifest {manifest.name!r} is {manifest.exposure} evidence and cannot be "
+            f"reported as {claim}; create and register a genuinely new manifest"
+        )

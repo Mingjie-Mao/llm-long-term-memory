@@ -16,6 +16,7 @@ from dataclasses import dataclass
 from datetime import datetime
 
 from llm_long_term_memory.conversation import ConversationSession
+from llm_long_term_memory.ingest.event_time import temporal_evidence
 from llm_long_term_memory.llm.client import GeminiClient
 from llm_long_term_memory.store import Memory
 
@@ -250,10 +251,14 @@ class Extractor:
                 bad_index += 1
                 continue
             session = sessions[item.session_index]
-            event_time = _parse_date(session.date)
             content = item.content.strip()
             if not content:
                 continue
+            # When it was said is always known; when it happened only if the fact
+            # says so. Copying the session's date into `event_time` is what made a
+            # restated event look as recent as the restatement.
+            observed_at = _parse_date(session.date)
+            temporal = temporal_evidence(content, observed_at)
 
             memories.append(
                 attach_source_span(
@@ -268,10 +273,15 @@ class Extractor:
                         object=item.object.strip(),
                         importance=item.importance,
                         replaces_previous=item.replaces_previous,
-                        event_time=event_time,
-                        # valid_from starts at the event; valid_to stays open until P4
-                        # finds something that supersedes it.
-                        valid_from=event_time,
+                        event_time=temporal.exact,
+                        observed_at=observed_at,
+                        event_time_expression=temporal.expression,
+                        event_time_estimate=temporal.estimate,
+                        event_time_precision=temporal.precision,
+                        # valid_from starts when the fact was stated; valid_to stays
+                        # open until P4 finds something that supersedes it. It was
+                        # `event_time`, which held this same value, so nothing moves.
+                        valid_from=observed_at,
                         valid_to=None,
                         ingested_at=now,
                         entities=[e.strip() for e in item.entities if e.strip()],

@@ -11,7 +11,9 @@ this is hot, swapping in FAISS means implementing the same `VectorIndex` Protoco
 
 from __future__ import annotations
 
+import hashlib
 import json
+import os
 from pathlib import Path
 
 import numpy as np
@@ -33,10 +35,35 @@ class NumpyFlatIndex:
     def _ids_path(self) -> Path:
         return self.path.with_suffix(".ids.json")
 
+    @property
+    def _manifest_path(self) -> Path:
+        return self.path.with_suffix(".manifest.json")
+
     def _load(self) -> None:
         if self._vec_path.exists() and self._ids_path.exists():
+            if self._manifest_path.exists():
+                manifest = json.loads(self._manifest_path.read_text(encoding="utf-8"))
+                for artifact in (self._vec_path, self._ids_path):
+                    expected = manifest["sha256"][artifact.name]
+                    actual = hashlib.sha256(artifact.read_bytes()).hexdigest()
+                    if actual != expected:
+                        raise ValueError(
+                            f"vector index generation is incomplete: {artifact.name} "
+                            "does not match its commit manifest; rebuild the index"
+                        )
             self._vectors = np.load(self._vec_path)
             self._ids = json.loads(self._ids_path.read_text(encoding="utf-8"))
+            if self._vectors.ndim != 2 or self._vectors.shape[1] != self.dim:
+                raise ValueError(
+                    "vector index dimension mismatch: "
+                    f"{self._vectors.shape}, expected (*, {self.dim})"
+                )
+            if self._vectors.shape[0] != len(self._ids):
+                raise ValueError(
+                    f"vector row/id mismatch: {self._vectors.shape[0]} rows, {len(self._ids)} ids"
+                )
+            if len(set(self._ids)) != len(self._ids):
+                raise ValueError("vector index contains duplicate memory ids; rebuild the index")
 
     def add(self, ids: list[str], vectors: np.ndarray) -> None:
         if not ids:
@@ -80,8 +107,51 @@ class NumpyFlatIndex:
 
     def save(self) -> None:
         self.path.parent.mkdir(parents=True, exist_ok=True)
-        np.save(self._vec_path, self._vectors)
-        self._ids_path.write_text(json.dumps(self._ids), encoding="utf-8")
+        vector_tmp = self._vec_path.with_suffix(self._vec_path.suffix + ".tmp")
+        ids_tmp = self._ids_path.with_suffix(self._ids_path.suffix + ".tmp")
+        manifest_tmp = self._manifest_path.with_suffix(self._manifest_path.suffix + ".tmp")
+        with vector_tmp.open("wb") as handle:
+            np.save(handle, self._vectors)
+            handle.flush()
+            os.fsync(handle.fileno())
+        with ids_tmp.open("w", encoding="utf-8") as handle:
+            json.dump(self._ids, handle)
+            handle.flush()
+            os.fsync(handle.fileno())
+        vector_tmp.replace(self._vec_path)
+        ids_tmp.replace(self._ids_path)
+        manifest = {
+            "schema_version": 1,
+            "rows": len(self._ids),
+            "dim": self.dim,
+            "sha256": {
+                self._vec_path.name: hashlib.sha256(self._vec_path.read_bytes()).hexdigest(),
+                self._ids_path.name: hashlib.sha256(self._ids_path.read_bytes()).hexdigest(),
+            },
+        }
+        with manifest_tmp.open("w", encoding="utf-8") as handle:
+            json.dump(manifest, handle, indent=2, sort_keys=True)
+            handle.write("\n")
+            handle.flush()
+            os.fsync(handle.fileno())
+        manifest_tmp.replace(self._manifest_path)
+
+    @property
+    def ids(self) -> tuple[str, ...]:
+        return tuple(self._ids)
+
+    def validate_ids(self, memory_ids: set[str]) -> None:
+        indexed = set(self._ids)
+        if len(indexed) != len(self._ids):
+            raise ValueError("vector index contains duplicate memory ids; rebuild the index")
+        if indexed != memory_ids:
+            missing = sorted(memory_ids - indexed)
+            orphaned = sorted(indexed - memory_ids)
+            raise ValueError(
+                "SQLite/vector index mismatch: "
+                f"{len(missing)} memories lack vectors and {len(orphaned)} vectors lack memories; "
+                "rebuild the index"
+            )
 
     def __len__(self) -> int:
         return len(self._ids)

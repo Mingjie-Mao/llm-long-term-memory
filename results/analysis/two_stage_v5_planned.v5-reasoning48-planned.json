@@ -1,0 +1,56 @@
+{
+  "experiment": "two_stage_v5_planned.v5-reasoning48-planned",
+  "class": "development",
+  "baseline_rows": "results/raw/two_stage_v2c.reasoning48-v2c8.jsonl",
+  "candidate_rows": "results/raw/two_stage_v5_planned.v5-reasoning48-planned.jsonl",
+  "questions": 48,
+  "baseline_correct": 37,
+  "candidate_correct": 36,
+  "wins": [
+    "a4996e51",
+    "dd2973ad",
+    "e48988bc"
+  ],
+  "losses": [
+    "57f827a0",
+    "6e984301",
+    "778164c6",
+    "982b5123"
+  ],
+  "ties": 41,
+  "net": -1,
+  "exact_mcnemar_p": 1.0,
+  "mechanism_fired_on": 48,
+  "mechanism_should_have_fired_but_did_not": [],
+  "reader_attributed_losses": [],
+  "targets": {
+    "gpt4_7a0daae1": {
+      "needle": "received my new tennis racket today",
+      "arrived": true,
+      "correct": false,
+      "was_correct": false
+    },
+    "a4996e51": {
+      "needle": "50 hours per week",
+      "arrived": true,
+      "correct": true,
+      "was_correct": false
+    },
+    "58ef2f1c": {
+      "needle": "valentine's day",
+      "arrived": true,
+      "correct": false,
+      "was_correct": false
+    }
+  },
+  "median_context_baseline": 634.5,
+  "median_context_candidate": 986.5,
+  "gates": {
+    "net_positive": false,
+    "no_reader_attributed_regression": true,
+    "mechanism_fired": true,
+    "registered_sentences_arrived": true,
+    "median_context_at_most_2000": true
+  },
+  "decision": "STOP"
+}

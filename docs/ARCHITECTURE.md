@@ -44,8 +44,8 @@ REST 配置令牌后获得凭据绑定的租户身份；空配置是开放模式
 **图 2.** `IngestionPipeline.run()` 先检查抽取指纹，再按命名空间分批，跳过检查点中已完成或已被内容策略拒绝的会话。`_ingest_batch()` 的主路径是：
 
 1. `TwoStageExtractor` 调用 Stage A 提取事实、说话人、主体和 scope；有事实时再调用 Stage B 分配 key、object、update operation。
-2. 规则补充类型、实体、importance 等属性。`event_time` 和 `valid_from` 来自**会话日期**。内容里的事件日期可能被保留为文字，但当前代码没有通用的事件日期解析器把它写入这两列。
-3. `source_span_for()` 根据句子词项重合和数字加权选择出处。找不到锚点时可以为空，因此不能声称每条记忆都有经过验证的精确证据。
+2. 规则补充类型、实体、importance 等属性。`observed_at` 与 `valid_from` 记录会话日期；`event_time` 仅在事实文本明确给出可无歧义解析到天的日期时写入。月级或近似相对时间只保留原表达、会话锚点、估计日期和精度，不参与生命周期排序。
+3. `source_span_for()` 根据句子词项重合和数字加权选择出处；匹配到原文时另存 `event_time_source_expression`，即使抽取文本省略了相对时间也能保留其证据。原文时间不会未经核实地升级为 `event_time`。找不到锚点时可以为空，因此不能声称每条记忆都有经过验证的精确证据。
 4. 抽取返回后，先注册原始会话和轮次，再将 memory 的 `source_session_id` 转为带命名空间的内部 ID。
 5. 对候选做嵌入，找到近邻并调用 LLM 判重。`0.92` 是近邻候选阈值；**不是达到阈值就直接丢弃**。同键事实也可能进入判重，只有 `DUPLICATE` 才丢弃新候选。
 6. 将保留的 memory 写入 SQLite，并追加向量；之后 `TemporalResolver` 重建本批触及的 key。
@@ -122,9 +122,9 @@ SQLite 保存源数据、状态、词法索引以及辅助关系。向量索引�
 
 **图 5.** 同一 `(user_id, subject, predicate)` 上，后到达的旧事实不会直接成为当前值。resolver 读取包括 superseded 在内的全链，按 `(event_time, id)` 排序，重算状态和有效期；因此三月事实晚到时可以把一月事实的 `valid_to` 从八月改为三月。
 
-这个示例显式假设每个新值都是 replacement。实际代码不会因为“同 key 有一个 replacement”就把所有事实排成互斥链：是否关闭前一条由**下一条事实**的 `replaces_previous` 决定。`coexists` 允许并存；`removes` 记录为结束操作并设置关闭标记。重复值可能折叠到最早的区间 owner，新增数字会阻止部分有损折叠。无日期事实被跳过，evicted 行不参与重建。
+这个示例显式假设每个新值都是 replacement。实际代码不会因为“同 key 有一个 replacement”就把所有事实排成互斥链：`coexists` 允许并存；`replaces` 用 `target_object` 关闭旧值并让 `object` 成为新值；`removes` 只关闭 `target_object`，自身作为 `historical` 事件保留，不能成为当前值。目标不明确时 resolver 保守地不关闭任何事实并记录 ambiguity。重复值可能折叠到最早的区间 owner，新增数字会阻止部分有损折叠。无日期事实被跳过，evicted 行不参与重建。
 
-`event_time`/有效区间与 `ingested_at` 是两种时间信息，但当前实现没有保存每次数据库状态变更的完整事务时间历史。文档宜写“有效期 + 写入时间”，不宜让“bi-temporal”暗示已经具备任意事务时间快照查询。
+`event_time`、`observed_at`、相对时间原文/估计与 `ingested_at` 是不同信息。只有天级精确的事件时间能影响上述时间线；近似日期不能凭估计日关闭有效区间。当前实现没有保存每次数据库状态变更的完整事务时间历史。文档宜写“有效期 + 写入时间”，不宜让“bi-temporal”暗示已经具备任意事务时间快照查询。
 
 代码：[TemporalResolver 和 as_of](../src/llm_long_term_memory/temporal/resolve.py)、[时序测试](../tests/test_temporal.py)。
 

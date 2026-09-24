@@ -12,7 +12,7 @@ from datetime import datetime
 from typing import Literal, Protocol, runtime_checkable
 
 MemoryType = Literal["semantic", "episodic", "preference", "procedural", "profile"]
-MemoryStatus = Literal["active", "superseded", "evicted"]
+MemoryStatus = Literal["active", "superseded", "historical", "evicted"]
 
 
 @dataclass(slots=True)
@@ -34,6 +34,14 @@ class Memory:
     stated by the user, has subject 'andy'. See `source_role`."""
     predicate: str | None = None
     object: str | None = None
+    target_object: str | None = None
+    """The prior value explicitly targeted by a transition.
+
+    `object` is the value established by ADD/COEXIST/REPLACE. `target_object` is
+    the value closed by REPLACE/TERMINATE. Keeping them separate prevents a
+    sentence such as "replaced the Nike shoes" from turning Nike into the new
+    current value merely because it is the only value named in the sentence.
+    """
 
     source_role: str = "user"
     """Who said it: user | assistant | system. Orthogonal to `subject`. Keeping
@@ -49,14 +57,45 @@ class Memory:
     confidence: float = 1.0
 
     event_time: datetime | None = None
+    """When the event happened, **as the fact itself states it**. None when the fact
+    states no time, which is the common case and is deliberately not filled in.
+
+    It used to be the session's date for every memory, which made "I moved last July"
+    dated to the day it was mentioned and made a restatement of an old event look
+    newer than the original. A guessed date is worse than an absent one because it
+    ranks: the temporal layer already reports undated facts and leaves them alone,
+    which is the correct outcome. See `observed_at` for the time that is always known.
+    """
+
+    observed_at: datetime | None = None
+    """When the statement was made — the conversation's date.
+
+    Always known, because it comes from the corpus rather than from the text. Rows
+    written before this column existed carry it in `event_time` instead, and the
+    migration copies it across; on those rows the two are equal and there is no way
+    to tell a stated time from an assumed one, because the old code never recorded
+    the difference.
+    """
+
+    event_time_expression: str | None = None
+    """Date words retained from the extracted fact. The source session and span
+    identify the original conversation; this field never invents missing wording."""
+    event_time_source_expression: str | None = None
+    """Date words copied from the matched source turn, when the anchor contains one.
+    Kept distinct because the extracted fact may paraphrase or omit the user's words."""
+    event_time_estimate: datetime | None = None
+    """Nominal date for an imprecise expression; never used to close a timeline."""
+    event_time_precision: str | None = None
+    """day | approximate_day | month | unresolved. NULL on old rows."""
+
     valid_from: datetime | None = None
     valid_to: datetime | None = None
     ingested_at: datetime | None = None
 
     update_op: str = "coexists"
     """Stage B's verdict on what this fact does to earlier ones on its key.
-    `replaces_previous` is the boolean the resolver acts on today; this keeps the
-    `removes` case distinguishable for when it gets its own handling."""
+    New resolution reads this operation directly. `replaces_previous` remains for
+    old stores and one-stage extractor compatibility only."""
 
     replaces_previous: bool = False
     """The user explicitly framed this as replacing an earlier statement. Lets the
@@ -75,6 +114,22 @@ class Memory:
     source_char_start: int | None = None
     source_char_end: int | None = None
     entities: list[str] = field(default_factory=list)
+
+    @property
+    def occurred_at(self) -> datetime | None:
+        """The best available time for the event: what was stated, else when it was said.
+
+        This is what ordering and recency want. Reading `event_time` directly now
+        answers a narrower question — "did the user give this fact a time?" — and the
+        two must not be confused, because the whole point of separating them is that
+        one is evidence and the other is an assumption.
+        """
+        return self.event_time or self.observed_at
+
+    @property
+    def event_time_is_stated(self) -> bool:
+        """Whether the time came from the fact rather than from its conversation."""
+        return self.event_time is not None
 
     @property
     def is_current(self) -> bool:
@@ -145,6 +200,10 @@ class MemoryStore(Protocol):
         """Every namespace present. Whole-store passes must walk all of them."""
         ...
 
+    def memory_ids(self) -> set[str]:
+        """Every durable memory id, independent of tenant or lifecycle status."""
+        ...
+
     def session_ids_for_user(self, user_id: str) -> set[str]:
         """Session ids belonging to one namespace."""
         ...
@@ -179,6 +238,10 @@ class MemoryStore(Protocol):
         Resolution is not monotonic: ingesting an older fact can demote the current
         head, and a corrected re-run has to be able to promote one back.
         """
+        ...
+
+    def mark_historical(self, memory_id: str, at: datetime) -> None:
+        """Retain a transition event without making it a current attribute value."""
         ...
 
     def set_validity(self, memory_id: str, valid_to: datetime | None) -> None: ...

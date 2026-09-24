@@ -101,7 +101,7 @@ def main() -> int:
             everything = list(svc.store.iter_all(qid))
             coherent = [m for m in everything if m.source_session_id in gold_sessions]
             coherent.sort(
-                key=lambda m: (m.event_time or m.valid_from or "", m.source_turn_index or 0)
+                key=lambda m: (m.occurred_at or m.valid_from or "", m.source_turn_index or 0)
             )
 
             text = svc.answerer.answer_with_memories(question, coherent)

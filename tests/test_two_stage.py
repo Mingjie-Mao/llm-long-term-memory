@@ -192,7 +192,8 @@ def test_a_fact_keeps_its_session_across_the_flatten_and_regroup():
 
     moved = by_content["The user moved to Sydney."]
     assert moved.source_session_id == "s1"
-    assert moved.event_time.month == 8, "the date comes from its own session, not the batch"
+    assert moved.observed_at.month == 8, "the date comes from its own session, not the batch"
+    assert moved.event_time is None, "'The user moved to Sydney.' names no date"
     assert moved.replaces_previous is True
 
 
@@ -203,12 +204,22 @@ def test_removes_also_closes_the_earlier_fact():
     sessions = [session("s0", "2023/07/01", "a")]
     client = _two_stage_client(
         [{"session_index": 0, "facts": [{"content": "The user sold their Honda Civic."}]}],
-        [{"index": 0, "temporal_key": "car", "update_op": "removes", "object": "Honda Civic"}],
+        [
+            {
+                "index": 0,
+                "temporal_key": "car",
+                "update_op": "removes",
+                "object": "",
+                "target_object": "Honda Civic",
+            }
+        ],
     )
     (memory,) = TwoStageExtractor(client, "m").extract(sessions).memories
 
     assert memory.update_op == "removes"
     assert memory.replaces_previous is True
+    assert memory.object == ""
+    assert memory.target_object == "Honda Civic"
 
 
 def test_coexists_never_sets_the_closing_flag():

@@ -200,7 +200,7 @@ class HybridRetriever:
         scored = []
         for memory in memories:
             raw = semantic_raw.get(memory.id, -1.0)
-            when = memory.event_time or memory.ingested_at
+            when = memory.occurred_at or memory.ingested_at
             age_days = max(0.0, (now - when).total_seconds() / 86_400) if when else 0.0
             recency = math.exp(-math.log(2) * age_days / self.recency_halflife_days)
             entity = self._entity_overlap(memory, query_terms)
