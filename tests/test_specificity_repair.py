@@ -251,7 +251,7 @@ def test_a_repair_id_is_the_same_in_another_process():
         "print(grounded_memory(Anchored(fact, 0, 0, len(span)), 's1', 'u').id)\n"
     )
     there = subprocess.run(
-        [sys.executable, "-c", script], capture_output=True, text=True, check=True
+        [sys.executable, "-c", script], capture_output=True, text=True, encoding="utf-8", check=True
     ).stdout.strip()
 
     assert here == there
