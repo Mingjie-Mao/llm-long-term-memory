@@ -31,6 +31,7 @@
 | v2e 日期出处 | 开发比较 | `STOP` | 37/48 对 37/48，5 胜 5 负净 0；10 处变动里 7 处落在机制影响不到的题型上，与 answerer 方差一致。代码保留、默认关闭 | [预注册](../results/prereg-v2e-reasoning48.md) · [决策](../results/v2e-reasoning48-decision.md) · [门判定](../results/analysis/v2e-gate.md) | 不得在这 48 题上调参复用标签；要判这个机制需要对时间题富集的新题集 |
 | v2d 拒算诊断 | 诊断已完成 | `未安排` | v2d 的 9 次拒算中 0 次能从已提交行分类；诊断管道已建好，但下一次 v2d 类运行才会产生可分类证据 | [拒算分类](../results/analysis/v2d-refusal-taxonomy.md) · [工具](../tools/v2d_refusal_taxonomy.py) | 若重启算术方向，用新标签和新的 12–16 题开发门 |
 | v5.0 并行原文 | 开发比较 | `STOP` | B 37/48 净 0，C 36/48 净 −1。**三句目标原文全部送达，只有 1 句转化成正确答案**；离线门测的是证据位置，不是证据可用性 | [预注册](../results/prereg-v5-reasoning48.md) · [决策](../results/v5-reasoning48-decision.md) · [离线门](../results/analysis/v5-offline-gate.md) · [B](../results/analysis/two_stage_v5_fixed.v5-reasoning48-fixed.md) · [C](../results/analysis/two_stage_v5_planned.v5-reasoning48-planned.md) | 不得在这 48 题上调窗口预算复用标签 |
+| 记忆即索引（离线） | 零调用开发诊断（`train150`） | `STOP` | 同预算下，用记忆定位原文轮次远不如直接用问题检索原文：4,000 token 时全部金标轮次覆盖 50.0% 对 78.1%，9 胜 50 负。**第一个出错的层是抽取，不是检索**：39 个未命中里 38 个是金标轮次没有任何记忆，另有锚点指错轮次的实例；有记忆的金标轮次 100% 被排进前 20 | [预注册](../results/prereg-memory-as-index-offline-v1.md) · [决策](../results/memory-as-index-offline-decision.md) · [分析](../results/analysis/memory-as-index-offline-v1.md) | 不为「记忆即索引」付费；「原文检索为主、记忆提供时间状态」需另行预注册 |
 
 ## v3 调整链
 
