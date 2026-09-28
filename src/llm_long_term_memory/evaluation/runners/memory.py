@@ -307,6 +307,8 @@ class MemoryRunner:
         raw_fallback_max_chars: int = 2400,
         parallel_raw_windows: int = 0,
         parallel_raw_planned: bool = False,
+        raw_primary_tokens: int = 0,
+        raw_primary_only: bool = False,
         date_provenance: bool = False,
         session_budget: SessionBudget | None = None,
         oracle_session_context: bool = False,
@@ -438,6 +440,13 @@ class MemoryRunner:
         # v2e. Say which dates the facts state and which are only when they were
         # mentioned. Nothing else about the arm differs from v2c.
         self.date_provenance = date_provenance
+        # Raw-primary arms (`results/prereg-raw-primary-heldout100-v1.md`): verbatim
+        # turns found in the whole archive by the question, attached before the first
+        # answer call. `raw_primary_only` drops the memory context and keeps only them.
+        self.raw_primary_tokens = max(0, raw_primary_tokens)
+        self.raw_primary_only = raw_primary_only
+        if raw_primary_only and not self.raw_primary_tokens:
+            raise ValueError("raw_primary_only needs raw_primary_tokens")
         self.parallel_raw = None
         self.parallel_raw_planned = parallel_raw_planned
         self.parallel_raw_windows = max(0, parallel_raw_windows)
@@ -688,6 +697,22 @@ class MemoryRunner:
                         f"{context}\n\nVerbatim turns from those same conversations:\n"
                         f"{parallel_evidence.render(max_chars=self.raw_fallback_max_chars)}"
                     )
+        raw_primary = None
+        if self.raw_primary_tokens:
+            from llm_long_term_memory.retrieve.excerpts import archive_excerpts
+
+            raw_primary = archive_excerpts(
+                self.store,
+                request.user_id,
+                request.question,
+                self.raw_primary_tokens,
+                chars_per_token=self.chars_per_token,
+            )
+            block = raw_primary.render()
+            if self.raw_primary_only:
+                context = block
+            elif block:
+                context = f"{context}\n\n{block}"
         assembly_latency_ms = (perf_counter() - assembly_started) * 1000
         if self.fallback is not None or self.answer_policy == "v2d":
             completion, answer_text, verdict, raw_evidence = self._answer_with_fallback(
@@ -702,6 +727,13 @@ class MemoryRunner:
             )
 
         parallel_notes = {
+            "raw_primary_tokens_budget": self.raw_primary_tokens,
+            "raw_primary_only": self.raw_primary_only,
+            "raw_primary_turns": len(raw_primary.turns) if raw_primary else 0,
+            "raw_primary_tokens": raw_primary.tokens if raw_primary else 0,
+            "raw_primary_sessions": [external_session_id(s) for s in raw_primary.sessions]
+            if raw_primary
+            else [],
             "parallel_raw_windows": self.parallel_raw_windows,
             "parallel_raw_planned": self.parallel_raw_planned,
             "parallel_raw_level": parallel_evidence.level if parallel_evidence else None,

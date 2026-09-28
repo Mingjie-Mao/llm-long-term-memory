@@ -42,6 +42,12 @@ eval_app = typer.Typer(help="Run and report evaluations")
 app.add_typer(eval_app, name="eval")
 
 
+# The budget the offline gate measured for question-found turns: 78.1% all-gold coverage
+# on train150 at 4,000 tokens (results/memory-as-index-offline-decision.md). Fixed by
+# registration, not tuned.
+RAW_PRIMARY_TOKENS = 4000
+
+
 def _default_store_name(variant: str) -> str:
     """Keep new extraction variants physically separate from frozen v1 data."""
     return "two-stage" if variant.startswith("two_stage") else "memories"
@@ -171,6 +177,12 @@ def _build(
         # stops reading as the day the fact became true. Requires a store whose
         # `event_time` means what it says — see tools/backfill_event_time.py.
         "two_stage_v2e",
+        # Raw-primary (results/prereg-raw-primary-heldout100-v1.md). Everything
+        # `two_stage_hydrated` does, plus verbatim turns found in the whole archive by
+        # the question, before the first answer call. `_raw_only` keeps only those
+        # turns: no memory context and no memory-located fallback.
+        "two_stage_raw_primary",
+        "two_stage_raw_only",
         # v3 research arm: same v2 store/retrieval/fallback, with an explicit
         # evidence/check/calculation answer policy. It never uses benchmark labels.
         "two_stage_reasoned",
@@ -247,7 +259,7 @@ def _build(
             decay_enabled=cfg.decay.enabled,
             decay_halflife_days=cfg.decay.halflife_days,
             reinforcement=cfg.decay.reinforcement,
-            evidence_hydration="_hydrated" in variant,
+            evidence_hydration="_hydrated" in variant or variant == "two_stage_raw_primary",
             adaptive_reasoning_hydration=variant
             in {
                 "two_stage_reasoned_evidence",
@@ -271,6 +283,7 @@ def _build(
                 "two_stage_memory_only",
                 "two_stage_v2c_memory_only",
                 "two_stage_v2d_memory_only",
+                "two_stage_raw_only",
             },
             raw_fallback_max_turns=cfg.fallback.max_turns,
             raw_fallback_max_chars=cfg.fallback.max_chars,
@@ -292,6 +305,10 @@ def _build(
                 cfg.fallback.max_turns if variant.startswith("two_stage_v5") else 0
             ),
             parallel_raw_planned=variant == "two_stage_v5_planned",
+            raw_primary_tokens=RAW_PRIMARY_TOKENS
+            if variant in {"two_stage_raw_primary", "two_stage_raw_only"}
+            else 0,
+            raw_primary_only=variant == "two_stage_raw_only",
             date_provenance=variant == "two_stage_v2e",
             answer_policy={
                 "two_stage_reasoned": "reasoned_v3",
