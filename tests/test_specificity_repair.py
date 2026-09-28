@@ -255,3 +255,23 @@ def test_a_repair_id_is_the_same_in_another_process():
     ).stdout.strip()
 
     assert here == there
+
+
+def test_a_comma_the_detector_swept_up_is_not_a_loss():
+    """ "it cost $800, which" is detected as "$800,"; a memory saying "$800" kept it."""
+    session = _session("The hotel cost $800, which was fine.")
+
+    assert missing_specifics(session, [_memory("The hotel cost the user $800.")]) == set()
+
+
+def test_a_repaired_fact_is_accepted_without_the_trailing_comma():
+    """v1 required "$800," in the repaired content, so it could never accept one."""
+    spoken = "The hotel cost $800, which was fine."
+    report = GroundingReport(anchored=[_anchored("The hotel cost the user $800.", spoken)])
+
+    outcome = SpecificityRepair(_Extractor(report)).repair(
+        _session(spoken), [_memory("The user stayed at a hotel.")], "u"
+    )
+
+    assert "$800" in outcome.missing
+    assert [m.content for m in outcome.memories] == ["The hotel cost the user $800."]

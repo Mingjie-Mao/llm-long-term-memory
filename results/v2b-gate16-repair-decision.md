@@ -131,3 +131,35 @@ the uncommitted working tree described in the registration; extractor
 Gate 7's collision case — one session repaired under two tenants — did not arise in this
 cohort (no shared session was repaired in more than one namespace), so the id fix made
 before the run is covered by its tests, not by this store.
+
+## Update 2026-09-28 — why money gained nothing, and repair v2
+
+The decision above left "money 0 / 97" unexplained. It is mostly the facet detector:
+it captures `$800,` from "it cost $800, which". Split by trailing punctuation, on this
+store:
+
+| specifics ending in `,.;:!?` | stated | lost at baseline | recovered by the repair |
+|---|---:|---:|---:|
+| money | 20 | 20 | **0** |
+| quantity | 82 | 77 | **0** |
+
+Every other facet and punctuation class recovered some. The repair required the
+detected value — comma included — in both the quoted span and the repaired content, so
+a repaired fact saying "$800" could never be accepted; and a stored memory saying
+"$800" still counted as having lost it, buying a call. Replayed on the baseline store,
+47 "missing" specifics are present once the trailing punctuation is stripped, and 11
+of the 343 triggered sessions were spurious.
+
+`specificity-repair-v2` compares specifics without trailing punctuation
+(`repair.core`). It changes what is written, so it is a new fingerprint: the v1 store
+built here will not resume under it. **v2 has not been run end to end**; the PASS above
+is a result about v1 and stays one. 17 money specifics without trailing punctuation
+were also not recovered, and without the repair's rejection log that remains
+unexplained.
+
+The literal-match bias of the ruler itself is measured separately and left in place
+(`results/analysis/fidelity-sensitivity.v2b-gate16*.md`): normalising number words,
+thousands separators and trailing punctuation raises recall by about 3 points on both
+stores, and restricting to non-ShareGPT sessions — where the specifics are facts about
+the user rather than task parameters — puts this store at 64.3% before the repair and
+75.7% after (literal).

@@ -39,18 +39,34 @@ from llm_long_term_memory.store import Memory
 from .fidelity import _extract_facets, user_assertions
 from .grounded import Anchored, GroundedExtractor, normalise
 
-REPAIR_VERSION = "specificity-repair-v1"
+# v1  2026-09-19  registered pilot; passed gate16 end to end (+13.0 pp recall)
+# v2  2026-09-28  compare specifics without trailing punctuation. The facet detector
+#                 captures "$800," from "it cost $800, which"; v1 then treated a
+#                 memory saying "$800" as having lost it (a wasted call) and could
+#                 never accept a repaired fact saying "$800" either. On gate16: 47
+#                 such false losses, 11 wasted calls, and 0 of 97 trailing-punctuation
+#                 specifics recovered. Not yet validated end to end.
+REPAIR_VERSION = "specificity-repair-v2"
+
+_TRAILING = ",.;:!?"
+
+
+def core(value: str) -> str:
+    """A detected specific without the punctuation the detector swept up after it."""
+    return value.rstrip(_TRAILING).strip()
 
 
 def missing_specifics(session: ConversationSession, memories: list[Memory]) -> set[str]:
     """Specifics the user stated that no memory of this session carries.
 
-    The same detector and the same haystack the fidelity ruler scores with, so what
-    triggers a repair is exactly what the ruler would have counted as lost.
+    The same detector and the same haystack the fidelity ruler scores with, compared
+    without trailing punctuation (`core`). So what triggers a repair is what the ruler
+    counts as lost, minus the losses that are only a comma the detector swept up.
     """
     stated = _extract_facets(user_assertions(session))
     blob = " || ".join(f"{memory.content} {memory.object or ''}" for memory in memories).lower()
-    return {value for values in stated.values() for value in values if value not in blob}
+    found = {core(value) for values in stated.values() for value in values}
+    return {value for value in found if value and value not in blob}
 
 
 def grounded_memory(anchored: Anchored, session_id: str, user_id: str) -> Memory:
