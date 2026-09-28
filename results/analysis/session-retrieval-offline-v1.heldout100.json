@@ -1,0 +1,58 @@
+{
+  "store": "heldout100",
+  "manifest": "heldout100.json",
+  "questions": 93,
+  "table": {
+    "bm25_turns@2000": 0.8064516129032258,
+    "bm25_turns@4000": 0.8602150537634409,
+    "bm25_turns@8000": 0.8817204301075269,
+    "bm25_turns@16000": 0.9247311827956989,
+    "bm25_turn_window@2000": 0.5591397849462365,
+    "bm25_turn_window@4000": 0.7526881720430108,
+    "bm25_turn_window@8000": 0.9247311827956989,
+    "bm25_turn_window@16000": 0.946236559139785,
+    "bm25_sessions@2000": 0.0967741935483871,
+    "bm25_sessions@4000": 0.3333333333333333,
+    "bm25_sessions@8000": 0.7526881720430108,
+    "bm25_sessions@16000": 0.9139784946236559
+  },
+  "paired_vs_bm25_turns": {
+    "bm25_turn_window@2000": {
+      "wins": 2,
+      "losses": 25
+    },
+    "bm25_turn_window@4000": {
+      "wins": 3,
+      "losses": 13
+    },
+    "bm25_turn_window@8000": {
+      "wins": 4,
+      "losses": 0
+    },
+    "bm25_turn_window@16000": {
+      "wins": 3,
+      "losses": 1
+    },
+    "bm25_sessions@2000": {
+      "wins": 0,
+      "losses": 66
+    },
+    "bm25_sessions@4000": {
+      "wins": 1,
+      "losses": 50
+    },
+    "bm25_sessions@8000": {
+      "wins": 4,
+      "losses": 16
+    },
+    "bm25_sessions@16000": {
+      "wins": 2,
+      "losses": 3
+    }
+  },
+  "decision": {
+    "sessions_pass_at": [],
+    "use_sessions": false
+  },
+  "rows": []
+}
