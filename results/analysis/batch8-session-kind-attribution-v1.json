@@ -1,0 +1,152 @@
+{
+  "experiment": "batch8-session-kind-attribution-v1",
+  "class": "development, exploratory, post hoc",
+  "model": "gemini-3.1-flash-lite",
+  "provider_calls": 0,
+  "cohorts": {
+    "A_first60_extraction": {
+      "overall": {
+        "sessions": 60,
+        "specifics": 134,
+        "kept": 87,
+        "recall": 0.6492537313432836
+      },
+      "without_task_sessions": {
+        "sessions": 55,
+        "specifics": 131,
+        "kept": 87,
+        "recall": 0.6641221374045801
+      },
+      "task_share_of_specifics": 0.022388059701492536,
+      "by_kind": {
+        "simulated": {
+          "sessions": 31,
+          "specifics": 116,
+          "kept": 74,
+          "recall": 0.6379310344827587
+        },
+        "evidence": {
+          "sessions": 3,
+          "specifics": 7,
+          "kept": 7,
+          "recall": 1.0
+        },
+        "ultrachat": {
+          "sessions": 21,
+          "specifics": 8,
+          "kept": 6,
+          "recall": 0.75
+        },
+        "sharegpt": {
+          "sessions": 5,
+          "specifics": 3,
+          "kept": 0,
+          "recall": 0.0
+        }
+      }
+    },
+    "B_second60_extraction": {
+      "overall": {
+        "sessions": 60,
+        "specifics": 145,
+        "kept": 65,
+        "recall": 0.4482758620689655
+      },
+      "without_task_sessions": {
+        "sessions": 39,
+        "specifics": 99,
+        "kept": 61,
+        "recall": 0.6161616161616161
+      },
+      "task_share_of_specifics": 0.31724137931034485,
+      "by_kind": {
+        "simulated": {
+          "sessions": 22,
+          "specifics": 72,
+          "kept": 47,
+          "recall": 0.6527777777777778
+        },
+        "evidence": {
+          "sessions": 2,
+          "specifics": 19,
+          "kept": 9,
+          "recall": 0.47368421052631576
+        },
+        "ultrachat": {
+          "sessions": 15,
+          "specifics": 8,
+          "kept": 5,
+          "recall": 0.625
+        },
+        "sharegpt": {
+          "sessions": 21,
+          "specifics": 46,
+          "kept": 4,
+          "recall": 0.08695652173913043
+        }
+      }
+    },
+    "C_gate16_store": {
+      "overall": {
+        "sessions": 780,
+        "specifics": 2338,
+        "kept": 1110,
+        "recall": 0.47476475620188197
+      },
+      "without_task_sessions": {
+        "sessions": 579,
+        "specifics": 1490,
+        "kept": 958,
+        "recall": 0.6429530201342282
+      },
+      "task_share_of_specifics": 0.3627031650983747,
+      "by_kind": {
+        "simulated": {
+          "sessions": 344,
+          "specifics": 1310,
+          "kept": 858,
+          "recall": 0.6549618320610687
+        },
+        "evidence": {
+          "sessions": 29,
+          "specifics": 86,
+          "kept": 48,
+          "recall": 0.5581395348837209
+        },
+        "ultrachat": {
+          "sessions": 206,
+          "specifics": 94,
+          "kept": 52,
+          "recall": 0.5531914893617021
+        },
+        "sharegpt": {
+          "sessions": 201,
+          "specifics": 848,
+          "kept": 152,
+          "recall": 0.1792452830188679
+        }
+      }
+    }
+  },
+  "standardised": {
+    "A_first60_extraction": {
+      "own": 0.6492537313432836,
+      "at_C_composition": 0.4243753871567211,
+      "C_recall_at_this_composition": 0.6331777390091062
+    },
+    "B_second60_extraction": {
+      "own": 0.4482758620689655,
+      "at_C_composition": 0.43984810155215337,
+      "C_recall_at_this_composition": 0.4857428827927531
+    },
+    "C_gate16_store": {
+      "own": 0.47476475620188197,
+      "at_C_composition": 0.47476475620188197,
+      "C_recall_at_this_composition": 0.47476475620188197
+    }
+  },
+  "gate16_dedup": {
+    "memories_written": 3055,
+    "duplicates_dropped": 2
+  }
+}

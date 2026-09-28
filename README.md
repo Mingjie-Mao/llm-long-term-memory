@@ -46,9 +46,12 @@ uv run uvicorn llm_long_term_memory.api.app:app --host 127.0.0.1 --port 8000
 ## 当前边界
 
 - 写入保真度是主要风险之一。同批 60 会话把每请求会话数从 15 改为 8，具体信息召回从
-  37.3% 升到 64.9%；另一个 780 会话库的 batch 8 基线只有 47.5%。加入条件修复后是
-  60.5%，但调用约增至三倍。**这些是抽取指标，未证明端到端答题变好。**
-  [批次实验](results/batch-size-result.md) · [修复结果](results/v2b-gate16-repair-decision.md)
+  37.3% 升到 64.9%；另一个 780 会话库的 batch 8 基线只有 47.5%。两者的差距主要来自会话构成：
+  ShareGPT 任务型会话里被计数的多是任务参数而非个人事实，召回仅约 18%；排除这类会话后，
+  三次测量都在 62%–66%（事后探索性分析）。加入条件修复后是 60.5%，但调用约增至三倍。
+  **这些是抽取指标，未证明端到端答题变好。**
+  [批次实验](results/batch-size-result.md) · [会话类型归因](results/analysis/batch8-session-kind-attribution-v1.md) ·
+  [修复结果](results/v2b-gate16-repair-decision.md)
 - 全部 500 道 LongMemEval-S 题都已用于开发或终测。最新改动没有新的未见题集成绩，
   不能把开发结果当成新终测。[评测口径](docs/EVALUATION.md)
 - SQLite 与 NumPy 索引适合单进程研究和集成；两者不是同一事务。同一个库只允许一个写进程，

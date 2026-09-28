@@ -80,7 +80,12 @@ def reweight(source: dict, target: dict) -> dict:
     }
 
 
-def analyse() -> dict:
+def cohort_pairs() -> tuple[dict[str, list[tuple]], dict]:
+    """The three cohorts as (session, memories) pairs, plus the archive metadata.
+
+    Shared with `batch8_session_kind_attribution.py`, so both analyses score exactly the
+    same reconstruction.
+    """
     from llm_long_term_memory.evaluation.datasets import longmemeval as lme
     from llm_long_term_memory.ingest.pipeline import namespaced_sessions
     from llm_long_term_memory.store import Memory, SQLiteMemoryStore, scoped_session_id
@@ -135,11 +140,24 @@ def analyse() -> dict:
         (session, memories_by_session.get(scoped_session_id(namespace, session.session_id), []))
         for namespace, session in c_scoped
     ]
-    cohorts = {
-        "A_first60_extraction": _summary(a_pairs, source="archived batch8 extraction"),
-        "B_second60_extraction": _summary(b_pairs, source="pilot baseline extraction"),
-        "C_gate16_store": _summary(c_pairs, source="built store after deduplication"),
+    pairs = {
+        "A_first60_extraction": a_pairs,
+        "B_second60_extraction": b_pairs,
+        "C_gate16_store": c_pairs,
     }
+    history = {"model": archive["model"], "a": recorded_a, "b": recorded_b, "c": recorded_c}
+    return pairs, history
+
+
+def analyse() -> dict:
+    pairs, history = cohort_pairs()
+    recorded_a, recorded_b, recorded_c = history["a"], history["b"], history["c"]
+    sources = {
+        "A_first60_extraction": "archived batch8 extraction",
+        "B_second60_extraction": "pilot baseline extraction",
+        "C_gate16_store": "built store after deduplication",
+    }
+    cohorts = {name: _summary(pairs[name], source=sources[name]) for name in sources}
     a, b, c = cohorts.values()
     gates = {
         "A_matches_history": a["specifics"] == recorded_a["specifics"]
@@ -163,7 +181,7 @@ def analyse() -> dict:
     return {
         "experiment": "batch8-cohort-attribution-v1",
         "class": "development",
-        "model": archive["model"],
+        "model": history["model"],
         "provider_calls": 0,
         "gates": gates,
         "cohorts": cohorts,
