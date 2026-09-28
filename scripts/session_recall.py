@@ -139,7 +139,7 @@ def main() -> int:
         return 2
     question_ids = manifest.question_ids if complete else complete_ids
 
-    svc = MemoryService(store_name=args.store, config_path=args.config)
+    svc = MemoryService(store_name=args.store, config_path=args.config, read_only=True)
     memory_limit = (
         args.memory_limit if args.memory_limit is not None else svc.config.retrieval.top_k
     )

@@ -71,9 +71,8 @@ def lock_holder(lock: Path) -> int | None:
     return pid if process_alive(pid) else None
 
 
-@contextmanager
-def exclusive(path: Path, *, what: str = "job"):
-    """Hold a lock beside `path` for the duration of the block.
+def _acquire(path: Path, *, what: str) -> Path:
+    """Create the lock file beside `path` with this pid, or raise `AlreadyRunning`.
 
     A stale lock from a killed process is reclaimed rather than being a permanent
     block: a crash during a quota-limited run is the normal case here, and a lock
@@ -112,8 +111,59 @@ def exclusive(path: Path, *, what: str = "job"):
             os.write(descriptor, str(os.getpid()).encode("ascii"))
         finally:
             os.close(descriptor)
-        break
+        return lock
+
+
+@contextmanager
+def exclusive(path: Path, *, what: str = "job"):
+    """Hold a lock beside `path` for the duration of the block."""
+    lock = _acquire(path, what=what)
     try:
         yield
     finally:
         lock.unlink(missing_ok=True)
+
+
+# Locks this process holds through `hold`, with how many holders share each. A store
+# opened twice in one process (tests do it; so does an app that builds a service per
+# request) must not refuse itself, and must not release the lock while the first
+# holder still relies on it.
+_held: dict[Path, int] = {}
+
+
+class Held:
+    """A lock taken by `hold`. Release it exactly once; releasing again is a no-op."""
+
+    def __init__(self, lock_target: Path) -> None:
+        self._target = lock_target
+        self._released = False
+
+    def release(self) -> None:
+        if self._released:
+            return
+        self._released = True
+        count = _held.get(self._target, 0) - 1
+        if count > 0:
+            _held[self._target] = count
+            return
+        _held.pop(self._target, None)
+        lock = self._target.with_suffix(self._target.suffix + ".lock")
+        with suppress(FileNotFoundError):
+            if lock_holder(lock) in (os.getpid(), None):
+                lock.unlink()
+
+
+def hold(path: Path, *, what: str = "writer") -> Held:
+    """Take the same lock as `exclusive`, for as long as the caller keeps it.
+
+    For long-lived owners such as a service process, where a `with` block does not
+    fit. Re-entrant within this process; another live process holding the lock makes
+    this raise `AlreadyRunning`, exactly as `exclusive` does.
+    """
+    target = path.resolve()
+    if _held.get(target, 0) > 0:
+        _held[target] += 1
+        return Held(target)
+    _acquire(target, what=what)
+    _held[target] = 1
+    return Held(target)

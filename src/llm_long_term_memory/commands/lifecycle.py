@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import typer
 
-from llm_long_term_memory.commands.common import console
+from llm_long_term_memory.commands.common import cli_lock, console
 from llm_long_term_memory.config import Settings
 
 lifecycle_app = typer.Typer(help="P5: decay, eviction, and traceable consolidation")
@@ -17,11 +17,19 @@ def lifecycle_rebuild_index(
 ) -> None:
     """Rebuild the derived vector index from every durable SQLite memory."""
     from llm_long_term_memory.config import ExperimentConfig
-    from llm_long_term_memory.embed import Encoder
-    from llm_long_term_memory.store import NumpyFlatIndex, SQLiteMemoryStore
 
     cfg = ExperimentConfig.from_yaml(config)
     settings = Settings()
+    # The writer lock, not only a read: a service still running on this store would save
+    # its in-memory index over the rebuilt one on its next write.
+    with cli_lock(settings.store_dir / f"{store_name}.db", what="index rebuild"):
+        _rebuild_index(cfg, settings, store_name)
+
+
+def _rebuild_index(cfg, settings: Settings, store_name: str) -> None:
+    from llm_long_term_memory.embed import Encoder
+    from llm_long_term_memory.store import NumpyFlatIndex, SQLiteMemoryStore
+
     store = SQLiteMemoryStore(settings.store_dir / f"{store_name}.db", read_only=True)
     store.initialize()
     memories = [memory for user_id in store.user_ids() for memory in store.iter_all(user_id)]

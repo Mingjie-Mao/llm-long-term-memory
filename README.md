@@ -51,7 +51,8 @@ uv run uvicorn llm_long_term_memory.api.app:app --host 127.0.0.1 --port 8000
   [批次实验](results/batch-size-result.md) · [修复结果](results/v2b-gate16-repair-decision.md)
 - 全部 500 道 LongMemEval-S 题都已用于开发或终测。最新改动没有新的未见题集成绩，
   不能把开发结果当成新终测。[评测口径](docs/EVALUATION.md)
-- SQLite 与 NumPy 索引适合单进程研究和集成；两者不是同一事务，不承诺多进程写入。
+- SQLite 与 NumPy 索引适合单进程研究和集成；两者不是同一事务。同一个库只允许一个写进程，
+  第二个会被写者锁拒绝，而不是悄悄互相覆盖。
   [架构与恢复方式](docs/ARCHITECTURE.md)
 
 更完整的设计、失败分析和未解决问题见[项目报告](docs/PROJECT_REPORT.md)。

@@ -33,6 +33,7 @@ from typing import Any
 from llm_long_term_memory.answering import ANSWER_PROMPT_VERSION
 from llm_long_term_memory.api.budget import AccountBudgets, BudgetExceeded
 from llm_long_term_memory.config import ExperimentConfig, Settings
+from llm_long_term_memory.locking import Held, hold
 from llm_long_term_memory.retrieve import EvidenceHydrator, HybridRetriever
 from llm_long_term_memory.store import (
     ErasureJournal,
@@ -259,6 +260,9 @@ class MemoryService:
         settings: Settings | None = None,
         encoder=None,
         extractor=None,
+        # Offline analyses read a store while an ingest may be writing it. They open it
+        # read-only and take no writer lock, so they neither block nor are blocked.
+        read_only: bool = False,
     ) -> None:
         self._lock = RLock()
         self.settings = settings or Settings()
@@ -269,8 +273,21 @@ class MemoryService:
         # answerer saw.
         self.top_k = self.config.service.top_k
 
-        self.store = SQLiteMemoryStore(self.settings.store_dir / f"{store_name}.db")
-        self.store.initialize()
+        store_path = self.settings.store_dir / f"{store_name}.db"
+        # One writer process per store. SQLite serialises its own writes, but the vector
+        # index is held in memory by each process and saved whole, so a second writer
+        # would overwrite the first one's vectors without either noticing. The same
+        # lock the ingest CLI takes: a service and an ingest on one store refuse each
+        # other instead of interleaving.
+        self.read_only = read_only
+        self._writer: Held | None = None if read_only else hold(store_path, what="memory service")
+        try:
+            self.store = SQLiteMemoryStore(store_path, read_only=read_only)
+            self.store.initialize()
+        except BaseException:
+            if self._writer is not None:
+                self._writer.release()
+            raise
         self._budgets: AccountBudgets | None = None
         self._erasures: ErasureJournal | None = None
 
@@ -549,7 +566,7 @@ class MemoryService:
         same failure as an unversioned result table, and this project has already
         been bitten by prompt drift making numbers incomparable.
         """
-        from llm_long_term_memory.evaluation.judge import JUDGE_PROMPT_VERSION
+        from llm_long_term_memory.prompt_versions import JUDGE_PROMPT_VERSION
 
         from .golden import fingerprint, load_runs, store_state
 
@@ -1309,3 +1326,6 @@ class MemoryService:
     @_synchronised
     def close(self) -> None:
         self.store.close()
+        if self._writer is not None:
+            self._writer.release()
+            self._writer = None

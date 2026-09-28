@@ -39,10 +39,9 @@ from pydantic import BaseModel, Field
 if TYPE_CHECKING:
     from llm_long_term_memory.llm.client import GeminiClient
 
-#   reference-v1     one reference-answer prompt plus an abstention prompt
-#   lme-type-aware-v2  2026-08-14: routed by question type, so a preference gold is
-#                      graded as the rubric it actually is
-JUDGE_PROMPT_VERSION = "lme-type-aware-v2"
+# The version lives in `prompt_versions` so the product can read it without importing
+# evaluation; the history of versions is kept there.
+from llm_long_term_memory.prompt_versions import JUDGE_PROMPT_VERSION
 
 JUDGE_SYSTEM = (
     "You grade answers to questions about a long chat history. You are strict about "

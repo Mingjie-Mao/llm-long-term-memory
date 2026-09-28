@@ -109,7 +109,7 @@ def analyse(store_name: str, manifest_name: str, config: str, limit: int = 50) -
     settings = Settings()
     manifest = load_manifest(settings.results_dir / "manifests" / manifest_name)
     instances = {i.question_id: i for i in lme.load(manifest.variant, settings.data_dir)}
-    svc = MemoryService(store_name=store_name, config_path=config)
+    svc = MemoryService(store_name=store_name, config_path=config, read_only=True)
     store = svc.store
 
     rows: list[dict] = []

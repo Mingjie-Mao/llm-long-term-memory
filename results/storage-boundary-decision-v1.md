@@ -24,3 +24,23 @@ rebuild-on-mismatch. Reopen storage architecture only after registering a concre
 load and recovery target (writers/processes, memory count, QPS, latency, crash point,
 acceptable recovery time), then test the existing design against it. The current
 two-file consistency limitation remains open rather than being labelled solved.
+
+## Update 2026-09-28 — single writer enforced, not only documented
+
+The decision above said "document and enforce single-writer deployment". Enforcement
+was missing for the service: only the ingest CLI took the store lock, so a service and
+an ingest — or two service processes — could each hold the vector index in memory and
+save it over the other's. Now:
+
+- `MemoryService` holds the store's writer lock (`<store>.db.lock`, the one the ingest
+  CLI already used) for its lifetime; a second writer process fails at startup with
+  `AlreadyRunning`. Re-entrant within one process, released on `close()`.
+- `lltm lifecycle rebuild-index` takes the same lock, so it cannot run under a live
+  service.
+- `MemoryService(read_only=True)` opens SQLite read-only and takes no lock, for
+  offline analyses that read while an ingest writes.
+
+Tests: `tests/test_store_writer_lock.py`, including a real second process. This
+forbids concurrent writers; it does not support them, and it does not make SQLite plus
+the index files one transaction. The crash story is unchanged: SQLite is the source of
+truth, the index is verified at startup and rebuilt from it on mismatch.
