@@ -1,0 +1,203 @@
+{
+  "version": "temporal-lifecycle-gold-v1",
+  "written": "2026-09-28",
+  "note": "Deterministic expectations for the temporal resolver, written from the lifecycle rules in AGENTS.md before the harness was run. Each memory's replaces_previous mirrors two_stage.py (true for replaces and removes) unless a case overrides it. `current` lists the distinct values in force per user|predicate; `status` gives final lifecycle states; `as_of` gives the values in force on a date.",
+  "cases": [
+    {
+      "id": "coexist_multi_valued",
+      "rule": "ADD/COEXIST adds a value and closes nothing",
+      "memories": [
+        {"id": "a", "predicate": "uses_tool", "object": "Figma", "op": "coexists", "date": "2023-01-10"},
+        {"id": "b", "predicate": "uses_tool", "object": "Notion", "op": "coexists", "date": "2023-02-10"}
+      ],
+      "current": {"u1|uses_tool": ["figma", "notion"]},
+      "status": {"a": "active", "b": "active"}
+    },
+    {
+      "id": "replace_closes_the_predecessor",
+      "rule": "REPLACE closes the single active value and activates the new one",
+      "memories": [
+        {"id": "a", "predicate": "lives_in", "object": "Canberra", "op": "coexists", "date": "2023-01-10"},
+        {"id": "b", "predicate": "lives_in", "object": "Sydney", "op": "replaces", "date": "2023-03-10"}
+      ],
+      "current": {"u1|lives_in": ["sydney"]},
+      "status": {"a": "superseded", "b": "active"},
+      "as_of": [
+        {"key": "u1|lives_in", "date": "2023-02-01", "values": ["canberra"]},
+        {"key": "u1|lives_in", "date": "2023-04-01", "values": ["sydney"]}
+      ]
+    },
+    {
+      "id": "no_explicit_transition_is_not_guessed",
+      "rule": "two values on a single-valued key without an explicit transition: neither is hidden",
+      "memories": [
+        {"id": "a", "predicate": "lives_in", "object": "Canberra", "op": "coexists", "date": "2023-01-10"},
+        {"id": "b", "predicate": "lives_in", "object": "Sydney", "op": "coexists", "date": "2023-03-10"}
+      ],
+      "current": {"u1|lives_in": ["canberra", "sydney"]},
+      "status": {"a": "active", "b": "active"}
+    },
+    {
+      "id": "replace_with_explicit_target_among_coexisting",
+      "rule": "REPLACE with target_object closes exactly the named value",
+      "memories": [
+        {"id": "a", "predicate": "running_shoes", "object": "Nike Pegasus", "op": "coexists", "date": "2023-01-10"},
+        {"id": "b", "predicate": "running_shoes", "object": "Hoka Clifton", "op": "coexists", "date": "2023-01-20"},
+        {"id": "c", "predicate": "running_shoes", "object": "Adidas Ultraboost", "target": "Nike Pegasus", "op": "replaces", "date": "2023-02-10"}
+      ],
+      "current": {"u1|running_shoes": ["adidas ultraboost", "hoka clifton"]},
+      "status": {"a": "superseded", "b": "active", "c": "active"}
+    },
+    {
+      "id": "terminate_leaves_no_current_value",
+      "rule": "TERMINATE closes the target; the termination is history, never a current value",
+      "memories": [
+        {"id": "a", "predicate": "owns_car", "object": "Honda Civic", "op": "coexists", "date": "2023-01-10"},
+        {"id": "b", "predicate": "owns_car", "object": "Honda Civic", "target": "Honda Civic", "op": "removes", "date": "2023-03-10", "content": "The user sold their Honda Civic."}
+      ],
+      "current": {"u1|owns_car": []},
+      "status": {"a": "superseded", "b": "historical"},
+      "as_of": [
+        {"key": "u1|owns_car", "date": "2023-02-01", "values": ["honda civic"]},
+        {"key": "u1|owns_car", "date": "2023-04-01", "values": []}
+      ]
+    },
+    {
+      "id": "legacy_nike_adidas_regression",
+      "rule": "a legacy 'replaced their X' with no successor and no target is a termination of X, not a new value",
+      "memories": [
+        {"id": "adidas", "predicate": "running_shoes", "object": "Adidas Ultraboost 22", "op": "coexists", "date": "2023-01-14", "content": "The user has been using Adidas Ultraboost 22 shoes for daily runs since February 10, 2023."},
+        {"id": "nike", "predicate": "running_shoes", "object": "Nike Air Zoom Pegasus 38", "op": "replaces", "date": "2023-02-10", "content": "The user replaced their Nike Air Zoom Pegasus 38 shoes around February 10, 2023."}
+      ],
+      "current": {"u1|running_shoes": ["adidas ultraboost 22"]},
+      "status": {"adidas": "active", "nike": "historical"}
+    },
+    {
+      "id": "terminate_one_of_several",
+      "rule": "TERMINATE with a target among coexisting values closes only that one",
+      "memories": [
+        {"id": "a", "predicate": "has_pet", "object": "dog", "op": "coexists", "date": "2023-01-10"},
+        {"id": "b", "predicate": "has_pet", "object": "cat", "op": "coexists", "date": "2023-01-12"},
+        {"id": "c", "predicate": "has_pet", "object": "cat", "target": "cat", "op": "removes", "date": "2023-03-01", "content": "The user gave their cat to a neighbour."}
+      ],
+      "current": {"u1|has_pet": ["dog"]},
+      "status": {"a": "active", "b": "superseded", "c": "historical"}
+    },
+    {
+      "id": "untargeted_replace_among_several_abstains",
+      "rule": "an ambiguous REPLACE closes nothing; ambiguity must never hide a true fact",
+      "memories": [
+        {"id": "a", "predicate": "uses_tool", "object": "Figma", "op": "coexists", "date": "2023-01-10"},
+        {"id": "b", "predicate": "uses_tool", "object": "Sketch", "op": "coexists", "date": "2023-01-12"},
+        {"id": "c", "predicate": "uses_tool", "object": "Penpot", "op": "replaces", "date": "2023-03-01"}
+      ],
+      "current": {"u1|uses_tool": ["figma", "penpot", "sketch"]},
+      "status": {"a": "active", "b": "active", "c": "active"}
+    },
+    {
+      "id": "untargeted_terminate_among_several_abstains",
+      "rule": "an ambiguous TERMINATE closes nothing and stays out of current state",
+      "memories": [
+        {"id": "a", "predicate": "has_pet", "object": "dog", "op": "coexists", "date": "2023-01-10"},
+        {"id": "b", "predicate": "has_pet", "object": "cat", "op": "coexists", "date": "2023-01-12"},
+        {"id": "c", "predicate": "has_pet", "object": "pet", "op": "removes", "date": "2023-03-01", "content": "The user gave a pet away."}
+      ],
+      "current": {"u1|has_pet": ["cat", "dog"]},
+      "status": {"a": "active", "b": "active", "c": "historical"}
+    },
+    {
+      "id": "replace_naming_an_absent_target_abstains",
+      "rule": "a REPLACE whose target matches no active value closes nothing",
+      "memories": [
+        {"id": "a", "predicate": "lives_in", "object": "Canberra", "op": "coexists", "date": "2023-01-10"},
+        {"id": "b", "predicate": "lives_in", "object": "Sydney", "target": "Perth", "op": "replaces", "date": "2023-03-10"}
+      ],
+      "current": {"u1|lives_in": ["canberra", "sydney"]},
+      "status": {"a": "active", "b": "active"}
+    },
+    {
+      "id": "restatement_is_not_change",
+      "rule": "consecutive mentions of one value collapse into the earliest; the interval starts there",
+      "memories": [
+        {"id": "a", "predicate": "uses_framework", "object": "TensorFlow", "op": "coexists", "date": "2023-01-10"},
+        {"id": "b", "predicate": "uses_framework", "object": "PyTorch", "op": "replaces", "date": "2023-03-10"},
+        {"id": "c", "predicate": "uses_framework", "object": "PyTorch", "op": "coexists", "date": "2023-08-10"}
+      ],
+      "current": {"u1|uses_framework": ["pytorch"]},
+      "status": {"a": "superseded", "b": "active", "c": "superseded"},
+      "as_of": [
+        {"key": "u1|uses_framework", "date": "2023-02-01", "values": ["tensorflow"]},
+        {"key": "u1|uses_framework", "date": "2023-05-01", "values": ["pytorch"]},
+        {"key": "u1|uses_framework", "date": "2023-09-01", "values": ["pytorch"]}
+      ]
+    },
+    {
+      "id": "late_arriving_middle_of_chain",
+      "rule": "a fact whose event falls between two others re-cuts both intervals whatever the ingestion order",
+      "memories": [
+        {"id": "a", "predicate": "works_at", "object": "Atlassian", "op": "coexists", "date": "2023-01-10"},
+        {"id": "c", "predicate": "works_at", "object": "Canva", "op": "replaces", "date": "2023-09-10"},
+        {"id": "b", "predicate": "works_at", "object": "Airtasker", "op": "replaces", "date": "2023-05-10"}
+      ],
+      "current": {"u1|works_at": ["canva"]},
+      "status": {"a": "superseded", "b": "superseded", "c": "active"},
+      "as_of": [
+        {"key": "u1|works_at", "date": "2023-03-01", "values": ["atlassian"]},
+        {"key": "u1|works_at", "date": "2023-06-01", "values": ["airtasker"]},
+        {"key": "u1|works_at", "date": "2023-10-01", "values": ["canva"]}
+      ]
+    },
+    {
+      "id": "terminate_then_new_value",
+      "rule": "after a termination the key is empty until a new value is added",
+      "memories": [
+        {"id": "a", "predicate": "owns_car", "object": "Honda Civic", "op": "coexists", "date": "2023-01-10"},
+        {"id": "b", "predicate": "owns_car", "object": "Honda Civic", "target": "Honda Civic", "op": "removes", "date": "2023-03-10", "content": "The user sold their Honda Civic."},
+        {"id": "c", "predicate": "owns_car", "object": "Toyota Corolla", "op": "coexists", "date": "2023-05-10"}
+      ],
+      "current": {"u1|owns_car": ["toyota corolla"]},
+      "status": {"a": "superseded", "b": "historical", "c": "active"},
+      "as_of": [
+        {"key": "u1|owns_car", "date": "2023-02-01", "values": ["honda civic"]},
+        {"key": "u1|owns_car", "date": "2023-04-01", "values": []},
+        {"key": "u1|owns_car", "date": "2023-06-01", "values": ["toyota corolla"]}
+      ]
+    },
+    {
+      "id": "lone_termination",
+      "rule": "a termination with nothing to close is history, not current state",
+      "memories": [
+        {"id": "a", "predicate": "employment_status", "object": "left the bank", "op": "removes", "date": "2023-05-30", "content": "The user left their job at the bank."}
+      ],
+      "current": {"u1|employment_status": []},
+      "status": {"a": "historical"}
+    },
+    {
+      "id": "tenants_do_not_share_a_timeline",
+      "rule": "one user's transition never touches another user's facts",
+      "memories": [
+        {"id": "a", "user": "u1", "predicate": "lives_in", "object": "Canberra", "op": "coexists", "date": "2023-01-10"},
+        {"id": "b", "user": "u2", "predicate": "lives_in", "object": "Canberra", "op": "coexists", "date": "2023-01-10"},
+        {"id": "c", "user": "u2", "predicate": "lives_in", "object": "Sydney", "op": "replaces", "date": "2023-03-10"}
+      ],
+      "current": {"u1|lives_in": ["canberra"], "u2|lives_in": ["sydney"]},
+      "status": {"a": "active", "b": "superseded", "c": "active"}
+    },
+    {
+      "id": "replace_then_terminate_the_replacement",
+      "rule": "a chain may end in a termination; history before it stays queryable",
+      "memories": [
+        {"id": "a", "predicate": "works_as", "object": "analyst", "op": "coexists", "date": "2023-01-10"},
+        {"id": "b", "predicate": "works_as", "object": "engineer", "op": "replaces", "date": "2023-04-10"},
+        {"id": "c", "predicate": "works_as", "object": "engineer", "target": "engineer", "op": "removes", "date": "2023-08-10", "content": "The user quit their engineering job."}
+      ],
+      "current": {"u1|works_as": []},
+      "status": {"a": "superseded", "b": "superseded", "c": "historical"},
+      "as_of": [
+        {"key": "u1|works_as", "date": "2023-02-01", "values": ["analyst"]},
+        {"key": "u1|works_as", "date": "2023-05-01", "values": ["engineer"]},
+        {"key": "u1|works_as", "date": "2023-09-01", "values": []}
+      ]
+    }
+  ]
+}
