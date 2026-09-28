@@ -679,16 +679,37 @@ class SQLiteMemoryStore:
         ).fetchone()
         return self._row_to_memory(row) if row else None
 
+    # SQLite caps the parameters in one statement (32,766 on current builds, 999 on
+    # older ones). An `IN` list longer than that is an OperationalError, not a slow
+    # query, so reads are chunked well under the older limit.
+    _IN_CHUNK = 900
+
     def get_many(self, memory_ids: list[str]) -> list[Memory]:
         if not memory_ids:
             return []
-        marks = ",".join(["?"] * len(memory_ids))
-        rows = self._conn.execute(
-            f"SELECT {self._read_columns} FROM memories WHERE id IN ({marks})", memory_ids
-        ).fetchall()
-        by_id = {r["id"]: self._row_to_memory(r) for r in rows}
+        by_id: dict[str, Memory] = {}
+        for start in range(0, len(memory_ids), self._IN_CHUNK):
+            chunk = memory_ids[start : start + self._IN_CHUNK]
+            marks = ",".join(["?"] * len(chunk))
+            rows = self._conn.execute(
+                f"SELECT {self._read_columns} FROM memories WHERE id IN ({marks})", chunk
+            ).fetchall()
+            by_id.update((r["id"], self._row_to_memory(r)) for r in rows)
         # Preserve caller ordering — retrieval passes ids in ranked order.
         return [by_id[mid] for mid in memory_ids if mid in by_id]
+
+    def retrievable_ids(self, user_id: str, *, active_only: bool) -> set[str]:
+        """Ids of one namespace's memories that retrieval may return.
+
+        The flat index is shared by every namespace, so semantic search ranks the whole
+        store and retrieval keeps the namespace's hits. Filtering by this set costs one
+        indexed query instead of fetching every ranked row, which failed outright once a
+        store outgrew SQLite's per-statement parameter limit.
+        """
+        sql = "SELECT id FROM memories WHERE user_id = ? AND status != 'evicted'"
+        if active_only:
+            sql += " AND status = 'active'"
+        return {row[0] for row in self._conn.execute(sql, (user_id,))}
 
     def iter_active(self, user_id: str) -> list[Memory]:
         rows = self._conn.execute(

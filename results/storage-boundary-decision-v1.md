@@ -44,3 +44,15 @@ Tests: `tests/test_store_writer_lock.py`, including a real second process. This
 forbids concurrent writers; it does not support them, and it does not make SQLite plus
 the index files one transaction. The crash story is unchanged: SQLite is the source of
 truth, the index is verified at startup and rebuilt from it on mismatch.
+
+## Update 2026-09-28 — retrieval failed past ~32k memories; fixed
+
+Simulating history growth on train150 made retrieval raise `sqlite3.OperationalError:
+too many SQL variables` at twice the store's size. The shared flat index ranks every
+memory in the store, and retrieval fetched every ranked row in one `IN (...)`
+statement before keeping the namespace's — so any store past SQLite's per-statement
+parameter limit (32,766 on current builds) could not be queried at all. Retrieval now
+filters ranked ids against the namespace's retrievable ids from one indexed query, and
+`get_many` reads in chunks. On train150 the new semantic candidate lists equal the old
+ones for all 300 question-and-temporal-setting pairs (`tests/test_retrieval_scale.py`).
+The index still ranks the whole store per query, which is linear in total size.

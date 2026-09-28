@@ -162,14 +162,12 @@ class HybridRetriever:
         """
         semantic_hits = self.index.search(query, limit=len(self.index))
         semantic_raw = dict(semantic_hits)
-        semantic_memories = self.store.get_many([memory_id for memory_id, _ in semantic_hits])
-        semantic_ids = [
-            memory.id
-            for memory in semantic_memories
-            if memory.user_id == namespace
-            and memory.status != "evicted"
-            and (not temporal or memory.status == "active")
-        ][: self.candidate_limit]
+        # Same ranking, same filter, same cut as fetching every hit and filtering the
+        # rows — without a statement that grows with the whole store.
+        eligible = self.store.retrievable_ids(namespace, active_only=temporal)
+        semantic_ids = [memory_id for memory_id, _ in semantic_hits if memory_id in eligible][
+            : self.candidate_limit
+        ]
 
         lexical_hits = self.store.search_lexical(
             namespace,
