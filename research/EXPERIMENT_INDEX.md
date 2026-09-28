@@ -32,6 +32,8 @@
 | v2d 拒算诊断 | 诊断已完成 | `未安排` | v2d 的 9 次拒算中 0 次能从已提交行分类；诊断管道已建好，但下一次 v2d 类运行才会产生可分类证据 | [拒算分类](../results/analysis/v2d-refusal-taxonomy.md) · [工具](../tools/v2d_refusal_taxonomy.py) | 若重启算术方向，用新标签和新的 12–16 题开发门 |
 | v5.0 并行原文 | 开发比较 | `STOP` | B 37/48 净 0，C 36/48 净 −1。**三句目标原文全部送达，只有 1 句转化成正确答案**；离线门测的是证据位置，不是证据可用性 | [预注册](../results/prereg-v5-reasoning48.md) · [决策](../results/v5-reasoning48-decision.md) · [离线门](../results/analysis/v5-offline-gate.md) · [B](../results/analysis/two_stage_v5_fixed.v5-reasoning48-fixed.md) · [C](../results/analysis/two_stage_v5_planned.v5-reasoning48-planned.md) | 不得在这 48 题上调窗口预算复用标签 |
 | 记忆即索引（离线） | 零调用开发诊断（`train150`） | `STOP` | 同预算下，用记忆定位原文轮次远不如直接用问题检索原文：4,000 token 时全部金标轮次覆盖 50.0% 对 78.1%，9 胜 50 负。**第一个出错的层是抽取，不是检索**：39 个未命中里 38 个是金标轮次没有任何记忆，另有锚点指错轮次的实例；有记忆的金标轮次 100% 被排进前 20 | [预注册](../results/prereg-memory-as-index-offline-v1.md) · [决策](../results/memory-as-index-offline-decision.md) · [分析](../results/analysis/memory-as-index-offline-v1.md) | 不为「记忆即索引」付费；「原文检索为主、记忆提供时间状态」需另行预注册 |
+| 失败归因调和 | 零调用复核 | 完成 | dev50「10/14 在抽取」与 reasoning-48「6/11 证据在眼前仍答错」放到同一套最早丢失层分类后不矛盾：前者是 batch 15 的冻结 v2 系统，后者是读 batch 8 库、带原文细节补回的 v2c；题型构成相近。前者瓶颈是抽取，后者残余是推理（错误前提、计数、算术） | [调和记录](../results/failure-attribution-reconciliation.md) | 当前 batch 8 线的下一个机制应针对回答推理；关于冻结系统的结论仍指向抽取 |
+| 时序生命周期金标 v1 | 零调用契约测试 | 通过 | 16 个案例（新增、替换、终止、并存、有目标/无目标、歧义弃权、目标不存在、复述折叠、链中插入、终止后新值、孤立终止、跨租户），每例正序、倒序、轮转三种写入顺序逐条摄取，均达到事先写定的时间线，第二次全量解析 0 写入。变异测试：关掉旧数据修复、把终止当继任、按行序猜目标，分别被抓到 3、21、15 个失败 | [金标](../tests/fixtures/temporal_lifecycle_gold_v1.json) · [测试](../tests/test_temporal_gold.py) | 只验证解析器；抽取阶段 B 是否给出正确操作类型，由 `temporal_pairs` 键控门另测（需调用） |
 
 ## v3 调整链
 

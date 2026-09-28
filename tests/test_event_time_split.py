@@ -369,3 +369,21 @@ def test_a_fact_with_no_time_at_all_still_says_so():
     nothing = _plugs(event_time=None, observed_at=None, valid_from=None)
 
     assert "date unknown" in _rendered(nothing, mark_unstated=True)
+
+
+def test_a_title_is_not_a_time():
+    """Found on train150: song and film titles were dated to the conversation's day."""
+    from llm_long_term_memory.ingest.event_time import temporal_evidence
+
+    song = "The assistant recommended Yesterday, Here Comes the Sun, and Let It Be."
+    film = 'The assistant recommended "No Day But Today: The Story of Rent".'
+    assert temporal_evidence(song, MARCH).exact is None
+    assert temporal_evidence(film, MARCH).exact is None
+
+
+def test_the_word_still_dates_a_sentence_that_uses_it_as_a_time():
+    from llm_long_term_memory.ingest.event_time import temporal_evidence
+
+    assert temporal_evidence("The user went fishing today.", MARCH).precision == "day"
+    assert temporal_evidence("Yesterday the user moved.", MARCH).precision == "day"
+    assert temporal_evidence("It rained. Today the user moved.", MARCH).precision == "day"

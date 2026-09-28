@@ -33,7 +33,7 @@ sys.path.insert(0, str(REPO / "tools"))
 
 from analysis_io import write_report  # noqa: E402
 
-from llm_long_term_memory.ingest.event_time import stated_event_time  # noqa: E402
+from llm_long_term_memory.ingest.event_time import temporal_evidence  # noqa: E402
 
 
 def _parse(value: str | None) -> datetime | None:
@@ -68,7 +68,8 @@ def recompute(path: Path) -> tuple[dict, list[tuple[str | None, str]]]:
         # migrated by some other route.
         observed = _parse(row["observed_at"]) or _parse(row["event_time"])
         before = _parse(row["event_time"])
-        after = stated_event_time(row["content"] or "", observed)
+        # The same call ingestion makes, so a backfilled store matches a new one.
+        after = temporal_evidence(row["content"] or "", observed).exact
         if after is not None:
             stated_after += 1
         if before == after:
@@ -108,6 +109,84 @@ def apply(path: Path, pending: list[tuple[str | None, str]]) -> int:
     connection = sqlite3.connect(path)
     try:
         connection.executemany("UPDATE memories SET event_time = ? WHERE id = ?", pending)
+        connection.commit()
+    finally:
+        connection.close()
+    return len(pending)
+
+
+EVIDENCE_COLUMNS = (
+    "event_time_expression",
+    "event_time_estimate",
+    "event_time_precision",
+    "event_time_source_expression",
+)
+
+
+def recompute_evidence(path: Path) -> tuple[dict, list[tuple]]:
+    """The four evidence columns new ingests fill and old stores leave NULL.
+
+    `event_time_expression`, `_estimate` and `_precision` come from the fact's own
+    words; `event_time_source_expression` from the raw span the fact was anchored to,
+    exactly as `provenance.attach_source_span` computes it. Rows without an anchor keep
+    NULL there.
+    """
+    connection = sqlite3.connect(path)
+    connection.row_factory = sqlite3.Row
+    try:
+        columns = {r["name"] for r in connection.execute("PRAGMA table_info(memories)")}
+        missing = [c for c in ("observed_at", *EVIDENCE_COLUMNS) if c not in columns]
+        if missing:
+            raise SystemExit(
+                f"{path} lacks {', '.join(missing)}. Open it once read-write with the "
+                "store, whose migration adds them, then re-run."
+            )
+        rows = connection.execute(
+            "SELECT m.id, m.content, m.event_time, m.observed_at, "
+            + ", ".join(f"m.{c}" for c in EVIDENCE_COLUMNS)
+            + ", t.content AS turn_text, m.source_char_start, m.source_char_end "
+            "FROM memories m LEFT JOIN turns t "
+            "ON t.session_id = m.source_session_id AND t.turn_index = m.source_turn_index"
+        ).fetchall()
+    finally:
+        connection.close()
+
+    pending: list[tuple] = []
+    precision: Counter[str] = Counter()
+    for row in rows:
+        observed = _parse(row["observed_at"]) or _parse(row["event_time"])
+        evidence = temporal_evidence(row["content"] or "", observed)
+        source = None
+        if row["turn_text"] is not None and row["source_char_start"] is not None:
+            span = row["turn_text"][row["source_char_start"] : row["source_char_end"]]
+            source = temporal_evidence(span, observed).expression
+        values = (
+            evidence.expression,
+            evidence.estimate.isoformat() if evidence.estimate else None,
+            evidence.precision,
+            source,
+        )
+        precision[evidence.precision or "none"] += 1
+        if values != tuple(row[c] for c in EVIDENCE_COLUMNS):
+            pending.append((*values, row["id"]))
+    report = {
+        "store": str(path),
+        "memories": len(rows),
+        "evidence_rows_changed": len(pending),
+        "precision": dict(sorted(precision.items())),
+    }
+    return report, pending
+
+
+def apply_evidence(path: Path, pending: list[tuple]) -> int:
+    connection = sqlite3.connect(path)
+    try:
+        connection.executemany(
+            "UPDATE memories SET "
+            + ", ".join(f"{c} = ?" for c in EVIDENCE_COLUMNS)
+            + " WHERE id = ?",
+            pending,
+        )
         connection.commit()
     finally:
         connection.close()
@@ -165,14 +244,21 @@ def main() -> int:
     args = parser.parse_args()
 
     report, pending = recompute(args.store)
+    evidence_report, evidence_pending = recompute_evidence(args.store)
+    report["evidence"] = evidence_report
     print(write_report(report, render, json_out=args.json_out, md_out=args.md_out), end="")
+    print(
+        f"evidence columns: {len(evidence_pending):,} rows would change; "
+        f"precision {evidence_report['precision']}"
+    )
     if args.write:
         written = apply(args.store, pending)
-        print(f"\nwrote {written:,} rows to {args.store}")
+        evidence_written = apply_evidence(args.store, evidence_pending)
+        print(f"\nwrote event_time on {written:,} rows and evidence on {evidence_written:,}")
     else:
-        print(f"\nnothing written; {len(pending):,} rows would change. Pass --write to apply.")
+        print("\nnothing written. Pass --write to apply.")
     return 0
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

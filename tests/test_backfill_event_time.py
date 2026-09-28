@@ -151,3 +151,76 @@ def test_a_store_without_the_column_is_refused_rather_than_guessed_at(tmp_path):
 
     with pytest.raises(SystemExit, match="observed_at"):
         _module().recompute(path)
+
+
+def test_the_evidence_columns_are_filled_as_a_new_ingest_would_fill_them(tmp_path):
+    """Old stores leave expression, estimate, precision and source expression NULL."""
+    from llm_long_term_memory.store import Session, Turn
+
+    path = tmp_path / "old.db"
+    store = SQLiteMemoryStore(path)
+    store.initialize()
+    spoken = "I moved to Sydney last July, it was hectic."
+    store.add_session(
+        Session(
+            id="s1",
+            user_id="u",
+            started_at=MARCH,
+            turns=[Turn("t0", "s1", 0, "user", spoken, MARCH)],
+        )
+    )
+    store.add_memories(
+        [
+            Memory(
+                id="m0",
+                user_id="u",
+                type="semantic",
+                content="The user moved yesterday.",
+                token_count=1,
+                event_time=MARCH,
+                observed_at=MARCH,
+            ),
+            Memory(
+                id="m1",
+                user_id="u",
+                type="semantic",
+                content="The user moved to Sydney.",
+                token_count=1,
+                event_time=MARCH,
+                observed_at=MARCH,
+                source_session_id="s1",
+                source_turn_index=0,
+                source_char_start=0,
+                source_char_end=len("I moved to Sydney last July"),
+            ),
+        ]
+    )
+    store.close()
+    module = _module()
+
+    _, pending = module.recompute_evidence(path)
+    module.apply_evidence(path, pending)
+
+    connection = sqlite3.connect(path)
+    rows = {
+        r[0]: r[1:]
+        for r in connection.execute(
+            "SELECT id, event_time_expression, event_time_estimate, event_time_precision, "
+            "event_time_source_expression FROM memories"
+        )
+    }
+    connection.close()
+    assert rows["m0"] == ("yesterday", "2023-03-14T00:00:00", "day", None)
+    assert rows["m1"][3] == "last July", "the raw span's own time phrase"
+    assert module.recompute_evidence(path)[1] == [], "a second pass has nothing to write"
+
+
+def test_the_evidence_backfill_refuses_a_store_without_the_columns(tmp_path):
+    path = _store(tmp_path, "The user owns a fern.")
+    connection = sqlite3.connect(path)
+    connection.execute("ALTER TABLE memories DROP COLUMN event_time_precision")
+    connection.commit()
+    connection.close()
+
+    with pytest.raises(SystemExit, match="event_time_precision"):
+        _module().recompute_evidence(path)

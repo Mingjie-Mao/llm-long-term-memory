@@ -133,6 +133,22 @@ def _shift_month(value: datetime, months: int) -> datetime:
     return value.replace(year=year, month=month, day=min(value.day, monthrange(year, month)[1]))
 
 
+_SENTENCE_START = re.compile(r"(?:^|[.!?]\s+)$")
+
+
+def _is_title(text: str, match: re.Match) -> bool:
+    """ "Yesterday" the song, "No Day But Today" the film — not a time.
+
+    A capitalised "Yesterday" mid-sentence, or any of the three words inside quotation
+    marks, names a work. On train150 the unguarded pattern dated two assistant
+    recommendations of film and song titles to the conversation's day.
+    """
+    word = match.group(0)
+    if text[: match.start()].count('"') % 2 == 1:
+        return True
+    return word[0].isupper() and not _SENTENCE_START.search(text[: match.start()])
+
+
 def temporal_evidence(text: str, observed_at: datetime | None) -> TemporalEvidence:
     """Parse a narrow set of dates while retaining the expression that justified it.
 
@@ -142,7 +158,7 @@ def temporal_evidence(text: str, observed_at: datetime | None) -> TemporalEviden
     """
     matches = sorted(
         [
-            *[(m.start(), m) for m in _RELATIVE_DAY.finditer(text)],
+            *[(m.start(), m) for m in _RELATIVE_DAY.finditer(text) if not _is_title(text, m)],
             *[(m.start(), m) for m in _AGO.finditer(text)],
             *[(m.start(), m) for m in _LAST_MONTH_NAME.finditer(text)],
             *[(m.start(), m) for m in _OTHER_RELATIVE.finditer(text)],
