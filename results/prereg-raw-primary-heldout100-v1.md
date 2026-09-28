@@ -127,3 +127,21 @@ lltm eval run two_stage_raw_primary --config configs/fallback.yaml --store-name 
 lltm eval run two_stage_raw_only    --config configs/fallback.yaml --store-name heldout100 \
   --questions results/manifests/heldout100.json --label raw-primary-v1
 ```
+
+## Addendum before any call — 2026-09-28
+
+Added after registration and before any answer or judge call; no outcome of this
+experiment had been seen. A zero-call simulation of history growth on train150
+(`results/analysis/history-growth-retention-v1.md`) grew each user's history to 2x and
+4x by copying in other users' sessions:
+
+| history | gold-anchored memory in top 20 | question-found turns cover all gold at 4,000 tokens |
+|---|---:|---:|
+| 1x | 73.3% | 78.1% |
+| 4x | 71.9% | 67.8% |
+
+The memory layer barely moves as history grows; the raw locator at a fixed budget loses
+ten points. heldout100 is a 1x set, so it will show the raw arms at their best. This
+does not change any rule above. It changes how a result is read: an O-over-R finding here
+would not license dropping the memory context for long histories, and the report will
+say so.
