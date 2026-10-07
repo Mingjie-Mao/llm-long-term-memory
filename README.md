@@ -7,6 +7,8 @@
 
 [在线演示](https://lltm-memory.pages.dev/) · [系统架构](docs/ARCHITECTURE.md) · [实验评测](docs/EVALUATION.md) · [项目报告](docs/PROJECT_REPORT.md)
 
+**技术栈**：Python · Gemini · SQLite · NumPy · Sentence Transformers · BM25 · FastAPI · MCP
+
 ## 核心功能
 
 - **事实抽取**：两阶段 LLM 抽取，把对话转成结构化记忆，并去重、持久化。
@@ -47,7 +49,7 @@ LLTM v2 比 naive RAG 正确率高 7 个百分点，但差异未达到统计显�
 低 14 个百分点。回答与评分阶段的 Token 用量比 naive RAG 少约 **88%**，比 Full Context 少约
 **98.5%**（不含三者共用的记忆抽取开销）。
 
-以上为冻结 v2 的结果；之后的改进在开发集上评估，记录见[实验索引](research/EXPERIMENT_INDEX.md)。
+以上为冻结 v2 的结果；之后的改进、当前问题和计划见[项目进展](docs/PROGRESS.md)。
 
 [详细评测](docs/EVALUATION.md) · [原始结果](results/final/test100-aggregate.md)
 
@@ -81,10 +83,6 @@ uv run uvicorn llm_long_term_memory.api.app:app \
 
 演示展示记忆写入、检索和时间状态变化，使用实际的存储与检索逻辑；其中的事实提取采用规则，
 不调用 LLM。
-
-## 技术栈
-
-Python · Gemini · SQLite · NumPy · Sentence Transformers · BM25 · FastAPI · MCP
 
 ## License
 
