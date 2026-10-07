@@ -1,63 +1,91 @@
-# llm-long-term-memory
+# LLTM — LLM Long-Term Memory
 
-跨会话保存用户事实，追踪变更，并在记忆缺少细节时找回原始对话。
+面向 LLM Agent 的长期记忆系统，用于**跨会话保存用户事实、追踪信息变化，并在需要时找回原始对话**。
 
-[在线演示](https://lltm-memory.pages.dev) · [架构](docs/ARCHITECTURE.md) · [评测](docs/EVALUATION.md) · [项目报告](docs/PROJECT_REPORT.md)
+系统从历史对话中提取结构化记忆，用时间状态管理维护用户信息，再结合语义检索与原文检索，
+为后续对话提供相关上下文，而不必每次加载完整历史。
 
-## 结果
+[在线演示](https://lltm-memory.pages.dev/) · [系统架构](docs/ARCHITECTURE.md) · [实验评测](docs/EVALUATION.md) · [项目报告](docs/PROJECT_REPORT.md)
 
-冻结 v2 在 100 道 LongMemEval-S 终测题上，每种方法运行一次：
+## 核心功能
 
-| 方法 | 答对 | 回答＋评分 token |
-|---|---:|---:|
-| LLTM v2 | 72/100 | 159,458 |
-| naive RAG | 65/100 | 1,352,847 |
-| 整段历史 | 86/100 | 10,932,294 |
+- **事实抽取**：两阶段 LLM 抽取，把对话转成结构化记忆，并去重、持久化。
+- **时间状态管理**：追踪事实的新增、替换和终止，保留历史版本，支持 `as_of()` 查询过去的状态。
+- **来源追踪**：记录每条记忆的来源会话、时间和原文位置。
+- **混合检索**：记忆用向量语义检索，原始对话用 BM25 检索。
+- **原文恢复**：结构化记忆缺少关键细节时，按需找回原始对话。
+- **多用户隔离**：每次写入和检索都限定在当前用户内。
+- **Agent 集成**：提供 REST API 和 MCP 接口。
 
-v2 比 naive RAG 多答对 7 题，配对检验 p=0.3368，不能证明稳定优势；整段历史多答对
-14 题，p=0.0043。token 数来自同一次运行的 provider 用量，均不含三组共用的抽取阶段。
-这些是**冻结 v2 的成绩，不是当前开发版本的成绩**。[原始汇总](results/final/test100-aggregate.md)
+## 系统架构
 
-## 实现
+![LLTM 系统架构](docs/figures/overview.zh-CN.svg)
 
 ```text
-历史对话 → 两阶段事实抽取 → 去重 → 时间状态更新 → SQLite＋向量索引
-                                                    ↓
-问题 → 检索相关事实 → 必要时找回原始轮次 → 回答上下文
+历史对话 → 两阶段事实抽取 → 去重 → 时间状态更新
+                                      ↓
+                              SQLite + 向量索引
+                                      ↓
+用户问题 → 记忆检索 → 必要时找回原文 → 回答上下文
 ```
 
-事实保留来源和时间；替换旧值时保留历史，`as_of()` 可查过去的状态。原始对话另存，
-用于恢复抽取时丢掉的数字、日期或原话。提供 REST 和 MCP 接口。
+记忆负责维护事实状态和筛选相关信息，原始对话负责提供精确的数字、日期和原话。
 
-在线演示展示真实的写入、检索和状态变化，但用浏览器句式规则生成事实，**不运行 LLM 抽取或生成回答**。
+[查看完整架构](docs/ARCHITECTURE.md)
 
-## 运行
+## 实验结果
 
-需要 Python 3.11+ 和 [uv](https://docs.astral.sh/uv/)：
+在 **LongMemEval-S** 的 100 道冻结终测题上，每种方法运行一次：
+
+| 方法 | 正确率 | 回答＋评分 Token |
+|---|---:|---:|
+| **LLTM v2** | **72%** | **159,458** |
+| naive RAG | 65% | 1,352,847 |
+| Full Context | 86% | 10,932,294 |
+
+LLTM v2 比 naive RAG 正确率高 7 个百分点，但差异未达到统计显著（p=0.3368）；比 Full Context
+低 14 个百分点。回答与评分阶段的 Token 用量比 naive RAG 少约 **88%**，比 Full Context 少约
+**98.5%**（不含三者共用的记忆抽取开销）。
+
+以上为冻结 v2 的结果；之后的改进在开发集上评估，记录见[实验索引](research/EXPERIMENT_INDEX.md)。
+
+[详细评测](docs/EVALUATION.md) · [原始结果](results/final/test100-aggregate.md)
+
+## 快速开始
+
+需要 Python 3.11+ 和 [uv](https://docs.astral.sh/uv/)。
 
 ```bash
+git clone https://github.com/Mingjie-Mao/llm-long-term-memory.git
+cd llm-long-term-memory
+
 uv sync --group dev --extra api --extra llm --extra embed --extra mcp
-uv run uvicorn llm_long_term_memory.api.app:app --host 127.0.0.1 --port 8000
 ```
 
-打开 <http://localhost:8000/docs>。新 checkout 没有实验数据库；检索使用本地嵌入模型，
-`/v1/messages` 和 `/v1/answer` 还需要 `GEMINI_API_KEY`。
+配置 `GEMINI_API_KEY` 以使用 LLM 事实抽取和回答功能。
 
-## 当前边界
+启动 API 服务：
 
-- 写入保真度是主要风险之一。同批 60 会话把每请求会话数从 15 改为 8，具体信息召回从
-  37.3% 升到 64.9%；另一个 780 会话库的 batch 8 基线只有 47.5%。两者的差距主要来自会话构成：
-  ShareGPT 任务型会话里被计数的多是任务参数而非个人事实，召回仅约 18%；排除这类会话后，
-  三次测量都在 62%–66%（事后探索性分析）。加入条件修复后是 60.5%，但调用约增至三倍。
-  **这些是抽取指标，未证明端到端答题变好。**
-  [批次实验](results/batch-size-result.md) · [会话类型归因](results/analysis/batch8-session-kind-attribution-v1.md) ·
-  [修复结果](results/v2b-gate16-repair-decision.md)
-- 全部 500 道 LongMemEval-S 题都已用于开发或终测。最新改动没有新的未见题集成绩，
-  不能把开发结果当成新终测。[评测口径](docs/EVALUATION.md)
-- SQLite 与 NumPy 索引适合单进程研究和集成；两者不是同一事务。同一个库只允许一个写进程，
-  第二个会被写者锁拒绝，而不是悄悄互相覆盖。
-  [架构与恢复方式](docs/ARCHITECTURE.md)
+```bash
+uv run uvicorn llm_long_term_memory.api.app:app \
+  --host 127.0.0.1 --port 8000
+```
 
-更完整的设计、失败分析和未解决问题见[项目报告](docs/PROJECT_REPORT.md)。
+访问 [http://localhost:8000/docs](http://localhost:8000/docs) 查看 API 文档。
 
-[MIT 许可](LICENSE)
+[部署说明](DEPLOY.md)
+
+## 在线演示
+
+[LLTM Interactive Demo](https://lltm-memory.pages.dev/)
+
+演示展示记忆写入、检索和时间状态变化，使用实际的存储与检索逻辑；其中的事实提取采用规则，
+不调用 LLM。
+
+## 技术栈
+
+Python · Gemini · SQLite · NumPy · Sentence Transformers · BM25 · FastAPI · MCP
+
+## License
+
+[MIT](LICENSE)

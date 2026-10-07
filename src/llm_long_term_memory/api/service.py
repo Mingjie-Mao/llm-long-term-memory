@@ -176,11 +176,12 @@ class LiveTurnExtractor:
     so a deployment can lower it to 0 and get exactly the previous behaviour.
     """
 
-    def __init__(self, batch_extractor, deduplicator, encoder, usage) -> None:
+    def __init__(self, batch_extractor, deduplicator, encoder, usage, repair=None) -> None:
         self.batch_extractor = batch_extractor
         self.deduplicator = deduplicator
         self.encoder = encoder
         self.usage = usage
+        self.repair = repair
 
     def extract_turn(
         self,
@@ -210,6 +211,31 @@ class LiveTurnExtractor:
                 )
             ]
         )
+        if self.repair is not None:
+            session = ConversationSession(
+                session_id=session_id,
+                date=now.strftime("%Y-%m-%d %H:%M"),
+                turns=[
+                    *(ConversationTurn(role=t.role, content=t.content) for t in window),
+                    ConversationTurn(role=role, content=content),
+                ],
+            )
+            extracted.memories.extend(
+                self.repair.repair(session, extracted.memories, user_id).memories
+            )
+            offset = len(context_turns) - len(window)
+            for memory in extracted.memories:
+                if memory.predicate == "source_quote" and memory.source_turn_index is not None:
+                    memory.source_turn_index += offset
+                    from llm_long_term_memory.ingest.personal_context import quote_identity
+
+                    memory.id = quote_identity(
+                        user_id,
+                        session_id,
+                        memory.source_turn_index,
+                        memory.source_char_start,
+                        memory.content,
+                    )
         vectors = self.encoder.encode([memory.content for memory in extracted.memories])
         deduped = self.deduplicator.process(extracted.memories, vectors)
         for current, _previous in deduped.updates:
@@ -442,7 +468,16 @@ class MemoryService:
             index=self.index,
             threshold=self.config.ingest.dedupe_similarity_threshold,
         )
-        return LiveTurnExtractor(batch_extractor, deduplicator, self.encoder, self._live_usage)
+        from llm_long_term_memory.ingest.personal_context import configured_repair
+
+        repair = (
+            configured_repair(self.config, client)
+            if self.config.ingest.personal_context_repair
+            else None
+        )
+        return LiveTurnExtractor(
+            batch_extractor, deduplicator, self.encoder, self._live_usage, repair
+        )
 
     @property
     def answerer(self):
@@ -470,6 +505,8 @@ class MemoryService:
                 raw_fallback=self.config.fallback.enabled,
                 raw_fallback_max_turns=self.config.fallback.max_turns,
                 raw_fallback_max_chars=self.config.fallback.max_chars,
+                raw_primary_tokens=self.config.service.raw_primary_tokens,
+                raw_primary_time_notes=self.config.service.raw_primary_time_notes,
             )
         return self._answerer
 
@@ -1105,7 +1142,25 @@ class MemoryService:
             for memory in outcome.memories:
                 memory.user_id = user_id
                 memory.source_session_id = session_id
-                memory.source_turn_index = turn_index
+                if memory.predicate != "source_quote":
+                    memory.source_turn_index = turn_index
+                else:
+                    source = next(
+                        (
+                            t
+                            for t in self.store.turns_for_session(session_id)
+                            if t.turn_index == memory.source_turn_index
+                        ),
+                        None,
+                    )
+                    if (
+                        source is None
+                        or source.role != "user"
+                        or source.content[memory.source_char_start : memory.source_char_end]
+                        != memory.content
+                    ):
+                        self.store.remove_turn(f"{session_id}:{turn_index}")
+                        raise ValueError("source quote is not an exact same-user archived span")
             # Captured before anything is written, because resolution is not invertible:
             # it closes validity intervals and points existing rows at a successor, and
             # nothing in the result says what those rows held before.

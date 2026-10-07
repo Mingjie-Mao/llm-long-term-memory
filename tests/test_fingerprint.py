@@ -186,12 +186,16 @@ def test_the_stored_form_keeps_the_keys_already_on_disk():
     """Renaming or adding a key makes every healthy store read as a mismatch and
     costs a re-ingest, so the set is pinned here and a change has to be deliberate.
 
-    It has been changed exactly once. `dedup_scope` was added when `_neighbours`
+    It has been changed twice. `dedup_scope` was added when `_neighbours`
     stopped adjudicating a candidate against other namespaces — a fix that changes
     which memories get written, so a store from before it genuinely is a different
     system and resuming into it would mix two dedup policies under one label. The
     cost is real and was accepted: every store written before the fix now refuses to
     resume. That refusal is the point, and the test below pins it.
+
+    `anchor` was added when new ingests moved to `provenance-v2`
+    (results/prereg-anchor-v2-offline-v1.md): it changes which turn each memory points
+    at, and a store holding both rules could not say which rows used which.
     """
     stored = fingerprint.from_config(cfg(), sessions_per_request=15).as_dict()
 
@@ -201,6 +205,7 @@ def test_the_stored_form_keeps_the_keys_already_on_disk():
         "model",
         "sessions_per_request",
         "prompts",
+        "anchor",
         "dedup_threshold",
         "dedup_scope",
     }

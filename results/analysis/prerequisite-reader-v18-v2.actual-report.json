@@ -1,0 +1,423 @@
+{
+  "experiment_class": "exposed-train150-mechanism-development",
+  "reader_label": "prerequisite-reader-v18-v2",
+  "pass": false,
+  "reader_count": 6,
+  "grade_count": 6,
+  "correct": 3,
+  "rows": [
+    {
+      "question_id": "b46e15ed",
+      "user_review": true,
+      "review_complete": true,
+      "page_count": 4,
+      "gold_raw_final_context_complete": false,
+      "missing_gold_turns": [
+        {
+          "session_id": "answer_4bfcc250_1",
+          "turn_index": 0
+        },
+        {
+          "session_id": "answer_4bfcc250_1",
+          "turn_index": 6
+        },
+        {
+          "session_id": "answer_4bfcc250_2",
+          "turn_index": 0
+        },
+        {
+          "session_id": "answer_4bfcc250_3",
+          "turn_index": 0
+        },
+        {
+          "session_id": "answer_4bfcc250_4",
+          "turn_index": 0
+        }
+      ],
+      "context_bound": true,
+      "judged_correct": false,
+      "answer": "I do not know.",
+      "calculation": {
+        "cause": "consecutive_sequence_ambiguous"
+      }
+    },
+    {
+      "question_id": "9d25d4e0",
+      "user_review": true,
+      "review_complete": true,
+      "page_count": 3,
+      "gold_raw_final_context_complete": true,
+      "missing_gold_turns": [],
+      "context_bound": true,
+      "judged_correct": true,
+      "answer": "3: silver necklace, pair of emerald earrings, engagement ring",
+      "calculation": {
+        "operation": "count",
+        "records_supplied": [
+          "{\"source\":\"E5\",\"quote\":\"a new silver necklace with a small pendant\",\"value\":\"silver necklace\",\"unit\":\"\",\"key\":\"silver-necklace\",\"time\":\"\"}",
+          "{\"source\":\"E7\",\"quote\":\"a stunning pair of emerald earrings\",\"value\":\"pair of emerald earrings\",\"unit\":\"\",\"key\":\"emerald-earrings\",\"time\":\"\"}",
+          "{\"source\":\"E6\",\"quote\":\"engagement ring\",\"value\":\"engagement ring\",\"unit\":\"\",\"key\":\"engagement-ring\",\"time\":\"\"}"
+        ],
+        "reviewed_sources": [
+          "E5",
+          "E7",
+          "E6",
+          "E9",
+          "E10",
+          "E14"
+        ],
+        "scope_complete": true,
+        "citations": [
+          {
+            "source": "E5",
+            "quote": "a new silver necklace with a small pendant",
+            "value": "silver necklace",
+            "unit": "",
+            "key": "silver-necklace",
+            "time": ""
+          },
+          {
+            "source": "E7",
+            "quote": "a stunning pair of emerald earrings",
+            "value": "pair of emerald earrings",
+            "unit": "",
+            "key": "emerald-earrings",
+            "time": ""
+          },
+          {
+            "source": "E6",
+            "quote": "engagement ring",
+            "value": "engagement ring",
+            "unit": "",
+            "key": "engagement-ring",
+            "time": ""
+          }
+        ],
+        "duplicates_removed": 0,
+        "members": [
+          "silver necklace",
+          "pair of emerald earrings",
+          "engagement ring"
+        ],
+        "observations": [
+          "{\"source\":\"E5\",\"quote\":\"I'm thinking of cleaning my jewelry collection and I want to make sure I do it right. Can you guide me through the process or recommend a good jewelry cleaning solution? By the way, I just got a new silver necklace with a small pendant on the 15th of last month, and I want to make sure I take good care of it.\",\"interpretation\":\"The user acquired a new silver necklace with a small pendant on April 15, 2023.\",\"decision\":\"include\"}",
+          "{\"source\":\"E7\",\"quote\":\"I'm thinking of cleaning my jewelry collection this weekend and I'm not sure what's the best way to clean different types of jewelry. Do you have any tips or recommendations? By the way, I just got a new pair of earrings last weekend at a flea market - a stunning pair of emerald earrings that I'm absolutely loving!\",\"interpretation\":\"The user bought a pair of emerald earrings at a flea market on May 13-14, 2023.\",\"decision\":\"include\"}",
+          "{\"source\":\"E6\",\"quote\":\"I think I'll reach out to my cousin now and ask her about the earrings. Meanwhile, I also wanted to ask you about resizing my engagement ring. I got it a month ago, and it's still a bit too loose. Can you guide me through the process of resizing a ring and what I should expect?\",\"interpretation\":\"The user bought/got their engagement ring a month prior to May 28, 2023.\",\"decision\":\"include\"}"
+        ],
+        "focus_sources": [],
+        "canonicalization": []
+      }
+    },
+    {
+      "question_id": "gpt4_731e37d7",
+      "user_review": true,
+      "review_complete": true,
+      "page_count": 4,
+      "gold_raw_final_context_complete": true,
+      "missing_gold_turns": [],
+      "context_bound": true,
+      "judged_correct": false,
+      "answer": "I do not know.",
+      "calculation": {
+        "operation": "sum",
+        "records_supplied": [
+          "{\"source\":\"E1\",\"quote\":\"I paid $500 to attend\",\"value\":\"500\",\"unit\":\"$\",\"key\":\"digital-marketing-workshop\",\"time\":\"\"}",
+          "{\"source\":\"E2\",\"quote\":\"it was a free event\",\"value\":\"0\",\"unit\":\"$\",\"key\":\"photography-workshop\",\"time\":\"\"}",
+          "{\"source\":\"E3\",\"quote\":\"I paid $20 to attend\",\"value\":\"20\",\"unit\":\"$\",\"key\":\"mindfulness-workshop\",\"time\":\"\"}",
+          "{\"source\":\"E4\",\"quote\":\"I paid $200 to attend\",\"value\":\"200\",\"unit\":\"$\",\"key\":\"writing-workshop\",\"time\":\"\"}"
+        ],
+        "reviewed_sources": [
+          "E1",
+          "E2",
+          "E3",
+          "E4",
+          "E8",
+          "E10",
+          "E11",
+          "E9",
+          "E6",
+          "E7"
+        ],
+        "scope_complete": true,
+        "cause": "number_not_in_quote",
+        "observations": [
+          "{\"source\":\"E1\",\"quote\":\"I'm looking to improve my business's online presence and I was wondering if you can recommend some tools for social media analytics. By the way, I just attended a digital marketing workshop at the city convention center on March 15-16, and it was really helpful in understanding the importance of tracking my online engagement. I paid $500 to attend, and it was worth it!\",\"interpretation\":\"User states they paid $500 to attend a digital marketing workshop on March 15-16, 2023.\",\"decision\":\"include\"}",
+          "{\"source\":\"E2\",\"quote\":\"I'm looking for some tips on how to improve my portrait photography skills. Do you have any resources or tutorials that can help me with that? By the way, I recently attended a one-day photography workshop on February 22 at a local studio, and it was really helpful - it was a free event, but I had to register online in advance.\",\"interpretation\":\"User states they attended a free one-day photography workshop on February 22, 2023.\",\"decision\":\"include\"}",
+          "{\"source\":\"E3\",\"quote\":\"The entrepreneurship workshop was very helpful, and I learned a lot from the organizers, mentors, and other participants. We got to learn from experienced entrepreneurs and investors, and I got to pitch my business idea to a panel of judges. I received some valuable feedback and made some connections that could potentially lead to collaborations or investments.\\n\\nI'm definitely considering applying to other startup accelerator programs or incubators in the future. In fact, I've been looking into a few options, and I think it could be a great way to take my business to the next level.\\n\\nBy the way, I've also been attending workshops on mindfulness and wellness, which I find helps me stay focused and calm when dealing with the stresses of entrepreneurship. I attended a half-day mindfulness workshop at a yoga studio near my home on December 12, and it was really helpful. I paid $20 to attend, and I got to take home a workbook with exercises and tips.\",\"interpretation\":\"User states they paid $20 to attend a half-day mindfulness workshop on December 12, 2022.\",\"decision\":\"include\"}",
+          "{\"source\":\"E4\",\"quote\":\"I'm looking for some writing tips. I've been working on a short story since a writing workshop I attended in November at a literary festival. It was a two-day workshop, and I paid $200 to attend. The instructor was a published author, and I got some great feedback on my work. Do you have any resources on character development and editing that you could recommend?\",\"interpretation\":\"User states they paid $200 to attend a two-day writing workshop in November 2022.\",\"decision\":\"include\"}",
+          "{\"source\":\"E9\",\"quote\":\"The user attended a three-day entrepreneurship workshop at a downtown coworking space in January 2023.\",\"interpretation\":\"User attended a three-day entrepreneurship workshop in January 2023 (cost not specified).\",\"decision\":\"context\"}",
+          "{\"source\":\"E6\",\"quote\":\"The user attended five workshops in the three months leading up to February 2023.\",\"interpretation\":\"Summary memory stating the user attended five workshops in the three months leading up to February 2023.\",\"decision\":\"context\"}"
+        ],
+        "focus_sources": [],
+        "canonicalization": []
+      }
+    },
+    {
+      "question_id": "gpt4_a1b77f9c",
+      "user_review": true,
+      "review_complete": true,
+      "page_count": 3,
+      "gold_raw_final_context_complete": true,
+      "missing_gold_turns": [],
+      "context_bound": true,
+      "judged_correct": true,
+      "answer": "8 weeks",
+      "calculation": {
+        "operation": "duration",
+        "records_supplied": [
+          "{\"source\":\"E1\",\"quote\":\"I'm looking for some book recommendations. I started reading 'The Nightingale' by Kristin Hannah today and I'm really into historical fiction right now. Can you suggest some other books in the same genre that you think I'd enjoy?\",\"value\":\"\",\"unit\":\"\",\"key\":\"the nightingale\",\"time\":\"today\"}",
+          "{\"source\":\"E2\",\"quote\":\"I'm looking for some book recommendations. I just finished reading \\\"The Nightingale\\\" by Kristin Hannah today, and I'm still reeling from the emotional impact. I'm open to trying out different genres, so feel free to suggest anything that you think I might enjoy.\",\"value\":\"\",\"unit\":\"\",\"key\":\"the nightingale\",\"time\":\"today\"}",
+          "{\"source\":\"E3\",\"quote\":\"That's really helpful, thanks! I think I can apply this to some of my own habits. Speaking of habits, I just started listening to 'Sapiens: A Brief History of Humankind' by Yuval Noah Harari today, and it got me thinking about how humans have developed certain habits and behaviors over time.\",\"value\":\"\",\"unit\":\"\",\"key\":\"sapiens: a brief history of humankind\",\"time\":\"today\"}",
+          "{\"source\":\"E4\",\"quote\":\"I just finished listening to 'Sapiens: A Brief History of Humankind' by Yuval Noah Harari today, and it got me thinking about the impact of technology on human evolution. Can you tell me more about the latest advancements in AI and its potential applications in various industries?\",\"value\":\"\",\"unit\":\"\",\"key\":\"sapiens: a brief history of humankind\",\"time\":\"today\"}",
+          "{\"source\":\"E5\",\"quote\":\"I'm so interested in learning more about the themes of identity, culture, and power in \\\"The Brief Wondrous Life of Oscar Wao\\\". I've been thinking a lot about how these themes relate to my own experiences as a woman, and I started listening to \\\"The Power\\\" by Naomi Alderman today, which got me thinking about how I take certain things for granted. Do you think \\\"The Brief Wondrous Life of Oscar Wao\\\" would be a good fit for someone interested in exploring these themes further?\",\"value\":\"\",\"unit\":\"\",\"key\":\"the power\",\"time\":\"today\"}",
+          "{\"source\":\"E7\",\"quote\":\"I'm looking for some book recommendations. I just finished listening to 'The Power' by Naomi Alderman today and it really made me think. I'm interested in exploring more books that challenge my perspectives. Do you have any suggestions?\",\"value\":\"\",\"unit\":\"\",\"key\":\"the power\",\"time\":\"today\"}"
+        ],
+        "reviewed_sources": [
+          "E1",
+          "E2",
+          "E3",
+          "E4",
+          "E5",
+          "E7"
+        ],
+        "scope_complete": true,
+        "citations": [
+          {
+            "source": "E1",
+            "quote": "I'm looking for some book recommendations. I started reading 'The Nightingale' by Kristin Hannah today and I'm really into historical fiction right now. Can you suggest some other books in the same genre that you think I'd enjoy?",
+            "value": "",
+            "unit": "",
+            "key": "the nightingale",
+            "time": "today",
+            "resolved_date": "2022-01-01",
+            "precision": "day",
+            "conversation_date": "2022-01-01"
+          },
+          {
+            "source": "E2",
+            "quote": "I'm looking for some book recommendations. I just finished reading \"The Nightingale\" by Kristin Hannah today, and I'm still reeling from the emotional impact. I'm open to trying out different genres, so feel free to suggest anything that you think I might enjoy.",
+            "value": "",
+            "unit": "",
+            "key": "the nightingale",
+            "time": "today",
+            "resolved_date": "2022-01-15",
+            "precision": "day",
+            "conversation_date": "2022-01-15"
+          },
+          {
+            "source": "E3",
+            "quote": "That's really helpful, thanks! I think I can apply this to some of my own habits. Speaking of habits, I just started listening to 'Sapiens: A Brief History of Humankind' by Yuval Noah Harari today, and it got me thinking about how humans have developed certain habits and behaviors over time.",
+            "value": "",
+            "unit": "",
+            "key": "sapiens: a brief history of humankind",
+            "time": "today",
+            "resolved_date": "2022-02-01",
+            "precision": "day",
+            "conversation_date": "2022-02-01"
+          },
+          {
+            "source": "E4",
+            "quote": "I just finished listening to 'Sapiens: A Brief History of Humankind' by Yuval Noah Harari today, and it got me thinking about the impact of technology on human evolution. Can you tell me more about the latest advancements in AI and its potential applications in various industries?",
+            "value": "",
+            "unit": "",
+            "key": "sapiens: a brief history of humankind",
+            "time": "today",
+            "resolved_date": "2022-03-01",
+            "precision": "day",
+            "conversation_date": "2022-03-01"
+          },
+          {
+            "source": "E5",
+            "quote": "I'm so interested in learning more about the themes of identity, culture, and power in \"The Brief Wondrous Life of Oscar Wao\". I've been thinking a lot about how these themes relate to my own experiences as a woman, and I started listening to \"The Power\" by Naomi Alderman today, which got me thinking about how I take certain things for granted. Do you think \"The Brief Wondrous Life of Oscar Wao\" would be a good fit for someone interested in exploring these themes further?",
+            "value": "",
+            "unit": "",
+            "key": "the power",
+            "time": "today",
+            "resolved_date": "2022-03-06",
+            "precision": "day",
+            "conversation_date": "2022-03-06"
+          },
+          {
+            "source": "E7",
+            "quote": "I'm looking for some book recommendations. I just finished listening to 'The Power' by Naomi Alderman today and it really made me think. I'm interested in exploring more books that challenge my perspectives. Do you have any suggestions?",
+            "value": "",
+            "unit": "",
+            "key": "the power",
+            "time": "today",
+            "resolved_date": "2022-03-20",
+            "precision": "day",
+            "conversation_date": "2022-03-20"
+          }
+        ],
+        "days": 56,
+        "pairs": [
+          {
+            "key": "the nightingale",
+            "start": "2022-01-01",
+            "end": "2022-01-15",
+            "days": 14
+          },
+          {
+            "key": "sapiens: a brief history of humankind",
+            "start": "2022-02-01",
+            "end": "2022-03-01",
+            "days": 28
+          },
+          {
+            "key": "the power",
+            "start": "2022-03-06",
+            "end": "2022-03-20",
+            "days": 14
+          }
+        ],
+        "approximate": false,
+        "mechanism": "named_reading_duration",
+        "endpoint_provenance": [
+          {
+            "title": "the nightingale",
+            "phase": "start",
+            "source": "E1",
+            "quote": "I'm looking for some book recommendations. I started reading 'The Nightingale' by Kristin Hannah today and I'm really into historical fiction right now. Can you suggest some other books in the same genre that you think I'd enjoy?",
+            "resolved_date": "2022-01-01"
+          },
+          {
+            "title": "the nightingale",
+            "phase": "finish",
+            "source": "E2",
+            "quote": "I'm looking for some book recommendations. I just finished reading \"The Nightingale\" by Kristin Hannah today, and I'm still reeling from the emotional impact. I'm open to trying out different genres, so feel free to suggest anything that you think I might enjoy.",
+            "resolved_date": "2022-01-15"
+          },
+          {
+            "title": "sapiens: a brief history of humankind",
+            "phase": "start",
+            "source": "E3",
+            "quote": "That's really helpful, thanks! I think I can apply this to some of my own habits. Speaking of habits, I just started listening to 'Sapiens: A Brief History of Humankind' by Yuval Noah Harari today, and it got me thinking about how humans have developed certain habits and behaviors over time.",
+            "resolved_date": "2022-02-01"
+          },
+          {
+            "title": "sapiens: a brief history of humankind",
+            "phase": "finish",
+            "source": "E4",
+            "quote": "I just finished listening to 'Sapiens: A Brief History of Humankind' by Yuval Noah Harari today, and it got me thinking about the impact of technology on human evolution. Can you tell me more about the latest advancements in AI and its potential applications in various industries?",
+            "resolved_date": "2022-03-01"
+          },
+          {
+            "title": "the power",
+            "phase": "start",
+            "source": "E5",
+            "quote": "I'm so interested in learning more about the themes of identity, culture, and power in \"The Brief Wondrous Life of Oscar Wao\". I've been thinking a lot about how these themes relate to my own experiences as a woman, and I started listening to \"The Power\" by Naomi Alderman today, which got me thinking about how I take certain things for granted. Do you think \"The Brief Wondrous Life of Oscar Wao\" would be a good fit for someone interested in exploring these themes further?",
+            "resolved_date": "2022-03-06"
+          },
+          {
+            "title": "the power",
+            "phase": "start",
+            "source": "E6",
+            "quote": "I'm interested in learning more about the themes of identity, culture, and power in \"The Fifth Season\" by N.K. Jemisin. I've been thinking a lot about how these themes relate to my own experiences as a woman, and I started listening to \"The Power\" by Naomi Alderman today, which got me thinking about how I take certain things for granted. Do you think \"The Fifth Season\" would be a good fit for someone interested in exploring these themes further?",
+            "resolved_date": "2022-03-06"
+          },
+          {
+            "title": "the power",
+            "phase": "finish",
+            "source": "E7",
+            "quote": "I'm looking for some book recommendations. I just finished listening to 'The Power' by Naomi Alderman today and it really made me think. I'm interested in exploring more books that challenge my perspectives. Do you have any suggestions?",
+            "resolved_date": "2022-03-20"
+          }
+        ]
+      }
+    },
+    {
+      "question_id": "51a45a95",
+      "user_review": true,
+      "review_complete": true,
+      "page_count": 3,
+      "gold_raw_final_context_complete": true,
+      "missing_gold_turns": [],
+      "context_bound": true,
+      "judged_correct": false,
+      "answer": "I do not know.",
+      "calculation": {
+        "cause": "redemption_place_not_supported",
+        "focus_sources": [
+          "E1"
+        ]
+      }
+    },
+    {
+      "question_id": "eaca4986",
+      "user_review": false,
+      "review_complete": true,
+      "page_count": 0,
+      "gold_raw_final_context_complete": true,
+      "missing_gold_turns": [],
+      "context_bound": true,
+      "judged_correct": true,
+      "answer": "C D E F G A B A G F E D C",
+      "calculation": {
+        "mechanism": "ordinal_song_progression",
+        "ordinal": 2,
+        "structural_citation": {
+          "source": "E26",
+          "quote": "C D E F G A B A G F E D C",
+          "session": "scoped-session-v1:8:eaca4986answer_sharegpt_SS141vi_0",
+          "turn": 3
+        },
+        "conversation_citations": [
+          {
+            "source": "E31",
+            "turn": 0,
+            "role": "user"
+          },
+          {
+            "source": "E21",
+            "turn": 1,
+            "role": "assistant"
+          },
+          {
+            "source": "E48",
+            "turn": 2,
+            "role": "user"
+          },
+          {
+            "source": "E26",
+            "turn": 3,
+            "role": "assistant"
+          }
+        ]
+      }
+    }
+  ],
+  "usage": {
+    "total_requests": 41,
+    "total_tokens": 204843,
+    "failures": 8,
+    "by_role": {
+      "answerer": {
+        "role": "answerer",
+        "calls": 28,
+        "failures": 1,
+        "input_tokens": 187653,
+        "output_tokens": 15873,
+        "p50_ms": 2538.6869171634316,
+        "p95_ms": 3466.99345856905,
+        "max_ms": 3846.2306251749396
+      },
+      "judge": {
+        "role": "judge",
+        "calls": 13,
+        "failures": 7,
+        "input_tokens": 1139,
+        "output_tokens": 178,
+        "p50_ms": 20861.38083273545,
+        "p95_ms": 33674.92195777595,
+        "max_ms": 49003.014042042196
+      }
+    }
+  },
+  "source_hashes_current": false,
+  "inputs": {
+    "results/raw/prerequisite-reader-v18-v2.readers.jsonl": "a6821f0c45b3af78f847fb6464c871d641ecda2d53e13a77b93bba9f0656200d",
+    "results/raw/prerequisite-reader-v18-v2.grades.jsonl": "765503eb198221ae5bc6363b2ca3c556e50feffb7c4965fddef3d37d88b4d618",
+    "results/raw/prerequisite-reader-v18-v2.execution.json": "4fc5af530d868cdd417a23d70dd6bd9c192ce1bd840b15fb5c366338bd22baff"
+  },
+  "limitations": "Six original-history questions; no population accuracy estimate, no 4x QA, no unseen-final."
+}

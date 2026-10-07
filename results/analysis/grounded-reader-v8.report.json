@@ -1,0 +1,282 @@
+{
+  "experiment_class": "development/regression; failure-enriched, not overall accuracy",
+  "provider_calls": 0,
+  "inventory_sha256": "def91d5a16271b5e164a8c3c318531617e4983c43b7a6d308ec75b1f5f629c9e",
+  "inputs": {
+    "results/raw/grounded-reader-v8.answers.jsonl": "b53d19f2e4f12628d11214a34274ed60bca0c565b6f4abd1ea58239d830b0315",
+    "results/analysis/grounded-reader-v8.execution.json": "def91d5a16271b5e164a8c3c318531617e4983c43b7a6d308ec75b1f5f629c9e",
+    "results/raw/grounded-reader-v8.usage.json": "d00f12fa999382ac968f31c0bc57e50f8a677fe2ae2892bfa2c67a1f8b7fe908",
+    "results/raw/grounded-reader-v8.grades.jsonl": "ff42cc1f86842f45cc15963aa5a731754ad5af8e54b3c059213c69e142768238"
+  },
+  "cohorts": {
+    "reasoning-errors": {
+      "readers": 9,
+      "graded": 9,
+      "correct": 5
+    },
+    "originally-correct": {
+      "readers": 10,
+      "graded": 10,
+      "correct": 9
+    }
+  },
+  "grading_complete_for_saved_readers": true,
+  "usage": {
+    "total_requests": 80,
+    "total_tokens": 393059,
+    "failures": 23,
+    "by_role": {
+      "answerer": {
+        "role": "answerer",
+        "calls": 39,
+        "failures": 1,
+        "input_tokens": 370784,
+        "output_tokens": 17819,
+        "p50_ms": 3816.9926246628165,
+        "p95_ms": 8237.789417151362,
+        "max_ms": 9709.09645780921
+      },
+      "judge": {
+        "role": "judge",
+        "calls": 41,
+        "failures": 22,
+        "input_tokens": 3851,
+        "output_tokens": 605,
+        "p50_ms": 25112.16800007969,
+        "p95_ms": 44294.56137493253,
+        "max_ms": 180005.6612920016
+      }
+    }
+  },
+  "rows": [
+    {
+      "question_id": "09ba9854",
+      "cohort": "reasoning-errors",
+      "answer": "50 $",
+      "correct": true,
+      "judge_reason": "The candidate answer provides the same numerical value as the reference answer.",
+      "reader_passes": 2,
+      "validation_causes": [
+        null,
+        null
+      ]
+    },
+    {
+      "question_id": "51a45a95",
+      "cohort": "reasoning-errors",
+      "answer": "I do not know.",
+      "correct": false,
+      "judge_reason": "The candidate answer states it does not know, whereas the reference answer provides a specific location.",
+      "reader_passes": 2,
+      "validation_causes": [
+        "validated_lookup",
+        "validated_lookup"
+      ]
+    },
+    {
+      "question_id": "6e984301",
+      "cohort": "reasoning-errors",
+      "answer": "3 weeks",
+      "correct": true,
+      "judge_reason": "The candidate answer provides the same numerical value as the reference answer.",
+      "reader_passes": 2,
+      "validation_causes": [
+        null,
+        null
+      ]
+    },
+    {
+      "question_id": "b46e15ed",
+      "cohort": "reasoning-errors",
+      "answer": "2 months and 3 days",
+      "correct": true,
+      "judge_reason": "The candidate answer specifies 2 months, which matches the reference answer, and adds extra detail (3 days) which is permissible.",
+      "reader_passes": 2,
+      "validation_causes": [
+        null,
+        null
+      ]
+    },
+    {
+      "question_id": "eaca4986",
+      "cohort": "reasoning-errors",
+      "answer": "I do not know.",
+      "correct": false,
+      "judge_reason": "The candidate answer declines to answer the question, whereas the reference answer provides a specific chord progression.",
+      "reader_passes": 2,
+      "validation_causes": [
+        "fact_quote_invalid",
+        "fact_quote_invalid"
+      ]
+    },
+    {
+      "question_id": "f685340e",
+      "cohort": "reasoning-errors",
+      "answer": "Previously, you played tennis with your friends weekly. Now, you play every other week.",
+      "correct": true,
+      "judge_reason": "The candidate answer accurately reflects the frequency of tennis play both previously (weekly) and currently (every other week) as stated in the reference.",
+      "reader_passes": 2,
+      "validation_causes": [
+        "validated_lookup",
+        "validated_lookup"
+      ]
+    },
+    {
+      "question_id": "f9e8c073",
+      "cohort": "reasoning-errors",
+      "answer": "I do not know.",
+      "correct": false,
+      "judge_reason": "The candidate answer states it does not know, whereas the reference answer provides a specific number.",
+      "reader_passes": 2,
+      "validation_causes": [
+        "grouped_count_requires_lookup",
+        "fact_value_not_in_answer"
+      ]
+    },
+    {
+      "question_id": "gpt4_7a0daae1",
+      "cohort": "reasoning-errors",
+      "answer": "1 weeks",
+      "correct": true,
+      "judge_reason": "The candidate answer is factually equivalent to the reference answer, despite the minor grammatical error.",
+      "reader_passes": 2,
+      "validation_causes": [
+        null,
+        null
+      ]
+    },
+    {
+      "question_id": "gpt4_a1b77f9c",
+      "cohort": "reasoning-errors",
+      "answer": "I do not know.",
+      "correct": false,
+      "judge_reason": "The candidate answer states it does not know, whereas the reference answer provides a specific total of 8 weeks.",
+      "reader_passes": 2,
+      "validation_causes": [
+        "duration_group_endpoints_invalid",
+        "question_date_invalid"
+      ]
+    },
+    {
+      "question_id": "0ddfec37_abs",
+      "cohort": "originally-correct",
+      "answer": "I do not know.",
+      "correct": true,
+      "judge_reason": "The candidate answer correctly declines to answer the question by stating it does not know.",
+      "reader_passes": 2,
+      "validation_causes": [
+        "zero_quote_invalid",
+        "zero_not_stated"
+      ]
+    },
+    {
+      "question_id": "1568498a",
+      "cohort": "originally-correct",
+      "answer": "The move made after 27. Kg2 Bd5+ was 29. Rd3 Rh4.",
+      "correct": false,
+      "judge_reason": "The candidate answer provides a different move (29. Rd3 Rh4) instead of the correct move (28. Kg3).",
+      "reader_passes": 2,
+      "validation_causes": [
+        "validated_lookup",
+        "validated_lookup"
+      ]
+    },
+    {
+      "question_id": "6456829e",
+      "cohort": "originally-correct",
+      "answer": "8 plants",
+      "correct": true,
+      "judge_reason": "The candidate answer provides the same numerical value as the reference answer.",
+      "reader_passes": 2,
+      "validation_causes": [
+        null,
+        null
+      ]
+    },
+    {
+      "question_id": "95228167",
+      "cohort": "originally-correct",
+      "answer": "Since you are looking at a Gibson Les Paul, keep an eye out for models with coil-tap or coil-splitting features for added tonal versatility, especially if you plan to play in alternate tunings like open D. Also, pay attention to the neck profile and overall weight to make sure it feels comfortable for you.",
+      "correct": true,
+      "judge_reason": "The candidate answer provides specific advice on the Gibson Les Paul, including neck profile and weight, which aligns with the preferences outlined in the rubric.",
+      "reader_passes": 2,
+      "validation_causes": [
+        "validated_lookup",
+        "validated_lookup"
+      ]
+    },
+    {
+      "question_id": "a89d7624",
+      "cohort": "originally-correct",
+      "answer": "For your upcoming trip to Denver, you should definitely check out top music venues like Red Rocks Park and Amphitheatre, The Ogden Theatre, The Bluebird Theater, The Fillmore Auditorium, and Larimer Lounge. For dining, you've mentioned wanting to eat at The Ship Rock Grille near Red Rocks.",
+      "correct": true,
+      "judge_reason": "The candidate answer provides personalized music venue recommendations and recalls the user's specific interest in Ship Rock Grille, aligning with the rubric's focus on live music.",
+      "reader_passes": 2,
+      "validation_causes": [
+        "validated_lookup",
+        "validated_lookup"
+      ]
+    },
+    {
+      "question_id": "af8d2e46",
+      "cohort": "originally-correct",
+      "answer": "You packed 7 shirts for your trip to Costa Rica.",
+      "correct": true,
+      "judge_reason": "The candidate answer correctly identifies the number of shirts as 7, matching the reference answer.",
+      "reader_passes": 2,
+      "validation_causes": [
+        "validated_lookup",
+        "validated_lookup"
+      ]
+    },
+    {
+      "question_id": "ed4ddc30",
+      "cohort": "originally-correct",
+      "answer": "You currently have 20 dozen eggs stocked up in your refrigerator.",
+      "correct": true,
+      "judge_reason": "The candidate answer correctly states the number of dozen eggs as 20, matching the reference answer.",
+      "reader_passes": 2,
+      "validation_causes": [
+        "validated_lookup",
+        "validated_lookup"
+      ]
+    },
+    {
+      "question_id": "gpt4_2f8be40d",
+      "cohort": "originally-correct",
+      "answer": "3: wedding, wedding, wedding",
+      "correct": true,
+      "judge_reason": "The candidate answer correctly identifies the number of weddings as 3, which matches the reference answer.",
+      "reader_passes": 2,
+      "validation_causes": [
+        null,
+        null
+      ]
+    },
+    {
+      "question_id": "gpt4_7ddcf75f",
+      "cohort": "originally-correct",
+      "answer": "3 days",
+      "correct": true,
+      "judge_reason": "The candidate answer matches the reference answer's primary value of 3 days.",
+      "reader_passes": 2,
+      "validation_causes": [
+        null,
+        null
+      ]
+    },
+    {
+      "question_id": "gpt4_a2d1d1f6",
+      "cohort": "originally-correct",
+      "answer": "3 days",
+      "correct": true,
+      "judge_reason": "The candidate answer matches the reference answer's primary value of 3 days.",
+      "reader_passes": 2,
+      "validation_causes": [
+        null,
+        null
+      ]
+    }
+  ],
+  "generator_sha256": "821ae9db7a157aa5216eab6ded137658e4af42a1f2bf02390488bb9946d327b4"
+}

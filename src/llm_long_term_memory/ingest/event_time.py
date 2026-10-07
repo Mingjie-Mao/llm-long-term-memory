@@ -189,25 +189,35 @@ def temporal_evidence(text: str, observed_at: datetime | None) -> TemporalEviden
     day = _RELATIVE_DAY.fullmatch(phrase)
     if day:
         offset = {"yesterday": -1, "today": 0, "tomorrow": 1}[phrase.lower()]
-        resolved = observed_at + timedelta(days=offset)
+        try:
+            resolved = observed_at + timedelta(days=offset)
+        except (OverflowError, ValueError):
+            return TemporalEvidence(expression=phrase, precision="unresolved")
         return TemporalEvidence(resolved, resolved, phrase, "day")
     ago = _AGO.fullmatch(phrase)
     if ago:
         count_text = ago["count"].lower()
+        if count_text.isdecimal() and len(count_text) > 9:
+            return TemporalEvidence(expression=phrase, precision="unresolved")
         count = int(count_text) if count_text.isdecimal() else _COUNTS[count_text]
         unit = ago["unit"].lower().rstrip("s")
-        if unit == "day":
-            resolved = observed_at - timedelta(days=count)
-            return TemporalEvidence(resolved, resolved, phrase, "day")
-        if unit == "week":
-            estimate = observed_at - timedelta(weeks=count)
-        else:
-            estimate = _shift_month(observed_at, -count * (12 if unit == "year" else 1))
+        try:
+            if unit == "day":
+                resolved = observed_at - timedelta(days=count)
+                return TemporalEvidence(resolved, resolved, phrase, "day")
+            if unit == "week":
+                estimate = observed_at - timedelta(weeks=count)
+            else:
+                estimate = _shift_month(observed_at, -count * (12 if unit == "year" else 1))
+        except (OverflowError, ValueError):
+            return TemporalEvidence(expression=phrase, precision="unresolved")
         return TemporalEvidence(estimate=estimate, expression=phrase, precision="approximate_day")
     named = _LAST_MONTH_NAME.fullmatch(phrase)
     if named:
         month = _MONTHS[named.group(1).lower()]
         year = observed_at.year - int(month >= observed_at.month)
+        if year < 1:
+            return TemporalEvidence(expression=phrase, precision="unresolved")
         return TemporalEvidence(
             estimate=observed_at.replace(year=year, month=month, day=1),
             expression=phrase,

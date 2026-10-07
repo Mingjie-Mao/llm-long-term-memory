@@ -1,0 +1,47 @@
+{
+  "train150": {
+    "temporal_failures": 8,
+    "count_ku_failures": 11,
+    "controls": 12,
+    "correct_on_temporal_failures": {
+      "v1": 0,
+      "t1": 1,
+      "t2": 5
+    },
+    "correct_on_count_ku_failures": {
+      "v1": 2,
+      "t1": 5,
+      "t2": 4
+    },
+    "wrong_on_controls": {
+      "v1": 0,
+      "t1": 1,
+      "t2": 1
+    }
+  },
+  "t1_move": 1,
+  "t2_move": 2,
+  "harm_vs_v1_rerun": {
+    "t1": 1,
+    "t2": 1
+  },
+  "readings": {
+    "t1_moves_its_target": false,
+    "t2_moves_its_target": true,
+    "t1_harm_signal": false,
+    "t2_harm_signal": false
+  },
+  "dev100_design_set": {
+    "t1": {
+      "questions": 9,
+      "correct": 4,
+      "v1_expected": 2.33
+    },
+    "t2": {
+      "questions": 18,
+      "correct": 9,
+      "v1_expected": 3.0
+    }
+  },
+  "proceed_to_heldout100": false
+}

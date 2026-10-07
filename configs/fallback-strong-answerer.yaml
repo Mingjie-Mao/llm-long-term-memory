@@ -1,0 +1,106 @@
+# fallback.yaml with one change: the answerer is gemini-3.6-flash instead of
+# gemini-3.5-flash-lite. Everything that decides what reaches the answerer -
+# extraction, store, retrieval, fallback, the raw-primary turns - is unchanged, so an
+# arm run under this config differs from its flash-lite twin only in the model reading
+# the context. The comparable systems report their largest single gain from the
+# answering model (Mastra: 84.2% with gpt-4o, 94.9% with gpt-5-mini).
+#
+# The free tier allowed 20 requests a day for this model when probed on 2026-08-10, so
+# it is registered for a 23-question diagnostic (results/prereg-strong-answerer-probe-v1.md),
+# not for a full set.
+# Model assignment shared by every variant.
+#
+# Pinned to explicit versioned IDs — never the floating `-latest` aliases — so that
+# a run from week 1 stays comparable to a run from week 8 (D3).
+#
+# Verified available on the free tier by probe on 2026-08-10. Note gemini-2.5-*
+# now returns 404 and all Pro models return 429 with `limit: 0`, i.e. Pro is not
+# offered on the free tier at all.
+name: fallback-strong-answerer
+description: two-stage + conditional raw-conversation fallback (live regression)
+
+# Probed 2026-08-10. The full-fat flash models (gemini-3.5-flash, gemini-3.6-flash)
+# allow only 20 requests/day on the free tier — not enough for one 50-question run —
+# while the flash-lite models are limited per *minute* and not per day. Every role
+# therefore runs on flash-lite, on three different models so that each gets its own
+# per-model quota pool.
+models:
+  # P2 ingestion is the heavy consumer; it gets a pool nothing else touches.
+  # Needs throughput above all: ~6.1M tokens for one dev-subset pass. Only the
+  # 250k-TPM models can do that in minutes rather than hours (gemma's 16k TPM makes
+  # the same work a 6.4-hour job regardless of its generous request budget).
+  extractor: gemini-3.1-flash-lite
+  # The system under test. Held constant across every variant.
+  answerer: gemini-3.6-flash
+  # A different model from the answerer, so no system grades its own prose.
+  # Its own pool, and chosen for the shape of the work rather than its size: judge
+  # inputs are ~200 tokens, so the 16k TPM that rules gemma out for extraction is
+  # irrelevant here, while its 1,500 requests/day is exactly what judging needs.
+  # Keeping judge and extractor on separate pools is what stops a large ingest
+  # starving the evaluation (D3).
+  judge: gemma-4-31b-it
+  embedder: sentence-transformers/all-MiniLM-L6-v2
+  embedding_dim: 384
+
+quota:
+  # Per model, not per project — the 429 body reports
+  # GenerateRequestsPerDayPerProjectPerModel-FreeTier. The flash-lite extractor
+  # has reported 500 RPD; runtime also loads any model-specific learned limit.
+  rpm: 10
+  tpm: 250000
+  rpd: 500
+  max_wait_seconds: 300.0
+
+dataset_variant: s
+dataset_limit: 50
+
+# P4. Ingestion applies temporal resolution; the eval variant
+# `chronomem_no_temporal` reads the same store with the filter off.
+temporal_resolution: true
+
+retrieval:
+  top_k: 20
+
+# 15, not the 10 D5 chose. With 2,400 namespaced dev-50 sessions, two-stage
+# extraction takes 189 namespace-bounded batches / 378 extractor calls before
+# deduplication. The measured 500-RPD limit leaves room for the observed dedupe
+# calls and retries on
+# an otherwise unused quota day; quality risk is small because batch size 10 had
+# zero cross-session misattributions.
+ingest:
+  sessions_per_request: 15
+  # Stage A emits bare fact strings, Stage B keys them with a second LLM call.
+  # Two requests per batch instead of one: the rule-based Stage B scored 43%
+  # predicate accuracy and produced zero supersessions, while this passes the
+  # temporal gate on all four metrics.
+  two_stage: true
+  checkpoint_every: 5
+  dedupe_similarity_threshold: 0.92
+
+# Conditional recovery: the answerer returns a verdict, and only `need_source`
+# pays for raw text and a second call. Distinct from `hydration`, which attached
+# evidence to every answer and was measured at 3x context for no detectable gain
+# (results/a2-pilot.md).
+fallback:
+  enabled: true
+  max_turns: 3
+  max_chars: 2400
+
+# P6. Session-coherent context, used only by the `two_stage_coherent` variant;
+# every other variant ignores this block entirely. These values are the starting
+# point, NOT a result: the pre-registration
+# (results/prereg-context-shape.md) puts the budget on train150 and freezes it
+# before dev100 is touched, and they live here rather than behind a CLI flag so
+# that scripts/freeze.py can see them.
+#
+# The former ~64% Top-3 estimate is superseded: its script mixed incomplete
+# questions into the denominator and compared scoped database ids with public ids.
+# A partial corrected train150 pass is above the registered 80% bar, but only the
+# fixed full-150 grid may select this arm or write configs/v2.yaml.
+context:
+  max_sessions: 3
+  window_radius: null
+  max_total_memories: 20
+  aggregate: sum_top3
+  session_order: chronological
+  include_superseded: false

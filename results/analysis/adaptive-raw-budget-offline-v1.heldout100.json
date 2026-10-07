@@ -1,0 +1,86 @@
+{
+  "store": "heldout100",
+  "questions": 100,
+  "with_gold": 93,
+  "summary": {
+    "fixed_4k": {
+      "all_gold": 0.8602150537634409,
+      "median_total_context": 5600.0,
+      "by_type": {
+        "knowledge-update": 0.9285714285714286,
+        "multi-session": 0.8333333333333334,
+        "single-session-assistant": 1.0,
+        "single-session-preference": 0.8333333333333334,
+        "single-session-user": 0.9166666666666666,
+        "temporal-reasoning": 0.7692307692307693
+      }
+    },
+    "fixed_8k": {
+      "all_gold": 0.8817204301075269,
+      "median_total_context": 9601.5,
+      "by_type": {
+        "knowledge-update": 0.9285714285714286,
+        "multi-session": 0.875,
+        "single-session-assistant": 1.0,
+        "single-session-preference": 0.8333333333333334,
+        "single-session-user": 0.9166666666666666,
+        "temporal-reasoning": 0.8076923076923077
+      }
+    },
+    "adaptive_agg": {
+      "all_gold": 0.8602150537634409,
+      "median_total_context": 6042.5,
+      "by_type": {
+        "knowledge-update": 0.9285714285714286,
+        "multi-session": 0.8333333333333334,
+        "single-session-assistant": 1.0,
+        "single-session-preference": 0.8333333333333334,
+        "single-session-user": 0.9166666666666666,
+        "temporal-reasoning": 0.7692307692307693
+      }
+    },
+    "adaptive_agg_temporal": {
+      "all_gold": 0.8709677419354839,
+      "median_total_context": 9492.5,
+      "by_type": {
+        "knowledge-update": 0.9285714285714286,
+        "multi-session": 0.8333333333333334,
+        "single-session-assistant": 1.0,
+        "single-session-preference": 0.8333333333333334,
+        "single-session-user": 0.9166666666666666,
+        "temporal-reasoning": 0.8076923076923077
+      }
+    }
+  },
+  "routed_share": {
+    "fixed_4k": 0.0,
+    "fixed_8k": 1.0,
+    "adaptive_agg": 0.3,
+    "adaptive_agg_temporal": 0.57
+  },
+  "routing": {
+    "knowledge-update -> current_state": 3,
+    "knowledge-update -> direct": 2,
+    "knowledge-update -> multi_session_aggregation": 8,
+    "knowledge-update -> temporal": 2,
+    "multi-session -> current_state": 1,
+    "multi-session -> direct": 8,
+    "multi-session -> multi_session_aggregation": 16,
+    "multi-session -> temporal": 2,
+    "single-session-assistant -> direct": 8,
+    "single-session-assistant -> multi_session_aggregation": 1,
+    "single-session-assistant -> temporal": 2,
+    "single-session-preference -> direct": 5,
+    "single-session-preference -> preference_application": 1,
+    "single-session-user -> direct": 11,
+    "single-session-user -> temporal": 3,
+    "temporal-reasoning -> direct": 4,
+    "temporal-reasoning -> multi_session_aggregation": 5,
+    "temporal-reasoning -> temporal": 18
+  },
+  "decision": {
+    "qualifying": [],
+    "chosen": "fixed_4k"
+  },
+  "rows": []
+}

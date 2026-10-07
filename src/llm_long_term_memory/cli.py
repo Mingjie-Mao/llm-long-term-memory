@@ -46,6 +46,41 @@ app.add_typer(eval_app, name="eval")
 # on train150 at 4,000 tokens (results/memory-as-index-offline-decision.md). Fixed by
 # registration, not tuned.
 RAW_PRIMARY_TOKENS = 4000
+RAW_PRIMARY_V2_OUTPUT_TOKENS = 1024
+GROUNDED_VARIANTS = {
+    "two_stage_raw_primary_grounded",
+    "two_stage_raw_primary_grounded_v2",
+    "two_stage_raw_primary_grounded_v3",
+    "two_stage_raw_primary_grounded_v4",
+    "two_stage_raw_primary_grounded_v5",
+    "two_stage_raw_primary_grounded_v6",
+    "two_stage_raw_primary_grounded_v7",
+    "two_stage_raw_primary_grounded_v8",
+    "two_stage_raw_primary_grounded_v9",
+    "two_stage_raw_primary_grounded_v10",
+    "two_stage_raw_primary_grounded_v11",
+    "two_stage_raw_primary_grounded_v12",
+    "two_stage_raw_primary_grounded_v13",
+    "two_stage_raw_primary_grounded_v14",
+    "two_stage_raw_primary_grounded_v15",
+    "two_stage_raw_primary_grounded_v16",
+    "two_stage_raw_primary_grounded_v17",
+    "two_stage_raw_primary_grounded_v18",
+}
+
+
+def _turn_index(settings, stem: str, cfg, kind: str = "turn-index"):
+    """The dense index over this store's turns, which the v2 and v4 arms cannot run without."""
+    from llm_long_term_memory.store import NumpyFlatIndex
+
+    index = NumpyFlatIndex(settings.store_dir / f"{stem}-{kind}", dim=cfg.models.embedding_dim)
+    if not len(index):
+        flag = " --fact-keys" if kind == "turn-key-index" else ""
+        raise typer.BadParameter(
+            f"{stem!r} has no {kind} — run `lltm lifecycle build-turn-index "
+            f"--store-name {stem}{flag}` first"
+        )
+    return index
 
 
 def _default_store_name(variant: str) -> str:
@@ -183,6 +218,45 @@ def _build(
         # turns: no memory context and no memory-located fallback.
         "two_stage_raw_primary",
         "two_stage_raw_only",
+        # Raw-primary t1 (results/prereg-raw-primary-time-notes-v1.md): the same arm with
+        # each conversation header dated relative to the question, and the relative
+        # dates inside its turns resolved from that conversation's date.
+        "two_stage_raw_primary_t1",
+        # Raw-primary t2: t1 with the answerer told that the latest value wins, and
+        # counts or totals answered item by item (answer policy `v2_cl`).
+        "two_stage_raw_primary_t2",
+        # Raw-primary t3: t2 with questions about dates, durations or order also answered
+        # from notes (answer policy `v2_clt`; results/prereg-t-probe-v2.md).
+        "two_stage_raw_primary_t3",
+        # Raw-primary t4: t3 with the user's turns packed first and the period a question
+        # names searched by time (results/prereg-raw-primary-t3-t4-heldout100-v1.md).
+        "two_stage_raw_primary_t4",
+        # Raw-primary v2 (results/prereg-raw-primary-dev100-v3.md): the same arm with
+        # BM25 fused with a dense turn ranking, conversation dates written relative to
+        # the question, and an answerer that lists its evidence before deciding.
+        "two_stage_raw_primary_v2",
+        # Raw-primary v4 (results/prereg-raw-primary-dev100-v4.md): v2 plus the turns
+        # the retrieved memories point at as a third ranking, and turns keyed by their
+        # text plus the facts anchored to them (lexical and dense).
+        "two_stage_raw_primary_v4",
+        "two_stage_raw_primary_grounded",
+        "two_stage_raw_primary_grounded_v2",
+        "two_stage_raw_primary_grounded_v3",
+        "two_stage_raw_primary_grounded_v4",
+        "two_stage_raw_primary_grounded_v5",
+        "two_stage_raw_primary_grounded_v6",
+        "two_stage_raw_primary_grounded_v7",
+        "two_stage_raw_primary_grounded_v8",
+        "two_stage_raw_primary_grounded_v9",
+        "two_stage_raw_primary_grounded_v10",
+        "two_stage_raw_primary_grounded_v11",
+        "two_stage_raw_primary_grounded_v12",
+        "two_stage_raw_primary_grounded_v13",
+        "two_stage_raw_primary_grounded_v14",
+        "two_stage_raw_primary_grounded_v15",
+        "two_stage_raw_primary_grounded_v16",
+        "two_stage_raw_primary_grounded_v17",
+        "two_stage_raw_primary_grounded_v18",
         # v3 research arm: same v2 store/retrieval/fallback, with an explicit
         # evidence/check/calculation answer policy. It never uses benchmark labels.
         "two_stage_reasoned",
@@ -259,7 +333,17 @@ def _build(
             decay_enabled=cfg.decay.enabled,
             decay_halflife_days=cfg.decay.halflife_days,
             reinforcement=cfg.decay.reinforcement,
-            evidence_hydration="_hydrated" in variant or variant == "two_stage_raw_primary",
+            evidence_hydration="_hydrated" in variant
+            or variant
+            in {
+                "two_stage_raw_primary",
+                "two_stage_raw_primary_t1",
+                "two_stage_raw_primary_t2",
+                "two_stage_raw_primary_t3",
+                "two_stage_raw_primary_t4",
+                "two_stage_raw_primary_v2",
+                "two_stage_raw_primary_v4",
+            },
             adaptive_reasoning_hydration=variant
             in {
                 "two_stage_reasoned_evidence",
@@ -306,9 +390,68 @@ def _build(
             ),
             parallel_raw_planned=variant == "two_stage_v5_planned",
             raw_primary_tokens=RAW_PRIMARY_TOKENS
-            if variant in {"two_stage_raw_primary", "two_stage_raw_only"}
+            if variant
+            in {
+                "two_stage_raw_primary",
+                "two_stage_raw_primary_t1",
+                "two_stage_raw_primary_t2",
+                "two_stage_raw_primary_t3",
+                "two_stage_raw_primary_t4",
+                "two_stage_raw_only",
+                "two_stage_raw_primary_v2",
+                "two_stage_raw_primary_v4",
+                "two_stage_raw_primary_grounded",
+                "two_stage_raw_primary_grounded_v2",
+                "two_stage_raw_primary_grounded_v3",
+                "two_stage_raw_primary_grounded_v4",
+                "two_stage_raw_primary_grounded_v5",
+                "two_stage_raw_primary_grounded_v6",
+                "two_stage_raw_primary_grounded_v7",
+                "two_stage_raw_primary_grounded_v8",
+                "two_stage_raw_primary_grounded_v9",
+                "two_stage_raw_primary_grounded_v10",
+                "two_stage_raw_primary_grounded_v11",
+                "two_stage_raw_primary_grounded_v12",
+                "two_stage_raw_primary_grounded_v13",
+                "two_stage_raw_primary_grounded_v14",
+                "two_stage_raw_primary_grounded_v15",
+                "two_stage_raw_primary_grounded_v16",
+                "two_stage_raw_primary_grounded_v17",
+                "two_stage_raw_primary_grounded_v18",
+            }
             else 0,
             raw_primary_only=variant == "two_stage_raw_only",
+            raw_primary_turn_index=_turn_index(settings, stem, cfg)
+            if variant == "two_stage_raw_primary_v2"
+            else _turn_index(settings, stem, cfg, kind="turn-key-index")
+            if variant in {"two_stage_raw_primary_v4"} | GROUNDED_VARIANTS
+            else None,
+            raw_primary_dated=variant
+            in {
+                "two_stage_raw_primary_t1",
+                "two_stage_raw_primary_t2",
+                "two_stage_raw_primary_t3",
+                "two_stage_raw_primary_t4",
+                "two_stage_raw_primary_v2",
+                "two_stage_raw_primary_v4",
+            },
+            raw_primary_prefer_user=variant == "two_stage_raw_primary_t4",
+            raw_primary_time_window=variant == "two_stage_raw_primary_t4",
+            raw_primary_time_notes=variant
+            in {
+                "two_stage_raw_primary_t1",
+                "two_stage_raw_primary_t2",
+                "two_stage_raw_primary_t3",
+                "two_stage_raw_primary_t4",
+            },
+            raw_primary_memory_fusion=variant in {"two_stage_raw_primary_v4"} | GROUNDED_VARIANTS,
+            raw_primary_fact_keys=variant in {"two_stage_raw_primary_v4"} | GROUNDED_VARIANTS,
+            # Listing the evidence first spends output; 512 would truncate the JSON.
+            max_output_tokens=2048
+            if variant in GROUNDED_VARIANTS
+            else RAW_PRIMARY_V2_OUTPUT_TOKENS
+            if variant in {"two_stage_raw_primary_v2", "two_stage_raw_primary_v4"}
+            else 512,
             date_provenance=variant == "two_stage_v2e",
             answer_policy={
                 "two_stage_reasoned": "reasoned_v3",
@@ -328,6 +471,29 @@ def _build(
                 # v2e changes the rendering, not the policy: the comparison against
                 # v2c is only meaningful while everything else is v2c.
                 "two_stage_v2e": "v2c",
+                "two_stage_raw_primary_v2": "v2_notes",
+                "two_stage_raw_primary_v4": "v2_notes",
+                "two_stage_raw_primary_t2": "v2_cl",
+                "two_stage_raw_primary_t3": "v2_clt",
+                "two_stage_raw_primary_t4": "v2_clt",
+                "two_stage_raw_primary_grounded": "grounded_v1",
+                "two_stage_raw_primary_grounded_v2": "grounded_v2",
+                "two_stage_raw_primary_grounded_v3": "grounded_v3",
+                "two_stage_raw_primary_grounded_v4": "grounded_v4",
+                "two_stage_raw_primary_grounded_v5": "grounded_v5",
+                "two_stage_raw_primary_grounded_v6": "grounded_v6",
+                "two_stage_raw_primary_grounded_v7": "grounded_v7",
+                "two_stage_raw_primary_grounded_v8": "grounded_v8",
+                "two_stage_raw_primary_grounded_v9": "grounded_v9",
+                "two_stage_raw_primary_grounded_v10": "grounded_v10",
+                "two_stage_raw_primary_grounded_v11": "grounded_v11",
+                "two_stage_raw_primary_grounded_v12": "grounded_v12",
+                "two_stage_raw_primary_grounded_v13": "grounded_v13",
+                "two_stage_raw_primary_grounded_v14": "grounded_v14",
+                "two_stage_raw_primary_grounded_v15": "grounded_v15",
+                "two_stage_raw_primary_grounded_v16": "grounded_v16",
+                "two_stage_raw_primary_grounded_v17": "grounded_v17",
+                "two_stage_raw_primary_grounded_v18": "grounded_v18",
             }.get(variant, "v2"),
             timeline_rendering=variant
             not in {

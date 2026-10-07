@@ -119,10 +119,46 @@ class Deduplicator:
         seen_memories: list[Memory] = []
 
         for candidate, vector in zip(candidates, vectors, strict=True):
+            if candidate.predicate == "source_quote":
+                # These are source navigation records. A paraphrased summary is not
+                # their duplicate; only the same tenant/source/span/body is.
+                exact = any(
+                    m.id == candidate.id and m.user_id == candidate.user_id for m in seen_memories
+                )
+                stored = self.store.get(candidate.id) if self.store is not None else None
+                if stored is not None and stored.user_id != candidate.user_id:
+                    raise ValueError("source quote id collides across tenants")
+                if stored is not None and (
+                    stored.predicate != "source_quote"
+                    or (
+                        stored.content,
+                        stored.source_session_id,
+                        stored.source_turn_index,
+                        stored.source_char_start,
+                        stored.source_char_end,
+                    )
+                    != (
+                        candidate.content,
+                        candidate.source_session_id,
+                        candidate.source_turn_index,
+                        candidate.source_char_start,
+                        candidate.source_char_end,
+                    )
+                ):
+                    raise ValueError("source quote id has inconsistent archived provenance")
+                if exact or stored is not None:
+                    outcome.duplicates += 1
+                    continue
+                outcome.kept.append(candidate)
+                seen_vectors.append(vector)
+                seen_memories.append(candidate)
+                continue
             neighbours = self._neighbours(candidate, vector, seen_vectors, seen_memories)
             verdict = None
 
-            for neighbour in neighbours[: self.max_neighbours]:
+            for neighbour in [m for m in neighbours if m.predicate != "source_quote"][
+                : self.max_neighbours
+            ]:
                 decision = self.adjudicate(neighbour, candidate)
                 outcome.adjudications += 1
                 if decision.verdict == "DUPLICATE":

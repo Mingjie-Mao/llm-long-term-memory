@@ -76,7 +76,7 @@ class UsageTracker:
         box: dict[str, int] = {"input_tokens": 0, "output_tokens": 0}
         try:
             yield box
-        except Exception as exc:
+        except BaseException as exc:
             self.record(
                 CallRecord(
                     role=role,

@@ -1,0 +1,53 @@
+{
+  "store": "dev100",
+  "checkable": 4272,
+  "accuracy": {
+    "stored": 0.8780430711610487,
+    "v1": 0.8780430711610487,
+    "v2": 0.962312734082397,
+    "v3": 0.9515449438202247
+  },
+  "v1_equals_stored": 1.0,
+  "flips": {
+    "v1_wrong_v2_right": 395,
+    "v1_right_v2_wrong": 35
+  },
+  "v2_kept_of_v1_correct": 0.9906691548920288,
+  "v3_kept_of_v1_correct": 0.981604905358571,
+  "v2_accuracy_by_reference_role": {
+    "user": 0.9828510182207931,
+    "assistant": 0.9565738244983528
+  },
+  "rules": {
+    "v2_at_least_3_points_above_v1": true,
+    "v2_keeps_99pct_of_v1_correct": true
+  },
+  "switch_to_v2": true,
+  "examples": [
+    {
+      "content": "The assistant recommended Bell Helmets, Specialized, and Giro for bike helmets.",
+      "v1_turn": 3,
+      "reference_turn": 5
+    },
+    {
+      "content": "The assistant recommended Cygolite, Planet Bike, and NiteRider for bike lights.",
+      "v1_turn": 3,
+      "reference_turn": 5
+    },
+    {
+      "content": "The assistant recommended Leatherman, Gerber, and Park Tool for bike multi-tools.",
+      "v1_turn": 3,
+      "reference_turn": 5
+    },
+    {
+      "content": "The assistant recommended Tofuya Ukai in Shinjuku for traditional Japanese cuisine.",
+      "v1_turn": 0,
+      "reference_turn": 1
+    },
+    {
+      "content": "The assistant recommended Kyubey Ginza in Shinjuku for traditional Japanese cuisine.",
+      "v1_turn": 0,
+      "reference_turn": 1
+    }
+  ]
+}

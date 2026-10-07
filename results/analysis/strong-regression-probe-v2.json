@@ -1,0 +1,45 @@
+{
+  "questions": 10,
+  "regressions": [
+    "a89d7624"
+  ],
+  "R": 1,
+  "by_type": {
+    "knowledge-update": {
+      "sampled": 2,
+      "regressed": 0
+    },
+    "multi-session": {
+      "sampled": 2,
+      "regressed": 0
+    },
+    "single-session-assistant": {
+      "sampled": 1,
+      "regressed": 0
+    },
+    "single-session-preference": {
+      "sampled": 2,
+      "regressed": 1
+    },
+    "single-session-user": {
+      "sampled": 1,
+      "regressed": 0
+    },
+    "temporal-reasoning": {
+      "sampled": 2,
+      "regressed": 0
+    }
+  },
+  "expected_noise_flips": 0.5900970144155223,
+  "noise_flip_rates": {
+    "multi-session": 0.047619047619047616,
+    "single-session-user": 0.0,
+    "single-session-preference": 0.125,
+    "knowledge-update": 0.024390243902439025,
+    "temporal-reasoning": 0.09803921568627451,
+    "single-session-assistant": 0.0
+  },
+  "projected_net_conservative": -7.699999999999999,
+  "projected_net_noise_adjusted": -0.20576791692286633,
+  "reading": "regression risk is low \u2014 proceed to the full strong vs flash-lite comparison"
+}

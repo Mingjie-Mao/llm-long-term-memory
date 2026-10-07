@@ -252,17 +252,41 @@ class FactExtractionOutcome:
         return sum(len(v) for v in self.by_session.values())
 
 
+PREFERENCE_OBSERVER = """\
+
+**Preferences expressed in passing.** Also write down what the user's habits, routines, \
+constraints and offhand remarks reveal about what they would want, as `preference` \
+lines, even when they never say "I prefer". "I'm usually in bed by 9:30" is a line \
+of its own: "The user prefers winding down early in the evening; they are usually in \
+bed by 9:30." Keep the user's own words and specifics in the line. Do not invent a \
+preference the conversation gives no ground for.\
+"""
+PREFERENCE_OBSERVER_VERSION = "pref-observer-v1"
+
+
 class FactExtractor:
-    def __init__(self, client: GeminiClient, model: str, chars_per_token: float = 4.6) -> None:
+    def __init__(
+        self,
+        client: GeminiClient,
+        model: str,
+        chars_per_token: float = 4.6,
+        preference_observer: bool = False,
+    ) -> None:
+        """`preference_observer` adds Mastra-style capture of preferences shown in
+        passing (`results/prereg-preference-extraction-probe-v1.md`). Off by default:
+        the production prompt is unchanged unless it is asked for."""
         self.client = client
         self.model = model
         self.chars_per_token = chars_per_token
+        self.preference_observer = preference_observer
 
     def extract(self, sessions: list[ConversationSession]) -> FactExtractionOutcome:
         if not sessions:
             return FactExtractionOutcome({}, 0)
 
         prompt = _PROMPT.format(n=len(sessions), sessions=render_batch(sessions))
+        if self.preference_observer:
+            prompt = f"{prompt}\n{PREFERENCE_OBSERVER}"
         completion = self.client.generate(
             role="extractor",
             model=self.model,

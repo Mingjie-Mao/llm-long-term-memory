@@ -1,0 +1,39 @@
+{
+  "summary": {
+    "total_requests": 2,
+    "total_tokens": 9303,
+    "failures": 1,
+    "by_role": {
+      "answerer": {
+        "role": "answerer",
+        "calls": 2,
+        "failures": 1,
+        "input_tokens": 8533,
+        "output_tokens": 770,
+        "p50_ms": 1001.0501253418624,
+        "p95_ms": 3226.9331659190357,
+        "max_ms": 3226.9331659190357
+      }
+    }
+  },
+  "calls": [
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 1001.0501253418624,
+      "ok": false,
+      "error": "ClientError: 400 INVALID_ARGUMENT. {'error': {'code': 400, 'message': 'Request contains an invalid argument.', 'status': 'INVALID_ARGUMENT'}}"
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 8533,
+      "output_tokens": 770,
+      "latency_ms": 3226.9331659190357,
+      "ok": true,
+      "error": null
+    }
+  ]
+}

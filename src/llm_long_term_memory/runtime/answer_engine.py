@@ -146,8 +146,39 @@ class AnswerEngine:
         raw_fallback_max_chars: int = 2400,
         max_output_tokens: int = 512,
         chars_per_token: float = 4.6,
+        answer_policy: str = "v2",
+        raw_primary_turn_index=None,
+        raw_primary_tokens: int = 0,
+        raw_primary_time_notes: bool = False,
     ) -> None:
         self.client = client
+        if raw_primary_time_notes and not raw_primary_tokens:
+            raise ValueError("raw_primary_time_notes needs raw_primary_tokens")
+        self.raw_primary_tokens = raw_primary_tokens
+        self.raw_primary_time_notes = raw_primary_time_notes
+        if answer_policy not in {
+            "v2",
+            "grounded_v1",
+            "grounded_v2",
+            "grounded_v3",
+            "grounded_v4",
+            "grounded_v5",
+            "grounded_v6",
+            "grounded_v7",
+            "grounded_v8",
+            "grounded_v9",
+            "grounded_v10",
+            "grounded_v11",
+            "grounded_v12",
+            "grounded_v13",
+            "grounded_v14",
+            "grounded_v15",
+            "grounded_v16",
+            "grounded_v17",
+            "grounded_v18",
+        }:
+            raise ValueError(f"unknown answer policy {answer_policy!r}")
+        self.answer_policy = answer_policy
         self.model = model
         self.encoder = encoder
         self.store = store
@@ -166,6 +197,80 @@ class AnswerEngine:
         self.fallback = (
             RawFallback(store, max_turns=raw_fallback_max_turns) if raw_fallback else None
         )
+        self.grounded = None
+        if answer_policy in {
+            "grounded_v1",
+            "grounded_v2",
+            "grounded_v3",
+            "grounded_v4",
+            "grounded_v5",
+            "grounded_v6",
+            "grounded_v7",
+            "grounded_v8",
+            "grounded_v9",
+            "grounded_v10",
+            "grounded_v11",
+            "grounded_v12",
+            "grounded_v13",
+            "grounded_v14",
+            "grounded_v15",
+            "grounded_v16",
+            "grounded_v17",
+            "grounded_v18",
+        }:
+            from llm_long_term_memory.runtime.grounded_answering import (
+                OUTPUT_LIMIT,
+                GroundedAnswerer,
+                GroundedAnswererV2,
+                GroundedAnswererV3,
+                GroundedAnswererV4,
+                GroundedAnswererV5,
+                GroundedAnswererV6,
+                GroundedAnswererV7,
+                GroundedAnswererV8,
+                GroundedAnswererV9,
+                GroundedAnswererV10,
+                GroundedAnswererV11,
+                GroundedAnswererV12,
+                GroundedAnswererV13,
+                GroundedAnswererV14,
+                GroundedAnswererV15,
+                GroundedAnswererV16,
+                GroundedAnswererV17,
+                GroundedAnswererV18,
+            )
+
+            cls = {
+                "grounded_v1": GroundedAnswerer,
+                "grounded_v2": GroundedAnswererV2,
+                "grounded_v3": GroundedAnswererV3,
+                "grounded_v4": GroundedAnswererV4,
+                "grounded_v5": GroundedAnswererV5,
+                "grounded_v6": GroundedAnswererV6,
+                "grounded_v7": GroundedAnswererV7,
+                "grounded_v8": GroundedAnswererV8,
+                "grounded_v9": GroundedAnswererV9,
+                "grounded_v10": GroundedAnswererV10,
+                "grounded_v11": GroundedAnswererV11,
+                "grounded_v12": GroundedAnswererV12,
+                "grounded_v13": GroundedAnswererV13,
+                "grounded_v14": GroundedAnswererV14,
+                "grounded_v15": GroundedAnswererV15,
+                "grounded_v16": GroundedAnswererV16,
+                "grounded_v17": GroundedAnswererV17,
+                "grounded_v18": GroundedAnswererV18,
+            }[answer_policy]
+            self.answer_prompt_version = cls.prompt_version
+            self.grounded = cls(
+                client,
+                model=model,
+                encoder=encoder,
+                store=store,
+                turn_index=raw_primary_turn_index,
+                fallback=self.fallback,
+                chars_per_token=chars_per_token,
+                max_output_tokens=OUTPUT_LIMIT if max_output_tokens == 512 else max_output_tokens,
+            )
 
     def answer_request(
         self,
@@ -187,7 +292,37 @@ class AnswerEngine:
         )
         retrieval_ms = (perf_counter() - started) * 1000
         memories = [hit.memory for hit in retrieved]
+        if self.grounded is not None:
+            answer = self.grounded.answer(request, memories, query)
+            answer.notes.update(
+                {
+                    "top_k": limit or self.top_k,
+                    "temporal": self.temporal,
+                    "retrieval_latency_ms": retrieval_ms,
+                }
+            )
+            return answer
         context = render_context(memories, self.temporal)
+        excerpts = None
+        if self.raw_primary_tokens:
+            from llm_long_term_memory.retrieve.excerpts import archive_excerpts
+
+            # Scoped by `request.user_id` inside `search_turns`: another tenant's turns
+            # cannot be selected (tests/test_product_raw_primary.py).
+            excerpts = archive_excerpts(
+                self.store,
+                request.user_id,
+                request.question,
+                self.raw_primary_tokens,
+                chars_per_token=self.chars_per_token,
+                asked_on=_parse_date(request.asked_on)
+                if self.raw_primary_time_notes and request.asked_on
+                else None,
+                time_notes=self.raw_primary_time_notes,
+            )
+            block = excerpts.render()
+            if block:
+                context = f"{context}\n\n{block}" if context else block
         prompt = _TEMPLATE.format(
             context=context or "No relevant long-term memory was found.",
             date=request.asked_on,
@@ -265,5 +400,7 @@ class AnswerEngine:
                 "fallback_level": evidence.level if evidence else "none",
                 "candidates_considered": len(trace.candidate_ids),
                 "retrieval_latency_ms": retrieval_ms,
+                "raw_primary_turns": len(excerpts.turns) if excerpts else 0,
+                "raw_primary_time_notes": self.raw_primary_time_notes,
             },
         )

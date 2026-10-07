@@ -1,0 +1,31 @@
+{
+  "experiment_class": "exposed-train150-mechanism-development",
+  "pass": false,
+  "reader_count": 0,
+  "grade_count": 0,
+  "correct": 0,
+  "rows": [],
+  "usage": {
+    "total_requests": 2,
+    "total_tokens": 8152,
+    "failures": 1,
+    "by_role": {
+      "answerer": {
+        "role": "answerer",
+        "calls": 2,
+        "failures": 1,
+        "input_tokens": 7988,
+        "output_tokens": 164,
+        "p50_ms": 967.8746671415865,
+        "p95_ms": 1582.736250013113,
+        "max_ms": 1582.736250013113
+      }
+    }
+  },
+  "source_hashes_current": false,
+  "inputs": {
+    "results/raw/prerequisite-reader-v18-v1.readers.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "results/raw/prerequisite-reader-v18-v1.execution.json": "e9467fe8c2a9633cf73cf2dba787183f566677d9788688e1009e785ca6938f99"
+  },
+  "limitations": "Six original-history questions; no population accuracy estimate, no 4x QA, no unseen-final."
+}

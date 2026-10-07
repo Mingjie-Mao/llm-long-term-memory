@@ -144,9 +144,22 @@ def test_raw_only_without_a_budget_is_refused(store, tmp_path):
 def test_the_arms_differ_from_the_control_only_where_registered():
     """Same answer policy and hydration as `two_stage_hydrated`; raw-only has no fallback."""
     import inspect
+    import re
 
     from llm_long_term_memory import cli
 
     source = inspect.getsource(cli)
-    assert '"_hydrated" in variant or variant == "two_stage_raw_primary"' in source
+    hydrated = re.search(
+        r'evidence_hydration="_hydrated" in variant\s+or variant\s+in \{([^}]*)\}', source
+    )
+    assert hydrated is not None
+    assert set(re.findall(r'"(\w+)"', hydrated.group(1))) == {
+        "two_stage_raw_primary",
+        "two_stage_raw_primary_t1",
+        "two_stage_raw_primary_t2",
+        "two_stage_raw_primary_t3",
+        "two_stage_raw_primary_t4",
+        "two_stage_raw_primary_v2",
+        "two_stage_raw_primary_v4",
+    }
     assert cli.RAW_PRIMARY_TOKENS == 4000

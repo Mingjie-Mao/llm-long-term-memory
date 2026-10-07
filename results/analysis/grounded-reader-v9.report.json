@@ -1,0 +1,271 @@
+{
+  "experiment_class": "development/regression; failure-enriched, not overall accuracy",
+  "provider_calls": 0,
+  "inventory_sha256": "d2d3f48c73d79baba006bf7884c8238851ad26a2a63f7f9658c9095fdb9693ed",
+  "inputs": {
+    "results/raw/grounded-reader-v9.answers.jsonl": "f05afcb328e4e5b940ecbc2ab58179cc603941c54a246764425b66c9cd1983f1",
+    "results/analysis/grounded-reader-v9.execution.json": "d2d3f48c73d79baba006bf7884c8238851ad26a2a63f7f9658c9095fdb9693ed",
+    "results/raw/grounded-reader-v9.usage.json": "9541793969620a58dbc1777afe760c6faa5b3f318bacecf38ed54c2bfdfa3259"
+  },
+  "cohorts": {
+    "reasoning-errors": {
+      "readers": 9,
+      "graded": 0,
+      "correct": 0
+    },
+    "originally-correct": {
+      "readers": 10,
+      "graded": 0,
+      "correct": 0
+    }
+  },
+  "grading_complete_for_saved_readers": false,
+  "usage": {
+    "total_requests": 39,
+    "total_tokens": 391164,
+    "failures": 1,
+    "by_role": {
+      "answerer": {
+        "role": "answerer",
+        "calls": 39,
+        "failures": 1,
+        "input_tokens": 372353,
+        "output_tokens": 18811,
+        "p50_ms": 2502.880707848817,
+        "p95_ms": 3750.616249628365,
+        "max_ms": 5497.982542030513
+      }
+    }
+  },
+  "rows": [
+    {
+      "question_id": "09ba9854",
+      "cohort": "reasoning-errors",
+      "answer": "50 $",
+      "correct": null,
+      "judge_reason": null,
+      "reader_passes": 2,
+      "validation_causes": [
+        null,
+        null
+      ]
+    },
+    {
+      "question_id": "51a45a95",
+      "cohort": "reasoning-errors",
+      "answer": "I do not know.",
+      "correct": null,
+      "judge_reason": null,
+      "reader_passes": 2,
+      "validation_causes": [
+        "validated_lookup",
+        "validated_lookup"
+      ]
+    },
+    {
+      "question_id": "6e984301",
+      "cohort": "reasoning-errors",
+      "answer": "I do not know.",
+      "correct": null,
+      "judge_reason": null,
+      "reader_passes": 2,
+      "validation_causes": [
+        null,
+        "duration_group_endpoints_invalid"
+      ]
+    },
+    {
+      "question_id": "b46e15ed",
+      "cohort": "reasoning-errors",
+      "answer": "2 months and 3 days",
+      "correct": null,
+      "judge_reason": null,
+      "reader_passes": 2,
+      "validation_causes": [
+        null,
+        null
+      ]
+    },
+    {
+      "question_id": "eaca4986",
+      "cohort": "reasoning-errors",
+      "answer": "The chord progression for the chorus in the second song is C D E F G A B A G F E D C.",
+      "correct": null,
+      "judge_reason": null,
+      "reader_passes": 2,
+      "validation_causes": [
+        "validated_lookup",
+        "validated_lookup"
+      ]
+    },
+    {
+      "question_id": "f685340e",
+      "cohort": "reasoning-errors",
+      "answer": "Previously, you played tennis with your friends weekly. Now, you play every other week.",
+      "correct": null,
+      "judge_reason": null,
+      "reader_passes": 2,
+      "validation_causes": [
+        "validated_lookup",
+        "validated_lookup"
+      ]
+    },
+    {
+      "question_id": "f9e8c073",
+      "cohort": "reasoning-errors",
+      "answer": "You attended five sessions of the bereavement support group.",
+      "correct": null,
+      "judge_reason": null,
+      "reader_passes": 2,
+      "validation_causes": [
+        "validated_lookup",
+        "validated_lookup"
+      ]
+    },
+    {
+      "question_id": "gpt4_7a0daae1",
+      "cohort": "reasoning-errors",
+      "answer": "1 weeks",
+      "correct": null,
+      "judge_reason": null,
+      "reader_passes": 2,
+      "validation_causes": [
+        null,
+        null
+      ]
+    },
+    {
+      "question_id": "gpt4_a1b77f9c",
+      "cohort": "reasoning-errors",
+      "answer": "I do not know.",
+      "correct": null,
+      "judge_reason": null,
+      "reader_passes": 2,
+      "validation_causes": [
+        "observation_quote_invalid",
+        "date_expression_not_quoted"
+      ]
+    },
+    {
+      "question_id": "0ddfec37_abs",
+      "cohort": "originally-correct",
+      "answer": "I do not know.",
+      "correct": null,
+      "judge_reason": null,
+      "reader_passes": 2,
+      "validation_causes": [
+        "no_operands",
+        "no_operands"
+      ]
+    },
+    {
+      "question_id": "1568498a",
+      "cohort": "originally-correct",
+      "answer": "The move I made after 27. Kg2 Bd5+ was 28. Kg3.",
+      "correct": null,
+      "judge_reason": null,
+      "reader_passes": 2,
+      "validation_causes": [
+        "validated_lookup",
+        "validated_lookup"
+      ]
+    },
+    {
+      "question_id": "6456829e",
+      "cohort": "originally-correct",
+      "answer": "8 plants",
+      "correct": null,
+      "judge_reason": null,
+      "reader_passes": 2,
+      "validation_causes": [
+        null,
+        null
+      ]
+    },
+    {
+      "question_id": "95228167",
+      "cohort": "originally-correct",
+      "answer": "As you prepare for your visit to the music store to check out a Gibson Les Paul, you might want to look into models that feature a coil-tap or coil-splitting option. This can give you extra tonal flexibility and options, which is especially handy if you like experimenting with alternate tunings like open D.",
+      "correct": null,
+      "judge_reason": null,
+      "reader_passes": 2,
+      "validation_causes": [
+        "validated_lookup",
+        "validated_lookup"
+      ]
+    },
+    {
+      "question_id": "a89d7624",
+      "cohort": "originally-correct",
+      "answer": "For your upcoming trip to Denver, you can explore the city's music venues and festivals previously recommended, such as Red Rocks Park and Amphitheatre (where you previously planned to dine at The Ship Rock Grille), The Ogden Theatre, The Bluebird Theater, The Fillmore Auditorium, and Larimer Lounge. You might also check out Twist & Shout Records or festivals like Grandoozy, the Denver Folk Festival, and the Denver Jazz Festival.",
+      "correct": null,
+      "judge_reason": null,
+      "reader_passes": 2,
+      "validation_causes": [
+        "validated_lookup",
+        "validated_lookup"
+      ]
+    },
+    {
+      "question_id": "af8d2e46",
+      "cohort": "originally-correct",
+      "answer": "You packed 7 shirts for your trip to Costa Rica.",
+      "correct": null,
+      "judge_reason": null,
+      "reader_passes": 2,
+      "validation_causes": [
+        "validated_lookup",
+        "validated_lookup"
+      ]
+    },
+    {
+      "question_id": "ed4ddc30",
+      "cohort": "originally-correct",
+      "answer": "You currently have 20 dozen eggs stocked up in your refrigerator.",
+      "correct": null,
+      "judge_reason": null,
+      "reader_passes": 2,
+      "validation_causes": [
+        "fact_not_included",
+        "validated_lookup"
+      ]
+    },
+    {
+      "question_id": "gpt4_2f8be40d",
+      "cohort": "originally-correct",
+      "answer": "5: college roommate's wedding, cousin's wedding, friend's wedding, cousin's wedding, sister's wedding",
+      "correct": null,
+      "judge_reason": null,
+      "reader_passes": 2,
+      "validation_causes": [
+        "operand_not_included_in_review",
+        null
+      ]
+    },
+    {
+      "question_id": "gpt4_7ddcf75f",
+      "cohort": "originally-correct",
+      "answer": "I do not know.",
+      "correct": null,
+      "judge_reason": null,
+      "reader_passes": 2,
+      "validation_causes": [
+        null,
+        "date_must_be_resolved_from_expression"
+      ]
+    },
+    {
+      "question_id": "gpt4_a2d1d1f6",
+      "cohort": "originally-correct",
+      "answer": "3 days",
+      "correct": null,
+      "judge_reason": null,
+      "reader_passes": 2,
+      "validation_causes": [
+        null,
+        null
+      ]
+    }
+  ],
+  "generator_sha256": "821ae9db7a157aa5216eab6ded137658e4af42a1f2bf02390488bb9946d327b4"
+}

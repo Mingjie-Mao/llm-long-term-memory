@@ -1,0 +1,72 @@
+{
+  "quota_reset_waits": 2,
+  "amended": [
+    {
+      "stage": "baseline-rep2",
+      "returncode": 0
+    },
+    {
+      "stage": "baseline-rep2",
+      "returncode": 0
+    }
+  ],
+  "previous_stops": [
+    {
+      "pid": 23660,
+      "status": "STOPPED",
+      "started_at": "2026-10-04T16:56:58.188493+00:00",
+      "readers_progress": {
+        "status": "QUOTA_WAIT",
+        "stage": "readers",
+        "arm": "candidate",
+        "repeat": 2,
+        "readers": 56,
+        "available": 9,
+        "required_headroom": 10
+      },
+      "grading_progress": {
+        "status": "INCOMPLETE",
+        "reason": "durable judge recovery budget exhausted",
+        "stage": "grades",
+        "arm": "baseline",
+        "repeat": 2,
+        "readers": 100,
+        "grades": 71
+      },
+      "finished_at": "2026-10-04T16:57:12.482932+00:00",
+      "reason": "grade stage failure",
+      "returncode": 2,
+      "note": "driver did not recognise the restart-time exhaustion message; zero provider calls; fixed and relaunched"
+    },
+    {
+      "status": "STOPPED",
+      "reason": "reader stage failure",
+      "returncode": 1,
+      "finished_at": "2026-10-06T07:56:55.872935+00:00"
+    }
+  ],
+  "pid": 11365,
+  "started_at": "2026-10-06T13:44:32.434905+00:00",
+  "readers_progress": {
+    "status": "RUNNING",
+    "stage": "readers",
+    "arm": "candidate",
+    "repeat": 3,
+    "readers": 100,
+    "grades": 0
+  },
+  "grading_progress": {
+    "status": "COMPLETE",
+    "pass": false
+  },
+  "transport_restarts": [
+    {
+      "at": "2026-10-06T07:56:55.872935+00:00",
+      "error": "httpx.ReadTimeout",
+      "returncode": 1,
+      "note": "stop before amendment 2; counted as the first use"
+    }
+  ],
+  "status": "GATE_WRITTEN",
+  "finished_at": "2026-10-06T14:22:02.041750+00:00"
+}

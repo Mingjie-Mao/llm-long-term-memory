@@ -1,0 +1,258 @@
+{
+  "experiment_class": "development/regression; failure-enriched, not overall accuracy",
+  "provider_calls": 0,
+  "inventory_sha256": "b2920c4aef920b9df5c0b0c9ce6441861c3e71e5c8483f5be676b088d009f30f",
+  "inputs": {
+    "results/raw/grounded-reader-v14.answers.jsonl": "ac60eeddbbec0a058806469deae612be953d47d9645f255795ae6d51d65a0911",
+    "results/analysis/grounded-reader-v14.execution.json": "b2920c4aef920b9df5c0b0c9ce6441861c3e71e5c8483f5be676b088d009f30f",
+    "results/raw/grounded-reader-v14.usage.json": "67804b046788f25f87ca8170aaded5a5276483d39807d6171861b4f5fdac0651"
+  },
+  "cohorts": {
+    "reasoning-errors": {
+      "readers": 9,
+      "graded": 0,
+      "correct": 0
+    },
+    "originally-correct": {
+      "readers": 10,
+      "graded": 0,
+      "correct": 0
+    }
+  },
+  "grading_complete_for_saved_readers": false,
+  "usage": {
+    "total_requests": 26,
+    "total_tokens": 268183,
+    "failures": 1,
+    "by_role": {
+      "answerer": {
+        "role": "answerer",
+        "calls": 26,
+        "failures": 1,
+        "input_tokens": 254986,
+        "output_tokens": 13197,
+        "p50_ms": 2459.4816248863935,
+        "p95_ms": 3777.895249892026,
+        "max_ms": 3990.1045421138406
+      }
+    }
+  },
+  "rows": [
+    {
+      "question_id": "09ba9854",
+      "cohort": "reasoning-errors",
+      "answer": "About 50 $",
+      "correct": null,
+      "judge_reason": null,
+      "reader_passes": 1,
+      "validation_causes": [
+        null
+      ]
+    },
+    {
+      "question_id": "51a45a95",
+      "cohort": "reasoning-errors",
+      "answer": "Likely Target, based on the shopping context in the same conversation. The redemption statement itself does not name the place.",
+      "correct": null,
+      "judge_reason": null,
+      "reader_passes": 2,
+      "validation_causes": [
+        null,
+        null
+      ]
+    },
+    {
+      "question_id": "6e984301",
+      "cohort": "reasoning-errors",
+      "answer": "3 weeks",
+      "correct": null,
+      "judge_reason": null,
+      "reader_passes": 1,
+      "validation_causes": [
+        null
+      ]
+    },
+    {
+      "question_id": "b46e15ed",
+      "cohort": "reasoning-errors",
+      "answer": "2 months and 3 days",
+      "correct": null,
+      "judge_reason": null,
+      "reader_passes": 2,
+      "validation_causes": [
+        null,
+        null
+      ]
+    },
+    {
+      "question_id": "eaca4986",
+      "cohort": "reasoning-errors",
+      "answer": "C D E F G A B A G F E D C",
+      "correct": null,
+      "judge_reason": null,
+      "reader_passes": 2,
+      "validation_causes": [
+        null,
+        null
+      ]
+    },
+    {
+      "question_id": "f685340e",
+      "cohort": "reasoning-errors",
+      "answer": "Previously, you played tennis weekly with friends. Now, you play every other week.",
+      "correct": null,
+      "judge_reason": null,
+      "reader_passes": 1,
+      "validation_causes": [
+        "validated_lookup"
+      ]
+    },
+    {
+      "question_id": "f9e8c073",
+      "cohort": "reasoning-errors",
+      "answer": "The records state 3 sessions (period unspecified); 5 sessions (last year). A combined total cannot be determined from these records.",
+      "correct": null,
+      "judge_reason": null,
+      "reader_passes": 1,
+      "validation_causes": [
+        null
+      ]
+    },
+    {
+      "question_id": "gpt4_7a0daae1",
+      "cohort": "reasoning-errors",
+      "answer": "1 weeks",
+      "correct": null,
+      "judge_reason": null,
+      "reader_passes": 1,
+      "validation_causes": [
+        null
+      ]
+    },
+    {
+      "question_id": "gpt4_a1b77f9c",
+      "cohort": "reasoning-errors",
+      "answer": "I do not know.",
+      "correct": null,
+      "judge_reason": null,
+      "reader_passes": 2,
+      "validation_causes": [
+        "number_not_in_quote",
+        "number_not_in_quote"
+      ]
+    },
+    {
+      "question_id": "0ddfec37_abs",
+      "cohort": "originally-correct",
+      "answer": "I do not know.",
+      "correct": null,
+      "judge_reason": null,
+      "reader_passes": 2,
+      "validation_causes": [
+        "zero_not_stated",
+        "no_operands"
+      ]
+    },
+    {
+      "question_id": "1568498a",
+      "cohort": "originally-correct",
+      "answer": "28. Kg3 would be my move.",
+      "correct": null,
+      "judge_reason": null,
+      "reader_passes": 1,
+      "validation_causes": [
+        null
+      ]
+    },
+    {
+      "question_id": "6456829e",
+      "cohort": "originally-correct",
+      "answer": "8 plants",
+      "correct": null,
+      "judge_reason": null,
+      "reader_passes": 1,
+      "validation_causes": [
+        null
+      ]
+    },
+    {
+      "question_id": "95228167",
+      "cohort": "originally-correct",
+      "answer": "Since you're considering an upgrade from a Fender Stratocaster to a Gibson Les Paul, here are a few key things to look for and test out at the music store this weekend: \n\n1. **Model Variations & Pickups:** Pay close attention to the pickups (humbuckers vs. single-coils) and see if you can test out a model with coil-tap or coil-splitting features, which can give you extra tonal flexibility.\n2. **Neck Profile & Weight:** Les Pauls are known for having a thicker neck profile and a heavier, more solid body compared to a Stratocaster, so make sure the feel and weight balance work comfortably for you.\n3. **Acoustic and Electric Response:** Try it out with different amp settings or even test how it handles alternative tunings (like open D) if that's something you enjoy playing.",
+      "correct": null,
+      "judge_reason": null,
+      "reader_passes": 1,
+      "validation_causes": [
+        "validated_lookup"
+      ]
+    },
+    {
+      "question_id": "a89d7624",
+      "cohort": "originally-correct",
+      "answer": "For your upcoming trip to Denver, you previously showed interest in the city's vibrant music scene. Top recommendations include visiting iconic music venues like Red Rocks Park and Amphitheatre (where you can dine at The Ship Rock Grille), The Ogden Theatre, The Bluebird Theater, The Fillmore Auditorium, Larimer Lounge, The hi-dive, and The Marquis Theater, as well as checking out Twist & Shout Records. You might also explore local festivals such as Grandoozy, the Denver Folk Festival, Denver Jazz Festival, Westword Music Showcase, and Riot Fest Denver.",
+      "correct": null,
+      "judge_reason": null,
+      "reader_passes": 1,
+      "validation_causes": [
+        "validated_lookup"
+      ]
+    },
+    {
+      "question_id": "af8d2e46",
+      "cohort": "originally-correct",
+      "answer": "You packed 7 shirts for your trip to Costa Rica.",
+      "correct": null,
+      "judge_reason": null,
+      "reader_passes": 1,
+      "validation_causes": [
+        "validated_lookup"
+      ]
+    },
+    {
+      "question_id": "ed4ddc30",
+      "cohort": "originally-correct",
+      "answer": "20 dozen eggs",
+      "correct": null,
+      "judge_reason": null,
+      "reader_passes": 1,
+      "validation_causes": [
+        null
+      ]
+    },
+    {
+      "question_id": "gpt4_2f8be40d",
+      "cohort": "originally-correct",
+      "answer": "I do not know.",
+      "correct": null,
+      "judge_reason": null,
+      "reader_passes": 2,
+      "validation_causes": [
+        "count_period_or_attendance_not_supported",
+        "count_period_or_attendance_not_supported"
+      ]
+    },
+    {
+      "question_id": "gpt4_7ddcf75f",
+      "cohort": "originally-correct",
+      "answer": "3 days",
+      "correct": null,
+      "judge_reason": null,
+      "reader_passes": 1,
+      "validation_causes": [
+        null
+      ]
+    },
+    {
+      "question_id": "gpt4_a2d1d1f6",
+      "cohort": "originally-correct",
+      "answer": "3 days",
+      "correct": null,
+      "judge_reason": null,
+      "reader_passes": 1,
+      "validation_causes": [
+        null
+      ]
+    }
+  ],
+  "generator_sha256": "821ae9db7a157aa5216eab6ded137658e4af42a1f2bf02390488bb9946d327b4"
+}

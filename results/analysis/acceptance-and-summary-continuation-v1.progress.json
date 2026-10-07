@@ -1,0 +1,27 @@
+{
+  "quota_reset_waits": 1,
+  "started_at": "2026-10-04T02:21:51.988736+00:00",
+  "pid": 12537,
+  "status": "STOPPED",
+  "updated_at": "2026-10-04T02:37:04.341541+00:00",
+  "primary_readers_progress": {
+    "status": "QUOTA_WAIT",
+    "stage": "readers",
+    "arm": "candidate",
+    "repeat": 2,
+    "readers": 56,
+    "available": 9,
+    "required_headroom": 10
+  },
+  "primary_grading_progress": {
+    "status": "INCOMPLETE",
+    "reason": "judge recovery stopped; saved readers remain intact",
+    "stage": "grades",
+    "arm": "baseline",
+    "repeat": 2,
+    "readers": 100,
+    "grades": 71
+  },
+  "reason": "primary grading failure",
+  "returncode": 2
+}

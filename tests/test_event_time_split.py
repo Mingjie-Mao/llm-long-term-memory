@@ -193,6 +193,25 @@ def test_an_ordinary_date_is_still_read_when_another_clause_mentions_before():
     ) == datetime(2023, 1, 29)
 
 
+@pytest.mark.parametrize(
+    "phrase,anchor",
+    [
+        ("4000 years ago", datetime(2023, 3, 15)),
+        ("999999999 days ago", datetime(2023, 3, 15)),
+        ("999999999 weeks ago", datetime(2023, 3, 15)),
+        ("999999999 months ago", datetime(2023, 3, 15)),
+        ("9" * 5000 + " years ago", datetime(2023, 3, 15)),
+        ("yesterday", datetime.min),
+        ("tomorrow", datetime.max),
+        ("last January", datetime(1, 1, 1)),
+    ],
+)
+def test_relative_date_overflow_is_unresolved_with_original_words(phrase, anchor):
+    result = temporal_evidence("The event was " + phrase + ".", anchor)
+    assert result.exact is None and result.estimate is None
+    assert result.precision == "unresolved" and result.expression == phrase
+
+
 def test_ordering_still_has_a_time_when_the_fact_gives_none():
     memory = _memory(observed_at=MARCH)
 

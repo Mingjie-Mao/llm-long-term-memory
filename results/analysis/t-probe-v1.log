@@ -1,0 +1,1946 @@
+== 2026-10-06T16:51:42Z two_stage_raw_primary train150
+observed limits: gemini-3.1-flash-lite rpd=500 rpm=15, gemini-3.5-flash-lite 
+rpd=500 rpm=15, gemma-4-31b-it rpd=1500 rpm=10
+two_stage_raw_primary.t-probe-v1 · regression · 31 questions · 
+answerer=gemini-3.5-flash-lite judge=gemma-4-31b-it · top_k=20 rerank=False
+→ results/raw/two_stage_raw_primary.t-probe-v1.jsonl
+
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/regex/_main.py:477: EncodingWarning: UTF-8 Mode affects locale.getpreferredencoding(). Consider locale.getencoding() instead.
+  pattern_locale = _getpreferredencoding(False)
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/regex/_main.py:477: EncodingWarning: UTF-8 Mode affects locale.getpreferredencoding(). Consider locale.getencoding() instead.
+  pattern_locale = _getpreferredencoding(False)
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/regex/_main.py:477: EncodingWarning: UTF-8 Mode affects locale.getpreferredencoding(). Consider locale.getencoding() instead.
+  pattern_locale = _getpreferredencoding(False)
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/regex/_main.py:477: EncodingWarning: UTF-8 Mode affects locale.getpreferredencoding(). Consider locale.getencoding() instead.
+  pattern_locale = _getpreferredencoding(False)
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/utils/_auth.py:152: EncodingWarning: 'encoding' argument not specified
+  return _clean_token(Path(constants.HF_TOKEN_PATH).read_text())
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/file_download.py:1123: EncodingWarning: 'encoding' argument not specified
+  with open(ref_path) as f:
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/utils/_auth.py:152: EncodingWarning: 'encoding' argument not specified
+  return _clean_token(Path(constants.HF_TOKEN_PATH).read_text())
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/file_download.py:1123: EncodingWarning: 'encoding' argument not specified
+  with open(ref_path) as f:
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/file_download.py:1548: EncodingWarning: 'encoding' argument not specified
+  with open(revision_file) as f:
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/regex/_main.py:477: EncodingWarning: UTF-8 Mode affects locale.getpreferredencoding(). Consider locale.getencoding() instead.
+  pattern_locale = _getpreferredencoding(False)
+Loading weights:   0%|          | 0/103 [00:00<?, ?it/s]Loading weights: 100%|██████████| 103/103 [00:00<00:00, 6327.55it/s]
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/_snapshot_download.py:312: EncodingWarning: 'encoding' argument not specified
+  with open(ref_path) as f:
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/utils/_auth.py:152: EncodingWarning: 'encoding' argument not specified
+  return _clean_token(Path(constants.HF_TOKEN_PATH).read_text())
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/file_download.py:1123: EncodingWarning: 'encoding' argument not specified
+  with open(ref_path) as f:
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/utils/_auth.py:152: EncodingWarning: 'encoding' argument not specified
+  return _clean_token(Path(constants.HF_TOKEN_PATH).read_text())
+✗ [1/31] 09ba9854             multi-session              acc=0.0% ctx=5,704
+✓ [2/31] 0ddfec37_abs         knowledge-update           acc=50.0% ctx=5,861
+✓ [3/31] 25e5aa4f             single-session-user        acc=66.7% ctx=5,536
+✗ [4/31] 36b9f61e             multi-session              acc=50.0% ctx=5,478
+✓ [5/31] 3a704032             multi-session              acc=60.0% ctx=5,713
+✓ [6/31] 45dc21b6             knowledge-update           acc=66.7% ctx=5,787
+✗ [7/31] 6e984301             temporal-reasoning         acc=57.1% ctx=5,694
+✗ [8/31] 9d25d4e0             multi-session              acc=50.0% ctx=6,263
+✓ [9/31] 9ea5eabc             knowledge-update           acc=55.6% ctx=5,741
+✓ [10/31] a1cc6108             multi-session              acc=60.0% ctx=5,668
+✗ [11/31] a3838d2b             temporal-reasoning         acc=54.5% ctx=5,606
+✗ [12/31] a9f6b44c             multi-session              acc=50.0% ctx=5,604
+✓ [13/31] afdc33df             single-session-preference  acc=53.8% ctx=5,788
+✗ [14/31] b46e15ed             temporal-reasoning         acc=50.0% ctx=6,240
+✗ [15/31] e3038f8c             multi-session              acc=46.7% ctx=5,691
+✓ [16/31] e48988bc             single-session-assistant   acc=50.0% ctx=5,821
+✗ [17/31] eeda8a6d             multi-session              acc=47.1% ctx=6,257
+✗ [18/31] f685340e             knowledge-update           acc=44.4% ctx=5,658
+✓ [19/31] f9e8c073             knowledge-update           acc=47.4% ctx=5,615
+╭───────────────────── Traceback (most recent call last) ──────────────────────╮
+│ /Users/mingjie/Desktop/llm-long-term-memory/src/llm_long_term_memory/command │
+│ s/eval_execution.py:154 in eval_run                                          │
+│                                                                              │
+│   151 │   │   │   │   highlight=False,                                       │
+│   152 │   │   │   )                                                          │
+│   153 │   │                                                                  │
+│ ❱ 154 │   │   report = run_eval(                                             │
+│   155 │   │   │   runner,                                                    │
+│   156 │   │   │   judge,                                                     │
+│   157 │   │   │   instances,                                                 │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/src/llm_long_term_memory/evaluat │
+│ ion/harness.py:157 in run_eval                                               │
+│                                                                              │
+│   154 │   path.parent.mkdir(parents=True, exist_ok=True)                     │
+│   155 │                                                                      │
+│   156 │   with _exclusive(path):                                             │
+│ ❱ 157 │   │   return _run_eval_locked(runner, judge, instances, path, usage, │
+│       resume, on_progress)                                                   │
+│   158                                                                        │
+│   159                                                                        │
+│   160 class StoreChanged(RuntimeError):                                      │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/src/llm_long_term_memory/evaluat │
+│ ion/harness.py:239 in _run_eval_locked                                       │
+│                                                                              │
+│   236 │   │   │   try:                                                       │
+│   237 │   │   │   │   runner.prepare(inst)                                   │
+│   238 │   │   │   │   answer = runner.answer(inst)                           │
+│ ❱ 239 │   │   │   │   verdict = judge.grade(                                 │
+│   240 │   │   │   │   │   question=inst.question,                            │
+│   241 │   │   │   │   │   gold=inst.answer,                                  │
+│   242 │   │   │   │   │   hypothesis=answer.text,                            │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/src/llm_long_term_memory/evaluat │
+│ ion/judge.py:157 in grade                                                    │
+│                                                                              │
+│   154 │   │   │   return JudgeResult(False, "empty answer", 0, 0)            │
+│   155 │   │                                                                  │
+│   156 │   │   prompt = self._prompt_for(question, gold, hypothesis,          │
+│       is_abstention, question_type)                                          │
+│ ❱ 157 │   │   completion = self.client.generate(                             │
+│   158 │   │   │   role="judge",                                              │
+│   159 │   │   │   model=self.model,                                          │
+│   160 │   │   │   prompt=prompt,                                             │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/src/llm_long_term_memory/llm/cli │
+│ ent.py:250 in generate                                                       │
+│                                                                              │
+│   247 │   │   │   try:                                                       │
+│   248 │   │   │   │   api_started = time.perf_counter()                      │
+│   249 │   │   │   │   with self.usage.measure(role, model) as box:           │
+│ ❱ 250 │   │   │   │   │   resp = self._client.models.generate_content(       │
+│   251 │   │   │   │   │   │   model=model, contents=prompt, config=config    │
+│   252 │   │   │   │   │   )                                                  │
+│   253 │   │   │   │   │   u = resp.usage_metadata                            │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packag │
+│ es/google/genai/models.py:6604 in generate_content                           │
+│                                                                              │
+│   6601 │   │   │   'afc',                                                    │
+│   6602 │   │   )                                                             │
+│   6603 │     i += 1                                                          │
+│ ❱ 6604 │     response = self._generate_content(                              │
+│   6605 │   │     model=model, contents=contents,                             │
+│        config=parsed_config_to_call                                          │
+│   6606 │     )                                                               │
+│   6607                                                                       │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packag │
+│ es/google/genai/models.py:5028 in _generate_content                          │
+│                                                                              │
+│   5025 │   request_dict = _common.convert_to_dict(request_dict)              │
+│   5026 │   request_dict = _common.encode_unserializable_types(request_dict)  │
+│   5027 │                                                                     │
+│ ❱ 5028 │   response = self._api_client.request(                              │
+│   5029 │   │   'post', path, request_dict, http_options                      │
+│   5030 │   )                                                                 │
+│   5031                                                                       │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packag │
+│ es/google/genai/_api_client.py:1708 in request                               │
+│                                                                              │
+│   1705 │   http_request = self._build_request(                               │
+│   1706 │   │   http_method, path, request_dict, http_options                 │
+│   1707 │   )                                                                 │
+│ ❱ 1708 │   response = self._request(http_request, http_options,              │
+│        stream=False)                                                         │
+│   1709 │   response_body = (                                                 │
+│   1710 │   │   response.response_stream[0] if response.response_stream else  │
+│        ''                                                                    │
+│   1711 │   )                                                                 │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packag │
+│ es/google/genai/_api_client.py:1495 in _request                              │
+│                                                                              │
+│   1492 │   │   retry = tenacity.Retrying(**retry_kwargs)                     │
+│   1493 │   │   return retry(self._request_once, http_request, stream)  #     │
+│        type: ignore[no-any-return]                                           │
+│   1494 │                                                                     │
+│ ❱ 1495 │   return self._retry(self._request_once, http_request, stream)  #   │
+│        type: ignore[no-any-return]                                           │
+│   1496                                                                       │
+│   1497   async def _async_request_once(                                      │
+│   1498 │     self, http_request: HttpRequest, stream: bool = False           │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packag │
+│ es/tenacity/__init__.py:470 in __call__                                      │
+│                                                                              │
+│   467 │   │                                                                  │
+│   468 │   │   retry_state = RetryCallState(retry_object=self, fn=fn,         │
+│       args=args, kwargs=kwargs)                                              │
+│   469 │   │   while True:                                                    │
+│ ❱ 470 │   │   │   do = self.iter(retry_state=retry_state)                    │
+│   471 │   │   │   if isinstance(do, DoAttempt):                              │
+│   472 │   │   │   │   try:                                                   │
+│   473 │   │   │   │   │   result = fn(*args, **kwargs)                       │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packag │
+│ es/tenacity/__init__.py:371 in iter                                          │
+│                                                                              │
+│   368 │   │   self._begin_iter(retry_state)                                  │
+│   369 │   │   result = None                                                  │
+│   370 │   │   for action in self.iter_state.actions:                         │
+│ ❱ 371 │   │   │   result = action(retry_state)                               │
+│   372 │   │   return result                                                  │
+│   373 │                                                                      │
+│   374 │   def _begin_iter(self, retry_state: "RetryCallState") -> None:  #   │
+│       noqa                                                                   │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packag │
+│ es/tenacity/__init__.py:413 in exc_check                                     │
+│                                                                              │
+│   410 │   │   │   │   fut = t.cast(Future, rs.outcome)                       │
+│   411 │   │   │   │   retry_exc = self.retry_error_cls(fut)                  │
+│   412 │   │   │   │   if self.reraise:                                       │
+│ ❱ 413 │   │   │   │   │   raise retry_exc.reraise()                          │
+│   414 │   │   │   │   raise retry_exc from fut.exception()                   │
+│   415 │   │   │                                                              │
+│   416 │   │   │   self._add_action_func(exc_check)                           │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packag │
+│ es/tenacity/__init__.py:184 in reraise                                       │
+│                                                                              │
+│   181 │                                                                      │
+│   182 │   def reraise(self) -> t.NoReturn:                                   │
+│   183 │   │   if self.last_attempt.failed:                                   │
+│ ❱ 184 │   │   │   raise self.last_attempt.result()                           │
+│   185 │   │   raise self                                                     │
+│   186 │                                                                      │
+│   187 │   def __str__(self) -> str:                                          │
+│                                                                              │
+│ /Users/mingjie/.local/share/uv/python/cpython-3.12.13-macos-aarch64-none/lib │
+│ /python3.12/concurrent/futures/_base.py:449 in result                        │
+│                                                                              │
+│   446 │   │   │   │   if self._state in [CANCELLED, CANCELLED_AND_NOTIFIED]: │
+│   447 │   │   │   │   │   raise CancelledError()                             │
+│   448 │   │   │   │   elif self._state == FINISHED:                          │
+│ ❱ 449 │   │   │   │   │   return self.__get_result()                         │
+│   450 │   │   │   │                                                          │
+│   451 │   │   │   │   self._condition.wait(timeout)                          │
+│   452                                                                        │
+│                                                                              │
+│ /Users/mingjie/.local/share/uv/python/cpython-3.12.13-macos-aarch64-none/lib │
+│ /python3.12/concurrent/futures/_base.py:401 in __get_result                  │
+│                                                                              │
+│   398 │   def __get_result(self):                                            │
+│   399 │   │   if self._exception:                                            │
+│   400 │   │   │   try:                                                       │
+│ ❱ 401 │   │   │   │   raise self._exception                                  │
+│   402 │   │   │   finally:                                                   │
+│   403 │   │   │   │   # Break a reference cycle with the exception in        │
+│       self._exception                                                        │
+│   404 │   │   │   │   self = None                                            │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packag │
+│ es/tenacity/__init__.py:473 in __call__                                      │
+│                                                                              │
+│   470 │   │   │   do = self.iter(retry_state=retry_state)                    │
+│   471 │   │   │   if isinstance(do, DoAttempt):                              │
+│   472 │   │   │   │   try:                                                   │
+│ ❱ 473 │   │   │   │   │   result = fn(*args, **kwargs)                       │
+│   474 │   │   │   │   except BaseException:  # noqa: B902                    │
+│   475 │   │   │   │   │   retry_state.set_exception(sys.exc_info())  # type: │
+│       ignore[arg-type]                                                       │
+│   476 │   │   │   │   else:                                                  │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packag │
+│ es/google/genai/_api_client.py:1472 in _request_once                         │
+│                                                                              │
+│   1469 │   │     timeout=http_request.timeout,                               │
+│   1470 │     )                                                               │
+│   1471 │     response = self._httpx_client.send(httpx_request,               │
+│        stream=stream)  # type: ignore[union-attr]                            │
+│ ❱ 1472 │   errors.APIError.raise_for_response(response)                      │
+│   1473 │   return HttpResponse(                                              │
+│   1474 │   │   response.headers, response if stream else [response.text]     │
+│   1475 │   )                                                                 │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packag │
+│ es/google/genai/errors.py:155 in raise_for_response                          │
+│                                                                              │
+│   152 │   else:                                                              │
+│   153 │     response_json = response.body_segments[0].get('error', {})       │
+│   154 │                                                                      │
+│ ❱ 155 │   cls.raise_error(response.status_code, response_json, response)     │
+│   156                                                                        │
+│   157   @classmethod                                                         │
+│   158   def raise_error(                                                     │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packag │
+│ es/google/genai/errors.py:186 in raise_error                                 │
+│                                                                              │
+│   183 │   if 400 <= status_code < 500:                                       │
+│   184 │     raise ClientError(status_code, response_json, response)          │
+│   185 │   elif 500 <= status_code < 600:                                     │
+│ ❱ 186 │     raise ServerError(status_code, response_json, response)          │
+│   187 │   else:                                                              │
+│   188 │     raise cls(status_code, response_json, response)                  │
+│   189                                                                        │
+╰──────────────────────────────────────────────────────────────────────────────╯
+ServerError: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is 
+currently experiencing high demand. Spikes in demand are usually temporary. 
+Please try again later.', 'status': 'UNAVAILABLE'}}
+rc=1 two_stage_raw_primary train150
+== 2026-10-06T17:06:13Z two_stage_raw_primary_t1 train150
+observed limits: gemini-3.1-flash-lite rpd=500 rpm=15, gemini-3.5-flash-lite 
+rpd=500 rpm=15, gemma-4-31b-it rpd=1500 rpm=10
+two_stage_raw_primary_t1.t-probe-v1 · regression · 31 questions · 
+answerer=gemini-3.5-flash-lite judge=gemma-4-31b-it · top_k=20 rerank=False
+→ results/raw/two_stage_raw_primary_t1.t-probe-v1.jsonl
+
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/regex/_main.py:477: EncodingWarning: UTF-8 Mode affects locale.getpreferredencoding(). Consider locale.getencoding() instead.
+  pattern_locale = _getpreferredencoding(False)
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/regex/_main.py:477: EncodingWarning: UTF-8 Mode affects locale.getpreferredencoding(). Consider locale.getencoding() instead.
+  pattern_locale = _getpreferredencoding(False)
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/regex/_main.py:477: EncodingWarning: UTF-8 Mode affects locale.getpreferredencoding(). Consider locale.getencoding() instead.
+  pattern_locale = _getpreferredencoding(False)
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/regex/_main.py:477: EncodingWarning: UTF-8 Mode affects locale.getpreferredencoding(). Consider locale.getencoding() instead.
+  pattern_locale = _getpreferredencoding(False)
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/utils/_auth.py:152: EncodingWarning: 'encoding' argument not specified
+  return _clean_token(Path(constants.HF_TOKEN_PATH).read_text())
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/file_download.py:1123: EncodingWarning: 'encoding' argument not specified
+  with open(ref_path) as f:
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/utils/_auth.py:152: EncodingWarning: 'encoding' argument not specified
+  return _clean_token(Path(constants.HF_TOKEN_PATH).read_text())
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/file_download.py:1123: EncodingWarning: 'encoding' argument not specified
+  with open(ref_path) as f:
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/file_download.py:1548: EncodingWarning: 'encoding' argument not specified
+  with open(revision_file) as f:
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/regex/_main.py:477: EncodingWarning: UTF-8 Mode affects locale.getpreferredencoding(). Consider locale.getencoding() instead.
+  pattern_locale = _getpreferredencoding(False)
+Loading weights:   0%|          | 0/103 [00:00<?, ?it/s]Loading weights: 100%|██████████| 103/103 [00:00<00:00, 4635.04it/s]
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/_snapshot_download.py:312: EncodingWarning: 'encoding' argument not specified
+  with open(ref_path) as f:
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/utils/_auth.py:152: EncodingWarning: 'encoding' argument not specified
+  return _clean_token(Path(constants.HF_TOKEN_PATH).read_text())
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/file_download.py:1123: EncodingWarning: 'encoding' argument not specified
+  with open(ref_path) as f:
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/utils/_auth.py:152: EncodingWarning: 'encoding' argument not specified
+  return _clean_token(Path(constants.HF_TOKEN_PATH).read_text())
+✗ [1/31] 09ba9854             multi-session              acc=0.0% ctx=5,768
+✓ [2/31] 0ddfec37_abs         knowledge-update           acc=50.0% ctx=5,779
+✓ [3/31] 25e5aa4f             single-session-user        acc=66.7% ctx=5,624
+✓ [4/31] 36b9f61e             multi-session              acc=75.0% ctx=5,566
+✗ [5/31] 3a704032             multi-session              acc=60.0% ctx=5,873
+✓ [6/31] 45dc21b6             knowledge-update           acc=66.7% ctx=5,963
+✗ [7/31] 6e984301             temporal-reasoning         acc=57.1% ctx=5,881
+✓ [8/31] 9d25d4e0             multi-session              acc=62.5% ctx=5,867
+✓ [9/31] 9ea5eabc             knowledge-update           acc=66.7% ctx=5,904
+✓ [10/31] a1cc6108             multi-session              acc=70.0% ctx=5,894
+✓ [11/31] a3838d2b             temporal-reasoning         acc=72.7% ctx=5,703
+✗ [12/31] a9f6b44c             multi-session              acc=66.7% ctx=5,728
+✓ [13/31] afdc33df             single-session-preference  acc=69.2% ctx=5,991
+✗ [14/31] b46e15ed             temporal-reasoning         acc=64.3% ctx=6,407
+✗ [15/31] e3038f8c             multi-session              acc=60.0% ctx=5,779
+✓ [16/31] e48988bc             single-session-assistant   acc=62.5% ctx=6,033
+✗ [17/31] eeda8a6d             multi-session              acc=58.8% ctx=5,789
+✓ [18/31] f685340e             knowledge-update           acc=61.1% ctx=5,867
+✓ [19/31] f9e8c073             knowledge-update           acc=63.2% ctx=5,758
+✓ [20/31] gpt4_2f91af09        multi-session              acc=65.0% ctx=5,805
+✗ [21/31] gpt4_4929293b        temporal-reasoning         acc=61.9% ctx=6,025
+✓ [22/31] gpt4_78cf46a3        temporal-reasoning         acc=63.6% ctx=5,781
+╭───────────────────── Traceback (most recent call last) ──────────────────────╮
+│ /Users/mingjie/Desktop/llm-long-term-memory/src/llm_long_term_memory/command │
+│ s/eval_execution.py:154 in eval_run                                          │
+│                                                                              │
+│   151 │   │   │   │   highlight=False,                                       │
+│   152 │   │   │   )                                                          │
+│   153 │   │                                                                  │
+│ ❱ 154 │   │   report = run_eval(                                             │
+│   155 │   │   │   runner,                                                    │
+│   156 │   │   │   judge,                                                     │
+│   157 │   │   │   instances,                                                 │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/src/llm_long_term_memory/evaluat │
+│ ion/harness.py:157 in run_eval                                               │
+│                                                                              │
+│   154 │   path.parent.mkdir(parents=True, exist_ok=True)                     │
+│   155 │                                                                      │
+│   156 │   with _exclusive(path):                                             │
+│ ❱ 157 │   │   return _run_eval_locked(runner, judge, instances, path, usage, │
+│       resume, on_progress)                                                   │
+│   158                                                                        │
+│   159                                                                        │
+│   160 class StoreChanged(RuntimeError):                                      │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/src/llm_long_term_memory/evaluat │
+│ ion/harness.py:239 in _run_eval_locked                                       │
+│                                                                              │
+│   236 │   │   │   try:                                                       │
+│   237 │   │   │   │   runner.prepare(inst)                                   │
+│   238 │   │   │   │   answer = runner.answer(inst)                           │
+│ ❱ 239 │   │   │   │   verdict = judge.grade(                                 │
+│   240 │   │   │   │   │   question=inst.question,                            │
+│   241 │   │   │   │   │   gold=inst.answer,                                  │
+│   242 │   │   │   │   │   hypothesis=answer.text,                            │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/src/llm_long_term_memory/evaluat │
+│ ion/judge.py:157 in grade                                                    │
+│                                                                              │
+│   154 │   │   │   return JudgeResult(False, "empty answer", 0, 0)            │
+│   155 │   │                                                                  │
+│   156 │   │   prompt = self._prompt_for(question, gold, hypothesis,          │
+│       is_abstention, question_type)                                          │
+│ ❱ 157 │   │   completion = self.client.generate(                             │
+│   158 │   │   │   role="judge",                                              │
+│   159 │   │   │   model=self.model,                                          │
+│   160 │   │   │   prompt=prompt,                                             │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/src/llm_long_term_memory/llm/cli │
+│ ent.py:250 in generate                                                       │
+│                                                                              │
+│   247 │   │   │   try:                                                       │
+│   248 │   │   │   │   api_started = time.perf_counter()                      │
+│   249 │   │   │   │   with self.usage.measure(role, model) as box:           │
+│ ❱ 250 │   │   │   │   │   resp = self._client.models.generate_content(       │
+│   251 │   │   │   │   │   │   model=model, contents=prompt, config=config    │
+│   252 │   │   │   │   │   )                                                  │
+│   253 │   │   │   │   │   u = resp.usage_metadata                            │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packag │
+│ es/google/genai/models.py:6604 in generate_content                           │
+│                                                                              │
+│   6601 │   │   │   'afc',                                                    │
+│   6602 │   │   )                                                             │
+│   6603 │     i += 1                                                          │
+│ ❱ 6604 │     response = self._generate_content(                              │
+│   6605 │   │     model=model, contents=contents,                             │
+│        config=parsed_config_to_call                                          │
+│   6606 │     )                                                               │
+│   6607                                                                       │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packag │
+│ es/google/genai/models.py:5028 in _generate_content                          │
+│                                                                              │
+│   5025 │   request_dict = _common.convert_to_dict(request_dict)              │
+│   5026 │   request_dict = _common.encode_unserializable_types(request_dict)  │
+│   5027 │                                                                     │
+│ ❱ 5028 │   response = self._api_client.request(                              │
+│   5029 │   │   'post', path, request_dict, http_options                      │
+│   5030 │   )                                                                 │
+│   5031                                                                       │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packag │
+│ es/google/genai/_api_client.py:1708 in request                               │
+│                                                                              │
+│   1705 │   http_request = self._build_request(                               │
+│   1706 │   │   http_method, path, request_dict, http_options                 │
+│   1707 │   )                                                                 │
+│ ❱ 1708 │   response = self._request(http_request, http_options,              │
+│        stream=False)                                                         │
+│   1709 │   response_body = (                                                 │
+│   1710 │   │   response.response_stream[0] if response.response_stream else  │
+│        ''                                                                    │
+│   1711 │   )                                                                 │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packag │
+│ es/google/genai/_api_client.py:1495 in _request                              │
+│                                                                              │
+│   1492 │   │   retry = tenacity.Retrying(**retry_kwargs)                     │
+│   1493 │   │   return retry(self._request_once, http_request, stream)  #     │
+│        type: ignore[no-any-return]                                           │
+│   1494 │                                                                     │
+│ ❱ 1495 │   return self._retry(self._request_once, http_request, stream)  #   │
+│        type: ignore[no-any-return]                                           │
+│   1496                                                                       │
+│   1497   async def _async_request_once(                                      │
+│   1498 │     self, http_request: HttpRequest, stream: bool = False           │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packag │
+│ es/tenacity/__init__.py:470 in __call__                                      │
+│                                                                              │
+│   467 │   │                                                                  │
+│   468 │   │   retry_state = RetryCallState(retry_object=self, fn=fn,         │
+│       args=args, kwargs=kwargs)                                              │
+│   469 │   │   while True:                                                    │
+│ ❱ 470 │   │   │   do = self.iter(retry_state=retry_state)                    │
+│   471 │   │   │   if isinstance(do, DoAttempt):                              │
+│   472 │   │   │   │   try:                                                   │
+│   473 │   │   │   │   │   result = fn(*args, **kwargs)                       │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packag │
+│ es/tenacity/__init__.py:371 in iter                                          │
+│                                                                              │
+│   368 │   │   self._begin_iter(retry_state)                                  │
+│   369 │   │   result = None                                                  │
+│   370 │   │   for action in self.iter_state.actions:                         │
+│ ❱ 371 │   │   │   result = action(retry_state)                               │
+│   372 │   │   return result                                                  │
+│   373 │                                                                      │
+│   374 │   def _begin_iter(self, retry_state: "RetryCallState") -> None:  #   │
+│       noqa                                                                   │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packag │
+│ es/tenacity/__init__.py:413 in exc_check                                     │
+│                                                                              │
+│   410 │   │   │   │   fut = t.cast(Future, rs.outcome)                       │
+│   411 │   │   │   │   retry_exc = self.retry_error_cls(fut)                  │
+│   412 │   │   │   │   if self.reraise:                                       │
+│ ❱ 413 │   │   │   │   │   raise retry_exc.reraise()                          │
+│   414 │   │   │   │   raise retry_exc from fut.exception()                   │
+│   415 │   │   │                                                              │
+│   416 │   │   │   self._add_action_func(exc_check)                           │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packag │
+│ es/tenacity/__init__.py:184 in reraise                                       │
+│                                                                              │
+│   181 │                                                                      │
+│   182 │   def reraise(self) -> t.NoReturn:                                   │
+│   183 │   │   if self.last_attempt.failed:                                   │
+│ ❱ 184 │   │   │   raise self.last_attempt.result()                           │
+│   185 │   │   raise self                                                     │
+│   186 │                                                                      │
+│   187 │   def __str__(self) -> str:                                          │
+│                                                                              │
+│ /Users/mingjie/.local/share/uv/python/cpython-3.12.13-macos-aarch64-none/lib │
+│ /python3.12/concurrent/futures/_base.py:449 in result                        │
+│                                                                              │
+│   446 │   │   │   │   if self._state in [CANCELLED, CANCELLED_AND_NOTIFIED]: │
+│   447 │   │   │   │   │   raise CancelledError()                             │
+│   448 │   │   │   │   elif self._state == FINISHED:                          │
+│ ❱ 449 │   │   │   │   │   return self.__get_result()                         │
+│   450 │   │   │   │                                                          │
+│   451 │   │   │   │   self._condition.wait(timeout)                          │
+│   452                                                                        │
+│                                                                              │
+│ /Users/mingjie/.local/share/uv/python/cpython-3.12.13-macos-aarch64-none/lib │
+│ /python3.12/concurrent/futures/_base.py:401 in __get_result                  │
+│                                                                              │
+│   398 │   def __get_result(self):                                            │
+│   399 │   │   if self._exception:                                            │
+│   400 │   │   │   try:                                                       │
+│ ❱ 401 │   │   │   │   raise self._exception                                  │
+│   402 │   │   │   finally:                                                   │
+│   403 │   │   │   │   # Break a reference cycle with the exception in        │
+│       self._exception                                                        │
+│   404 │   │   │   │   self = None                                            │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packag │
+│ es/tenacity/__init__.py:473 in __call__                                      │
+│                                                                              │
+│   470 │   │   │   do = self.iter(retry_state=retry_state)                    │
+│   471 │   │   │   if isinstance(do, DoAttempt):                              │
+│   472 │   │   │   │   try:                                                   │
+│ ❱ 473 │   │   │   │   │   result = fn(*args, **kwargs)                       │
+│   474 │   │   │   │   except BaseException:  # noqa: B902                    │
+│   475 │   │   │   │   │   retry_state.set_exception(sys.exc_info())  # type: │
+│       ignore[arg-type]                                                       │
+│   476 │   │   │   │   else:                                                  │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packag │
+│ es/google/genai/_api_client.py:1472 in _request_once                         │
+│                                                                              │
+│   1469 │   │     timeout=http_request.timeout,                               │
+│   1470 │     )                                                               │
+│   1471 │     response = self._httpx_client.send(httpx_request,               │
+│        stream=stream)  # type: ignore[union-attr]                            │
+│ ❱ 1472 │   errors.APIError.raise_for_response(response)                      │
+│   1473 │   return HttpResponse(                                              │
+│   1474 │   │   response.headers, response if stream else [response.text]     │
+│   1475 │   )                                                                 │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packag │
+│ es/google/genai/errors.py:155 in raise_for_response                          │
+│                                                                              │
+│   152 │   else:                                                              │
+│   153 │     response_json = response.body_segments[0].get('error', {})       │
+│   154 │                                                                      │
+│ ❱ 155 │   cls.raise_error(response.status_code, response_json, response)     │
+│   156                                                                        │
+│   157   @classmethod                                                         │
+│   158   def raise_error(                                                     │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packag │
+│ es/google/genai/errors.py:186 in raise_error                                 │
+│                                                                              │
+│   183 │   if 400 <= status_code < 500:                                       │
+│   184 │     raise ClientError(status_code, response_json, response)          │
+│   185 │   elif 500 <= status_code < 600:                                     │
+│ ❱ 186 │     raise ServerError(status_code, response_json, response)          │
+│   187 │   else:                                                              │
+│   188 │     raise cls(status_code, response_json, response)                  │
+│   189                                                                        │
+╰──────────────────────────────────────────────────────────────────────────────╯
+ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error 
+encountered.', 'status': 'INTERNAL'}}
+rc=1 two_stage_raw_primary_t1 train150
+== 2026-10-06T17:20:50Z two_stage_raw_primary_t2 train150
+observed limits: gemini-3.1-flash-lite rpd=500 rpm=15, gemini-3.5-flash-lite 
+rpd=500 rpm=15, gemma-4-31b-it rpd=1500 rpm=10
+two_stage_raw_primary_t2.t-probe-v1 · regression · 31 questions · 
+answerer=gemini-3.5-flash-lite judge=gemma-4-31b-it · top_k=20 rerank=False
+→ results/raw/two_stage_raw_primary_t2.t-probe-v1.jsonl
+
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/regex/_main.py:477: EncodingWarning: UTF-8 Mode affects locale.getpreferredencoding(). Consider locale.getencoding() instead.
+  pattern_locale = _getpreferredencoding(False)
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/regex/_main.py:477: EncodingWarning: UTF-8 Mode affects locale.getpreferredencoding(). Consider locale.getencoding() instead.
+  pattern_locale = _getpreferredencoding(False)
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/regex/_main.py:477: EncodingWarning: UTF-8 Mode affects locale.getpreferredencoding(). Consider locale.getencoding() instead.
+  pattern_locale = _getpreferredencoding(False)
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/regex/_main.py:477: EncodingWarning: UTF-8 Mode affects locale.getpreferredencoding(). Consider locale.getencoding() instead.
+  pattern_locale = _getpreferredencoding(False)
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/utils/_auth.py:152: EncodingWarning: 'encoding' argument not specified
+  return _clean_token(Path(constants.HF_TOKEN_PATH).read_text())
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/file_download.py:1123: EncodingWarning: 'encoding' argument not specified
+  with open(ref_path) as f:
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/utils/_auth.py:152: EncodingWarning: 'encoding' argument not specified
+  return _clean_token(Path(constants.HF_TOKEN_PATH).read_text())
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/file_download.py:1123: EncodingWarning: 'encoding' argument not specified
+  with open(ref_path) as f:
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/file_download.py:1548: EncodingWarning: 'encoding' argument not specified
+  with open(revision_file) as f:
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/regex/_main.py:477: EncodingWarning: UTF-8 Mode affects locale.getpreferredencoding(). Consider locale.getencoding() instead.
+  pattern_locale = _getpreferredencoding(False)
+Loading weights:   0%|          | 0/103 [00:00<?, ?it/s]Loading weights: 100%|██████████| 103/103 [00:00<00:00, 7140.83it/s]
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/_snapshot_download.py:312: EncodingWarning: 'encoding' argument not specified
+  with open(ref_path) as f:
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/utils/_auth.py:152: EncodingWarning: 'encoding' argument not specified
+  return _clean_token(Path(constants.HF_TOKEN_PATH).read_text())
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/file_download.py:1123: EncodingWarning: 'encoding' argument not specified
+  with open(ref_path) as f:
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/utils/_auth.py:152: EncodingWarning: 'encoding' argument not specified
+  return _clean_token(Path(constants.HF_TOKEN_PATH).read_text())
+✗ [1/31] 09ba9854             multi-session              acc=0.0% ctx=5,768
+✓ [2/31] 0ddfec37_abs         knowledge-update           acc=50.0% ctx=6,021
+✓ [3/31] 25e5aa4f             single-session-user        acc=66.7% ctx=5,624
+✗ [4/31] 36b9f61e             multi-session              acc=50.0% ctx=5,566
+✓ [5/31] 3a704032             multi-session              acc=60.0% ctx=5,873
+✓ [6/31] 45dc21b6             knowledge-update           acc=66.7% ctx=5,963
+✓ [7/31] 6e984301             temporal-reasoning         acc=71.4% ctx=5,881
+✓ [8/31] 9d25d4e0             multi-session              acc=75.0% ctx=5,867
+╭───────────────────── Traceback (most recent call last) ──────────────────────╮
+│ /Users/mingjie/Desktop/llm-long-term-memory/src/llm_long_term_memory/command │
+│ s/eval_execution.py:154 in eval_run                                          │
+│                                                                              │
+│   151 │   │   │   │   highlight=False,                                       │
+│   152 │   │   │   )                                                          │
+│   153 │   │                                                                  │
+│ ❱ 154 │   │   report = run_eval(                                             │
+│   155 │   │   │   runner,                                                    │
+│   156 │   │   │   judge,                                                     │
+│   157 │   │   │   instances,                                                 │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/src/llm_long_term_memory/evaluat │
+│ ion/harness.py:157 in run_eval                                               │
+│                                                                              │
+│   154 │   path.parent.mkdir(parents=True, exist_ok=True)                     │
+│   155 │                                                                      │
+│   156 │   with _exclusive(path):                                             │
+│ ❱ 157 │   │   return _run_eval_locked(runner, judge, instances, path, usage, │
+│       resume, on_progress)                                                   │
+│   158                                                                        │
+│   159                                                                        │
+│   160 class StoreChanged(RuntimeError):                                      │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/src/llm_long_term_memory/evaluat │
+│ ion/harness.py:239 in _run_eval_locked                                       │
+│                                                                              │
+│   236 │   │   │   try:                                                       │
+│   237 │   │   │   │   runner.prepare(inst)                                   │
+│   238 │   │   │   │   answer = runner.answer(inst)                           │
+│ ❱ 239 │   │   │   │   verdict = judge.grade(                                 │
+│   240 │   │   │   │   │   question=inst.question,                            │
+│   241 │   │   │   │   │   gold=inst.answer,                                  │
+│   242 │   │   │   │   │   hypothesis=answer.text,                            │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/src/llm_long_term_memory/evaluat │
+│ ion/judge.py:157 in grade                                                    │
+│                                                                              │
+│   154 │   │   │   return JudgeResult(False, "empty answer", 0, 0)            │
+│   155 │   │                                                                  │
+│   156 │   │   prompt = self._prompt_for(question, gold, hypothesis,          │
+│       is_abstention, question_type)                                          │
+│ ❱ 157 │   │   completion = self.client.generate(                             │
+│   158 │   │   │   role="judge",                                              │
+│   159 │   │   │   model=self.model,                                          │
+│   160 │   │   │   prompt=prompt,                                             │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/src/llm_long_term_memory/llm/cli │
+│ ent.py:250 in generate                                                       │
+│                                                                              │
+│   247 │   │   │   try:                                                       │
+│   248 │   │   │   │   api_started = time.perf_counter()                      │
+│   249 │   │   │   │   with self.usage.measure(role, model) as box:           │
+│ ❱ 250 │   │   │   │   │   resp = self._client.models.generate_content(       │
+│   251 │   │   │   │   │   │   model=model, contents=prompt, config=config    │
+│   252 │   │   │   │   │   )                                                  │
+│   253 │   │   │   │   │   u = resp.usage_metadata                            │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packag │
+│ es/google/genai/models.py:6604 in generate_content                           │
+│                                                                              │
+│   6601 │   │   │   'afc',                                                    │
+│   6602 │   │   )                                                             │
+│   6603 │     i += 1                                                          │
+│ ❱ 6604 │     response = self._generate_content(                              │
+│   6605 │   │     model=model, contents=contents,                             │
+│        config=parsed_config_to_call                                          │
+│   6606 │     )                                                               │
+│   6607                                                                       │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packag │
+│ es/google/genai/models.py:5028 in _generate_content                          │
+│                                                                              │
+│   5025 │   request_dict = _common.convert_to_dict(request_dict)              │
+│   5026 │   request_dict = _common.encode_unserializable_types(request_dict)  │
+│   5027 │                                                                     │
+│ ❱ 5028 │   response = self._api_client.request(                              │
+│   5029 │   │   'post', path, request_dict, http_options                      │
+│   5030 │   )                                                                 │
+│   5031                                                                       │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packag │
+│ es/google/genai/_api_client.py:1708 in request                               │
+│                                                                              │
+│   1705 │   http_request = self._build_request(                               │
+│   1706 │   │   http_method, path, request_dict, http_options                 │
+│   1707 │   )                                                                 │
+│ ❱ 1708 │   response = self._request(http_request, http_options,              │
+│        stream=False)                                                         │
+│   1709 │   response_body = (                                                 │
+│   1710 │   │   response.response_stream[0] if response.response_stream else  │
+│        ''                                                                    │
+│   1711 │   )                                                                 │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packag │
+│ es/google/genai/_api_client.py:1495 in _request                              │
+│                                                                              │
+│   1492 │   │   retry = tenacity.Retrying(**retry_kwargs)                     │
+│   1493 │   │   return retry(self._request_once, http_request, stream)  #     │
+│        type: ignore[no-any-return]                                           │
+│   1494 │                                                                     │
+│ ❱ 1495 │   return self._retry(self._request_once, http_request, stream)  #   │
+│        type: ignore[no-any-return]                                           │
+│   1496                                                                       │
+│   1497   async def _async_request_once(                                      │
+│   1498 │     self, http_request: HttpRequest, stream: bool = False           │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packag │
+│ es/tenacity/__init__.py:470 in __call__                                      │
+│                                                                              │
+│   467 │   │                                                                  │
+│   468 │   │   retry_state = RetryCallState(retry_object=self, fn=fn,         │
+│       args=args, kwargs=kwargs)                                              │
+│   469 │   │   while True:                                                    │
+│ ❱ 470 │   │   │   do = self.iter(retry_state=retry_state)                    │
+│   471 │   │   │   if isinstance(do, DoAttempt):                              │
+│   472 │   │   │   │   try:                                                   │
+│   473 │   │   │   │   │   result = fn(*args, **kwargs)                       │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packag │
+│ es/tenacity/__init__.py:371 in iter                                          │
+│                                                                              │
+│   368 │   │   self._begin_iter(retry_state)                                  │
+│   369 │   │   result = None                                                  │
+│   370 │   │   for action in self.iter_state.actions:                         │
+│ ❱ 371 │   │   │   result = action(retry_state)                               │
+│   372 │   │   return result                                                  │
+│   373 │                                                                      │
+│   374 │   def _begin_iter(self, retry_state: "RetryCallState") -> None:  #   │
+│       noqa                                                                   │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packag │
+│ es/tenacity/__init__.py:413 in exc_check                                     │
+│                                                                              │
+│   410 │   │   │   │   fut = t.cast(Future, rs.outcome)                       │
+│   411 │   │   │   │   retry_exc = self.retry_error_cls(fut)                  │
+│   412 │   │   │   │   if self.reraise:                                       │
+│ ❱ 413 │   │   │   │   │   raise retry_exc.reraise()                          │
+│   414 │   │   │   │   raise retry_exc from fut.exception()                   │
+│   415 │   │   │                                                              │
+│   416 │   │   │   self._add_action_func(exc_check)                           │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packag │
+│ es/tenacity/__init__.py:184 in reraise                                       │
+│                                                                              │
+│   181 │                                                                      │
+│   182 │   def reraise(self) -> t.NoReturn:                                   │
+│   183 │   │   if self.last_attempt.failed:                                   │
+│ ❱ 184 │   │   │   raise self.last_attempt.result()                           │
+│   185 │   │   raise self                                                     │
+│   186 │                                                                      │
+│   187 │   def __str__(self) -> str:                                          │
+│                                                                              │
+│ /Users/mingjie/.local/share/uv/python/cpython-3.12.13-macos-aarch64-none/lib │
+│ /python3.12/concurrent/futures/_base.py:449 in result                        │
+│                                                                              │
+│   446 │   │   │   │   if self._state in [CANCELLED, CANCELLED_AND_NOTIFIED]: │
+│   447 │   │   │   │   │   raise CancelledError()                             │
+│   448 │   │   │   │   elif self._state == FINISHED:                          │
+│ ❱ 449 │   │   │   │   │   return self.__get_result()                         │
+│   450 │   │   │   │                                                          │
+│   451 │   │   │   │   self._condition.wait(timeout)                          │
+│   452                                                                        │
+│                                                                              │
+│ /Users/mingjie/.local/share/uv/python/cpython-3.12.13-macos-aarch64-none/lib │
+│ /python3.12/concurrent/futures/_base.py:401 in __get_result                  │
+│                                                                              │
+│   398 │   def __get_result(self):                                            │
+│   399 │   │   if self._exception:                                            │
+│   400 │   │   │   try:                                                       │
+│ ❱ 401 │   │   │   │   raise self._exception                                  │
+│   402 │   │   │   finally:                                                   │
+│   403 │   │   │   │   # Break a reference cycle with the exception in        │
+│       self._exception                                                        │
+│   404 │   │   │   │   self = None                                            │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packag │
+│ es/tenacity/__init__.py:473 in __call__                                      │
+│                                                                              │
+│   470 │   │   │   do = self.iter(retry_state=retry_state)                    │
+│   471 │   │   │   if isinstance(do, DoAttempt):                              │
+│   472 │   │   │   │   try:                                                   │
+│ ❱ 473 │   │   │   │   │   result = fn(*args, **kwargs)                       │
+│   474 │   │   │   │   except BaseException:  # noqa: B902                    │
+│   475 │   │   │   │   │   retry_state.set_exception(sys.exc_info())  # type: │
+│       ignore[arg-type]                                                       │
+│   476 │   │   │   │   else:                                                  │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packag │
+│ es/google/genai/_api_client.py:1472 in _request_once                         │
+│                                                                              │
+│   1469 │   │     timeout=http_request.timeout,                               │
+│   1470 │     )                                                               │
+│   1471 │     response = self._httpx_client.send(httpx_request,               │
+│        stream=stream)  # type: ignore[union-attr]                            │
+│ ❱ 1472 │   errors.APIError.raise_for_response(response)                      │
+│   1473 │   return HttpResponse(                                              │
+│   1474 │   │   response.headers, response if stream else [response.text]     │
+│   1475 │   )                                                                 │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packag │
+│ es/google/genai/errors.py:155 in raise_for_response                          │
+│                                                                              │
+│   152 │   else:                                                              │
+│   153 │     response_json = response.body_segments[0].get('error', {})       │
+│   154 │                                                                      │
+│ ❱ 155 │   cls.raise_error(response.status_code, response_json, response)     │
+│   156                                                                        │
+│   157   @classmethod                                                         │
+│   158   def raise_error(                                                     │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packag │
+│ es/google/genai/errors.py:186 in raise_error                                 │
+│                                                                              │
+│   183 │   if 400 <= status_code < 500:                                       │
+│   184 │     raise ClientError(status_code, response_json, response)          │
+│   185 │   elif 500 <= status_code < 600:                                     │
+│ ❱ 186 │     raise ServerError(status_code, response_json, response)          │
+│   187 │   else:                                                              │
+│   188 │     raise cls(status_code, response_json, response)                  │
+│   189                                                                        │
+╰──────────────────────────────────────────────────────────────────────────────╯
+ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error 
+encountered.', 'status': 'INTERNAL'}}
+rc=1 two_stage_raw_primary_t2 train150
+== 2026-10-06T17:27:13Z t1 dev100
+observed limits: gemini-3.1-flash-lite rpd=500 rpm=15, gemini-3.5-flash-lite 
+rpd=500 rpm=15, gemma-4-31b-it rpd=1500 rpm=10
+two_stage_raw_primary_t1.t-probe-v1-dev · regression · 9 questions · 
+answerer=gemini-3.5-flash-lite judge=gemma-4-31b-it · top_k=20 rerank=False
+→ results/raw/two_stage_raw_primary_t1.t-probe-v1-dev.jsonl
+
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/regex/_main.py:477: EncodingWarning: UTF-8 Mode affects locale.getpreferredencoding(). Consider locale.getencoding() instead.
+  pattern_locale = _getpreferredencoding(False)
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/regex/_main.py:477: EncodingWarning: UTF-8 Mode affects locale.getpreferredencoding(). Consider locale.getencoding() instead.
+  pattern_locale = _getpreferredencoding(False)
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/regex/_main.py:477: EncodingWarning: UTF-8 Mode affects locale.getpreferredencoding(). Consider locale.getencoding() instead.
+  pattern_locale = _getpreferredencoding(False)
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/regex/_main.py:477: EncodingWarning: UTF-8 Mode affects locale.getpreferredencoding(). Consider locale.getencoding() instead.
+  pattern_locale = _getpreferredencoding(False)
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/utils/_auth.py:152: EncodingWarning: 'encoding' argument not specified
+  return _clean_token(Path(constants.HF_TOKEN_PATH).read_text())
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/file_download.py:1123: EncodingWarning: 'encoding' argument not specified
+  with open(ref_path) as f:
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/utils/_auth.py:152: EncodingWarning: 'encoding' argument not specified
+  return _clean_token(Path(constants.HF_TOKEN_PATH).read_text())
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/file_download.py:1123: EncodingWarning: 'encoding' argument not specified
+  with open(ref_path) as f:
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/file_download.py:1548: EncodingWarning: 'encoding' argument not specified
+  with open(revision_file) as f:
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/regex/_main.py:477: EncodingWarning: UTF-8 Mode affects locale.getpreferredencoding(). Consider locale.getencoding() instead.
+  pattern_locale = _getpreferredencoding(False)
+Loading weights:   0%|          | 0/103 [00:00<?, ?it/s]Loading weights: 100%|██████████| 103/103 [00:00<00:00, 8115.36it/s]
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/_snapshot_download.py:312: EncodingWarning: 'encoding' argument not specified
+  with open(ref_path) as f:
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/utils/_auth.py:152: EncodingWarning: 'encoding' argument not specified
+  return _clean_token(Path(constants.HF_TOKEN_PATH).read_text())
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/file_download.py:1123: EncodingWarning: 'encoding' argument not specified
+  with open(ref_path) as f:
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/utils/_auth.py:152: EncodingWarning: 'encoding' argument not specified
+  return _clean_token(Path(constants.HF_TOKEN_PATH).read_text())
+✓ [1/9] 0bc8ad93             temporal-reasoning         acc=100.0% ctx=5,881
+✗ [2/9] gpt4_213fd887        temporal-reasoning         acc=50.0% ctx=5,659
+✗ [3/9] gpt4_483dd43c        temporal-reasoning         acc=33.3% ctx=5,944
+✓ [4/9] gpt4_4ef30696        temporal-reasoning         acc=50.0% ctx=5,934
+✓ [5/9] gpt4_65aabe59        temporal-reasoning         acc=60.0% ctx=5,740
+✗ [6/9] gpt4_7bc6cf22        temporal-reasoning         acc=50.0% ctx=5,977
+✗ [7/9] gpt4_85da3956        temporal-reasoning         acc=42.9% ctx=5,797
+✓ [8/9] gpt4_93159ced        temporal-reasoning         acc=50.0% ctx=5,932
+✗ [9/9] gpt4_e414231f        temporal-reasoning         acc=44.4% ctx=5,808
+
+### `two_stage_raw_primary_t1.t-probe-v1-dev`
+
+- questions: **9**
+- accuracy: **44.4%**
+- median context tokens: **5,881**
+- observed p95 answer API latency: **9.4s**
+- source-session recall: **100.0%**
+
+| question type | n | accuracy |
+|---|---|---|
+| temporal-reasoning | 9 | 44.4% |
+== 2026-10-06T17:33:38Z t2 dev100
+observed limits: gemini-3.1-flash-lite rpd=500 rpm=15, gemini-3.5-flash-lite 
+rpd=500 rpm=15, gemma-4-31b-it rpd=1500 rpm=10
+two_stage_raw_primary_t2.t-probe-v1-dev · regression · 18 questions · 
+answerer=gemini-3.5-flash-lite judge=gemma-4-31b-it · top_k=20 rerank=False
+→ results/raw/two_stage_raw_primary_t2.t-probe-v1-dev.jsonl
+
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/regex/_main.py:477: EncodingWarning: UTF-8 Mode affects locale.getpreferredencoding(). Consider locale.getencoding() instead.
+  pattern_locale = _getpreferredencoding(False)
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/regex/_main.py:477: EncodingWarning: UTF-8 Mode affects locale.getpreferredencoding(). Consider locale.getencoding() instead.
+  pattern_locale = _getpreferredencoding(False)
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/regex/_main.py:477: EncodingWarning: UTF-8 Mode affects locale.getpreferredencoding(). Consider locale.getencoding() instead.
+  pattern_locale = _getpreferredencoding(False)
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/regex/_main.py:477: EncodingWarning: UTF-8 Mode affects locale.getpreferredencoding(). Consider locale.getencoding() instead.
+  pattern_locale = _getpreferredencoding(False)
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/utils/_auth.py:152: EncodingWarning: 'encoding' argument not specified
+  return _clean_token(Path(constants.HF_TOKEN_PATH).read_text())
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/file_download.py:1123: EncodingWarning: 'encoding' argument not specified
+  with open(ref_path) as f:
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/utils/_auth.py:152: EncodingWarning: 'encoding' argument not specified
+  return _clean_token(Path(constants.HF_TOKEN_PATH).read_text())
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/file_download.py:1123: EncodingWarning: 'encoding' argument not specified
+  with open(ref_path) as f:
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/file_download.py:1548: EncodingWarning: 'encoding' argument not specified
+  with open(revision_file) as f:
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/regex/_main.py:477: EncodingWarning: UTF-8 Mode affects locale.getpreferredencoding(). Consider locale.getencoding() instead.
+  pattern_locale = _getpreferredencoding(False)
+Loading weights:   0%|          | 0/103 [00:00<?, ?it/s]Loading weights: 100%|██████████| 103/103 [00:00<00:00, 5971.65it/s]
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/_snapshot_download.py:312: EncodingWarning: 'encoding' argument not specified
+  with open(ref_path) as f:
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/utils/_auth.py:152: EncodingWarning: 'encoding' argument not specified
+  return _clean_token(Path(constants.HF_TOKEN_PATH).read_text())
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/file_download.py:1123: EncodingWarning: 'encoding' argument not specified
+  with open(ref_path) as f:
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/utils/_auth.py:152: EncodingWarning: 'encoding' argument not specified
+  return _clean_token(Path(constants.HF_TOKEN_PATH).read_text())
+✗ [1/18] 0bc8ad93             temporal-reasoning         acc=0.0% ctx=5,881
+✓ [2/18] 2788b940             multi-session              acc=50.0% ctx=6,038
+✗ [3/18] 59524333             knowledge-update           acc=33.3% ctx=5,897
+✓ [4/18] 681a1674             multi-session              acc=50.0% ctx=5,895
+✓ [5/18] 945e3d21             knowledge-update           acc=60.0% ctx=5,887
+✓ [6/18] a1eacc2a             knowledge-update           acc=66.7% ctx=5,761
+✗ [7/18] aae3761f             multi-session              acc=57.1% ctx=5,709
+✗ [8/18] c4ea545c             knowledge-update           acc=50.0% ctx=6,076
+✗ [9/18] d851d5ba             multi-session              acc=44.4% ctx=5,671
+╭───────────────────── Traceback (most recent call last) ──────────────────────╮
+│ /Users/mingjie/Desktop/llm-long-term-memory/src/llm_long_term_memory/command │
+│ s/eval_execution.py:154 in eval_run                                          │
+│                                                                              │
+│   151 │   │   │   │   highlight=False,                                       │
+│   152 │   │   │   )                                                          │
+│   153 │   │                                                                  │
+│ ❱ 154 │   │   report = run_eval(                                             │
+│   155 │   │   │   runner,                                                    │
+│   156 │   │   │   judge,                                                     │
+│   157 │   │   │   instances,                                                 │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/src/llm_long_term_memory/evaluat │
+│ ion/harness.py:157 in run_eval                                               │
+│                                                                              │
+│   154 │   path.parent.mkdir(parents=True, exist_ok=True)                     │
+│   155 │                                                                      │
+│   156 │   with _exclusive(path):                                             │
+│ ❱ 157 │   │   return _run_eval_locked(runner, judge, instances, path, usage, │
+│       resume, on_progress)                                                   │
+│   158                                                                        │
+│   159                                                                        │
+│   160 class StoreChanged(RuntimeError):                                      │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/src/llm_long_term_memory/evaluat │
+│ ion/harness.py:239 in _run_eval_locked                                       │
+│                                                                              │
+│   236 │   │   │   try:                                                       │
+│   237 │   │   │   │   runner.prepare(inst)                                   │
+│   238 │   │   │   │   answer = runner.answer(inst)                           │
+│ ❱ 239 │   │   │   │   verdict = judge.grade(                                 │
+│   240 │   │   │   │   │   question=inst.question,                            │
+│   241 │   │   │   │   │   gold=inst.answer,                                  │
+│   242 │   │   │   │   │   hypothesis=answer.text,                            │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/src/llm_long_term_memory/evaluat │
+│ ion/judge.py:157 in grade                                                    │
+│                                                                              │
+│   154 │   │   │   return JudgeResult(False, "empty answer", 0, 0)            │
+│   155 │   │                                                                  │
+│   156 │   │   prompt = self._prompt_for(question, gold, hypothesis,          │
+│       is_abstention, question_type)                                          │
+│ ❱ 157 │   │   completion = self.client.generate(                             │
+│   158 │   │   │   role="judge",                                              │
+│   159 │   │   │   model=self.model,                                          │
+│   160 │   │   │   prompt=prompt,                                             │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/src/llm_long_term_memory/llm/cli │
+│ ent.py:250 in generate                                                       │
+│                                                                              │
+│   247 │   │   │   try:                                                       │
+│   248 │   │   │   │   api_started = time.perf_counter()                      │
+│   249 │   │   │   │   with self.usage.measure(role, model) as box:           │
+│ ❱ 250 │   │   │   │   │   resp = self._client.models.generate_content(       │
+│   251 │   │   │   │   │   │   model=model, contents=prompt, config=config    │
+│   252 │   │   │   │   │   )                                                  │
+│   253 │   │   │   │   │   u = resp.usage_metadata                            │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packag │
+│ es/google/genai/models.py:6604 in generate_content                           │
+│                                                                              │
+│   6601 │   │   │   'afc',                                                    │
+│   6602 │   │   )                                                             │
+│   6603 │     i += 1                                                          │
+│ ❱ 6604 │     response = self._generate_content(                              │
+│   6605 │   │     model=model, contents=contents,                             │
+│        config=parsed_config_to_call                                          │
+│   6606 │     )                                                               │
+│   6607                                                                       │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packag │
+│ es/google/genai/models.py:5028 in _generate_content                          │
+│                                                                              │
+│   5025 │   request_dict = _common.convert_to_dict(request_dict)              │
+│   5026 │   request_dict = _common.encode_unserializable_types(request_dict)  │
+│   5027 │                                                                     │
+│ ❱ 5028 │   response = self._api_client.request(                              │
+│   5029 │   │   'post', path, request_dict, http_options                      │
+│   5030 │   )                                                                 │
+│   5031                                                                       │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packag │
+│ es/google/genai/_api_client.py:1708 in request                               │
+│                                                                              │
+│   1705 │   http_request = self._build_request(                               │
+│   1706 │   │   http_method, path, request_dict, http_options                 │
+│   1707 │   )                                                                 │
+│ ❱ 1708 │   response = self._request(http_request, http_options,              │
+│        stream=False)                                                         │
+│   1709 │   response_body = (                                                 │
+│   1710 │   │   response.response_stream[0] if response.response_stream else  │
+│        ''                                                                    │
+│   1711 │   )                                                                 │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packag │
+│ es/google/genai/_api_client.py:1495 in _request                              │
+│                                                                              │
+│   1492 │   │   retry = tenacity.Retrying(**retry_kwargs)                     │
+│   1493 │   │   return retry(self._request_once, http_request, stream)  #     │
+│        type: ignore[no-any-return]                                           │
+│   1494 │                                                                     │
+│ ❱ 1495 │   return self._retry(self._request_once, http_request, stream)  #   │
+│        type: ignore[no-any-return]                                           │
+│   1496                                                                       │
+│   1497   async def _async_request_once(                                      │
+│   1498 │     self, http_request: HttpRequest, stream: bool = False           │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packag │
+│ es/tenacity/__init__.py:470 in __call__                                      │
+│                                                                              │
+│   467 │   │                                                                  │
+│   468 │   │   retry_state = RetryCallState(retry_object=self, fn=fn,         │
+│       args=args, kwargs=kwargs)                                              │
+│   469 │   │   while True:                                                    │
+│ ❱ 470 │   │   │   do = self.iter(retry_state=retry_state)                    │
+│   471 │   │   │   if isinstance(do, DoAttempt):                              │
+│   472 │   │   │   │   try:                                                   │
+│   473 │   │   │   │   │   result = fn(*args, **kwargs)                       │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packag │
+│ es/tenacity/__init__.py:371 in iter                                          │
+│                                                                              │
+│   368 │   │   self._begin_iter(retry_state)                                  │
+│   369 │   │   result = None                                                  │
+│   370 │   │   for action in self.iter_state.actions:                         │
+│ ❱ 371 │   │   │   result = action(retry_state)                               │
+│   372 │   │   return result                                                  │
+│   373 │                                                                      │
+│   374 │   def _begin_iter(self, retry_state: "RetryCallState") -> None:  #   │
+│       noqa                                                                   │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packag │
+│ es/tenacity/__init__.py:413 in exc_check                                     │
+│                                                                              │
+│   410 │   │   │   │   fut = t.cast(Future, rs.outcome)                       │
+│   411 │   │   │   │   retry_exc = self.retry_error_cls(fut)                  │
+│   412 │   │   │   │   if self.reraise:                                       │
+│ ❱ 413 │   │   │   │   │   raise retry_exc.reraise()                          │
+│   414 │   │   │   │   raise retry_exc from fut.exception()                   │
+│   415 │   │   │                                                              │
+│   416 │   │   │   self._add_action_func(exc_check)                           │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packag │
+│ es/tenacity/__init__.py:184 in reraise                                       │
+│                                                                              │
+│   181 │                                                                      │
+│   182 │   def reraise(self) -> t.NoReturn:                                   │
+│   183 │   │   if self.last_attempt.failed:                                   │
+│ ❱ 184 │   │   │   raise self.last_attempt.result()                           │
+│   185 │   │   raise self                                                     │
+│   186 │                                                                      │
+│   187 │   def __str__(self) -> str:                                          │
+│                                                                              │
+│ /Users/mingjie/.local/share/uv/python/cpython-3.12.13-macos-aarch64-none/lib │
+│ /python3.12/concurrent/futures/_base.py:449 in result                        │
+│                                                                              │
+│   446 │   │   │   │   if self._state in [CANCELLED, CANCELLED_AND_NOTIFIED]: │
+│   447 │   │   │   │   │   raise CancelledError()                             │
+│   448 │   │   │   │   elif self._state == FINISHED:                          │
+│ ❱ 449 │   │   │   │   │   return self.__get_result()                         │
+│   450 │   │   │   │                                                          │
+│   451 │   │   │   │   self._condition.wait(timeout)                          │
+│   452                                                                        │
+│                                                                              │
+│ /Users/mingjie/.local/share/uv/python/cpython-3.12.13-macos-aarch64-none/lib │
+│ /python3.12/concurrent/futures/_base.py:401 in __get_result                  │
+│                                                                              │
+│   398 │   def __get_result(self):                                            │
+│   399 │   │   if self._exception:                                            │
+│   400 │   │   │   try:                                                       │
+│ ❱ 401 │   │   │   │   raise self._exception                                  │
+│   402 │   │   │   finally:                                                   │
+│   403 │   │   │   │   # Break a reference cycle with the exception in        │
+│       self._exception                                                        │
+│   404 │   │   │   │   self = None                                            │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packag │
+│ es/tenacity/__init__.py:473 in __call__                                      │
+│                                                                              │
+│   470 │   │   │   do = self.iter(retry_state=retry_state)                    │
+│   471 │   │   │   if isinstance(do, DoAttempt):                              │
+│   472 │   │   │   │   try:                                                   │
+│ ❱ 473 │   │   │   │   │   result = fn(*args, **kwargs)                       │
+│   474 │   │   │   │   except BaseException:  # noqa: B902                    │
+│   475 │   │   │   │   │   retry_state.set_exception(sys.exc_info())  # type: │
+│       ignore[arg-type]                                                       │
+│   476 │   │   │   │   else:                                                  │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packag │
+│ es/google/genai/_api_client.py:1472 in _request_once                         │
+│                                                                              │
+│   1469 │   │     timeout=http_request.timeout,                               │
+│   1470 │     )                                                               │
+│   1471 │     response = self._httpx_client.send(httpx_request,               │
+│        stream=stream)  # type: ignore[union-attr]                            │
+│ ❱ 1472 │   errors.APIError.raise_for_response(response)                      │
+│   1473 │   return HttpResponse(                                              │
+│   1474 │   │   response.headers, response if stream else [response.text]     │
+│   1475 │   )                                                                 │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packag │
+│ es/google/genai/errors.py:155 in raise_for_response                          │
+│                                                                              │
+│   152 │   else:                                                              │
+│   153 │     response_json = response.body_segments[0].get('error', {})       │
+│   154 │                                                                      │
+│ ❱ 155 │   cls.raise_error(response.status_code, response_json, response)     │
+│   156                                                                        │
+│   157   @classmethod                                                         │
+│   158   def raise_error(                                                     │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packag │
+│ es/google/genai/errors.py:186 in raise_error                                 │
+│                                                                              │
+│   183 │   if 400 <= status_code < 500:                                       │
+│   184 │     raise ClientError(status_code, response_json, response)          │
+│   185 │   elif 500 <= status_code < 600:                                     │
+│ ❱ 186 │     raise ServerError(status_code, response_json, response)          │
+│   187 │   else:                                                              │
+│   188 │     raise cls(status_code, response_json, response)                  │
+│   189                                                                        │
+╰──────────────────────────────────────────────────────────────────────────────╯
+ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error 
+encountered.', 'status': 'INTERNAL'}}
+rc=1 t2 dev100
+== 2026-10-06T17:40:09Z DONE
+== 2026-10-06T17:40:31Z resume two_stage_raw_primary train150 attempt 1 (rows       19/31)
+observed limits: gemini-3.1-flash-lite rpd=500 rpm=15, gemini-3.5-flash-lite 
+rpd=500 rpm=15, gemma-4-31b-it rpd=1500 rpm=10
+two_stage_raw_primary.t-probe-v1 · regression · 31 questions · 
+answerer=gemini-3.5-flash-lite judge=gemma-4-31b-it · top_k=20 rerank=False
+→ results/raw/two_stage_raw_primary.t-probe-v1.jsonl
+
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/regex/_main.py:477: EncodingWarning: UTF-8 Mode affects locale.getpreferredencoding(). Consider locale.getencoding() instead.
+  pattern_locale = _getpreferredencoding(False)
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/regex/_main.py:477: EncodingWarning: UTF-8 Mode affects locale.getpreferredencoding(). Consider locale.getencoding() instead.
+  pattern_locale = _getpreferredencoding(False)
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/regex/_main.py:477: EncodingWarning: UTF-8 Mode affects locale.getpreferredencoding(). Consider locale.getencoding() instead.
+  pattern_locale = _getpreferredencoding(False)
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/regex/_main.py:477: EncodingWarning: UTF-8 Mode affects locale.getpreferredencoding(). Consider locale.getencoding() instead.
+  pattern_locale = _getpreferredencoding(False)
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/utils/_auth.py:152: EncodingWarning: 'encoding' argument not specified
+  return _clean_token(Path(constants.HF_TOKEN_PATH).read_text())
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/file_download.py:1123: EncodingWarning: 'encoding' argument not specified
+  with open(ref_path) as f:
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/utils/_auth.py:152: EncodingWarning: 'encoding' argument not specified
+  return _clean_token(Path(constants.HF_TOKEN_PATH).read_text())
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/file_download.py:1123: EncodingWarning: 'encoding' argument not specified
+  with open(ref_path) as f:
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/file_download.py:1548: EncodingWarning: 'encoding' argument not specified
+  with open(revision_file) as f:
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/regex/_main.py:477: EncodingWarning: UTF-8 Mode affects locale.getpreferredencoding(). Consider locale.getencoding() instead.
+  pattern_locale = _getpreferredencoding(False)
+Loading weights:   0%|          | 0/103 [00:00<?, ?it/s]Loading weights: 100%|██████████| 103/103 [00:00<00:00, 4340.14it/s]
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/_snapshot_download.py:312: EncodingWarning: 'encoding' argument not specified
+  with open(ref_path) as f:
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/utils/_auth.py:152: EncodingWarning: 'encoding' argument not specified
+  return _clean_token(Path(constants.HF_TOKEN_PATH).read_text())
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/file_download.py:1123: EncodingWarning: 'encoding' argument not specified
+  with open(ref_path) as f:
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/utils/_auth.py:152: EncodingWarning: 'encoding' argument not specified
+  return _clean_token(Path(constants.HF_TOKEN_PATH).read_text())
+✓ [20/31] gpt4_2f91af09        multi-session              acc=50.0% ctx=5,691
+✗ [21/31] gpt4_4929293b        temporal-reasoning         acc=47.6% ctx=5,724
+✓ [22/31] gpt4_78cf46a3        temporal-reasoning         acc=50.0% ctx=5,675
+✗ [23/31] gpt4_7a0daae1        temporal-reasoning         acc=47.8% ctx=5,535
+✓ [24/31] gpt4_8279ba02        temporal-reasoning         acc=50.0% ctx=5,659
+✗ [25/31] gpt4_a1b77f9c        temporal-reasoning         acc=48.0% ctx=5,941
+✓ [26/31] gpt4_a2d1d1f6        temporal-reasoning         acc=50.0% ctx=5,600
+✗ [27/31] gpt4_a56e767c        multi-session              acc=48.1% ctx=5,824
+✗ [28/31] gpt4_ab202e7f        multi-session              acc=46.4% ctx=5,751
+✗ [29/31] gpt4_b5700ca0        temporal-reasoning         acc=44.8% ctx=6,365
+✓ [30/31] gpt4_d12ceb0e        multi-session              acc=46.7% ctx=5,736
+✗ [31/31] gpt4_d6585ce9        temporal-reasoning         acc=45.2% ctx=5,753
+
+### `two_stage_raw_primary.t-probe-v1`
+
+- questions: **31**
+- accuracy: **45.2%**
+- median context tokens: **5,713**
+- observed p95 answer API latency: **2.4s**
+- source-session recall: **96.8%**
+
+| question type | n | accuracy |
+|---|---|---|
+| knowledge-update | 5 | 80.0% |
+| multi-session | 12 | 33.3% |
+| single-session-assistant | 1 | 100.0% |
+| single-session-preference | 1 | 100.0% |
+| single-session-user | 1 | 100.0% |
+| temporal-reasoning | 11 | 27.3% |
+== 2026-10-06T17:48:25Z resume two_stage_raw_primary_t1 train150 attempt 1 (rows       22/31)
+observed limits: gemini-3.1-flash-lite rpd=500 rpm=15, gemini-3.5-flash-lite 
+rpd=500 rpm=15, gemma-4-31b-it rpd=1500 rpm=10
+two_stage_raw_primary_t1.t-probe-v1 · regression · 31 questions · 
+answerer=gemini-3.5-flash-lite judge=gemma-4-31b-it · top_k=20 rerank=False
+→ results/raw/two_stage_raw_primary_t1.t-probe-v1.jsonl
+
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/regex/_main.py:477: EncodingWarning: UTF-8 Mode affects locale.getpreferredencoding(). Consider locale.getencoding() instead.
+  pattern_locale = _getpreferredencoding(False)
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/regex/_main.py:477: EncodingWarning: UTF-8 Mode affects locale.getpreferredencoding(). Consider locale.getencoding() instead.
+  pattern_locale = _getpreferredencoding(False)
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/regex/_main.py:477: EncodingWarning: UTF-8 Mode affects locale.getpreferredencoding(). Consider locale.getencoding() instead.
+  pattern_locale = _getpreferredencoding(False)
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/regex/_main.py:477: EncodingWarning: UTF-8 Mode affects locale.getpreferredencoding(). Consider locale.getencoding() instead.
+  pattern_locale = _getpreferredencoding(False)
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/utils/_auth.py:152: EncodingWarning: 'encoding' argument not specified
+  return _clean_token(Path(constants.HF_TOKEN_PATH).read_text())
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/file_download.py:1123: EncodingWarning: 'encoding' argument not specified
+  with open(ref_path) as f:
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/utils/_auth.py:152: EncodingWarning: 'encoding' argument not specified
+  return _clean_token(Path(constants.HF_TOKEN_PATH).read_text())
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/file_download.py:1123: EncodingWarning: 'encoding' argument not specified
+  with open(ref_path) as f:
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/file_download.py:1548: EncodingWarning: 'encoding' argument not specified
+  with open(revision_file) as f:
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/regex/_main.py:477: EncodingWarning: UTF-8 Mode affects locale.getpreferredencoding(). Consider locale.getencoding() instead.
+  pattern_locale = _getpreferredencoding(False)
+Loading weights:   0%|          | 0/103 [00:00<?, ?it/s]Loading weights: 100%|██████████| 103/103 [00:00<00:00, 7744.95it/s]
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/_snapshot_download.py:312: EncodingWarning: 'encoding' argument not specified
+  with open(ref_path) as f:
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/utils/_auth.py:152: EncodingWarning: 'encoding' argument not specified
+  return _clean_token(Path(constants.HF_TOKEN_PATH).read_text())
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/file_download.py:1123: EncodingWarning: 'encoding' argument not specified
+  with open(ref_path) as f:
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/utils/_auth.py:152: EncodingWarning: 'encoding' argument not specified
+  return _clean_token(Path(constants.HF_TOKEN_PATH).read_text())
+✗ [23/31] gpt4_7a0daae1        temporal-reasoning         acc=60.9% ctx=5,650
+✓ [24/31] gpt4_8279ba02        temporal-reasoning         acc=62.5% ctx=5,872
+✗ [25/31] gpt4_a1b77f9c        temporal-reasoning         acc=60.0% ctx=5,871
+✓ [26/31] gpt4_a2d1d1f6        temporal-reasoning         acc=61.5% ctx=5,738
+✗ [27/31] gpt4_a56e767c        multi-session              acc=59.3% ctx=5,984
+✗ [28/31] gpt4_ab202e7f        multi-session              acc=57.1% ctx=5,961
+✗ [29/31] gpt4_b5700ca0        temporal-reasoning         acc=55.2% ctx=6,574
+✓ [30/31] gpt4_d12ceb0e        multi-session              acc=56.7% ctx=6,025
+✗ [31/31] gpt4_d6585ce9        temporal-reasoning         acc=54.8% ctx=5,886
+
+### `two_stage_raw_primary_t1.t-probe-v1`
+
+- questions: **31**
+- accuracy: **54.8%**
+- median context tokens: **5,871**
+- observed p95 answer API latency: **2.0s**
+- source-session recall: **96.8%**
+
+| question type | n | accuracy |
+|---|---|---|
+| knowledge-update | 5 | 100.0% |
+| multi-session | 12 | 41.7% |
+| single-session-assistant | 1 | 100.0% |
+| single-session-preference | 1 | 100.0% |
+| single-session-user | 1 | 100.0% |
+| temporal-reasoning | 11 | 36.4% |
+== 2026-10-06T17:55:17Z resume two_stage_raw_primary_t2 train150 attempt 1 (rows        8/31)
+observed limits: gemini-3.1-flash-lite rpd=500 rpm=15, gemini-3.5-flash-lite 
+rpd=500 rpm=15, gemma-4-31b-it rpd=1500 rpm=10
+two_stage_raw_primary_t2.t-probe-v1 · regression · 31 questions · 
+answerer=gemini-3.5-flash-lite judge=gemma-4-31b-it · top_k=20 rerank=False
+→ results/raw/two_stage_raw_primary_t2.t-probe-v1.jsonl
+
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/regex/_main.py:477: EncodingWarning: UTF-8 Mode affects locale.getpreferredencoding(). Consider locale.getencoding() instead.
+  pattern_locale = _getpreferredencoding(False)
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/regex/_main.py:477: EncodingWarning: UTF-8 Mode affects locale.getpreferredencoding(). Consider locale.getencoding() instead.
+  pattern_locale = _getpreferredencoding(False)
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/regex/_main.py:477: EncodingWarning: UTF-8 Mode affects locale.getpreferredencoding(). Consider locale.getencoding() instead.
+  pattern_locale = _getpreferredencoding(False)
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/regex/_main.py:477: EncodingWarning: UTF-8 Mode affects locale.getpreferredencoding(). Consider locale.getencoding() instead.
+  pattern_locale = _getpreferredencoding(False)
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/utils/_auth.py:152: EncodingWarning: 'encoding' argument not specified
+  return _clean_token(Path(constants.HF_TOKEN_PATH).read_text())
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/file_download.py:1123: EncodingWarning: 'encoding' argument not specified
+  with open(ref_path) as f:
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/utils/_auth.py:152: EncodingWarning: 'encoding' argument not specified
+  return _clean_token(Path(constants.HF_TOKEN_PATH).read_text())
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/file_download.py:1123: EncodingWarning: 'encoding' argument not specified
+  with open(ref_path) as f:
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/file_download.py:1548: EncodingWarning: 'encoding' argument not specified
+  with open(revision_file) as f:
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/regex/_main.py:477: EncodingWarning: UTF-8 Mode affects locale.getpreferredencoding(). Consider locale.getencoding() instead.
+  pattern_locale = _getpreferredencoding(False)
+Loading weights:   0%|          | 0/103 [00:00<?, ?it/s]Loading weights: 100%|██████████| 103/103 [00:00<00:00, 6648.61it/s]
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/_snapshot_download.py:312: EncodingWarning: 'encoding' argument not specified
+  with open(ref_path) as f:
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/utils/_auth.py:152: EncodingWarning: 'encoding' argument not specified
+  return _clean_token(Path(constants.HF_TOKEN_PATH).read_text())
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/file_download.py:1123: EncodingWarning: 'encoding' argument not specified
+  with open(ref_path) as f:
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/utils/_auth.py:152: EncodingWarning: 'encoding' argument not specified
+  return _clean_token(Path(constants.HF_TOKEN_PATH).read_text())
+✓ [9/31] 9ea5eabc             knowledge-update           acc=77.8% ctx=5,904
+✓ [10/31] a1cc6108             multi-session              acc=80.0% ctx=6,450
+✓ [11/31] a3838d2b             temporal-reasoning         acc=81.8% ctx=5,703
+✗ [12/31] a9f6b44c             multi-session              acc=75.0% ctx=5,728
+✓ [13/31] afdc33df             single-session-preference  acc=76.9% ctx=5,991
+✓ [14/31] b46e15ed             temporal-reasoning         acc=78.6% ctx=5,852
+✗ [15/31] e3038f8c             multi-session              acc=73.3% ctx=5,779
+✓ [16/31] e48988bc             single-session-assistant   acc=75.0% ctx=6,033
+✗ [17/31] eeda8a6d             multi-session              acc=70.6% ctx=5,789
+╭───────────────────── Traceback (most recent call last) ──────────────────────╮
+│ /Users/mingjie/Desktop/llm-long-term-memory/src/llm_long_term_memory/command │
+│ s/eval_execution.py:154 in eval_run                                          │
+│                                                                              │
+│   151 │   │   │   │   highlight=False,                                       │
+│   152 │   │   │   )                                                          │
+│   153 │   │                                                                  │
+│ ❱ 154 │   │   report = run_eval(                                             │
+│   155 │   │   │   runner,                                                    │
+│   156 │   │   │   judge,                                                     │
+│   157 │   │   │   instances,                                                 │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/src/llm_long_term_memory/evaluat │
+│ ion/harness.py:157 in run_eval                                               │
+│                                                                              │
+│   154 │   path.parent.mkdir(parents=True, exist_ok=True)                     │
+│   155 │                                                                      │
+│   156 │   with _exclusive(path):                                             │
+│ ❱ 157 │   │   return _run_eval_locked(runner, judge, instances, path, usage, │
+│       resume, on_progress)                                                   │
+│   158                                                                        │
+│   159                                                                        │
+│   160 class StoreChanged(RuntimeError):                                      │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/src/llm_long_term_memory/evaluat │
+│ ion/harness.py:239 in _run_eval_locked                                       │
+│                                                                              │
+│   236 │   │   │   try:                                                       │
+│   237 │   │   │   │   runner.prepare(inst)                                   │
+│   238 │   │   │   │   answer = runner.answer(inst)                           │
+│ ❱ 239 │   │   │   │   verdict = judge.grade(                                 │
+│   240 │   │   │   │   │   question=inst.question,                            │
+│   241 │   │   │   │   │   gold=inst.answer,                                  │
+│   242 │   │   │   │   │   hypothesis=answer.text,                            │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/src/llm_long_term_memory/evaluat │
+│ ion/judge.py:157 in grade                                                    │
+│                                                                              │
+│   154 │   │   │   return JudgeResult(False, "empty answer", 0, 0)            │
+│   155 │   │                                                                  │
+│   156 │   │   prompt = self._prompt_for(question, gold, hypothesis,          │
+│       is_abstention, question_type)                                          │
+│ ❱ 157 │   │   completion = self.client.generate(                             │
+│   158 │   │   │   role="judge",                                              │
+│   159 │   │   │   model=self.model,                                          │
+│   160 │   │   │   prompt=prompt,                                             │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/src/llm_long_term_memory/llm/cli │
+│ ent.py:250 in generate                                                       │
+│                                                                              │
+│   247 │   │   │   try:                                                       │
+│   248 │   │   │   │   api_started = time.perf_counter()                      │
+│   249 │   │   │   │   with self.usage.measure(role, model) as box:           │
+│ ❱ 250 │   │   │   │   │   resp = self._client.models.generate_content(       │
+│   251 │   │   │   │   │   │   model=model, contents=prompt, config=config    │
+│   252 │   │   │   │   │   )                                                  │
+│   253 │   │   │   │   │   u = resp.usage_metadata                            │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packag │
+│ es/google/genai/models.py:6604 in generate_content                           │
+│                                                                              │
+│   6601 │   │   │   'afc',                                                    │
+│   6602 │   │   )                                                             │
+│   6603 │     i += 1                                                          │
+│ ❱ 6604 │     response = self._generate_content(                              │
+│   6605 │   │     model=model, contents=contents,                             │
+│        config=parsed_config_to_call                                          │
+│   6606 │     )                                                               │
+│   6607                                                                       │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packag │
+│ es/google/genai/models.py:5028 in _generate_content                          │
+│                                                                              │
+│   5025 │   request_dict = _common.convert_to_dict(request_dict)              │
+│   5026 │   request_dict = _common.encode_unserializable_types(request_dict)  │
+│   5027 │                                                                     │
+│ ❱ 5028 │   response = self._api_client.request(                              │
+│   5029 │   │   'post', path, request_dict, http_options                      │
+│   5030 │   )                                                                 │
+│   5031                                                                       │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packag │
+│ es/google/genai/_api_client.py:1708 in request                               │
+│                                                                              │
+│   1705 │   http_request = self._build_request(                               │
+│   1706 │   │   http_method, path, request_dict, http_options                 │
+│   1707 │   )                                                                 │
+│ ❱ 1708 │   response = self._request(http_request, http_options,              │
+│        stream=False)                                                         │
+│   1709 │   response_body = (                                                 │
+│   1710 │   │   response.response_stream[0] if response.response_stream else  │
+│        ''                                                                    │
+│   1711 │   )                                                                 │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packag │
+│ es/google/genai/_api_client.py:1495 in _request                              │
+│                                                                              │
+│   1492 │   │   retry = tenacity.Retrying(**retry_kwargs)                     │
+│   1493 │   │   return retry(self._request_once, http_request, stream)  #     │
+│        type: ignore[no-any-return]                                           │
+│   1494 │                                                                     │
+│ ❱ 1495 │   return self._retry(self._request_once, http_request, stream)  #   │
+│        type: ignore[no-any-return]                                           │
+│   1496                                                                       │
+│   1497   async def _async_request_once(                                      │
+│   1498 │     self, http_request: HttpRequest, stream: bool = False           │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packag │
+│ es/tenacity/__init__.py:470 in __call__                                      │
+│                                                                              │
+│   467 │   │                                                                  │
+│   468 │   │   retry_state = RetryCallState(retry_object=self, fn=fn,         │
+│       args=args, kwargs=kwargs)                                              │
+│   469 │   │   while True:                                                    │
+│ ❱ 470 │   │   │   do = self.iter(retry_state=retry_state)                    │
+│   471 │   │   │   if isinstance(do, DoAttempt):                              │
+│   472 │   │   │   │   try:                                                   │
+│   473 │   │   │   │   │   result = fn(*args, **kwargs)                       │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packag │
+│ es/tenacity/__init__.py:371 in iter                                          │
+│                                                                              │
+│   368 │   │   self._begin_iter(retry_state)                                  │
+│   369 │   │   result = None                                                  │
+│   370 │   │   for action in self.iter_state.actions:                         │
+│ ❱ 371 │   │   │   result = action(retry_state)                               │
+│   372 │   │   return result                                                  │
+│   373 │                                                                      │
+│   374 │   def _begin_iter(self, retry_state: "RetryCallState") -> None:  #   │
+│       noqa                                                                   │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packag │
+│ es/tenacity/__init__.py:413 in exc_check                                     │
+│                                                                              │
+│   410 │   │   │   │   fut = t.cast(Future, rs.outcome)                       │
+│   411 │   │   │   │   retry_exc = self.retry_error_cls(fut)                  │
+│   412 │   │   │   │   if self.reraise:                                       │
+│ ❱ 413 │   │   │   │   │   raise retry_exc.reraise()                          │
+│   414 │   │   │   │   raise retry_exc from fut.exception()                   │
+│   415 │   │   │                                                              │
+│   416 │   │   │   self._add_action_func(exc_check)                           │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packag │
+│ es/tenacity/__init__.py:184 in reraise                                       │
+│                                                                              │
+│   181 │                                                                      │
+│   182 │   def reraise(self) -> t.NoReturn:                                   │
+│   183 │   │   if self.last_attempt.failed:                                   │
+│ ❱ 184 │   │   │   raise self.last_attempt.result()                           │
+│   185 │   │   raise self                                                     │
+│   186 │                                                                      │
+│   187 │   def __str__(self) -> str:                                          │
+│                                                                              │
+│ /Users/mingjie/.local/share/uv/python/cpython-3.12.13-macos-aarch64-none/lib │
+│ /python3.12/concurrent/futures/_base.py:449 in result                        │
+│                                                                              │
+│   446 │   │   │   │   if self._state in [CANCELLED, CANCELLED_AND_NOTIFIED]: │
+│   447 │   │   │   │   │   raise CancelledError()                             │
+│   448 │   │   │   │   elif self._state == FINISHED:                          │
+│ ❱ 449 │   │   │   │   │   return self.__get_result()                         │
+│   450 │   │   │   │                                                          │
+│   451 │   │   │   │   self._condition.wait(timeout)                          │
+│   452                                                                        │
+│                                                                              │
+│ /Users/mingjie/.local/share/uv/python/cpython-3.12.13-macos-aarch64-none/lib │
+│ /python3.12/concurrent/futures/_base.py:401 in __get_result                  │
+│                                                                              │
+│   398 │   def __get_result(self):                                            │
+│   399 │   │   if self._exception:                                            │
+│   400 │   │   │   try:                                                       │
+│ ❱ 401 │   │   │   │   raise self._exception                                  │
+│   402 │   │   │   finally:                                                   │
+│   403 │   │   │   │   # Break a reference cycle with the exception in        │
+│       self._exception                                                        │
+│   404 │   │   │   │   self = None                                            │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packag │
+│ es/tenacity/__init__.py:473 in __call__                                      │
+│                                                                              │
+│   470 │   │   │   do = self.iter(retry_state=retry_state)                    │
+│   471 │   │   │   if isinstance(do, DoAttempt):                              │
+│   472 │   │   │   │   try:                                                   │
+│ ❱ 473 │   │   │   │   │   result = fn(*args, **kwargs)                       │
+│   474 │   │   │   │   except BaseException:  # noqa: B902                    │
+│   475 │   │   │   │   │   retry_state.set_exception(sys.exc_info())  # type: │
+│       ignore[arg-type]                                                       │
+│   476 │   │   │   │   else:                                                  │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packag │
+│ es/google/genai/_api_client.py:1472 in _request_once                         │
+│                                                                              │
+│   1469 │   │     timeout=http_request.timeout,                               │
+│   1470 │     )                                                               │
+│   1471 │     response = self._httpx_client.send(httpx_request,               │
+│        stream=stream)  # type: ignore[union-attr]                            │
+│ ❱ 1472 │   errors.APIError.raise_for_response(response)                      │
+│   1473 │   return HttpResponse(                                              │
+│   1474 │   │   response.headers, response if stream else [response.text]     │
+│   1475 │   )                                                                 │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packag │
+│ es/google/genai/errors.py:155 in raise_for_response                          │
+│                                                                              │
+│   152 │   else:                                                              │
+│   153 │     response_json = response.body_segments[0].get('error', {})       │
+│   154 │                                                                      │
+│ ❱ 155 │   cls.raise_error(response.status_code, response_json, response)     │
+│   156                                                                        │
+│   157   @classmethod                                                         │
+│   158   def raise_error(                                                     │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packag │
+│ es/google/genai/errors.py:186 in raise_error                                 │
+│                                                                              │
+│   183 │   if 400 <= status_code < 500:                                       │
+│   184 │     raise ClientError(status_code, response_json, response)          │
+│   185 │   elif 500 <= status_code < 600:                                     │
+│ ❱ 186 │     raise ServerError(status_code, response_json, response)          │
+│   187 │   else:                                                              │
+│   188 │     raise cls(status_code, response_json, response)                  │
+│   189                                                                        │
+╰──────────────────────────────────────────────────────────────────────────────╯
+ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error 
+encountered.', 'status': 'INTERNAL'}}
+rc=1 resume two_stage_raw_primary_t2 train150
+== 2026-10-06T18:02:33Z resume two_stage_raw_primary_t2 train150 attempt 2 (rows       17/31)
+observed limits: gemini-3.1-flash-lite rpd=500 rpm=15, gemini-3.5-flash-lite 
+rpd=500 rpm=15, gemma-4-31b-it rpd=1500 rpm=10
+two_stage_raw_primary_t2.t-probe-v1 · regression · 31 questions · 
+answerer=gemini-3.5-flash-lite judge=gemma-4-31b-it · top_k=20 rerank=False
+→ results/raw/two_stage_raw_primary_t2.t-probe-v1.jsonl
+
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/regex/_main.py:477: EncodingWarning: UTF-8 Mode affects locale.getpreferredencoding(). Consider locale.getencoding() instead.
+  pattern_locale = _getpreferredencoding(False)
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/regex/_main.py:477: EncodingWarning: UTF-8 Mode affects locale.getpreferredencoding(). Consider locale.getencoding() instead.
+  pattern_locale = _getpreferredencoding(False)
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/regex/_main.py:477: EncodingWarning: UTF-8 Mode affects locale.getpreferredencoding(). Consider locale.getencoding() instead.
+  pattern_locale = _getpreferredencoding(False)
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/regex/_main.py:477: EncodingWarning: UTF-8 Mode affects locale.getpreferredencoding(). Consider locale.getencoding() instead.
+  pattern_locale = _getpreferredencoding(False)
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/utils/_auth.py:152: EncodingWarning: 'encoding' argument not specified
+  return _clean_token(Path(constants.HF_TOKEN_PATH).read_text())
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/file_download.py:1123: EncodingWarning: 'encoding' argument not specified
+  with open(ref_path) as f:
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/utils/_auth.py:152: EncodingWarning: 'encoding' argument not specified
+  return _clean_token(Path(constants.HF_TOKEN_PATH).read_text())
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/file_download.py:1123: EncodingWarning: 'encoding' argument not specified
+  with open(ref_path) as f:
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/file_download.py:1548: EncodingWarning: 'encoding' argument not specified
+  with open(revision_file) as f:
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/regex/_main.py:477: EncodingWarning: UTF-8 Mode affects locale.getpreferredencoding(). Consider locale.getencoding() instead.
+  pattern_locale = _getpreferredencoding(False)
+Loading weights:   0%|          | 0/103 [00:00<?, ?it/s]Loading weights: 100%|██████████| 103/103 [00:00<00:00, 8064.01it/s]
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/_snapshot_download.py:312: EncodingWarning: 'encoding' argument not specified
+  with open(ref_path) as f:
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/utils/_auth.py:152: EncodingWarning: 'encoding' argument not specified
+  return _clean_token(Path(constants.HF_TOKEN_PATH).read_text())
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/file_download.py:1123: EncodingWarning: 'encoding' argument not specified
+  with open(ref_path) as f:
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/utils/_auth.py:152: EncodingWarning: 'encoding' argument not specified
+  return _clean_token(Path(constants.HF_TOKEN_PATH).read_text())
+✓ [18/31] f685340e             knowledge-update           acc=72.2% ctx=5,867
+╭───────────────────── Traceback (most recent call last) ──────────────────────╮
+│ /Users/mingjie/Desktop/llm-long-term-memory/src/llm_long_term_memory/command │
+│ s/eval_execution.py:154 in eval_run                                          │
+│                                                                              │
+│   151 │   │   │   │   highlight=False,                                       │
+│   152 │   │   │   )                                                          │
+│   153 │   │                                                                  │
+│ ❱ 154 │   │   report = run_eval(                                             │
+│   155 │   │   │   runner,                                                    │
+│   156 │   │   │   judge,                                                     │
+│   157 │   │   │   instances,                                                 │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/src/llm_long_term_memory/evaluat │
+│ ion/harness.py:157 in run_eval                                               │
+│                                                                              │
+│   154 │   path.parent.mkdir(parents=True, exist_ok=True)                     │
+│   155 │                                                                      │
+│   156 │   with _exclusive(path):                                             │
+│ ❱ 157 │   │   return _run_eval_locked(runner, judge, instances, path, usage, │
+│       resume, on_progress)                                                   │
+│   158                                                                        │
+│   159                                                                        │
+│   160 class StoreChanged(RuntimeError):                                      │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/src/llm_long_term_memory/evaluat │
+│ ion/harness.py:239 in _run_eval_locked                                       │
+│                                                                              │
+│   236 │   │   │   try:                                                       │
+│   237 │   │   │   │   runner.prepare(inst)                                   │
+│   238 │   │   │   │   answer = runner.answer(inst)                           │
+│ ❱ 239 │   │   │   │   verdict = judge.grade(                                 │
+│   240 │   │   │   │   │   question=inst.question,                            │
+│   241 │   │   │   │   │   gold=inst.answer,                                  │
+│   242 │   │   │   │   │   hypothesis=answer.text,                            │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/src/llm_long_term_memory/evaluat │
+│ ion/judge.py:157 in grade                                                    │
+│                                                                              │
+│   154 │   │   │   return JudgeResult(False, "empty answer", 0, 0)            │
+│   155 │   │                                                                  │
+│   156 │   │   prompt = self._prompt_for(question, gold, hypothesis,          │
+│       is_abstention, question_type)                                          │
+│ ❱ 157 │   │   completion = self.client.generate(                             │
+│   158 │   │   │   role="judge",                                              │
+│   159 │   │   │   model=self.model,                                          │
+│   160 │   │   │   prompt=prompt,                                             │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/src/llm_long_term_memory/llm/cli │
+│ ent.py:250 in generate                                                       │
+│                                                                              │
+│   247 │   │   │   try:                                                       │
+│   248 │   │   │   │   api_started = time.perf_counter()                      │
+│   249 │   │   │   │   with self.usage.measure(role, model) as box:           │
+│ ❱ 250 │   │   │   │   │   resp = self._client.models.generate_content(       │
+│   251 │   │   │   │   │   │   model=model, contents=prompt, config=config    │
+│   252 │   │   │   │   │   )                                                  │
+│   253 │   │   │   │   │   u = resp.usage_metadata                            │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packag │
+│ es/google/genai/models.py:6604 in generate_content                           │
+│                                                                              │
+│   6601 │   │   │   'afc',                                                    │
+│   6602 │   │   )                                                             │
+│   6603 │     i += 1                                                          │
+│ ❱ 6604 │     response = self._generate_content(                              │
+│   6605 │   │     model=model, contents=contents,                             │
+│        config=parsed_config_to_call                                          │
+│   6606 │     )                                                               │
+│   6607                                                                       │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packag │
+│ es/google/genai/models.py:5028 in _generate_content                          │
+│                                                                              │
+│   5025 │   request_dict = _common.convert_to_dict(request_dict)              │
+│   5026 │   request_dict = _common.encode_unserializable_types(request_dict)  │
+│   5027 │                                                                     │
+│ ❱ 5028 │   response = self._api_client.request(                              │
+│   5029 │   │   'post', path, request_dict, http_options                      │
+│   5030 │   )                                                                 │
+│   5031                                                                       │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packag │
+│ es/google/genai/_api_client.py:1708 in request                               │
+│                                                                              │
+│   1705 │   http_request = self._build_request(                               │
+│   1706 │   │   http_method, path, request_dict, http_options                 │
+│   1707 │   )                                                                 │
+│ ❱ 1708 │   response = self._request(http_request, http_options,              │
+│        stream=False)                                                         │
+│   1709 │   response_body = (                                                 │
+│   1710 │   │   response.response_stream[0] if response.response_stream else  │
+│        ''                                                                    │
+│   1711 │   )                                                                 │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packag │
+│ es/google/genai/_api_client.py:1495 in _request                              │
+│                                                                              │
+│   1492 │   │   retry = tenacity.Retrying(**retry_kwargs)                     │
+│   1493 │   │   return retry(self._request_once, http_request, stream)  #     │
+│        type: ignore[no-any-return]                                           │
+│   1494 │                                                                     │
+│ ❱ 1495 │   return self._retry(self._request_once, http_request, stream)  #   │
+│        type: ignore[no-any-return]                                           │
+│   1496                                                                       │
+│   1497   async def _async_request_once(                                      │
+│   1498 │     self, http_request: HttpRequest, stream: bool = False           │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packag │
+│ es/tenacity/__init__.py:470 in __call__                                      │
+│                                                                              │
+│   467 │   │                                                                  │
+│   468 │   │   retry_state = RetryCallState(retry_object=self, fn=fn,         │
+│       args=args, kwargs=kwargs)                                              │
+│   469 │   │   while True:                                                    │
+│ ❱ 470 │   │   │   do = self.iter(retry_state=retry_state)                    │
+│   471 │   │   │   if isinstance(do, DoAttempt):                              │
+│   472 │   │   │   │   try:                                                   │
+│   473 │   │   │   │   │   result = fn(*args, **kwargs)                       │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packag │
+│ es/tenacity/__init__.py:371 in iter                                          │
+│                                                                              │
+│   368 │   │   self._begin_iter(retry_state)                                  │
+│   369 │   │   result = None                                                  │
+│   370 │   │   for action in self.iter_state.actions:                         │
+│ ❱ 371 │   │   │   result = action(retry_state)                               │
+│   372 │   │   return result                                                  │
+│   373 │                                                                      │
+│   374 │   def _begin_iter(self, retry_state: "RetryCallState") -> None:  #   │
+│       noqa                                                                   │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packag │
+│ es/tenacity/__init__.py:413 in exc_check                                     │
+│                                                                              │
+│   410 │   │   │   │   fut = t.cast(Future, rs.outcome)                       │
+│   411 │   │   │   │   retry_exc = self.retry_error_cls(fut)                  │
+│   412 │   │   │   │   if self.reraise:                                       │
+│ ❱ 413 │   │   │   │   │   raise retry_exc.reraise()                          │
+│   414 │   │   │   │   raise retry_exc from fut.exception()                   │
+│   415 │   │   │                                                              │
+│   416 │   │   │   self._add_action_func(exc_check)                           │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packag │
+│ es/tenacity/__init__.py:184 in reraise                                       │
+│                                                                              │
+│   181 │                                                                      │
+│   182 │   def reraise(self) -> t.NoReturn:                                   │
+│   183 │   │   if self.last_attempt.failed:                                   │
+│ ❱ 184 │   │   │   raise self.last_attempt.result()                           │
+│   185 │   │   raise self                                                     │
+│   186 │                                                                      │
+│   187 │   def __str__(self) -> str:                                          │
+│                                                                              │
+│ /Users/mingjie/.local/share/uv/python/cpython-3.12.13-macos-aarch64-none/lib │
+│ /python3.12/concurrent/futures/_base.py:449 in result                        │
+│                                                                              │
+│   446 │   │   │   │   if self._state in [CANCELLED, CANCELLED_AND_NOTIFIED]: │
+│   447 │   │   │   │   │   raise CancelledError()                             │
+│   448 │   │   │   │   elif self._state == FINISHED:                          │
+│ ❱ 449 │   │   │   │   │   return self.__get_result()                         │
+│   450 │   │   │   │                                                          │
+│   451 │   │   │   │   self._condition.wait(timeout)                          │
+│   452                                                                        │
+│                                                                              │
+│ /Users/mingjie/.local/share/uv/python/cpython-3.12.13-macos-aarch64-none/lib │
+│ /python3.12/concurrent/futures/_base.py:401 in __get_result                  │
+│                                                                              │
+│   398 │   def __get_result(self):                                            │
+│   399 │   │   if self._exception:                                            │
+│   400 │   │   │   try:                                                       │
+│ ❱ 401 │   │   │   │   raise self._exception                                  │
+│   402 │   │   │   finally:                                                   │
+│   403 │   │   │   │   # Break a reference cycle with the exception in        │
+│       self._exception                                                        │
+│   404 │   │   │   │   self = None                                            │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packag │
+│ es/tenacity/__init__.py:473 in __call__                                      │
+│                                                                              │
+│   470 │   │   │   do = self.iter(retry_state=retry_state)                    │
+│   471 │   │   │   if isinstance(do, DoAttempt):                              │
+│   472 │   │   │   │   try:                                                   │
+│ ❱ 473 │   │   │   │   │   result = fn(*args, **kwargs)                       │
+│   474 │   │   │   │   except BaseException:  # noqa: B902                    │
+│   475 │   │   │   │   │   retry_state.set_exception(sys.exc_info())  # type: │
+│       ignore[arg-type]                                                       │
+│   476 │   │   │   │   else:                                                  │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packag │
+│ es/google/genai/_api_client.py:1472 in _request_once                         │
+│                                                                              │
+│   1469 │   │     timeout=http_request.timeout,                               │
+│   1470 │     )                                                               │
+│   1471 │     response = self._httpx_client.send(httpx_request,               │
+│        stream=stream)  # type: ignore[union-attr]                            │
+│ ❱ 1472 │   errors.APIError.raise_for_response(response)                      │
+│   1473 │   return HttpResponse(                                              │
+│   1474 │   │   response.headers, response if stream else [response.text]     │
+│   1475 │   )                                                                 │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packag │
+│ es/google/genai/errors.py:155 in raise_for_response                          │
+│                                                                              │
+│   152 │   else:                                                              │
+│   153 │     response_json = response.body_segments[0].get('error', {})       │
+│   154 │                                                                      │
+│ ❱ 155 │   cls.raise_error(response.status_code, response_json, response)     │
+│   156                                                                        │
+│   157   @classmethod                                                         │
+│   158   def raise_error(                                                     │
+│                                                                              │
+│ /Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packag │
+│ es/google/genai/errors.py:186 in raise_error                                 │
+│                                                                              │
+│   183 │   if 400 <= status_code < 500:                                       │
+│   184 │     raise ClientError(status_code, response_json, response)          │
+│   185 │   elif 500 <= status_code < 600:                                     │
+│ ❱ 186 │     raise ServerError(status_code, response_json, response)          │
+│   187 │   else:                                                              │
+│   188 │     raise cls(status_code, response_json, response)                  │
+│   189                                                                        │
+╰──────────────────────────────────────────────────────────────────────────────╯
+ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error 
+encountered.', 'status': 'INTERNAL'}}
+rc=1 resume two_stage_raw_primary_t2 train150
+== 2026-10-06T18:04:25Z resume two_stage_raw_primary_t2 train150 attempt 3 (rows       18/31)
+observed limits: gemini-3.1-flash-lite rpd=500 rpm=15, gemini-3.5-flash-lite 
+rpd=500 rpm=15, gemma-4-31b-it rpd=1500 rpm=10
+two_stage_raw_primary_t2.t-probe-v1 · regression · 31 questions · 
+answerer=gemini-3.5-flash-lite judge=gemma-4-31b-it · top_k=20 rerank=False
+→ results/raw/two_stage_raw_primary_t2.t-probe-v1.jsonl
+
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/regex/_main.py:477: EncodingWarning: UTF-8 Mode affects locale.getpreferredencoding(). Consider locale.getencoding() instead.
+  pattern_locale = _getpreferredencoding(False)
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/regex/_main.py:477: EncodingWarning: UTF-8 Mode affects locale.getpreferredencoding(). Consider locale.getencoding() instead.
+  pattern_locale = _getpreferredencoding(False)
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/regex/_main.py:477: EncodingWarning: UTF-8 Mode affects locale.getpreferredencoding(). Consider locale.getencoding() instead.
+  pattern_locale = _getpreferredencoding(False)
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/regex/_main.py:477: EncodingWarning: UTF-8 Mode affects locale.getpreferredencoding(). Consider locale.getencoding() instead.
+  pattern_locale = _getpreferredencoding(False)
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/utils/_auth.py:152: EncodingWarning: 'encoding' argument not specified
+  return _clean_token(Path(constants.HF_TOKEN_PATH).read_text())
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/file_download.py:1123: EncodingWarning: 'encoding' argument not specified
+  with open(ref_path) as f:
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/utils/_auth.py:152: EncodingWarning: 'encoding' argument not specified
+  return _clean_token(Path(constants.HF_TOKEN_PATH).read_text())
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/file_download.py:1123: EncodingWarning: 'encoding' argument not specified
+  with open(ref_path) as f:
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/file_download.py:1548: EncodingWarning: 'encoding' argument not specified
+  with open(revision_file) as f:
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/regex/_main.py:477: EncodingWarning: UTF-8 Mode affects locale.getpreferredencoding(). Consider locale.getencoding() instead.
+  pattern_locale = _getpreferredencoding(False)
+Loading weights:   0%|          | 0/103 [00:00<?, ?it/s]Loading weights: 100%|██████████| 103/103 [00:00<00:00, 7435.30it/s]
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/_snapshot_download.py:312: EncodingWarning: 'encoding' argument not specified
+  with open(ref_path) as f:
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/utils/_auth.py:152: EncodingWarning: 'encoding' argument not specified
+  return _clean_token(Path(constants.HF_TOKEN_PATH).read_text())
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/file_download.py:1123: EncodingWarning: 'encoding' argument not specified
+  with open(ref_path) as f:
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/utils/_auth.py:152: EncodingWarning: 'encoding' argument not specified
+  return _clean_token(Path(constants.HF_TOKEN_PATH).read_text())
+✓ [19/31] f9e8c073             knowledge-update           acc=73.7% ctx=5,758
+✓ [20/31] gpt4_2f91af09        multi-session              acc=75.0% ctx=5,805
+✗ [21/31] gpt4_4929293b        temporal-reasoning         acc=71.4% ctx=6,025
+✓ [22/31] gpt4_78cf46a3        temporal-reasoning         acc=72.7% ctx=5,781
+✓ [23/31] gpt4_7a0daae1        temporal-reasoning         acc=73.9% ctx=5,650
+✓ [24/31] gpt4_8279ba02        temporal-reasoning         acc=75.0% ctx=5,872
+✓ [25/31] gpt4_a1b77f9c        temporal-reasoning         acc=76.0% ctx=5,871
+✓ [26/31] gpt4_a2d1d1f6        temporal-reasoning         acc=76.9% ctx=5,738
+✗ [27/31] gpt4_a56e767c        multi-session              acc=74.1% ctx=5,984
+✗ [28/31] gpt4_ab202e7f        multi-session              acc=71.4% ctx=5,961
+✗ [29/31] gpt4_b5700ca0        temporal-reasoning         acc=69.0% ctx=6,574
+✗ [30/31] gpt4_d12ceb0e        multi-session              acc=66.7% ctx=6,025
+✗ [31/31] gpt4_d6585ce9        temporal-reasoning         acc=64.5% ctx=5,886
+
+### `two_stage_raw_primary_t2.t-probe-v1`
+
+- questions: **31**
+- accuracy: **64.5%**
+- median context tokens: **5,871**
+- observed p95 answer API latency: **2.3s**
+- source-session recall: **96.8%**
+
+| question type | n | accuracy |
+|---|---|---|
+| knowledge-update | 5 | 100.0% |
+| multi-session | 12 | 33.3% |
+| single-session-assistant | 1 | 100.0% |
+| single-session-preference | 1 | 100.0% |
+| single-session-user | 1 | 100.0% |
+| temporal-reasoning | 11 | 72.7% |
+== 2026-10-06T18:11:58Z resume two_stage_raw_primary_t2 dev100 attempt 1 (rows        9/18)
+observed limits: gemini-3.1-flash-lite rpd=500 rpm=15, gemini-3.5-flash-lite 
+rpd=500 rpm=15, gemma-4-31b-it rpd=1500 rpm=10
+two_stage_raw_primary_t2.t-probe-v1-dev · regression · 18 questions · 
+answerer=gemini-3.5-flash-lite judge=gemma-4-31b-it · top_k=20 rerank=False
+→ results/raw/two_stage_raw_primary_t2.t-probe-v1-dev.jsonl
+
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/regex/_main.py:477: EncodingWarning: UTF-8 Mode affects locale.getpreferredencoding(). Consider locale.getencoding() instead.
+  pattern_locale = _getpreferredencoding(False)
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/regex/_main.py:477: EncodingWarning: UTF-8 Mode affects locale.getpreferredencoding(). Consider locale.getencoding() instead.
+  pattern_locale = _getpreferredencoding(False)
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/regex/_main.py:477: EncodingWarning: UTF-8 Mode affects locale.getpreferredencoding(). Consider locale.getencoding() instead.
+  pattern_locale = _getpreferredencoding(False)
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/regex/_main.py:477: EncodingWarning: UTF-8 Mode affects locale.getpreferredencoding(). Consider locale.getencoding() instead.
+  pattern_locale = _getpreferredencoding(False)
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/utils/_auth.py:152: EncodingWarning: 'encoding' argument not specified
+  return _clean_token(Path(constants.HF_TOKEN_PATH).read_text())
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/file_download.py:1123: EncodingWarning: 'encoding' argument not specified
+  with open(ref_path) as f:
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/utils/_auth.py:152: EncodingWarning: 'encoding' argument not specified
+  return _clean_token(Path(constants.HF_TOKEN_PATH).read_text())
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/file_download.py:1123: EncodingWarning: 'encoding' argument not specified
+  with open(ref_path) as f:
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/file_download.py:1548: EncodingWarning: 'encoding' argument not specified
+  with open(revision_file) as f:
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/regex/_main.py:477: EncodingWarning: UTF-8 Mode affects locale.getpreferredencoding(). Consider locale.getencoding() instead.
+  pattern_locale = _getpreferredencoding(False)
+Loading weights:   0%|          | 0/103 [00:00<?, ?it/s]Loading weights: 100%|██████████| 103/103 [00:00<00:00, 6767.44it/s]
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/_snapshot_download.py:312: EncodingWarning: 'encoding' argument not specified
+  with open(ref_path) as f:
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/utils/_auth.py:152: EncodingWarning: 'encoding' argument not specified
+  return _clean_token(Path(constants.HF_TOKEN_PATH).read_text())
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/file_download.py:1123: EncodingWarning: 'encoding' argument not specified
+  with open(ref_path) as f:
+/Users/mingjie/Desktop/llm-long-term-memory/.venv/lib/python3.12/site-packages/huggingface_hub/utils/_auth.py:152: EncodingWarning: 'encoding' argument not specified
+  return _clean_token(Path(constants.HF_TOKEN_PATH).read_text())
+✓ [10/18] gpt4_213fd887        temporal-reasoning         acc=50.0% ctx=5,659
+✓ [11/18] gpt4_483dd43c        temporal-reasoning         acc=54.5% ctx=5,944
+✓ [12/18] gpt4_4ef30696        temporal-reasoning         acc=58.3% ctx=5,934
+✓ [13/18] gpt4_65aabe59        temporal-reasoning         acc=61.5% ctx=5,740
+✗ [14/18] gpt4_7bc6cf22        temporal-reasoning         acc=57.1% ctx=5,977
+✗ [15/18] gpt4_85da3956        temporal-reasoning         acc=53.3% ctx=5,797
+✓ [16/18] gpt4_93159ced        temporal-reasoning         acc=56.2% ctx=5,932
+✗ [17/18] gpt4_e05b82a6        multi-session              acc=52.9% ctx=5,893
+✗ [18/18] gpt4_e414231f        temporal-reasoning         acc=50.0% ctx=5,808
+
+### `two_stage_raw_primary_t2.t-probe-v1-dev`
+
+- questions: **18**
+- accuracy: **50.0%**
+- median context tokens: **5,893**
+- observed p95 answer API latency: **10.0s**
+- source-session recall: **100.0%**
+
+| question type | n | accuracy |
+|---|---|---|
+| knowledge-update | 4 | 50.0% |
+| multi-session | 5 | 40.0% |
+| temporal-reasoning | 9 | 55.6% |
+== 2026-10-06T18:19:37Z RESUME DONE

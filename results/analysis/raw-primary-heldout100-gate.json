@@ -1,0 +1,128 @@
+{
+  "scores": {
+    "two_stage_hydrated.heldout100": 70,
+    "two_stage_hydrated.heldout100-rep2": 71,
+    "two_stage_hydrated.heldout100-rep3": 73,
+    "two_stage_hydrated.heldout100-rep4": 72,
+    "two_stage_raw_primary.raw-primary-v1": 83,
+    "two_stage_raw_only.raw-primary-v1": 76
+  },
+  "drift": {
+    "fresh": 72,
+    "range": [
+      67,
+      76
+    ],
+    "declared": false
+  },
+  "control_runs_used": [
+    "two_stage_hydrated.heldout100",
+    "two_stage_hydrated.heldout100-rep2",
+    "two_stage_hydrated.heldout100-rep3",
+    "two_stage_hydrated.heldout100-rep4"
+  ],
+  "control_majority_score": 69,
+  "control_ties": [
+    "00ca467f",
+    "a96c20ee_abs",
+    "gpt4_0b2f1d21",
+    "gpt4_61e13b3c"
+  ],
+  "primary_R_vs_control": {
+    "wins": 18,
+    "losses": 4,
+    "net": 14
+  },
+  "by_type_R_vs_control": {
+    "knowledge-update": {
+      "wins": 2,
+      "losses": 1,
+      "net": 1
+    },
+    "multi-session": {
+      "wins": 5,
+      "losses": 2,
+      "net": 3
+    },
+    "single-session-assistant": {
+      "wins": 2,
+      "losses": 0,
+      "net": 2
+    },
+    "single-session-preference": {
+      "wins": 1,
+      "losses": 0,
+      "net": 1
+    },
+    "single-session-user": {
+      "wins": 1,
+      "losses": 0,
+      "net": 1
+    },
+    "temporal-reasoning": {
+      "wins": 7,
+      "losses": 1,
+      "net": 6
+    }
+  },
+  "median_context_tokens": {
+    "two_stage_hydrated.heldout100-rep4": 1502.0,
+    "two_stage_raw_primary.raw-primary-v1": 5598.5,
+    "two_stage_raw_only.raw-primary-v1": 4125.5
+  },
+  "rules": {
+    "net_at_least_5": true,
+    "no_type_loses_more_than_2": true,
+    "median_context_at_most_5500": false
+  },
+  "pass": false,
+  "descriptive_R_vs_fresh_control": {
+    "wins": 18,
+    "losses": 7,
+    "net": 11,
+    "exact_mcnemar_p": 0.043285250663757324
+  },
+  "secondary_R_vs_O": {
+    "wins": 13,
+    "losses": 6,
+    "net": 7
+  },
+  "secondary_R_vs_O_state_types": {
+    "wins": 8,
+    "losses": 2,
+    "net": 6
+  },
+  "type_counts": {
+    "multi-session": 27,
+    "knowledge-update": 15,
+    "single-session-user": 14,
+    "single-session-preference": 6,
+    "temporal-reasoning": 27,
+    "single-session-assistant": 11
+  },
+  "flipped_R_vs_control": [
+    "00ca467f",
+    "1da05512",
+    "2b8f3739",
+    "4baee567",
+    "60159905",
+    "69fee5aa",
+    "6e984302",
+    "71315a70",
+    "75499fd8",
+    "852ce960",
+    "8cf51dda",
+    "91b15a6e",
+    "a346bb18",
+    "a96c20ee_abs",
+    "e4e14d04",
+    "e6041065",
+    "gpt4_4cd9eba1",
+    "gpt4_5438fa52",
+    "gpt4_61e13b3c",
+    "gpt4_8c8961ae",
+    "gpt4_9a159967",
+    "gpt4_fe651585"
+  ],
+  "raw_primary_turns_median": 20.0
+}

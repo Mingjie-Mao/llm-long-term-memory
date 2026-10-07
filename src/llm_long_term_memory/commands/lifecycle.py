@@ -41,14 +41,77 @@ def _rebuild_index(cfg, settings: Settings, store_name: str) -> None:
             rebuilt.add([memory.id for memory in memories], vectors)
         rebuilt.save()
         rebuilt.validate_ids(store.memory_ids())
-        target = settings.store_dir / f"{store_name}-index"
-        for suffix in (".npy", ".ids.json", ".manifest.json"):
-            temp_stem.with_suffix(suffix).replace(target.with_suffix(suffix))
+        promoted = rebuilt.promote(settings.store_dir / f"{store_name}-index")
+        promoted.validate_ids(store.memory_ids())
         console.print(f"[green]✓[/green] rebuilt {len(memories):,} vectors for {store_name}")
     finally:
         store.close()
         for suffix in (".npy", ".ids.json", ".manifest.json"):
             temp_stem.with_suffix(suffix).unlink(missing_ok=True)
+
+
+@lifecycle_app.command("build-turn-index")
+def lifecycle_build_turn_index(
+    config: str = typer.Option("configs/fallback.yaml", "--config", "-c"),
+    store_name: str = typer.Option("live", help="Memory store filename stem"),
+    fact_keys: bool = typer.Option(
+        False,
+        "--fact-keys",
+        help="Embed each turn with the facts anchored to it (writes <store>-turn-key-index)",
+    ),
+) -> None:
+    """Embed every raw turn with the local encoder, for dense turn retrieval.
+
+    A derivative of the durable turns, like the memory index: no provider call, written
+    to a temporary stem and swapped in whole, and taken under the store's writer lock.
+    """
+    from llm_long_term_memory.config import ExperimentConfig
+
+    cfg = ExperimentConfig.from_yaml(config)
+    settings = Settings()
+    with cli_lock(settings.store_dir / f"{store_name}.db", what="turn index build"):
+        count = _build_turn_index(cfg, settings, store_name, fact_keys=fact_keys)
+    console.print(f"[green]✓[/green] embedded {count:,} turns for {store_name}")
+
+
+def _build_turn_index(cfg, settings: Settings, store_name: str, fact_keys: bool = False) -> int:
+    from llm_long_term_memory.embed import Encoder
+    from llm_long_term_memory.retrieve.excerpts import fact_keyed_texts
+    from llm_long_term_memory.store import NumpyFlatIndex, SQLiteMemoryStore
+
+    store = SQLiteMemoryStore(settings.store_dir / f"{store_name}.db", read_only=True)
+    store.initialize()
+    try:
+        turns = [
+            turn
+            for session_id in sorted(store.session_ids())
+            for turn in store.turns_for_session(session_id)
+        ]
+        texts = {turn.id: turn.content for turn in turns}
+        if fact_keys:
+            # Keys are per user: a fact is only ever attached to its own user's turn.
+            for user_id in store.user_ids():
+                own = [
+                    turn
+                    for session_id in store.session_ids_for_user(user_id)
+                    for turn in store.turns_for_session(session_id)
+                ]
+                texts.update(fact_keyed_texts(store, user_id, own))
+    finally:
+        store.close()
+    suffix_stem = "turn-key-index" if fact_keys else "turn-index"
+    temp_stem = settings.store_dir / f".{store_name}-{suffix_stem}-build"
+    built = NumpyFlatIndex(temp_stem, dim=cfg.models.embedding_dim)
+    try:
+        if turns:
+            vectors = Encoder(cfg.models.embedder).encode([texts[t.id] for t in turns])
+            built.add([t.id for t in turns], vectors)
+        built.save()
+        built.promote(settings.store_dir / f"{store_name}-{suffix_stem}")
+    finally:
+        for suffix in (".npy", ".ids.json", ".manifest.json"):
+            temp_stem.with_suffix(suffix).unlink(missing_ok=True)
+    return len(turns)
 
 
 @lifecycle_app.command("run")

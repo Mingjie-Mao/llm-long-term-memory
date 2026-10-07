@@ -1,0 +1,572 @@
+{
+  "experiment_class": "exposed-train150-mechanism-development",
+  "reader_label": "prerequisite-reader-v18-v8",
+  "mechanism_pass_under_preregistered_five_plus_one": false,
+  "faithful_temporal_conflict_disclosure": true,
+  "supported_correct": 4,
+  "supported_total": 5,
+  "pass": false,
+  "reader_count": 6,
+  "grade_count": 6,
+  "correct": 5,
+  "rows": [
+    {
+      "question_id": "b46e15ed",
+      "user_review": true,
+      "review_complete": true,
+      "page_count": 4,
+      "gold_raw_final_context_complete": true,
+      "missing_gold_turns": [],
+      "context_bound": true,
+      "judged_correct": true,
+      "answer": "2 months and 3 days",
+      "calculation": {
+        "operation": "duration",
+        "records_supplied": [
+          "{\"source\":\"E10\",\"quote\":\"I volunteered at the \\\"Books for Kids\\\" charity book drive event at my local library today, helping to sort and pack over 500 books for underprivileged kids in the neighborhood.\",\"value\":\"\",\"unit\":\"\",\"key\":\"sequence-end\",\"time\":\"today\"}",
+          "{\"source\":\"QUESTION_DATE\",\"quote\":\"\",\"value\":\"\",\"unit\":\"\",\"key\":\"question-date\",\"time\":\"\"}"
+        ],
+        "reviewed_sources": [
+          "E1",
+          "E2",
+          "E3",
+          "E4",
+          "E5",
+          "E6",
+          "E7",
+          "E8",
+          "E9",
+          "E10",
+          "E11",
+          "E12",
+          "E13",
+          "E14",
+          "E15",
+          "E16",
+          "E17",
+          "E18",
+          "E19",
+          "E20",
+          "E21",
+          "E22",
+          "E23",
+          "E24",
+          "E25",
+          "E26",
+          "E27",
+          "E28",
+          "E29",
+          "E30",
+          "E31",
+          "E32",
+          "E33",
+          "E34",
+          "E35",
+          "E36",
+          "E37",
+          "E38",
+          "E39",
+          "E40",
+          "E41",
+          "E42",
+          "E43",
+          "E44",
+          "E45",
+          "E46",
+          "E47",
+          "E48",
+          "E49",
+          "E50",
+          "E51"
+        ],
+        "scope_complete": true,
+        "citations": [
+          {
+            "source": "E10",
+            "quote": "I volunteered at the \"Books for Kids\" charity book drive event at my local library today, helping to sort and pack over 500 books for underprivileged kids in the neighborhood.",
+            "value": "",
+            "unit": "",
+            "key": "sequence-end",
+            "time": "today",
+            "resolved_date": "2023-02-15",
+            "precision": "day",
+            "conversation_date": "2023-02-15"
+          },
+          {
+            "source": "QUESTION_DATE",
+            "quote": "",
+            "value": "",
+            "unit": "",
+            "key": "question-date",
+            "time": "",
+            "resolved_date": "2023-04-18"
+          }
+        ],
+        "days": 62,
+        "start": "2023-02-15",
+        "end": "2023-04-18",
+        "approximate": false,
+        "mechanism": "consecutive_event_interval",
+        "sequence_citations": [
+          {
+            "source": "E2",
+            "quote": "I'm feeling a bit tired today, just got back from the \"24-Hour Bike Ride\" charity event, where I cycled for 4 hours non-stop to raise money for a local children's hospital.",
+            "resolved_date": "2023-02-14"
+          },
+          {
+            "source": "E10",
+            "quote": "I volunteered at the \"Books for Kids\" charity book drive event at my local library today, helping to sort and pack over 500 books for underprivileged kids in the neighborhood.",
+            "resolved_date": "2023-02-15"
+          }
+        ]
+      },
+      "evidence_gap": null
+    },
+    {
+      "question_id": "9d25d4e0",
+      "user_review": true,
+      "review_complete": true,
+      "page_count": 3,
+      "gold_raw_final_context_complete": true,
+      "missing_gold_turns": [],
+      "context_bound": true,
+      "judged_correct": false,
+      "answer": "4: silver necklace, emerald earrings, engagement ring, Victorian-era wooden dresser",
+      "calculation": {
+        "operation": "count",
+        "records_supplied": [
+          "{\"source\":\"E6\",\"quote\":\"I just got a new silver necklace with a small pendant on the 15th of last month\",\"value\":\"silver necklace\",\"unit\":\"\",\"key\":\"silver-necklace\",\"time\":\"\"}",
+          "{\"source\":\"E9\",\"quote\":\"I just got a new pair of earrings last weekend at a flea market - a stunning pair of emerald earrings\",\"value\":\"emerald earrings\",\"unit\":\"\",\"key\":\"emerald-earrings\",\"time\":\"\"}",
+          "{\"source\":\"E11\",\"quote\":\"I got my engagement ring a month ago\",\"value\":\"engagement ring\",\"unit\":\"\",\"key\":\"engagement-ring\",\"time\":\"\"}",
+          "{\"source\":\"E84\",\"quote\":\"The user inherited a Victorian-era wooden dresser from their grandmother's estate.\",\"value\":\"Victorian-era wooden dresser\",\"unit\":\"\",\"key\":\"wooden-dresser\",\"time\":\"\"}"
+        ],
+        "reviewed_sources": [
+          "E2",
+          "E6",
+          "E9",
+          "E11",
+          "E84"
+        ],
+        "scope_complete": true,
+        "citations": [
+          {
+            "source": "E6",
+            "quote": "I just got a new silver necklace with a small pendant on the 15th of last month",
+            "value": "silver necklace",
+            "unit": "",
+            "key": "silver-necklace",
+            "time": ""
+          },
+          {
+            "source": "E9",
+            "quote": "I just got a new pair of earrings last weekend at a flea market - a stunning pair of emerald earrings",
+            "value": "emerald earrings",
+            "unit": "",
+            "key": "emerald-earrings",
+            "time": ""
+          },
+          {
+            "source": "E11",
+            "quote": "I got my engagement ring a month ago",
+            "value": "engagement ring",
+            "unit": "",
+            "key": "engagement-ring",
+            "time": ""
+          },
+          {
+            "source": "E84",
+            "quote": "The user inherited a Victorian-era wooden dresser from their grandmother's estate.",
+            "value": "Victorian-era wooden dresser",
+            "unit": "",
+            "key": "wooden-dresser",
+            "time": ""
+          }
+        ],
+        "duplicates_removed": 0,
+        "members": [
+          "silver necklace",
+          "emerald earrings",
+          "engagement ring",
+          "Victorian-era wooden dresser"
+        ],
+        "observations": [
+          "{\"source\":\"E6\",\"quote\":\"I'm thinking of cleaning my jewelry collection and I want to make sure I do it right. Can you guide me through the process or recommend a good jewelry cleaning solution? By the way, I just got a new silver necklace with a small pendant on the 15th of last month, and I want to make sure I take good care of it.\",\"interpretation\":\"Acquired a new silver necklace with a small pendant on the 15th of last month (April 2023), which is within the last two months relative to May 28, 2023.\",\"decision\":\"include\"}",
+          "{\"source\":\"E9\",\"quote\":\"I'm thinking of cleaning my jewelry collection this weekend and I'm not sure what's the best way to clean different types of jewelry. Do you have any tips or recommendations? By the way, I just got a new pair of earrings last weekend at a flea market - a stunning pair of emerald earrings that I'm absolutely loving!\",\"interpretation\":\"Acquired a new pair of emerald earrings last weekend at a flea market (May 13-14, 2023), which is within the last two months.\",\"decision\":\"include\"}",
+          "{\"source\":\"E11\",\"quote\":\"I need help with cleaning my jewelry. Can you give me some tips on how to properly clean my gold chains and rings? Oh, and by the way, I got my engagement ring a month ago, and I still need to get it resized - it's still a bit too loose.\",\"interpretation\":\"Acquired an engagement ring a month ago (around April 2023), which is within the last two months.\",\"decision\":\"include\"}",
+          "{\"source\":\"E2\",\"quote\":\"I've already got a lead on a local furniture restorer, but I'll definitely check out these resources to compare services and prices. On a related note, I've been thinking about my grandmother's estate that we inherited last month - there were some amazing antique pieces, and I'm glad we decided to split them among us.\",\"interpretation\":\"Inherited antique pieces from grandmother's estate last month (April 2023), including a Victorian-era wooden dresser (E84).\",\"decision\":\"include\"}",
+          "{\"source\":\"E84\",\"quote\":\"The user inherited a Victorian-era wooden dresser from their grandmother's estate.\",\"interpretation\":\"Selected operand from original evidence\",\"decision\":\"include\"}"
+        ],
+        "focus_sources": [],
+        "canonicalization": []
+      },
+      "evidence_gap": null
+    },
+    {
+      "question_id": "gpt4_731e37d7",
+      "user_review": true,
+      "review_complete": true,
+      "page_count": 4,
+      "gold_raw_final_context_complete": true,
+      "missing_gold_turns": [],
+      "context_bound": true,
+      "judged_correct": true,
+      "answer": "The quoted attendance payments total $720 ($500 + $20 + $200). I cannot confirm that this is the total within the requested months: a 2023-02-26 conversation says the user just attended an event on March 15. The event date/year needs clarification; I have not assumed a corrected year.",
+      "calculation": {
+        "mechanism": "scoped_payment_conflict",
+        "scope_complete": false,
+        "reported_total": "720",
+        "payments": [
+          {
+            "source": "E1",
+            "source_id": "scoped-session-v1:13:gpt4_731e37d7answer_826d51da_2:0",
+            "quote": "I paid $500 to attend",
+            "amount": "500",
+            "unit": "$",
+            "event": "digital marketing workshop"
+          },
+          {
+            "source": "E3",
+            "source_id": "scoped-session-v1:13:gpt4_731e37d7answer_826d51da_3:10",
+            "quote": "I paid $20 to attend",
+            "amount": "20",
+            "unit": "$",
+            "event": "mindfulness workshop"
+          },
+          {
+            "source": "E4",
+            "source_id": "scoped-session-v1:13:gpt4_731e37d7answer_826d51da_4:0",
+            "quote": "I paid $200 to attend",
+            "amount": "200",
+            "unit": "$",
+            "event": "writing workshop"
+          }
+        ],
+        "temporal_conflicts": [
+          {
+            "source": "E1",
+            "source_id": "scoped-session-v1:13:gpt4_731e37d7answer_826d51da_2:0",
+            "quote": "I'm looking to improve my business's online presence and I was wondering if you can recommend some tools for social media analytics. By the way, I just attended a digital marketing workshop at the city convention center on March 15-16, and it was really helpful in understanding the importance of tracking my online engagement. I paid $500 to attend, and it was worth it!",
+            "conversation_date": "2023-02-26",
+            "original_event_expression": "March 15",
+            "inferred_event_date": "2022-03-15",
+            "amount": "500"
+          }
+        ],
+        "duplicate_payment_mentions": [
+          {
+            "source_id": "scoped-session-v1:13:gpt4_731e37d7answer_826d51da_4:4",
+            "quote": "I paid $200 to attend",
+            "event": "writing workshop",
+            "event_date_key": [
+              "november",
+              "original_month_expression"
+            ]
+          }
+        ]
+      },
+      "evidence_gap": {
+        "status": "needs_clarification",
+        "cause": "event_year_or_requested_period_unresolved",
+        "missing_fields": [
+          "event_date",
+          "event_year",
+          "report_period"
+        ],
+        "user_id": "gpt4_731e37d7",
+        "question": "How much total money did I spend on attending workshops in the last four months?",
+        "sources": [
+          {
+            "source": "E1",
+            "source_id": "scoped-session-v1:13:gpt4_731e37d7answer_826d51da_2:0",
+            "quote": "I'm looking to improve my business's online presence and I was wondering if you can recommend some tools for social media analytics. By the way, I just attended a digital marketing workshop at the city convention center on March 15-16, and it was really helpful in understanding the importance of tracking my online engagement. I paid $500 to attend, and it was worth it!",
+            "conversation_date": "2023-02-26",
+            "original_event_expression": "March 15",
+            "inferred_event_date": "2022-03-15",
+            "amount": "500"
+          }
+        ],
+        "clarification": "Confirm the completed event's date/year and whether its payment falls in the requested period.",
+        "resolution": "Ingest the clarification into this user's history, then ask again."
+      }
+    },
+    {
+      "question_id": "gpt4_a1b77f9c",
+      "user_review": true,
+      "review_complete": true,
+      "page_count": 3,
+      "gold_raw_final_context_complete": true,
+      "missing_gold_turns": [],
+      "context_bound": true,
+      "judged_correct": true,
+      "answer": "8 weeks",
+      "calculation": {
+        "operation": "duration",
+        "records_supplied": [
+          "{\"source\":\"E1\",\"quote\":\"I'm looking for some book recommendations. I started reading 'The Nightingale' by Kristin Hannah today and I'm really into historical fiction right now. Can you suggest some other books in the same genre that you think I'd enjoy?\",\"value\":\"\",\"unit\":\"\",\"key\":\"the nightingale\",\"time\":\"today\"}",
+          "{\"source\":\"E2\",\"quote\":\"I'm looking for some book recommendations. I just finished reading \\\"The Nightingale\\\" by Kristin Hannah today, and I'm still reeling from the emotional impact. I'm open to trying out different genres, so feel free to suggest anything that you think I might enjoy.\",\"value\":\"\",\"unit\":\"\",\"key\":\"the nightingale\",\"time\":\"today\"}",
+          "{\"source\":\"E3\",\"quote\":\"That's really helpful, thanks! I think I can apply this to some of my own habits. Speaking of habits, I just started listening to 'Sapiens: A Brief History of Humankind' by Yuval Noah Harari today, and it got me thinking about how humans have developed certain habits and behaviors over time.\",\"value\":\"\",\"unit\":\"\",\"key\":\"sapiens: a brief history of humankind\",\"time\":\"today\"}",
+          "{\"source\":\"E4\",\"quote\":\"I just finished listening to 'Sapiens: A Brief History of Humankind' by Yuval Noah Harari today, and it got me thinking about the impact of technology on human evolution. Can you tell me more about the latest advancements in AI and its potential applications in various industries?\",\"value\":\"\",\"unit\":\"\",\"key\":\"sapiens: a brief history of humankind\",\"time\":\"today\"}",
+          "{\"source\":\"E5\",\"quote\":\"I'm so interested in learning more about the themes of identity, culture, and power in \\\"The Brief Wondrous Life of Oscar Wao\\\". I've been thinking a lot about how these themes relate to my own experiences as a woman, and I started listening to \\\"The Power\\\" by Naomi Alderman today, which got me thinking about how I take certain things for granted. Do you think \\\"The Brief Wondrous Life of Oscar Wao\\\" would be a good fit for someone interested in exploring these themes further?\",\"value\":\"\",\"unit\":\"\",\"key\":\"the power\",\"time\":\"today\"}",
+          "{\"source\":\"E7\",\"quote\":\"I'm looking for some book recommendations. I just finished listening to 'The Power' by Naomi Alderman today and it really made me think. I'm interested in exploring more books that challenge my perspectives. Do you have any suggestions?\",\"value\":\"\",\"unit\":\"\",\"key\":\"the power\",\"time\":\"today\"}"
+        ],
+        "reviewed_sources": [
+          "E1",
+          "E2",
+          "E3",
+          "E4",
+          "E5",
+          "E7"
+        ],
+        "scope_complete": true,
+        "citations": [
+          {
+            "source": "E1",
+            "quote": "I'm looking for some book recommendations. I started reading 'The Nightingale' by Kristin Hannah today and I'm really into historical fiction right now. Can you suggest some other books in the same genre that you think I'd enjoy?",
+            "value": "",
+            "unit": "",
+            "key": "the nightingale",
+            "time": "today",
+            "resolved_date": "2022-01-01",
+            "precision": "day",
+            "conversation_date": "2022-01-01"
+          },
+          {
+            "source": "E2",
+            "quote": "I'm looking for some book recommendations. I just finished reading \"The Nightingale\" by Kristin Hannah today, and I'm still reeling from the emotional impact. I'm open to trying out different genres, so feel free to suggest anything that you think I might enjoy.",
+            "value": "",
+            "unit": "",
+            "key": "the nightingale",
+            "time": "today",
+            "resolved_date": "2022-01-15",
+            "precision": "day",
+            "conversation_date": "2022-01-15"
+          },
+          {
+            "source": "E3",
+            "quote": "That's really helpful, thanks! I think I can apply this to some of my own habits. Speaking of habits, I just started listening to 'Sapiens: A Brief History of Humankind' by Yuval Noah Harari today, and it got me thinking about how humans have developed certain habits and behaviors over time.",
+            "value": "",
+            "unit": "",
+            "key": "sapiens: a brief history of humankind",
+            "time": "today",
+            "resolved_date": "2022-02-01",
+            "precision": "day",
+            "conversation_date": "2022-02-01"
+          },
+          {
+            "source": "E4",
+            "quote": "I just finished listening to 'Sapiens: A Brief History of Humankind' by Yuval Noah Harari today, and it got me thinking about the impact of technology on human evolution. Can you tell me more about the latest advancements in AI and its potential applications in various industries?",
+            "value": "",
+            "unit": "",
+            "key": "sapiens: a brief history of humankind",
+            "time": "today",
+            "resolved_date": "2022-03-01",
+            "precision": "day",
+            "conversation_date": "2022-03-01"
+          },
+          {
+            "source": "E5",
+            "quote": "I'm so interested in learning more about the themes of identity, culture, and power in \"The Brief Wondrous Life of Oscar Wao\". I've been thinking a lot about how these themes relate to my own experiences as a woman, and I started listening to \"The Power\" by Naomi Alderman today, which got me thinking about how I take certain things for granted. Do you think \"The Brief Wondrous Life of Oscar Wao\" would be a good fit for someone interested in exploring these themes further?",
+            "value": "",
+            "unit": "",
+            "key": "the power",
+            "time": "today",
+            "resolved_date": "2022-03-06",
+            "precision": "day",
+            "conversation_date": "2022-03-06"
+          },
+          {
+            "source": "E7",
+            "quote": "I'm looking for some book recommendations. I just finished listening to 'The Power' by Naomi Alderman today and it really made me think. I'm interested in exploring more books that challenge my perspectives. Do you have any suggestions?",
+            "value": "",
+            "unit": "",
+            "key": "the power",
+            "time": "today",
+            "resolved_date": "2022-03-20",
+            "precision": "day",
+            "conversation_date": "2022-03-20"
+          }
+        ],
+        "days": 56,
+        "pairs": [
+          {
+            "key": "the nightingale",
+            "start": "2022-01-01",
+            "end": "2022-01-15",
+            "days": 14
+          },
+          {
+            "key": "sapiens: a brief history of humankind",
+            "start": "2022-02-01",
+            "end": "2022-03-01",
+            "days": 28
+          },
+          {
+            "key": "the power",
+            "start": "2022-03-06",
+            "end": "2022-03-20",
+            "days": 14
+          }
+        ],
+        "approximate": false,
+        "mechanism": "named_reading_duration",
+        "endpoint_provenance": [
+          {
+            "title": "the nightingale",
+            "phase": "start",
+            "source": "E1",
+            "quote": "I'm looking for some book recommendations. I started reading 'The Nightingale' by Kristin Hannah today and I'm really into historical fiction right now. Can you suggest some other books in the same genre that you think I'd enjoy?",
+            "resolved_date": "2022-01-01"
+          },
+          {
+            "title": "the nightingale",
+            "phase": "finish",
+            "source": "E2",
+            "quote": "I'm looking for some book recommendations. I just finished reading \"The Nightingale\" by Kristin Hannah today, and I'm still reeling from the emotional impact. I'm open to trying out different genres, so feel free to suggest anything that you think I might enjoy.",
+            "resolved_date": "2022-01-15"
+          },
+          {
+            "title": "sapiens: a brief history of humankind",
+            "phase": "start",
+            "source": "E3",
+            "quote": "That's really helpful, thanks! I think I can apply this to some of my own habits. Speaking of habits, I just started listening to 'Sapiens: A Brief History of Humankind' by Yuval Noah Harari today, and it got me thinking about how humans have developed certain habits and behaviors over time.",
+            "resolved_date": "2022-02-01"
+          },
+          {
+            "title": "sapiens: a brief history of humankind",
+            "phase": "finish",
+            "source": "E4",
+            "quote": "I just finished listening to 'Sapiens: A Brief History of Humankind' by Yuval Noah Harari today, and it got me thinking about the impact of technology on human evolution. Can you tell me more about the latest advancements in AI and its potential applications in various industries?",
+            "resolved_date": "2022-03-01"
+          },
+          {
+            "title": "the power",
+            "phase": "start",
+            "source": "E5",
+            "quote": "I'm so interested in learning more about the themes of identity, culture, and power in \"The Brief Wondrous Life of Oscar Wao\". I've been thinking a lot about how these themes relate to my own experiences as a woman, and I started listening to \"The Power\" by Naomi Alderman today, which got me thinking about how I take certain things for granted. Do you think \"The Brief Wondrous Life of Oscar Wao\" would be a good fit for someone interested in exploring these themes further?",
+            "resolved_date": "2022-03-06"
+          },
+          {
+            "title": "the power",
+            "phase": "start",
+            "source": "E6",
+            "quote": "I'm interested in learning more about the themes of identity, culture, and power in \"The Fifth Season\" by N.K. Jemisin. I've been thinking a lot about how these themes relate to my own experiences as a woman, and I started listening to \"The Power\" by Naomi Alderman today, which got me thinking about how I take certain things for granted. Do you think \"The Fifth Season\" would be a good fit for someone interested in exploring these themes further?",
+            "resolved_date": "2022-03-06"
+          },
+          {
+            "title": "the power",
+            "phase": "finish",
+            "source": "E7",
+            "quote": "I'm looking for some book recommendations. I just finished listening to 'The Power' by Naomi Alderman today and it really made me think. I'm interested in exploring more books that challenge my perspectives. Do you have any suggestions?",
+            "resolved_date": "2022-03-20"
+          }
+        ]
+      },
+      "evidence_gap": null
+    },
+    {
+      "question_id": "51a45a95",
+      "user_review": true,
+      "review_complete": true,
+      "page_count": 3,
+      "gold_raw_final_context_complete": true,
+      "missing_gold_turns": [],
+      "context_bound": true,
+      "judged_correct": true,
+      "answer": "Likely Target, based on the shopping context in the same conversation. The redemption statement itself does not name the place.",
+      "calculation": {
+        "mechanism": "redemption_place",
+        "inferred": true,
+        "location_citations": [
+          {
+            "source": "E1",
+            "quote": "I actually redeemed a $5 coupon on coffee creamer last Sunday, which was a nice surprise since I didn't know I had it in my email inbox."
+          },
+          {
+            "source": "E3",
+            "quote": "I shop at Target pretty frequently, maybe every other week. I like buying household items, toiletries, and sometimes clothes for my kids. I've also been using their Cartwheel app for a few weeks now and have saved around $20 total on various household items.",
+            "place": "Target"
+          }
+        ]
+      },
+      "evidence_gap": null
+    },
+    {
+      "question_id": "eaca4986",
+      "user_review": false,
+      "review_complete": true,
+      "page_count": 0,
+      "gold_raw_final_context_complete": true,
+      "missing_gold_turns": [],
+      "context_bound": true,
+      "judged_correct": true,
+      "answer": "C D E F G A B A G F E D C",
+      "calculation": {
+        "mechanism": "ordinal_song_progression",
+        "ordinal": 2,
+        "structural_citation": {
+          "source": "E26",
+          "quote": "C D E F G A B A G F E D C",
+          "session": "scoped-session-v1:8:eaca4986answer_sharegpt_SS141vi_0",
+          "turn": 3
+        },
+        "conversation_citations": [
+          {
+            "source": "E31",
+            "turn": 0,
+            "role": "user"
+          },
+          {
+            "source": "E21",
+            "turn": 1,
+            "role": "assistant"
+          },
+          {
+            "source": "E48",
+            "turn": 2,
+            "role": "user"
+          },
+          {
+            "source": "E26",
+            "turn": 3,
+            "role": "assistant"
+          }
+        ]
+      },
+      "evidence_gap": null
+    }
+  ],
+  "usage": {
+    "total_requests": 36,
+    "total_tokens": 222489,
+    "failures": 4,
+    "by_role": {
+      "answerer": {
+        "role": "answerer",
+        "calls": 27,
+        "failures": 1,
+        "input_tokens": 206746,
+        "output_tokens": 14311,
+        "p50_ms": 2355.5511250160635,
+        "p95_ms": 3575.169582851231,
+        "max_ms": 3664.9564593099058
+      },
+      "judge": {
+        "role": "judge",
+        "calls": 9,
+        "failures": 3,
+        "input_tokens": 1236,
+        "output_tokens": 196,
+        "p50_ms": 28467.23312465474,
+        "p95_ms": 64891.59270795062,
+        "max_ms": 64891.59270795062
+      }
+    }
+  },
+  "source_hashes_current": true,
+  "inputs": {
+    "results/raw/prerequisite-reader-v18-v8.readers.jsonl": "7f61802a7808ec3788e2e86e8e26b44f2d05a640d1133b62a58216a855d9e025",
+    "results/raw/prerequisite-reader-v18-v8.grades.jsonl": "fb265d6498b5ada2a46a0d3ed07f83207a556b616dae55e1ece5f1a28fec0c8b",
+    "results/raw/prerequisite-reader-v18-v8.execution.json": "593e3607754318f0fc9b8c9d6194adb71472c809359480237cd5efde53b7bc25"
+  },
+  "limitations": "Six original-history questions; no population accuracy estimate, no 4x QA, no unseen-final."
+}

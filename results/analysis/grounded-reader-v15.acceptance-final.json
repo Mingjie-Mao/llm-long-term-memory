@@ -1,0 +1,159 @@
+{
+  "pass": true,
+  "rules": {
+    "original_grading_complete_for_all19": true,
+    "all17_original_judge_correct": true,
+    "two_predeclared_uncertainties_faithfully_preserved": true,
+    "all19_tenant_sources_context_hash_fixed_pool_and_final_code_replay": true
+  },
+  "experiment_class": "exposed train150 mechanism acceptance; not overall accuracy or unseen final",
+  "supported_correct": 17,
+  "supported_total": 17,
+  "original19_correct": 17,
+  "source_rows": [
+    {
+      "question_id": "09ba9854",
+      "tenant_raw_hashes_fixed_pool_and_final_replay": true,
+      "mechanism": null,
+      "cause": null,
+      "computed": true
+    },
+    {
+      "question_id": "51a45a95",
+      "tenant_raw_hashes_fixed_pool_and_final_replay": true,
+      "mechanism": "redemption_place",
+      "cause": null,
+      "computed": true
+    },
+    {
+      "question_id": "6e984301",
+      "tenant_raw_hashes_fixed_pool_and_final_replay": true,
+      "mechanism": null,
+      "cause": null,
+      "computed": true
+    },
+    {
+      "question_id": "b46e15ed",
+      "tenant_raw_hashes_fixed_pool_and_final_replay": true,
+      "mechanism": "consecutive_event_interval",
+      "cause": null,
+      "computed": true
+    },
+    {
+      "question_id": "eaca4986",
+      "tenant_raw_hashes_fixed_pool_and_final_replay": true,
+      "mechanism": "ordinal_song_progression",
+      "cause": null,
+      "computed": true
+    },
+    {
+      "question_id": "f685340e",
+      "tenant_raw_hashes_fixed_pool_and_final_replay": true,
+      "mechanism": null,
+      "cause": "validated_lookup",
+      "computed": false
+    },
+    {
+      "question_id": "f9e8c073",
+      "tenant_raw_hashes_fixed_pool_and_final_replay": true,
+      "mechanism": "scoped_quantity_disclosure",
+      "cause": null,
+      "computed": true
+    },
+    {
+      "question_id": "gpt4_7a0daae1",
+      "tenant_raw_hashes_fixed_pool_and_final_replay": true,
+      "mechanism": null,
+      "cause": null,
+      "computed": true
+    },
+    {
+      "question_id": "gpt4_a1b77f9c",
+      "tenant_raw_hashes_fixed_pool_and_final_replay": true,
+      "mechanism": "named_reading_duration",
+      "cause": null,
+      "computed": true
+    },
+    {
+      "question_id": "0ddfec37_abs",
+      "tenant_raw_hashes_fixed_pool_and_final_replay": true,
+      "mechanism": null,
+      "cause": "no_operands",
+      "computed": false
+    },
+    {
+      "question_id": "1568498a",
+      "tenant_raw_hashes_fixed_pool_and_final_replay": true,
+      "mechanism": "structural_successor_lookup",
+      "cause": null,
+      "computed": true
+    },
+    {
+      "question_id": "6456829e",
+      "tenant_raw_hashes_fixed_pool_and_final_replay": true,
+      "mechanism": null,
+      "cause": null,
+      "computed": true
+    },
+    {
+      "question_id": "95228167",
+      "tenant_raw_hashes_fixed_pool_and_final_replay": true,
+      "mechanism": null,
+      "cause": "validated_lookup",
+      "computed": false
+    },
+    {
+      "question_id": "a89d7624",
+      "tenant_raw_hashes_fixed_pool_and_final_replay": true,
+      "mechanism": null,
+      "cause": "validated_lookup",
+      "computed": false
+    },
+    {
+      "question_id": "af8d2e46",
+      "tenant_raw_hashes_fixed_pool_and_final_replay": true,
+      "mechanism": null,
+      "cause": "validated_lookup",
+      "computed": false
+    },
+    {
+      "question_id": "ed4ddc30",
+      "tenant_raw_hashes_fixed_pool_and_final_replay": true,
+      "mechanism": "latest_inventory_quantity",
+      "cause": null,
+      "computed": true
+    },
+    {
+      "question_id": "gpt4_2f8be40d",
+      "tenant_raw_hashes_fixed_pool_and_final_replay": true,
+      "mechanism": null,
+      "cause": "scope_incomplete",
+      "computed": false
+    },
+    {
+      "question_id": "gpt4_7ddcf75f",
+      "tenant_raw_hashes_fixed_pool_and_final_replay": true,
+      "mechanism": null,
+      "cause": null,
+      "computed": true
+    },
+    {
+      "question_id": "gpt4_a2d1d1f6",
+      "tenant_raw_hashes_fixed_pool_and_final_replay": true,
+      "mechanism": null,
+      "cause": null,
+      "computed": true
+    }
+  ],
+  "inputs": {
+    "results/raw/grounded-reader-v15.answers.jsonl": "d6d69842455afedc0d8493526e7981c95f66a4527a152eff51390d4489de168e",
+    "results/analysis/grounded-reader-v15.execution.json": "829f413588107d7429a7155c2841295dcf655e234a11dc69718afb03098b6b64",
+    "results/raw/grounded-reader-v15.usage.json": "8db271efc6f72b159f49c705771be70a6cf1e7687fd33fccf221035dfb48fb97",
+    "results/raw/grounded-reader-v15.grades.jsonl": "4afceeb7dadabb21b5d9ed81e14eb1be61eddc27c59fcb6a7392aebbae882d34",
+    "results/analysis/grounded-reader-v15.public-source-audit.json": "7802f1e76a698e657b4672f03c0bca968744471a9008d696282dbb54af4e759e",
+    "results/prereg-raw-primary-grounded-v12-acceptance.md": "a4dc59e75e18ec1038e9818a1308c4f5b4fd906142daefbdadd0b5c14c537a90"
+  },
+  "generator_sha256": "c5961e9934c3db0f8876732ca6b0ad817782600afe098ebddf6a3d51a82f1466",
+  "generator_source": "import hashlib\nimport json\nimport sys\nfrom pathlib import Path\n\nrepo = Path.cwd()\nsys.path[:0] = [str(repo / 'src'), str(repo / 'tools')]\nfrom analysis_io import rows_by_question, sha256_file\nfrom grounded_reader_report import summarize\nfrom grounded_operand_replay import restore_ledger\nfrom llm_long_term_memory.config import Settings\nfrom llm_long_term_memory.conversation import AnswerRequest\nfrom llm_long_term_memory.evaluation.datasets.longmemeval import load\nfrom llm_long_term_memory.runtime.grounded_answering import GroundedAnswererV15, SessionEvidenceLedger, FocusSessionEvidenceLedger\nfrom llm_long_term_memory.store import SQLiteMemoryStore\n\nstem = 'grounded-reader-v15'\nanswers_path = repo / f'results/raw/{stem}.answers.jsonl'\ngrades_path = repo / f'results/raw/{stem}.grades.jsonl'\ninventory_path = repo / f'results/analysis/{stem}.execution.json'\nusage_path = repo / f'results/raw/{stem}.usage.json'\nproof_path = repo / f'results/analysis/{stem}.public-source-audit.json'\nanswers = rows_by_question(answers_path)\nproof = json.loads(proof_path.read_text())\nidentity = json.loads(inventory_path.read_text())\nassert proof['status'] == 'PASS'\nfor rel, sha in identity['files'].items():\n    assert sha256_file(repo / rel) == sha, rel\nexpected = set()\nfor cohort in ['reasoning-errors', 'correct-sample10']:\n    expected.update(json.loads((repo / f'results/manifests/train150-raw-v1-{cohort}.json').read_text())['question_ids'])\nassert set(answers) == expected\ninstances = {i.question_id: i for i in load('s', Settings().data_dir)}\nengine = object.__new__(GroundedAnswererV15)\nstore = SQLiteMemoryStore(repo / 'stores/train150.db', read_only=True)\nresults = []\ndef pool_sha(audit):\n    values = sorted([{k: v for k, v in item.items() if k != 'id'} for item in audit['sources']], key=lambda item: (item['kind'], item['source_id']))\n    return hashlib.sha256(json.dumps(values, sort_keys=True).encode()).hexdigest()\ntry:\n    for qid, row in answers.items():\n        instance = instances[qid]\n        request = AnswerRequest(instance.question, instance.question_date, instance.store_namespace)\n        calls = row['answer']['notes']['grounded_calls']\n        assert row['inventory_sha256'] == sha256_file(inventory_path)\n        assert pool_sha(calls[0]['evidence']) == proof['source_pools'][qid]['canonical_source_pool_sha256'], qid\n        previous_focus = ()\n        last_calc = last_verdict = None\n        for saved in calls:\n            assert pool_sha(saved['evidence']) == pool_sha(calls[0]['evidence']), qid\n            def ledger_type(*, sources, max_tokens):\n                return (FocusSessionEvidenceLedger(sources=sources, max_tokens=max_tokens, focus_ids=previous_focus) if previous_focus else SessionEvidenceLedger(sources=sources, max_tokens=max_tokens))\n            ledger = restore_ledger(store, instance.store_namespace, saved['evidence'], ledger_type=ledger_type)\n            last_verdict = engine.parse_verdict(saved['provider_response'], ledger, request)\n            last_calc = engine.validate_verdict(last_verdict, ledger, request)\n            assert last_calc.computed == saved['computed'], qid\n            assert last_calc.detail == saved['calculation'], qid\n            previous_focus = tuple(saved.get('calculation', {}).get('focus_sources', []))\n        expected_answer = (last_calc.answer if last_calc.computed else last_verdict.answer.strip()) if engine.can_answer(last_verdict, last_calc) else 'I do not know.'\n        assert expected_answer == row['answer']['text'], qid\n        results.append({'question_id': qid, 'tenant_raw_hashes_fixed_pool_and_final_replay': True, 'mechanism': last_calc.detail.get('mechanism'), 'cause': last_calc.detail.get('cause'), 'computed': last_calc.computed})\n        if qid == 'f9e8c073':\n            assert last_calc.detail.get('mechanism') == 'scoped_quantity_disclosure'\n            assert {c['period'] for c in last_calc.detail['quantity_citations']} == {'last year', 'period unspecified'}\n            assert 'combined total cannot be determined' in row['answer']['text']\n        if qid == 'gpt4_2f8be40d':\n            assert not engine.can_answer(last_verdict, last_calc)\n            assert last_calc.detail.get('cause')\nfinally:\n    store.close()\nreport = summarize(answers_path, grades_path, inventory_path, usage_path)\nunsupported = {'f9e8c073', 'gpt4_2f8be40d'}\nsupported = [r for r in report['rows'] if r['question_id'] not in unsupported]\nassert len(supported) == 17\nrules = {'original_grading_complete_for_all19': report['grading_complete_for_saved_readers'], 'all17_original_judge_correct': all(r['correct'] is True for r in supported), 'two_predeclared_uncertainties_faithfully_preserved': True, 'all19_tenant_sources_context_hash_fixed_pool_and_final_code_replay': True}\nassert report['grading_complete_for_saved_readers'], 'STOP: original19 grading incomplete'\nout = repo / f'results/analysis/{stem}.acceptance-final.json'\nif out.exists():\n    raise SystemExit('refusing overwrite')\nresult = {'pass': all(rules.values()), 'rules': rules, 'experiment_class': 'exposed train150 mechanism acceptance; not overall accuracy or unseen final', 'supported_correct': sum(r['correct'] is True for r in supported), 'supported_total': 17, 'original19_correct': sum(r['correct'] is True for r in report['rows']), 'source_rows': results, 'inputs': report['inputs'] | {str(proof_path.relative_to(repo)): sha256_file(proof_path), 'results/prereg-raw-primary-grounded-v12-acceptance.md': sha256_file(repo / 'results/prereg-raw-primary-grounded-v12-acceptance.md')}, 'generator_sha256': sha256_file(Path(__file__)), 'generator_source': Path(__file__).read_text(), 'provider_calls': 0}\nout.write_text(json.dumps(result, indent=2) + '\\n')\nprint(json.dumps({k: v for k, v in result.items() if k not in ['source_rows', 'generator_source', 'inputs']}))\n",
+  "provider_calls": 0
+}

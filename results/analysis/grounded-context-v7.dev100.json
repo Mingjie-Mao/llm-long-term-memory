@@ -1,0 +1,37 @@
+{
+  "experiment_class": "development-offline",
+  "store": "dev100",
+  "manifest": "results/manifests/dev100.json",
+  "manifest_sha256": "fe6ae148da5f81730d698ecd10cc795d6bd69357e22eb26d47ba6cefe16d6072",
+  "questions": 100,
+  "context_only": true,
+  "context": {
+    "two_stage_raw_primary": {
+      "median": 5689.0,
+      "p90": 5806,
+      "max": 5873
+    },
+    "two_stage_raw_primary_grounded_v7": {
+      "median": 5842.5,
+      "p90": 5965,
+      "max": 5998
+    }
+  },
+  "candidate_questions_with_dropped_sources": 100,
+  "provider_requests": 0,
+  "provider_tokens": 0,
+  "stub_calls": 200,
+  "models": {
+    "extractor": "gemini-3.1-flash-lite",
+    "answerer": "gemini-3.5-flash-lite",
+    "judge": "gemma-4-31b-it",
+    "embedder": "sentence-transformers/all-MiniLM-L6-v2",
+    "embedding_dim": 384
+  },
+  "config_sha256": "397c0c59908079c965a96a690206c27320a3e0c0eb3b6a30eadc1ada19d8a0e8",
+  "git_sha": "4a4cc644fba4b282b0c14b0f2394a68e682b04a0",
+  "python": "3.12.13",
+  "candidate_prompt": "memory-grounded-v7",
+  "candidate_source_sha256": "9e7d0510288afa53ee1dc816dad749be0eefd16508dd50ee281722ce1c75809f",
+  "index_ids_sha256": "23c0c0204a1649c30dbd14f859060c0f81507ff3f8ca152897911d335d3b77f4"
+}
