@@ -33,8 +33,6 @@
 
 记忆负责维护事实状态和筛选相关信息，原始对话负责提供精确的数字、日期和原话。
 
-[查看完整架构](docs/ARCHITECTURE.md)
-
 ## 实验结果
 
 在 **LongMemEval-S** 的 100 道冻结终测题上，每种方法运行一次：
@@ -51,7 +49,7 @@ LLTM v2 比 naive RAG 正确率高 7 个百分点，但差异未达到统计显�
 
 以上为冻结 v2 的结果；之后的改进、当前问题和计划见[项目进展](docs/PROGRESS.md)。
 
-[详细评测](docs/EVALUATION.md) · [原始结果](results/final/test100-aggregate.md)
+[原始结果](results/final/test100-aggregate.md)
 
 ## 快速开始
 
@@ -78,8 +76,6 @@ uv run uvicorn llm_long_term_memory.api.app:app \
 [部署说明](DEPLOY.md)
 
 ## 在线演示
-
-[LLTM Interactive Demo](https://lltm-memory.pages.dev/)
 
 演示展示记忆写入、检索和时间状态变化，使用实际的存储与检索逻辑；其中的事实提取采用规则，
 不调用 LLM。
