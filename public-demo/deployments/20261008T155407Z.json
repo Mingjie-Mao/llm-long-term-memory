@@ -1,0 +1,58 @@
+{
+ "schema_version": 1,
+ "deployed_at_utc": "2026-10-08T15:54:07Z",
+ "provider": "cloudflare-pages",
+ "project": "lltm-memory",
+ "branch": "main",
+ "deployment_id": "fd99a78f-922d-4ec3-b0cd-dea9de0a49f2",
+ "deployment_url": "https://fd99a78f.lltm-memory.pages.dev",
+ "production_url": "https://lltm-memory.pages.dev",
+ "git_head": "12f1536e7a723d9cdad33699f186060f03545906",
+ "dirty_worktree": false,
+ "note": "Renames the page from ChronoMem to LLTM, the name the README and docs use, and brings release.json level with the repository: from tests=1583, coverage 86%, verified 2026-09-24 to tests=2103, coverage 88%, verified 2026-10-08. The deployment it replaces, 61a91b6a from 4f06c77 (2026-09-25), had no record here. dirty_worktree counts tracked files only: the untracked files present were outputs of the running t3/t4 heldout100 experiment, outside the deploy root.",
+ "deploy_root": "public-demo/site",
+ "files": [
+  {
+   "path": "app.js",
+   "sha256": "a305981febcb373c924ea5284b075cfee34c17b28bf8c3f69e460c503c600b8f"
+  },
+  {
+   "path": "content.js",
+   "sha256": "68fa2341a8231de1cd0176179e46636ebda4e493a6a1e6e8443e8db888f0739d"
+  },
+  {
+   "path": "index.html",
+   "sha256": "9e5011291101c54a20c52f18724e1d6a9e198df476c9b17e431056e3450b9626"
+  },
+  {
+   "path": "playground.html",
+   "sha256": "f8685c6ab83cbca75c4bae77d69dacd130337f43e4ba5bcbd057d5b8c53d7d90"
+  },
+  {
+   "path": "release.json",
+   "sha256": "5cc753b0fc5f9218b1ddc9e2f603d393335b8e6d1f7aeadf5b0e38690223d1df"
+  },
+  {
+   "path": "release.schema.json",
+   "sha256": "84ec62f18152850eef8fa39fd256cff0353c847008bcfd58b9bfdc2be7be126f"
+  },
+  {
+   "path": "styles.css",
+   "sha256": "faeb08c50af04039aa4e3e38591d59d5998bbb4368e3ba99102c4e50cd366592"
+  }
+ ],
+ "predeploy_gates": [
+  "public-demo/check_site.py",
+  "node --input-type=module --check (app.js, content.js)",
+  "git diff --check",
+  "pytest public-demo/, tests/test_markdown_renders.py, tests/test_release_manifest.py",
+  "ruff check and format",
+  "CI on 12f1536: ci (lint, ubuntu, windows, macos, release figures) and public-demo workflows green"
+ ],
+ "postdeploy_checks": [
+  "all 7 deploy files fetched from the production origin and the deployment URL, following redirects, and sha256-compared against the repository: identical",
+  "production release.json reports tests=2103, line_coverage=88, verified_at=2026-10-08",
+  "production page title and wordmark read LLTM; no console errors on load"
+ ],
+ "verification_note": "The first production comparison, seconds after the deploy, still served five of the seven old files while the deployment URL served all seven new ones; a repeat check found production identical. Propagation, not a failed deploy."
+}
