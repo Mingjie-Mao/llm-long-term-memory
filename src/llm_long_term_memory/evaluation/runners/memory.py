@@ -21,6 +21,18 @@ from time import perf_counter
 
 import numpy as np
 
+from llm_long_term_memory.answering import (
+    COUNT_LATEST_PROMPT_VERSION,
+    COUNT_LATEST_SYSTEM,
+    COUNT_NOTES_SYSTEM,
+    COUNT_TIME_PROMPT_VERSION,
+    NOTED_ANSWER_PROMPT_VERSION,
+    NOTED_ANSWER_SYSTEM,
+    NotedAnswerVerdict,
+    asks_about_time,
+    asks_for_aggregate,
+    count_time_system,
+)
 from llm_long_term_memory.conversation import AnswerRequest
 from llm_long_term_memory.embed import Encoder
 from llm_long_term_memory.evaluation.datasets.longmemeval import Instance
@@ -33,6 +45,35 @@ from llm_long_term_memory.retrieve import (
     SessionBudget,
     build_coherent_context,
     render_evidence,
+)
+from llm_long_term_memory.runtime.grounded_answering import (
+    PROMPT_VERSION as GROUNDED_PROMPT_VERSION,
+)
+from llm_long_term_memory.runtime.grounded_answering import (
+    SYSTEM as GROUNDED_SYSTEM,
+)
+from llm_long_term_memory.runtime.grounded_answering import (
+    GroundedAnswerer,
+    GroundedAnswererV2,
+    GroundedAnswererV3,
+    GroundedAnswererV4,
+    GroundedAnswererV5,
+    GroundedAnswererV6,
+    GroundedAnswererV7,
+    GroundedAnswererV8,
+    GroundedAnswererV9,
+    GroundedAnswererV10,
+    GroundedAnswererV11,
+    GroundedAnswererV12,
+    GroundedAnswererV13,
+    GroundedAnswererV14,
+    GroundedAnswererV15,
+    GroundedAnswererV16,
+    GroundedAnswererV17,
+    GroundedAnswererV18,
+    GroundedVerdict,
+    GroundedVerdictV6,
+    GroundedVerdictV7,
 )
 from llm_long_term_memory.store import (
     Memory,
@@ -309,6 +350,13 @@ class MemoryRunner:
         parallel_raw_planned: bool = False,
         raw_primary_tokens: int = 0,
         raw_primary_only: bool = False,
+        raw_primary_turn_index=None,
+        raw_primary_dated: bool = False,
+        raw_primary_memory_fusion: bool = False,
+        raw_primary_fact_keys: bool = False,
+        raw_primary_time_notes: bool = False,
+        raw_primary_prefer_user: bool = False,
+        raw_primary_time_window: bool = False,
         date_provenance: bool = False,
         session_budget: SessionBudget | None = None,
         oracle_session_context: bool = False,
@@ -338,6 +386,27 @@ class MemoryRunner:
         self.oracle_session_context = oracle_session_context
         if answer_policy not in {
             "v2",
+            "v2_notes",
+            "v2_cl",
+            "v2_clt",
+            "grounded_v1",
+            "grounded_v2",
+            "grounded_v3",
+            "grounded_v4",
+            "grounded_v5",
+            "grounded_v6",
+            "grounded_v7",
+            "grounded_v8",
+            "grounded_v9",
+            "grounded_v10",
+            "grounded_v11",
+            "grounded_v12",
+            "grounded_v13",
+            "grounded_v14",
+            "grounded_v15",
+            "grounded_v16",
+            "grounded_v17",
+            "grounded_v18",
             "v2c",
             "v2d",
             "reasoned_v3",
@@ -360,6 +429,95 @@ class MemoryRunner:
         # schema drift away from the parser without anything noticing.
         self.answer_system, self.answer_prompt_version, self.verdict_schema = {
             "v2": (ANSWER_SYSTEM, ANSWER_PROMPT_VERSION, AnswerVerdict),
+            "v2_notes": (NOTED_ANSWER_SYSTEM, NOTED_ANSWER_PROMPT_VERSION, NotedAnswerVerdict),
+            "v2_cl": (COUNT_LATEST_SYSTEM, COUNT_LATEST_PROMPT_VERSION, AnswerVerdict),
+            "v2_clt": (COUNT_LATEST_SYSTEM, COUNT_TIME_PROMPT_VERSION, AnswerVerdict),
+            "grounded_v1": (GROUNDED_SYSTEM, GROUNDED_PROMPT_VERSION, GroundedVerdict),
+            "grounded_v2": (
+                GroundedAnswererV2.system,
+                GroundedAnswererV2.prompt_version,
+                GroundedVerdict,
+            ),
+            "grounded_v3": (
+                GroundedAnswererV3.system,
+                GroundedAnswererV3.prompt_version,
+                GroundedVerdict,
+            ),
+            "grounded_v4": (
+                GroundedAnswererV4.system,
+                GroundedAnswererV4.prompt_version,
+                GroundedVerdict,
+            ),
+            "grounded_v5": (
+                GroundedAnswererV5.system,
+                GroundedAnswererV5.prompt_version,
+                GroundedVerdict,
+            ),
+            "grounded_v6": (
+                GroundedAnswererV6.system,
+                GroundedAnswererV6.prompt_version,
+                GroundedVerdictV6,
+            ),
+            "grounded_v7": (
+                GroundedAnswererV7.system,
+                GroundedAnswererV7.prompt_version,
+                GroundedVerdictV7,
+            ),
+            "grounded_v8": (
+                GroundedAnswererV8.system,
+                GroundedAnswererV8.prompt_version,
+                GroundedVerdictV7,
+            ),
+            "grounded_v9": (
+                GroundedAnswererV9.system,
+                GroundedAnswererV9.prompt_version,
+                GroundedVerdictV7,
+            ),
+            "grounded_v10": (
+                GroundedAnswererV10.system,
+                GroundedAnswererV10.prompt_version,
+                GroundedVerdictV7,
+            ),
+            "grounded_v11": (
+                GroundedAnswererV11.system,
+                GroundedAnswererV11.prompt_version,
+                GroundedVerdictV7,
+            ),
+            "grounded_v12": (
+                GroundedAnswererV12.system,
+                GroundedAnswererV12.prompt_version,
+                GroundedVerdictV7,
+            ),
+            "grounded_v13": (
+                GroundedAnswererV13.system,
+                GroundedAnswererV13.prompt_version,
+                GroundedVerdictV7,
+            ),
+            "grounded_v14": (
+                GroundedAnswererV14.system,
+                GroundedAnswererV14.prompt_version,
+                GroundedVerdictV7,
+            ),
+            "grounded_v15": (
+                GroundedAnswererV15.system,
+                GroundedAnswererV15.prompt_version,
+                GroundedVerdictV7,
+            ),
+            "grounded_v16": (
+                GroundedAnswererV16.system,
+                GroundedAnswererV16.prompt_version,
+                GroundedVerdictV7,
+            ),
+            "grounded_v17": (
+                GroundedAnswererV17.system,
+                GroundedAnswererV17.prompt_version,
+                GroundedVerdictV7,
+            ),
+            "grounded_v18": (
+                GroundedAnswererV18.system,
+                GroundedAnswererV18.prompt_version,
+                GroundedVerdictV7,
+            ),
             "reasoned_v3": (
                 REASONED_ANSWER_SYSTEM,
                 REASONED_ANSWER_PROMPT_VERSION,
@@ -410,6 +568,8 @@ class MemoryRunner:
         self.utility_model = utility_model
         self.type_floors = type_floors
         self.max_output_tokens = max_output_tokens
+        self._base_max_output_tokens = max_output_tokens
+        self._answer_mode: str | None = None
         self.chars_per_token = chars_per_token
         # A plain attribute, not a property: the CLI overrides it so that the
         # results file is named after the config variant rather than after the flag.
@@ -445,6 +605,19 @@ class MemoryRunner:
         # answer call. `raw_primary_only` drops the memory context and keeps only them.
         self.raw_primary_tokens = max(0, raw_primary_tokens)
         self.raw_primary_only = raw_primary_only
+        # v2 of the arm (`results/prereg-raw-primary-dev100-v3.md`): fuse BM25 with a
+        # dense turn ranking, and date each conversation relative to the question.
+        # Both off by default, so the registered v1 arm is unchanged.
+        self.raw_primary_turn_index = raw_primary_turn_index
+        self.raw_primary_dated = raw_primary_dated
+        # v4 (`results/prereg-raw-primary-dev100-v4.md`): the turns the retrieved
+        # memories point at vote in the fusion, and turns are ranked lexically under
+        # their text plus the facts anchored to them.
+        self.raw_primary_memory_fusion = raw_primary_memory_fusion
+        self.raw_primary_fact_keys = raw_primary_fact_keys
+        self.raw_primary_time_notes = raw_primary_time_notes
+        self.raw_primary_prefer_user = raw_primary_prefer_user
+        self.raw_primary_time_window = raw_primary_time_window
         if raw_primary_only and not self.raw_primary_tokens:
             raise ValueError("raw_primary_only needs raw_primary_tokens")
         self.parallel_raw = None
@@ -463,6 +636,59 @@ class MemoryRunner:
         # count is part of the identity. `run_eval` refuses to resume across a change
         # in this string.
         self.store_fingerprint = f"{self.extractor_version or 'unversioned'}@{store.count()}"
+        self.grounded = (
+            {
+                "grounded_v1": GroundedAnswerer,
+                "grounded_v2": GroundedAnswererV2,
+                "grounded_v3": GroundedAnswererV3,
+                "grounded_v4": GroundedAnswererV4,
+                "grounded_v5": GroundedAnswererV5,
+                "grounded_v6": GroundedAnswererV6,
+                "grounded_v7": GroundedAnswererV7,
+                "grounded_v8": GroundedAnswererV8,
+                "grounded_v9": GroundedAnswererV9,
+                "grounded_v10": GroundedAnswererV10,
+                "grounded_v11": GroundedAnswererV11,
+                "grounded_v12": GroundedAnswererV12,
+                "grounded_v13": GroundedAnswererV13,
+                "grounded_v14": GroundedAnswererV14,
+                "grounded_v15": GroundedAnswererV15,
+                "grounded_v16": GroundedAnswererV16,
+                "grounded_v17": GroundedAnswererV17,
+                "grounded_v18": GroundedAnswererV18,
+            }[answer_policy](
+                client,
+                model=model,
+                encoder=encoder,
+                store=store,
+                turn_index=raw_primary_turn_index,
+                fallback=self.fallback,
+                chars_per_token=chars_per_token,
+                max_output_tokens=max_output_tokens,
+            )
+            if answer_policy
+            in {
+                "grounded_v1",
+                "grounded_v2",
+                "grounded_v3",
+                "grounded_v4",
+                "grounded_v5",
+                "grounded_v6",
+                "grounded_v7",
+                "grounded_v8",
+                "grounded_v9",
+                "grounded_v10",
+                "grounded_v11",
+                "grounded_v12",
+                "grounded_v13",
+                "grounded_v14",
+                "grounded_v15",
+                "grounded_v16",
+                "grounded_v17",
+                "grounded_v18",
+            }
+            else None
+        )
 
     def prepare(self, instance: Instance) -> None:
         """Nothing per-instance: the store is built once by `lltm ingest`.
@@ -579,6 +805,29 @@ class MemoryRunner:
         self._computation: dict | None = None
         self._answer_was_raw_structure = False
         self._scan_route = None
+        if self.answer_policy in {"v2_cl", "v2_clt"}:
+            # Per question: a count or total (and under v2_clt a question about dates,
+            # durations or order) is answered from notes, with room for them; every
+            # other question keeps v2's verdict and output limit.
+            counting = asks_for_aggregate(request.question)
+            timing = self.answer_policy == "v2_clt" and asks_about_time(request.question)
+            noted = counting or timing
+            self._answer_mode = (
+                "_".join(m for m, on in (("count", counting), ("time", timing)) if on) + "_notes"
+                if noted
+                else "latest_only"
+            )
+            self.answer_system = (
+                count_time_system(counting, timing)
+                if self.answer_policy == "v2_clt"
+                else COUNT_NOTES_SYSTEM
+                if counting
+                else COUNT_LATEST_SYSTEM
+            )
+            self.verdict_schema = NotedAnswerVerdict if noted else AnswerVerdict
+            self.max_output_tokens = (
+                max(1024, self._base_max_output_tokens) if noted else self._base_max_output_tokens
+            )
         now = datetime.now()
         if self.decay_enabled:
             from llm_long_term_memory.lifecycle import apply_decay
@@ -647,6 +896,27 @@ class MemoryRunner:
             packed = self._pack(selected, retrieved_by_id, request.question)
             selected = packed.selected
 
+        if self.grounded is not None:
+            answer = self.grounded.answer(request, selected, query_vector)
+            if self.decay_enabled:
+                self.store.record_access(
+                    [memory.id for memory in selected], now, reinforcement=self.reinforcement
+                )
+            calls = answer.notes.get("grounded_calls", [])
+            final_sources = calls[-1]["evidence"]["sources"] if calls else []
+            present = _external_session_ids(s["session_id"] for s in final_sources)
+            answer.notes.update(
+                {
+                    "top_k": limit or self.top_k,
+                    "temporal": self.temporal,
+                    "evidence_recalled": bool(set(evidence_session_ids) & present),
+                    "source_session_recalled": bool(set(evidence_session_ids) & present),
+                    "retrieval_latency_ms": retrieval_latency_ms,
+                    "extractor_version": self.extractor_version,
+                }
+            )
+            return answer
+
         v2c_plan = None
         if self.answer_policy in {"v2c", "v2d"}:
             from .v2c import plan as plan_v2c
@@ -707,6 +977,24 @@ class MemoryRunner:
                 request.question,
                 self.raw_primary_tokens,
                 chars_per_token=self.chars_per_token,
+                turn_index=self.raw_primary_turn_index,
+                query_vector=self.encoder.encode_one(request.question)
+                if self.raw_primary_turn_index is not None
+                else None,
+                asked_on=_as_of(request.asked_on)
+                if self.raw_primary_dated or self.raw_primary_time_window
+                else None,
+                memory_anchors=[
+                    (hit.memory.source_session_id, hit.memory.source_turn_index)
+                    for hit in retrieved
+                    if hit.memory.source_session_id and hit.memory.source_turn_index is not None
+                ]
+                if self.raw_primary_memory_fusion
+                else None,
+                fact_keys=self.raw_primary_fact_keys,
+                time_notes=self.raw_primary_time_notes,
+                prefer_user=self.raw_primary_prefer_user,
+                time_window=self.raw_primary_time_window,
             )
             block = raw_primary.render()
             if self.raw_primary_only:
@@ -729,6 +1017,15 @@ class MemoryRunner:
         parallel_notes = {
             "raw_primary_tokens_budget": self.raw_primary_tokens,
             "raw_primary_only": self.raw_primary_only,
+            "raw_primary_hybrid": self.raw_primary_turn_index is not None,
+            "raw_primary_dated": self.raw_primary_dated,
+            "raw_primary_memory_fusion": self.raw_primary_memory_fusion,
+            "raw_primary_fact_keys": self.raw_primary_fact_keys,
+            "raw_primary_time_notes": self.raw_primary_time_notes,
+            "raw_primary_prefer_user": self.raw_primary_prefer_user,
+            "raw_primary_time_window": self.raw_primary_time_window,
+            "raw_primary_window_turns": raw_primary.window_turns if raw_primary else 0,
+            "answer_mode": self._answer_mode,
             "raw_primary_turns": len(raw_primary.turns) if raw_primary else 0,
             "raw_primary_tokens": raw_primary.tokens if raw_primary else 0,
             "raw_primary_sessions": [external_session_id(s) for s in raw_primary.sessions]
@@ -1106,6 +1403,8 @@ Question: {question}
                 if self.answer_policy == "v2d"
                 else ANSWER_SYSTEM
                 if self.answer_policy in {"synthesis_v4", "synthesis_v4_enumerate"}
+                else COUNT_LATEST_SYSTEM
+                if self.answer_policy in {"v2_cl", "v2_clt"}
                 else self.answer_system
             ),
             temperature=0.0,

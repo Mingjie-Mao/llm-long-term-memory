@@ -88,11 +88,16 @@ def ingest_run(
             threshold=cfg.ingest.dedupe_similarity_threshold,
         )
         repair = None
+        if cfg.ingest.personal_context_repair:
+            from llm_long_term_memory.ingest.personal_context import configured_repair
+
+            repair = configured_repair(cfg, client)
         if cfg.ingest.specificity_repair:
             from llm_long_term_memory.ingest.grounded import GroundedExtractor
             from llm_long_term_memory.ingest.repair import SpecificityRepair
 
-            repair = SpecificityRepair(GroundedExtractor(client, cfg.models.extractor))
+            if repair is None:
+                repair = SpecificityRepair(GroundedExtractor(client, cfg.models.extractor))
             console.print(
                 "[yellow]specificity repair on[/yellow] [dim]— one grounded call for "
                 "each session that lost a specific; measured 44.8% -> 59.3% retention "

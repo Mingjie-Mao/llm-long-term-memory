@@ -1,0 +1,182 @@
+{
+  "experiment_class": "exposed-dev100-regression-not-unseen-final",
+  "primary_gate": {
+    "experiment_class": "regression",
+    "mean_net": -3.3333333333333335,
+    "mean_scores": {
+      "baseline": 77.66666666666667,
+      "candidate": 74.33333333333333
+    },
+    "by_type_mean_net": {
+      "temporal-reasoning": -2.0,
+      "single-session-user": 1.3333333333333333,
+      "knowledge-update": 1.0,
+      "single-session-preference": -0.3333333333333333,
+      "multi-session": -3.3333333333333335,
+      "single-session-assistant": 0.0
+    },
+    "type_counts": {
+      "single-session-preference": 6,
+      "knowledge-update": 16,
+      "multi-session": 27,
+      "temporal-reasoning": 26,
+      "single-session-user": 14,
+      "single-session-assistant": 11
+    },
+    "median_context": 5978.0,
+    "rules": {
+      "mean_net_at_least_4": false,
+      "no_type_loses_more_than_2": false,
+      "median_context_at_most_6000": true
+    },
+    "pass": false,
+    "questions_up_down": {
+      "up": 15,
+      "down": 21
+    },
+    "outcome_scope": "PASS_TO_SUMMARY_COST_COMPARISON only; no default promotion or unseen-final claim",
+    "execution_inventory": "results/analysis/paged-paired-dev100-v18-v1.execution.json"
+  },
+  "arms": {
+    "baseline": {
+      "runs": [
+        {
+          "repeat": 1,
+          "fresh_answers": 100,
+          "correct": 78,
+          "grades": 100,
+          "fresh_grades": 71,
+          "cached_grades": 29,
+          "user_archive_reviews": 0,
+          "complete_user_archive_reviews": 0,
+          "max_source_context_tokens": 6373,
+          "whole_question_answerer_requests": 112
+        },
+        {
+          "repeat": 2,
+          "fresh_answers": 100,
+          "correct": 80,
+          "grades": 100,
+          "fresh_grades": 65,
+          "cached_grades": 35,
+          "user_archive_reviews": 0,
+          "complete_user_archive_reviews": 0,
+          "max_source_context_tokens": 6294,
+          "whole_question_answerer_requests": 110
+        },
+        {
+          "repeat": 3,
+          "fresh_answers": 100,
+          "correct": 75,
+          "grades": 100,
+          "fresh_grades": 57,
+          "cached_grades": 43,
+          "user_archive_reviews": 0,
+          "complete_user_archive_reviews": 0,
+          "max_source_context_tokens": 6373,
+          "whole_question_answerer_requests": 114
+        }
+      ],
+      "answering_resources_by_model": {
+        "gemini-3.5-flash-lite": {
+          "calls": 336,
+          "failures": 8,
+          "input_tokens": 2021997,
+          "output_tokens": 16946
+        }
+      },
+      "grading_resources_by_model": {
+        "gemma-4-31b-it": {
+          "calls": 337,
+          "failures": 144,
+          "input_tokens": 44151,
+          "output_tokens": 6336
+        }
+      }
+    },
+    "candidate": {
+      "runs": [
+        {
+          "repeat": 1,
+          "fresh_answers": 100,
+          "correct": 74,
+          "grades": 100,
+          "fresh_grades": 60,
+          "cached_grades": 40,
+          "user_archive_reviews": 83,
+          "complete_user_archive_reviews": 83,
+          "max_source_context_tokens": 5999,
+          "whole_question_answerer_requests": 404
+        },
+        {
+          "repeat": 2,
+          "fresh_answers": 100,
+          "correct": 73,
+          "grades": 100,
+          "fresh_grades": 37,
+          "cached_grades": 63,
+          "user_archive_reviews": 83,
+          "complete_user_archive_reviews": 83,
+          "max_source_context_tokens": 5999,
+          "whole_question_answerer_requests": 397
+        },
+        {
+          "repeat": 3,
+          "fresh_answers": 100,
+          "correct": 76,
+          "grades": 100,
+          "fresh_grades": 30,
+          "cached_grades": 70,
+          "user_archive_reviews": 83,
+          "complete_user_archive_reviews": 83,
+          "max_source_context_tokens": 5999,
+          "whole_question_answerer_requests": 397
+        }
+      ],
+      "answering_resources_by_model": {
+        "gemini-3.5-flash-lite": {
+          "calls": 1203,
+          "failures": 28,
+          "input_tokens": 9411581,
+          "output_tokens": 620299
+        }
+      },
+      "grading_resources_by_model": {
+        "gemma-4-31b-it": {
+          "calls": 241,
+          "failures": 114,
+          "input_tokens": 27488,
+          "output_tokens": 4004
+        }
+      }
+    }
+  },
+  "inputs": {
+    "results/analysis/paged-paired-dev100-v18-v1.execution.json": "f83877bd575877619681e564f5b7872c75c747766dbb9c2caeed2e8101f34f5e",
+    "results/analysis/paged-paired-dev100-v18-v1.gate.json": "d9f00ebc1689a44d15a2047455c4c46e24f77f7a9b0c58f912d95675a732b002",
+    "results/raw/paged-paired-dev100-v18-v1-baseline-rep1.readers.jsonl": "b2a41c23cedce7a781742339ac85b8374eeea1757c2e683c384bc7257d1275fe",
+    "results/raw/paged-paired-dev100-v18-v1-baseline-rep1.grades.jsonl": "449a76d5fbc8a33c8dd75a66d3764aecf815acc249c94b39676a6319b70f8f11",
+    "results/raw/paged-paired-dev100-v18-v1-baseline-rep1.usage.json": "0337a655d10218c89d7b68d320f78f63a5ebf82caad0a526afdf94e7e01a40dc",
+    "results/raw/paged-paired-dev100-v18-v1-baseline-rep2.readers.jsonl": "165784bde7c127af75402b03b96ec6ffc4adec618001c3dac82551ef587b3ddc",
+    "results/raw/paged-paired-dev100-v18-v1-baseline-rep2.grades.jsonl": "36e0162e621ca17dd79f58445baba8fca44963e873689e9ea7f99a2faf3009c7",
+    "results/raw/paged-paired-dev100-v18-v1-baseline-rep2.usage.json": "a7bf802bbc821d1d4f7e4b3c8167b78ed8c6b8fd5d77437ae452abac2b457fef",
+    "results/raw/paged-paired-dev100-v18-v1-baseline-rep3.readers.jsonl": "6c2436cd076a897c341ac9e48dffcce1e8aa8a4af7768bb5f8a217a04c716bec",
+    "results/raw/paged-paired-dev100-v18-v1-baseline-rep3.grades.jsonl": "9f19c5ba3f495a8f4ff69ce43e558ffc801d12dd8c177ae7177cd197d32b1c8f",
+    "results/raw/paged-paired-dev100-v18-v1-baseline-rep3.usage.json": "80b49ac54d1a80aed123dc8eb1c52362c3d4dad201107c3a84889aedf90e51c0",
+    "results/raw/paged-paired-dev100-v18-v1-candidate-rep1.readers.jsonl": "362a0c87d66861d6c93f448f313b364caa9491d1bc73d636b9e5c03057880c53",
+    "results/raw/paged-paired-dev100-v18-v1-candidate-rep1.grades.jsonl": "42a60e3fa0a5a4c48d640f1ab5f663d78650fd40d10065c4e03935c11b1f4932",
+    "results/raw/paged-paired-dev100-v18-v1-candidate-rep1.usage.json": "be9be5e6c4a142022555a4a05e7c62a45f77a5bf06a736c6e6afdf6fd443204c",
+    "results/raw/paged-paired-dev100-v18-v1-candidate-rep2.readers.jsonl": "8d5f1e7725b32e00f503e8fabc81305fcab0c1fd22576a819c585d8c37cb4541",
+    "results/raw/paged-paired-dev100-v18-v1-candidate-rep2.grades.jsonl": "bfe0db5ccc7cb22bc5d4f5bfaa33caf9a0d8b9107b1d26cedd1463a52f3fdde4",
+    "results/raw/paged-paired-dev100-v18-v1-candidate-rep2.usage.json": "61f781f1712d0e95330881ae31491a05d4a68fd8387fdb709fa357a5d3f3d5f6",
+    "results/raw/paged-paired-dev100-v18-v1-candidate-rep3.readers.jsonl": "2e269388351dcad2303041256ab8c2787320e779e7a7b2788e6fa0e5b94f6f01",
+    "results/raw/paged-paired-dev100-v18-v1-candidate-rep3.grades.jsonl": "731c3660b05d143cecfbc3f4713f46cbce8ba2382e16eb44f71777ca76982e26",
+    "results/raw/paged-paired-dev100-v18-v1-candidate-rep3.usage.json": "9a6386811e81738a3a403d834d3b4058b410fcaa3220d5092baf2199d1674ff3"
+  },
+  "generator_sha256": "ed0e7e69109a8de10099b2d7c8a7e0190b86d93139d7375b206d7ee9a522761f",
+  "end_to_end_query_latency": "not captured in this namespace; do not infer from API latency",
+  "failed_request_tokens": "provider may omit tokens on failures; unknown, not free",
+  "financial_cost": "not inferred from token totals",
+  "provider_calls": 0,
+  "summary_api_calls_in_this_experiment": 0
+}

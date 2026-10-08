@@ -1,0 +1,271 @@
+{
+  "experiment_class": "development/regression; failure-enriched, not overall accuracy",
+  "provider_calls": 0,
+  "inventory_sha256": "2aa156b6d5502311f94ea9195334c1ebfd6fa2f3ba9bee1e0aa343fcb226b0bf",
+  "inputs": {
+    "results/raw/grounded-reader-v10.answers.jsonl": "4df723178efb11e7a1a200d9ad2670d7ab233c162cf44f5c182229a0f3a704a3",
+    "results/analysis/grounded-reader-v10.execution.json": "2aa156b6d5502311f94ea9195334c1ebfd6fa2f3ba9bee1e0aa343fcb226b0bf",
+    "results/raw/grounded-reader-v10.usage.json": "666b7d99ee8e87cf17b3aa6def0a944ad3b2e16d0dcf2a0fbb514aff564ebae7"
+  },
+  "cohorts": {
+    "reasoning-errors": {
+      "readers": 9,
+      "graded": 0,
+      "correct": 0
+    },
+    "originally-correct": {
+      "readers": 10,
+      "graded": 0,
+      "correct": 0
+    }
+  },
+  "grading_complete_for_saved_readers": false,
+  "usage": {
+    "total_requests": 39,
+    "total_tokens": 397080,
+    "failures": 1,
+    "by_role": {
+      "answerer": {
+        "role": "answerer",
+        "calls": 39,
+        "failures": 1,
+        "input_tokens": 378565,
+        "output_tokens": 18515,
+        "p50_ms": 2600.392334163189,
+        "p95_ms": 3881.8817092105746,
+        "max_ms": 4732.249374967068
+      }
+    }
+  },
+  "rows": [
+    {
+      "question_id": "09ba9854",
+      "cohort": "reasoning-errors",
+      "answer": "50 $",
+      "correct": null,
+      "judge_reason": null,
+      "reader_passes": 2,
+      "validation_causes": [
+        null,
+        null
+      ]
+    },
+    {
+      "question_id": "51a45a95",
+      "cohort": "reasoning-errors",
+      "answer": "You redeemed the $5 coupon on coffee creamer from your email inbox.",
+      "correct": null,
+      "judge_reason": null,
+      "reader_passes": 2,
+      "validation_causes": [
+        "validated_lookup",
+        "validated_lookup"
+      ]
+    },
+    {
+      "question_id": "6e984301",
+      "cohort": "reasoning-errors",
+      "answer": "3 weeks",
+      "correct": null,
+      "judge_reason": null,
+      "reader_passes": 2,
+      "validation_causes": [
+        null,
+        null
+      ]
+    },
+    {
+      "question_id": "b46e15ed",
+      "cohort": "reasoning-errors",
+      "answer": "2 months and 3 days",
+      "correct": null,
+      "judge_reason": null,
+      "reader_passes": 2,
+      "validation_causes": [
+        null,
+        null
+      ]
+    },
+    {
+      "question_id": "eaca4986",
+      "cohort": "reasoning-errors",
+      "answer": "The chord progression for the chorus in the second song is C D E F G A B A G F E D C.",
+      "correct": null,
+      "judge_reason": null,
+      "reader_passes": 2,
+      "validation_causes": [
+        "validated_lookup",
+        "validated_lookup"
+      ]
+    },
+    {
+      "question_id": "f685340e",
+      "cohort": "reasoning-errors",
+      "answer": "Previously, you played tennis weekly with friends. Now, you play every other week.",
+      "correct": null,
+      "judge_reason": null,
+      "reader_passes": 2,
+      "validation_causes": [
+        "validated_lookup",
+        "validated_lookup"
+      ]
+    },
+    {
+      "question_id": "f9e8c073",
+      "cohort": "reasoning-errors",
+      "answer": "1: three",
+      "correct": null,
+      "judge_reason": null,
+      "reader_passes": 2,
+      "validation_causes": [
+        "validated_lookup",
+        null
+      ]
+    },
+    {
+      "question_id": "gpt4_7a0daae1",
+      "cohort": "reasoning-errors",
+      "answer": "1 weeks",
+      "correct": null,
+      "judge_reason": null,
+      "reader_passes": 2,
+      "validation_causes": [
+        null,
+        null
+      ]
+    },
+    {
+      "question_id": "gpt4_a1b77f9c",
+      "cohort": "reasoning-errors",
+      "answer": "I do not know.",
+      "correct": null,
+      "judge_reason": null,
+      "reader_passes": 2,
+      "validation_causes": [
+        null,
+        "duration_group_endpoints_invalid"
+      ]
+    },
+    {
+      "question_id": "0ddfec37_abs",
+      "cohort": "originally-correct",
+      "answer": "I do not know.",
+      "correct": null,
+      "judge_reason": null,
+      "reader_passes": 2,
+      "validation_causes": [
+        "no_operands",
+        "no_operands"
+      ]
+    },
+    {
+      "question_id": "1568498a",
+      "cohort": "originally-correct",
+      "answer": "I do not know.",
+      "correct": null,
+      "judge_reason": null,
+      "reader_passes": 2,
+      "validation_causes": [
+        "sequence_successor_required",
+        "sequence_successor_required"
+      ]
+    },
+    {
+      "question_id": "6456829e",
+      "cohort": "originally-correct",
+      "answer": "8 plants",
+      "correct": null,
+      "judge_reason": null,
+      "reader_passes": 2,
+      "validation_causes": [
+        null,
+        null
+      ]
+    },
+    {
+      "question_id": "95228167",
+      "cohort": "originally-correct",
+      "answer": "Since you're considering an upgrade from your Fender Stratocaster to a Gibson Les Paul for your new guitar, you might want to look for a model with a coil-tap or coil-splitting feature. This can give you great extra tonal options and flexibility, especially when playing in open D tuning.",
+      "correct": null,
+      "judge_reason": null,
+      "reader_passes": 2,
+      "validation_causes": [
+        "validated_lookup",
+        "validated_lookup"
+      ]
+    },
+    {
+      "question_id": "a89d7624",
+      "cohort": "originally-correct",
+      "answer": "For your trip to Denver, you can explore the city's vibrant music scene and venues. Top recommendations include visiting the iconic Red Rocks Park and Amphitheatre (where you can dine at The Ship Rock Grille), The Ogden Theatre, The Bluebird Theater, The Fillmore Auditorium, and Larimer Lounge. You might also want to check out local spots like Twist & Shout Records or attend festivals like the Denver Folk Festival and Westword Music Showcase.",
+      "correct": null,
+      "judge_reason": null,
+      "reader_passes": 2,
+      "validation_causes": [
+        "validated_lookup",
+        "validated_lookup"
+      ]
+    },
+    {
+      "question_id": "af8d2e46",
+      "cohort": "originally-correct",
+      "answer": "You packed 7 shirts for your trip to Costa Rica.",
+      "correct": null,
+      "judge_reason": null,
+      "reader_passes": 2,
+      "validation_causes": [
+        "validated_lookup",
+        "validated_lookup"
+      ]
+    },
+    {
+      "question_id": "ed4ddc30",
+      "cohort": "originally-correct",
+      "answer": "You currently have 20 dozen eggs stocked up in your refrigerator.",
+      "correct": null,
+      "judge_reason": null,
+      "reader_passes": 2,
+      "validation_causes": [
+        "fact_not_included",
+        "validated_lookup"
+      ]
+    },
+    {
+      "question_id": "gpt4_2f8be40d",
+      "cohort": "originally-correct",
+      "answer": "I do not know.",
+      "correct": null,
+      "judge_reason": null,
+      "reader_passes": 2,
+      "validation_causes": [
+        null,
+        "member_not_in_quote"
+      ]
+    },
+    {
+      "question_id": "gpt4_7ddcf75f",
+      "cohort": "originally-correct",
+      "answer": "I do not know.",
+      "correct": null,
+      "judge_reason": null,
+      "reader_passes": 2,
+      "validation_causes": [
+        null,
+        "observation_quote_invalid"
+      ]
+    },
+    {
+      "question_id": "gpt4_a2d1d1f6",
+      "cohort": "originally-correct",
+      "answer": "3 days",
+      "correct": null,
+      "judge_reason": null,
+      "reader_passes": 2,
+      "validation_causes": [
+        null,
+        null
+      ]
+    }
+  ],
+  "generator_sha256": "821ae9db7a157aa5216eab6ded137658e4af42a1f2bf02390488bb9946d327b4"
+}

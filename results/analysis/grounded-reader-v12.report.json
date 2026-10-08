@@ -1,0 +1,257 @@
+{
+  "experiment_class": "development/regression; failure-enriched, not overall accuracy",
+  "provider_calls": 0,
+  "inventory_sha256": "36e676769b0c61f2b5cd5106d96ee70f33ae6171cd2598efa43052dc91202f34",
+  "inputs": {
+    "results/raw/grounded-reader-v12.answers.jsonl": "6a85f0b2f26e9869eae5e6aa467a0332474dcde112e0df619c135f8597ce5d29",
+    "results/analysis/grounded-reader-v12.execution.json": "36e676769b0c61f2b5cd5106d96ee70f33ae6171cd2598efa43052dc91202f34",
+    "results/raw/grounded-reader-v12.usage.json": "cad4ce4da1163bf897f92edf99033e95fa2130bce3f14c89678e0e2e88ed34b6"
+  },
+  "cohorts": {
+    "reasoning-errors": {
+      "readers": 9,
+      "graded": 0,
+      "correct": 0
+    },
+    "originally-correct": {
+      "readers": 10,
+      "graded": 0,
+      "correct": 0
+    }
+  },
+  "grading_complete_for_saved_readers": false,
+  "usage": {
+    "total_requests": 28,
+    "total_tokens": 253246,
+    "failures": 4,
+    "by_role": {
+      "answerer": {
+        "role": "answerer",
+        "calls": 28,
+        "failures": 4,
+        "input_tokens": 241311,
+        "output_tokens": 11935,
+        "p50_ms": 2945.710875093937,
+        "p95_ms": 12641.157957725227,
+        "max_ms": 14477.435708977282
+      }
+    }
+  },
+  "rows": [
+    {
+      "question_id": "09ba9854",
+      "cohort": "reasoning-errors",
+      "answer": "-50 $",
+      "correct": null,
+      "judge_reason": null,
+      "reader_passes": 1,
+      "validation_causes": [
+        null
+      ]
+    },
+    {
+      "question_id": "51a45a95",
+      "cohort": "reasoning-errors",
+      "answer": "Likely Target, based on the shopping context in the same conversation. The redemption statement itself does not name the place.",
+      "correct": null,
+      "judge_reason": null,
+      "reader_passes": 2,
+      "validation_causes": [
+        null,
+        null
+      ]
+    },
+    {
+      "question_id": "6e984301",
+      "cohort": "reasoning-errors",
+      "answer": "3 weeks",
+      "correct": null,
+      "judge_reason": null,
+      "reader_passes": 1,
+      "validation_causes": [
+        null
+      ]
+    },
+    {
+      "question_id": "b46e15ed",
+      "cohort": "reasoning-errors",
+      "answer": "2 months and 3 days",
+      "correct": null,
+      "judge_reason": null,
+      "reader_passes": 2,
+      "validation_causes": [
+        null,
+        null
+      ]
+    },
+    {
+      "question_id": "eaca4986",
+      "cohort": "reasoning-errors",
+      "answer": "The chord progression for the chorus in the sad song is G G G G A G F.",
+      "correct": null,
+      "judge_reason": null,
+      "reader_passes": 2,
+      "validation_causes": [
+        "validated_lookup",
+        "validated_lookup"
+      ]
+    },
+    {
+      "question_id": "f685340e",
+      "cohort": "reasoning-errors",
+      "answer": "Previously, you played tennis weekly with friends. Now, you play every other week.",
+      "correct": null,
+      "judge_reason": null,
+      "reader_passes": 1,
+      "validation_causes": [
+        "validated_lookup"
+      ]
+    },
+    {
+      "question_id": "f9e8c073",
+      "cohort": "reasoning-errors",
+      "answer": "The records state 3 sessions (period unspecified); 5 sessions (last year). A combined total cannot be determined from these records.",
+      "correct": null,
+      "judge_reason": null,
+      "reader_passes": 1,
+      "validation_causes": [
+        null
+      ]
+    },
+    {
+      "question_id": "gpt4_7a0daae1",
+      "cohort": "reasoning-errors",
+      "answer": "1 weeks",
+      "correct": null,
+      "judge_reason": null,
+      "reader_passes": 1,
+      "validation_causes": [
+        null
+      ]
+    },
+    {
+      "question_id": "gpt4_a1b77f9c",
+      "cohort": "reasoning-errors",
+      "answer": "8 weeks",
+      "correct": null,
+      "judge_reason": null,
+      "reader_passes": 1,
+      "validation_causes": [
+        null
+      ]
+    },
+    {
+      "question_id": "0ddfec37_abs",
+      "cohort": "originally-correct",
+      "answer": "I do not know.",
+      "correct": null,
+      "judge_reason": null,
+      "reader_passes": 2,
+      "validation_causes": [
+        "fact_records_required",
+        "no_operands"
+      ]
+    },
+    {
+      "question_id": "1568498a",
+      "cohort": "originally-correct",
+      "answer": "28. Kg3 would be my move.",
+      "correct": null,
+      "judge_reason": null,
+      "reader_passes": 1,
+      "validation_causes": [
+        null
+      ]
+    },
+    {
+      "question_id": "6456829e",
+      "cohort": "originally-correct",
+      "answer": "8 plants",
+      "correct": null,
+      "judge_reason": null,
+      "reader_passes": 1,
+      "validation_causes": [
+        null
+      ]
+    },
+    {
+      "question_id": "95228167",
+      "cohort": "originally-correct",
+      "answer": "Since you're planning to look at guitars this weekend and have been considering an upgrade from your Fender Stratocaster to a Gibson Les Paul, keep an eye out for models that feature a coil-tap or coil-splitting option\u2014which you were curious about for extra tonal flexibility, especially in open D tuning. You might also want to test how comfortably it handles different playing styles, like fingerpicking!",
+      "correct": null,
+      "judge_reason": null,
+      "reader_passes": 1,
+      "validation_causes": [
+        "validated_lookup"
+      ]
+    },
+    {
+      "question_id": "a89d7624",
+      "cohort": "originally-correct",
+      "answer": "For your trip to Denver, you previously expressed interest in exploring music venues like Red Rocks Park and Amphitheatre, The Ogden Theatre, The Bluebird Theater, The Fillmore Auditorium, and Larimer Lounge. You also planned to dine at The Ship Rock Grille before a concert at Red Rocks.",
+      "correct": null,
+      "judge_reason": null,
+      "reader_passes": 1,
+      "validation_causes": [
+        "validated_lookup"
+      ]
+    },
+    {
+      "question_id": "af8d2e46",
+      "cohort": "originally-correct",
+      "answer": "You packed 7 shirts for your trip to Costa Rica.",
+      "correct": null,
+      "judge_reason": null,
+      "reader_passes": 1,
+      "validation_causes": [
+        "validated_lookup"
+      ]
+    },
+    {
+      "question_id": "ed4ddc30",
+      "cohort": "originally-correct",
+      "answer": "20 dozen eggs",
+      "correct": null,
+      "judge_reason": null,
+      "reader_passes": 1,
+      "validation_causes": [
+        null
+      ]
+    },
+    {
+      "question_id": "gpt4_2f8be40d",
+      "cohort": "originally-correct",
+      "answer": "I do not know.",
+      "correct": null,
+      "judge_reason": null,
+      "reader_passes": 2,
+      "validation_causes": [
+        "count_period_or_attendance_not_supported",
+        "scope_incomplete"
+      ]
+    },
+    {
+      "question_id": "gpt4_7ddcf75f",
+      "cohort": "originally-correct",
+      "answer": "3 days",
+      "correct": null,
+      "judge_reason": null,
+      "reader_passes": 1,
+      "validation_causes": [
+        null
+      ]
+    },
+    {
+      "question_id": "gpt4_a2d1d1f6",
+      "cohort": "originally-correct",
+      "answer": "3 days",
+      "correct": null,
+      "judge_reason": null,
+      "reader_passes": 1,
+      "validation_causes": [
+        null
+      ]
+    }
+  ],
+  "generator_sha256": "821ae9db7a157aa5216eab6ded137658e4af42a1f2bf02390488bb9946d327b4"
+}

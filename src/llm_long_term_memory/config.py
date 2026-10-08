@@ -101,6 +101,10 @@ class IngestConfig(BaseModel):
     Measured in `results/prereg-specificity-repair-pilot.md` — 44.8% to 59.3% on the
     registered cohort, 21 specifics gained and 0 lost."""
 
+    personal_context_repair: bool = False
+    """Retain verbatim personal user assertions and repair unique numeric echo anchors.
+    Zero extraction calls; increases index size. Opt-in and fingerprinted."""
+
     checkpoint_every: int = 25
 
 
@@ -220,6 +224,16 @@ class ServiceConfig(BaseModel):
     """Pilot default: k=10 matched naive RAG on 242 median context tokens where k=20
     spent 439 for no measurable gain (results/rerank-pareto.md). Not frozen — 31
     questions cannot settle it."""
+
+    raw_primary_tokens: int = 0
+    """Verbatim turns found in the user's archive by the question, added to the memory
+    context before the first answer call — the benchmark's raw-primary arm (v1: 4,000;
+    train150 net +29, heldout100 +14, both exposed development sets). Off (0) by
+    default: the served context grows from about 1,500 to about 5,600 tokens."""
+
+    raw_primary_time_notes: bool = False
+    """With `raw_primary_tokens`: date the excerpts relative to the question and resolve
+    relative dates in the user's turns (raw-primary t1). Unmeasured; off by default."""
 
 
 class ExperimentConfig(BaseModel):

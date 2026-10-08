@@ -15,7 +15,11 @@ holds real data and that changes what it needs.
 
 ## B2 · Redeploy the page
 
-The live page was built from `5a456a78` on 2026-09-13 and the repository has moved since.
+The last recorded deployment is `public-demo/deployments/20260915T043700Z.json`
+(`aae73ad`, 2026-09-15). Production has been redeployed since without a record: on
+2026-10-08 it served a `release.json` verified 2026-09-24 (1,583 tests, 86% coverage,
+reference commit `4da58681b4`). The repository's manifest has moved on, so the live
+figures lag until the next deploy, which should be recorded as below.
 
 ```bash
 # 1. Check the deploy root is complete and self-consistent. Stdlib only, no install.

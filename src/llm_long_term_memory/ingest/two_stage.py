@@ -75,13 +75,25 @@ class TwoStageExtractor:
         user_id: str = "user",
         chars_per_token: float = 4.6,
         llm_keying: bool = True,
+        preference_observer: bool = False,
     ) -> None:
         self.client = client
         self.model = model
         self.user_id = user_id
         self.chars_per_token = chars_per_token
         self.llm_keying = llm_keying
-        self._facts = FactExtractor(client, model, chars_per_token)
+        self.preference_observer = preference_observer
+        if preference_observer:
+            # A different prompt writes different rows: the instance says so, and the
+            # fingerprint reads the instance.
+            from .extract_facts import PREFERENCE_OBSERVER, PREFERENCE_OBSERVER_VERSION
+
+            self.version = f"{EXTRACTOR_VERSION}+{PREFERENCE_OBSERVER_VERSION}"
+            base = self.prompt_texts
+            self.prompt_texts = lambda: (*base(), PREFERENCE_OBSERVER)
+        self._facts = FactExtractor(
+            client, model, chars_per_token, preference_observer=preference_observer
+        )
         self._keyer = FactKeyer(client, model, chars_per_token)
 
     def extract(self, sessions: list[ConversationSession]) -> ExtractionOutcome:

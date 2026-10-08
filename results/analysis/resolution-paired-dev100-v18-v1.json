@@ -1,0 +1,119 @@
+{
+  "measured": {
+    "sources": {
+      "two_stage_fallback.v2b-gate16": {
+        "runs": 2,
+        "questions": 9,
+        "disagreed": 1,
+        "accuracy_per_run": [
+          6,
+          5
+        ]
+      },
+      "two_stage_hydrated.heldout100": {
+        "runs": 4,
+        "questions": 100,
+        "disagreed": 12,
+        "accuracy_per_run": [
+          71,
+          73,
+          72,
+          70
+        ]
+      },
+      "two_stage_memory_only.v2b-gate16": {
+        "runs": 2,
+        "questions": 9,
+        "disagreed": 1,
+        "accuracy_per_run": [
+          3,
+          4
+        ]
+      },
+      "two_stage_v2c.conflict1-v2c8": {
+        "runs": 2,
+        "questions": 1,
+        "disagreed": 0,
+        "accuracy_per_run": [
+          1,
+          1
+        ]
+      },
+      "two_stage_v2c.gate8-v2c3": {
+        "runs": 2,
+        "questions": 8,
+        "disagreed": 0,
+        "accuracy_per_run": [
+          8,
+          8
+        ]
+      },
+      "two_stage_v2c_memory_only.gate8-v2c1": {
+        "runs": 2,
+        "questions": 8,
+        "disagreed": 0,
+        "accuracy_per_run": [
+          5,
+          5
+        ]
+      },
+      "two_stage_v2c_memory_only.gate8-v2c2": {
+        "runs": 2,
+        "questions": 8,
+        "disagreed": 0,
+        "accuracy_per_run": [
+          5,
+          5
+        ]
+      }
+    },
+    "rates": {
+      "knowledge-update": {
+        "unstable": 2,
+        "n": 23,
+        "rate": 0.08695652173913043
+      },
+      "multi-session": {
+        "unstable": 3,
+        "n": 41,
+        "rate": 0.07317073170731707
+      },
+      "single-session-assistant": {
+        "unstable": 0,
+        "n": 17,
+        "rate": 0.0
+      },
+      "single-session-preference": {
+        "unstable": 3,
+        "n": 8,
+        "rate": 0.375
+      },
+      "single-session-user": {
+        "unstable": 0,
+        "n": 19,
+        "rate": 0.0
+      },
+      "temporal-reasoning": {
+        "unstable": 6,
+        "n": 35,
+        "rate": 0.17142857142857143
+      }
+    }
+  },
+  "target_name": "grounded-paired-dev100-v15-baseline-rep1",
+  "target": {
+    "questions": 100,
+    "composition": {
+      "knowledge-update": 16,
+      "multi-session": 27,
+      "single-session-assistant": 11,
+      "single-session-preference": 6,
+      "single-session-user": 14,
+      "temporal-reasoning": 26
+    },
+    "types_with_no_repeat_measurement": [],
+    "expected_disagreeing_questions": 10.074056961066505,
+    "net_noise_sd": 3.1739654946244302,
+    "smallest_interpretable_net": 7
+  }
+}

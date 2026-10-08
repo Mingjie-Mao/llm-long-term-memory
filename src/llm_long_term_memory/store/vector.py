@@ -136,6 +136,35 @@ class NumpyFlatIndex:
             os.fsync(handle.fileno())
         manifest_tmp.replace(self._manifest_path)
 
+    def promote(self, target: str | Path) -> NumpyFlatIndex:
+        """Move a saved index built under a scratch stem to `target`, and reopen it there.
+
+        The commit manifest records each artifact by file name, so renaming the files
+        alone leaves a manifest that names the scratch stem, and the promoted index
+        refuses to load. `rebuild-index` shipped with exactly that: its recovery output
+        could not be opened. The manifest is rewritten for the new names, with the same
+        digests, after the artifacts are in place; a crash in between leaves a manifest
+        that no longer matches, which loading reports rather than trusts.
+        """
+        destination = NumpyFlatIndex.__new__(NumpyFlatIndex)
+        destination.path = Path(target)
+        self._vec_path.replace(destination._vec_path)
+        self._ids_path.replace(destination._ids_path)
+        manifest = json.loads(self._manifest_path.read_text(encoding="utf-8"))
+        manifest["sha256"] = {
+            destination._vec_path.name: manifest["sha256"][self._vec_path.name],
+            destination._ids_path.name: manifest["sha256"][self._ids_path.name],
+        }
+        manifest_tmp = destination._manifest_path.with_suffix(".json.tmp")
+        with manifest_tmp.open("w", encoding="utf-8") as handle:
+            json.dump(manifest, handle, indent=2, sort_keys=True)
+            handle.write("\n")
+            handle.flush()
+            os.fsync(handle.fileno())
+        manifest_tmp.replace(destination._manifest_path)
+        self._manifest_path.unlink(missing_ok=True)
+        return NumpyFlatIndex(target, dim=self.dim)
+
     @property
     def ids(self) -> tuple[str, ...]:
         return tuple(self._ids)

@@ -1,0 +1,349 @@
+{
+  "experiment_class": "exposed-train150-mechanism-development",
+  "reader_label": "prerequisite-reader-v18-v3",
+  "pass": false,
+  "reader_count": 6,
+  "grade_count": 0,
+  "correct": 0,
+  "rows": [
+    {
+      "question_id": "b46e15ed",
+      "user_review": true,
+      "review_complete": true,
+      "page_count": 4,
+      "gold_raw_final_context_complete": true,
+      "missing_gold_turns": [],
+      "context_bound": true,
+      "judged_correct": null,
+      "answer": "2 months and 3 days",
+      "calculation": {
+        "operation": "duration",
+        "records_supplied": [
+          "{\"source\":\"E10\",\"quote\":\"I volunteered at the \\\"Books for Kids\\\" charity book drive event at my local library today, helping to sort and pack over 500 books for underprivileged kids in the neighborhood.\",\"value\":\"\",\"unit\":\"\",\"key\":\"sequence-end\",\"time\":\"today\"}",
+          "{\"source\":\"QUESTION_DATE\",\"quote\":\"\",\"value\":\"\",\"unit\":\"\",\"key\":\"question-date\",\"time\":\"\"}"
+        ],
+        "reviewed_sources": [
+          "E1",
+          "E2",
+          "E3",
+          "E4",
+          "E5",
+          "E6",
+          "E7",
+          "E8",
+          "E9",
+          "E10",
+          "E11",
+          "E12",
+          "E13",
+          "E14",
+          "E15",
+          "E16",
+          "E17",
+          "E18",
+          "E19",
+          "E20",
+          "E21",
+          "E22",
+          "E23",
+          "E24",
+          "E25",
+          "E26",
+          "E27",
+          "E28",
+          "E29",
+          "E30",
+          "E31",
+          "E32",
+          "E33",
+          "E34",
+          "E35",
+          "E36",
+          "E37",
+          "E38",
+          "E39",
+          "E40",
+          "E41",
+          "E42",
+          "E43",
+          "E44",
+          "E45",
+          "E46",
+          "E47",
+          "E48",
+          "E49",
+          "E50",
+          "E51"
+        ],
+        "scope_complete": true,
+        "citations": [
+          {
+            "source": "E10",
+            "quote": "I volunteered at the \"Books for Kids\" charity book drive event at my local library today, helping to sort and pack over 500 books for underprivileged kids in the neighborhood.",
+            "value": "",
+            "unit": "",
+            "key": "sequence-end",
+            "time": "today",
+            "resolved_date": "2023-02-15",
+            "precision": "day",
+            "conversation_date": "2023-02-15"
+          },
+          {
+            "source": "QUESTION_DATE",
+            "quote": "",
+            "value": "",
+            "unit": "",
+            "key": "question-date",
+            "time": "",
+            "resolved_date": "2023-04-18"
+          }
+        ],
+        "days": 62,
+        "start": "2023-02-15",
+        "end": "2023-04-18",
+        "approximate": false,
+        "mechanism": "consecutive_event_interval",
+        "sequence_citations": [
+          {
+            "source": "E2",
+            "quote": "I'm feeling a bit tired today, just got back from the \"24-Hour Bike Ride\" charity event, where I cycled for 4 hours non-stop to raise money for a local children's hospital.",
+            "resolved_date": "2023-02-14"
+          },
+          {
+            "source": "E10",
+            "quote": "I volunteered at the \"Books for Kids\" charity book drive event at my local library today, helping to sort and pack over 500 books for underprivileged kids in the neighborhood.",
+            "resolved_date": "2023-02-15"
+          }
+        ]
+      }
+    },
+    {
+      "question_id": "9d25d4e0",
+      "user_review": true,
+      "review_complete": true,
+      "page_count": 3,
+      "gold_raw_final_context_complete": true,
+      "missing_gold_turns": [],
+      "context_bound": true,
+      "judged_correct": null,
+      "answer": "I do not know.",
+      "calculation": {
+        "operation": "count",
+        "records_supplied": [
+          "{\"source\":\"E6\",\"quote\":\"I just got a new silver necklace with a small pendant on the 15th of last month\",\"value\":\"silver necklace\",\"unit\":\"\",\"key\":\"silver-necklace\",\"time\":\"\"}",
+          "{\"source\":\"E8\",\"quote\":\"I got it a month ago\",\"value\":\"engagement ring\",\"unit\":\"\",\"key\":\"engagement-ring\",\"time\":\"\"}",
+          "{\"source\":\"E9\",\"quote\":\"a stunning pair of emerald earrings that I'm absolutely loving\",\"value\":\"emerald earrings\",\"unit\":\"\",\"key\":\"emerald-earrings\",\"time\":\"\"}"
+        ],
+        "reviewed_sources": [
+          "E6",
+          "E7",
+          "E8",
+          "E9",
+          "E10",
+          "E11"
+        ],
+        "scope_complete": true,
+        "cause": "member_not_in_quote",
+        "observations": [
+          "{\"source\":\"E6\",\"quote\":\"I'm thinking of cleaning my jewelry collection and I want to make sure I do it right. Can you guide me through the process or recommend a good jewelry cleaning solution? By the way, I just got a new silver necklace with a small pendant on the 15th of last month, and I want to make sure I take good care of it.\",\"interpretation\":\"User states they just got a new silver necklace with a small pendant on the 15th of last month (April 2023).\",\"decision\":\"include\"}",
+          "{\"source\":\"E7\",\"quote\":\"I'm also trying to locate a pair of earrings that I think I left at my cousin's place after wearing them to her birthday party. They're a special pair with little diamonds that my grandma gave me. Do you have any tips on how to keep track of my jewelry when I'm traveling or lending them to others?\",\"interpretation\":\"User mentions losing special earrings with little diamonds that their grandma gave them in the past (not acquired in the last two months).\",\"decision\":\"exclude\"}",
+          "{\"source\":\"E8\",\"quote\":\"I think I'll reach out to my cousin now and ask her about the earrings. Meanwhile, I also wanted to ask you about resizing my engagement ring. I got it a month ago, and it's still a bit too loose. Can you guide me through the process of resizing a ring and what I should expect?\",\"interpretation\":\"User mentions getting their engagement ring a month ago (April 2023).\",\"decision\":\"include\"}",
+          "{\"source\":\"E9\",\"quote\":\"I'm thinking of cleaning my jewelry collection this weekend and I'm not sure what's the best way to clean different types of jewelry. Do you have any tips or recommendations? By the way, I just got a new pair of earrings last weekend at a flea market - a stunning pair of emerald earrings that I'm absolutely loving!\",\"interpretation\":\"User mentions getting a new pair of emerald earrings last weekend at a flea market.\",\"decision\":\"include\"}",
+          "{\"source\":\"E10\",\"quote\":\"I'm thinking of getting a jewelry cleaning kit that includes a solution and a soft cloth. Do you think that would be a good idea? And by the way, I'm really glad I got those emerald earrings at the flea market last weekend - they're really stunning!\",\"interpretation\":\"User reiterates getting those emerald earrings at the flea market last weekend.\",\"decision\":\"exclude\"}",
+          "{\"source\":\"E11\",\"quote\":\"I need help with cleaning my jewelry. Can you give me some tips on how to properly clean my gold chains and rings? Oh, and by the way, I got my engagement ring a month ago, and I still need to get it resized - it's still a bit too loose.\",\"interpretation\":\"User mentions getting their engagement ring a month ago.\",\"decision\":\"exclude\"}"
+        ],
+        "focus_sources": [],
+        "canonicalization": []
+      }
+    },
+    {
+      "question_id": "gpt4_731e37d7",
+      "user_review": true,
+      "review_complete": true,
+      "page_count": 4,
+      "gold_raw_final_context_complete": true,
+      "missing_gold_turns": [],
+      "context_bound": true,
+      "judged_correct": null,
+      "answer": "220 $",
+      "calculation": {
+        "operation": "sum",
+        "records_supplied": [
+          "{\"source\":\"E4\",\"quote\":\"I paid $200 to attend\",\"value\":\"200\",\"unit\":\"$\",\"key\":\"writing-workshop\",\"time\":\"\"}",
+          "{\"source\":\"E3\",\"quote\":\"I paid $20 to attend\",\"value\":\"20\",\"unit\":\"$\",\"key\":\"mindfulness-workshop\",\"time\":\"\"}",
+          "{\"source\":\"E2\",\"quote\":\"it was a free event\",\"value\":\"0\",\"unit\":\"$\",\"key\":\"photography-workshop\",\"time\":\"\"}"
+        ],
+        "reviewed_sources": [
+          "E1",
+          "E2",
+          "E3",
+          "E4",
+          "E12",
+          "E25"
+        ],
+        "scope_complete": true,
+        "explicit_zero_costs": [
+          {
+            "source": "E2",
+            "quote": "it was a free event",
+            "value": "0",
+            "unit": "$",
+            "key": "photography-workshop",
+            "time": ""
+          }
+        ],
+        "citations": [
+          {
+            "source": "E4",
+            "quote": "I paid $200 to attend",
+            "value": "200",
+            "unit": "$",
+            "key": "writing-workshop",
+            "time": ""
+          },
+          {
+            "source": "E3",
+            "quote": "I paid $20 to attend",
+            "value": "20",
+            "unit": "$",
+            "key": "mindfulness-workshop",
+            "time": ""
+          },
+          {
+            "source": "E2",
+            "quote": "it was a free event",
+            "value": "0",
+            "unit": "$",
+            "key": "photography-workshop",
+            "time": ""
+          }
+        ],
+        "duplicates_removed": 0,
+        "result": "220",
+        "unit": "$",
+        "observations": [
+          "{\"source\":\"E1\",\"quote\":\"I'm looking to improve my business's online presence and I was wondering if you can recommend some tools for social media analytics. By the way, I just attended a digital marketing workshop at the city convention center on March 15-16, and it was really helpful in understanding the importance of tracking my online engagement. I paid $500 to attend, and it was worth it!\",\"interpretation\":\"Paid $500 for a digital marketing workshop attended on March 15-16\",\"decision\":\"exclude\"}",
+          "{\"source\":\"E2\",\"quote\":\"I'm looking for some tips on how to improve my portrait photography skills. Do you have any resources or tutorials that can help me with that? By the way, I recently attended a one-day photography workshop on February 22 at a local studio, and it was really helpful - it was a free event, but I had to register online in advance.\",\"interpretation\":\"Attended a free one-day photography workshop on February 22\",\"decision\":\"include\"}",
+          "{\"source\":\"E3\",\"quote\":\"The entrepreneurship workshop was very helpful, and I learned a lot from the organizers, mentors, and other participants. We got to learn from experienced entrepreneurs and investors, and I got to pitch my business idea to a panel of judges. I received some valuable feedback and made some connections that could potentially lead to collaborations or investments.\\n\\nI'm definitely considering applying to other startup accelerator programs or incubators in the future. In fact, I've been looking into a few options, and I think it could be a great way to take my business to the next level.\\n\\nBy the way, I've also been attending workshops on mindfulness and wellness, which I find helps me stay focused and calm when dealing with the stresses of entrepreneurship. I attended a half-day mindfulness workshop at a yoga studio near my home on December 12, and it was really helpful. I paid $20 to attend, and I got to take home a workbook with exercises and tips.\",\"interpretation\":\"Paid $20 for a half-day mindfulness workshop on December 12\",\"decision\":\"include\"}",
+          "{\"source\":\"E4\",\"quote\":\"I'm looking for some writing tips. I've been working on a short story since a writing workshop I attended in November at a literary festival. It was a two-day workshop, and I paid $200 to attend. The instructor was a published author, and I got some great feedback on my work. Do you have any resources on character development and editing that you could recommend?\",\"interpretation\":\"Paid $200 for a two-day writing workshop in November at a literary festival\",\"decision\":\"include\"}",
+          "{\"source\":\"E12\",\"quote\":\"I'll definitely try those methods to find upcoming workshops. By the way, I've been attending workshops in different fields, not just photography. For instance, I recently attended a two-day digital marketing workshop at the city convention center on March 15-16.\",\"interpretation\":\"Attended a two-day digital marketing workshop at the city convention center on March 15-16\",\"decision\":\"exclude\"}",
+          "{\"source\":\"E25\",\"quote\":\"Now it's my turn. Here's my response:\\n\\nI think I'll go with the Neutrogena Hydrating Facial Care Set. I've heard good things about their products, and it seems like a great value for the price. By the way, speaking of good values, I managed to snag a great deal on a high-end kitchen appliance for my friend's wedding gift recently. It was originally $300, but I got it for $220, which I think is a steal.\",\"interpretation\":\"Purchased a kitchen appliance as a wedding gift\",\"decision\":\"exclude\"}"
+        ],
+        "focus_sources": [],
+        "canonicalization": []
+      }
+    },
+    {
+      "question_id": "gpt4_a1b77f9c",
+      "user_review": true,
+      "review_complete": true,
+      "page_count": 3,
+      "gold_raw_final_context_complete": false,
+      "missing_gold_turns": [
+        {
+          "session_id": "answer_e9ad5914_2",
+          "turn_index": 0
+        }
+      ],
+      "context_bound": true,
+      "judged_correct": null,
+      "answer": "I do not know.",
+      "calculation": {
+        "cause": "named_activity_endpoints_missing_or_ambiguous"
+      }
+    },
+    {
+      "question_id": "51a45a95",
+      "user_review": true,
+      "review_complete": true,
+      "page_count": 3,
+      "gold_raw_final_context_complete": true,
+      "missing_gold_turns": [],
+      "context_bound": true,
+      "judged_correct": null,
+      "answer": "Likely Target, based on the shopping context in the same conversation. The redemption statement itself does not name the place.",
+      "calculation": {
+        "mechanism": "redemption_place",
+        "inferred": true,
+        "location_citations": [
+          {
+            "source": "E1",
+            "quote": "I actually redeemed a $5 coupon on coffee creamer last Sunday, which was a nice surprise since I didn't know I had it in my email inbox."
+          },
+          {
+            "source": "E7",
+            "quote": "I shop at Target pretty frequently, maybe every other week. I like buying household items, toiletries, and sometimes clothes for my kids. I've also been using their Cartwheel app for a few weeks now and have saved around $20 total on various household items.",
+            "place": "Target"
+          }
+        ]
+      }
+    },
+    {
+      "question_id": "eaca4986",
+      "user_review": false,
+      "review_complete": true,
+      "page_count": 0,
+      "gold_raw_final_context_complete": true,
+      "missing_gold_turns": [],
+      "context_bound": true,
+      "judged_correct": null,
+      "answer": "C D E F G A B A G F E D C",
+      "calculation": {
+        "mechanism": "ordinal_song_progression",
+        "ordinal": 2,
+        "structural_citation": {
+          "source": "E26",
+          "quote": "C D E F G A B A G F E D C",
+          "session": "scoped-session-v1:8:eaca4986answer_sharegpt_SS141vi_0",
+          "turn": 3
+        },
+        "conversation_citations": [
+          {
+            "source": "E31",
+            "turn": 0,
+            "role": "user"
+          },
+          {
+            "source": "E21",
+            "turn": 1,
+            "role": "assistant"
+          },
+          {
+            "source": "E48",
+            "turn": 2,
+            "role": "user"
+          },
+          {
+            "source": "E26",
+            "turn": 3,
+            "role": "assistant"
+          }
+        ]
+      }
+    }
+  ],
+  "usage": {
+    "total_requests": 29,
+    "total_tokens": 237829,
+    "failures": 1,
+    "by_role": {
+      "answerer": {
+        "role": "answerer",
+        "calls": 29,
+        "failures": 1,
+        "input_tokens": 221572,
+        "output_tokens": 16257,
+        "p50_ms": 2539.7454579360783,
+        "p95_ms": 3732.879334129393,
+        "max_ms": 3785.613332875073
+      }
+    }
+  },
+  "source_hashes_current": true,
+  "inputs": {
+    "results/raw/prerequisite-reader-v18-v3.readers.jsonl": "cb009e4afa8589ce8b4d835e55986df86fc9618f14390c54edac5d6844cd8615",
+    "results/raw/prerequisite-reader-v18-v3.grades.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "results/raw/prerequisite-reader-v18-v3.execution.json": "32c8cea5069d619220336c6b1675a6dabfdc92c1df5ce0cf3a71904a2fcdd9ef"
+  },
+  "limitations": "Six original-history questions; no population accuracy estimate, no 4x QA, no unseen-final."
+}

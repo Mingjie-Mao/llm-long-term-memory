@@ -1,0 +1,259 @@
+{
+  "experiment_class": "development/regression; failure-enriched, not overall accuracy",
+  "provider_calls": 0,
+  "inventory_sha256": "c3fbc76c2533e1bfdda3787d6c161734ee86ec8861f5f764d7bea23474cbdd57",
+  "inputs": {
+    "results/raw/grounded-reader-v13.answers.jsonl": "4e351407091302393e6945aac3c17dc6ca6f9fa3c30ae6d41d5b4d0fb3b76e74",
+    "results/analysis/grounded-reader-v13.execution.json": "c3fbc76c2533e1bfdda3787d6c161734ee86ec8861f5f764d7bea23474cbdd57",
+    "results/raw/grounded-reader-v13.usage.json": "f6ca482e1da76017977b16761858f5e2f623f36d052799bf1137350661da173d"
+  },
+  "cohorts": {
+    "reasoning-errors": {
+      "readers": 9,
+      "graded": 0,
+      "correct": 0
+    },
+    "originally-correct": {
+      "readers": 10,
+      "graded": 0,
+      "correct": 0
+    }
+  },
+  "grading_complete_for_saved_readers": false,
+  "usage": {
+    "total_requests": 33,
+    "total_tokens": 277927,
+    "failures": 7,
+    "by_role": {
+      "answerer": {
+        "role": "answerer",
+        "calls": 33,
+        "failures": 7,
+        "input_tokens": 263671,
+        "output_tokens": 14256,
+        "p50_ms": 3151.1113750748336,
+        "p95_ms": 22818.382874596864,
+        "max_ms": 25933.018541894853
+      }
+    }
+  },
+  "rows": [
+    {
+      "question_id": "09ba9854",
+      "cohort": "reasoning-errors",
+      "answer": "About 50 $",
+      "correct": null,
+      "judge_reason": null,
+      "reader_passes": 1,
+      "validation_causes": [
+        null
+      ]
+    },
+    {
+      "question_id": "51a45a95",
+      "cohort": "reasoning-errors",
+      "answer": "Likely Target, based on the shopping context in the same conversation. The redemption statement itself does not name the place.",
+      "correct": null,
+      "judge_reason": null,
+      "reader_passes": 2,
+      "validation_causes": [
+        null,
+        null
+      ]
+    },
+    {
+      "question_id": "6e984301",
+      "cohort": "reasoning-errors",
+      "answer": "3 weeks",
+      "correct": null,
+      "judge_reason": null,
+      "reader_passes": 1,
+      "validation_causes": [
+        null
+      ]
+    },
+    {
+      "question_id": "b46e15ed",
+      "cohort": "reasoning-errors",
+      "answer": "2 months and 3 days",
+      "correct": null,
+      "judge_reason": null,
+      "reader_passes": 2,
+      "validation_causes": [
+        null,
+        null
+      ]
+    },
+    {
+      "question_id": "eaca4986",
+      "cohort": "reasoning-errors",
+      "answer": "C D E F G A B A G F E D C",
+      "correct": null,
+      "judge_reason": null,
+      "reader_passes": 2,
+      "validation_causes": [
+        null,
+        null
+      ]
+    },
+    {
+      "question_id": "f685340e",
+      "cohort": "reasoning-errors",
+      "answer": "Previously, you played tennis weekly with friends. Now, you play every other week.",
+      "correct": null,
+      "judge_reason": null,
+      "reader_passes": 1,
+      "validation_causes": [
+        "validated_lookup"
+      ]
+    },
+    {
+      "question_id": "f9e8c073",
+      "cohort": "reasoning-errors",
+      "answer": "The records state 3 sessions (period unspecified); 5 sessions (last year). A combined total cannot be determined from these records.",
+      "correct": null,
+      "judge_reason": null,
+      "reader_passes": 1,
+      "validation_causes": [
+        null
+      ]
+    },
+    {
+      "question_id": "gpt4_7a0daae1",
+      "cohort": "reasoning-errors",
+      "answer": "1 weeks",
+      "correct": null,
+      "judge_reason": null,
+      "reader_passes": 1,
+      "validation_causes": [
+        null
+      ]
+    },
+    {
+      "question_id": "gpt4_a1b77f9c",
+      "cohort": "reasoning-errors",
+      "answer": "8 weeks",
+      "correct": null,
+      "judge_reason": null,
+      "reader_passes": 2,
+      "validation_causes": [
+        "named_duration_requires_start_end_pair",
+        null
+      ]
+    },
+    {
+      "question_id": "0ddfec37_abs",
+      "cohort": "originally-correct",
+      "answer": "I do not know.",
+      "correct": null,
+      "judge_reason": null,
+      "reader_passes": 2,
+      "validation_causes": [
+        "zero_not_stated",
+        "no_operands"
+      ]
+    },
+    {
+      "question_id": "1568498a",
+      "cohort": "originally-correct",
+      "answer": "28. Kg3 would be my move.",
+      "correct": null,
+      "judge_reason": null,
+      "reader_passes": 1,
+      "validation_causes": [
+        null
+      ]
+    },
+    {
+      "question_id": "6456829e",
+      "cohort": "originally-correct",
+      "answer": "8 plants",
+      "correct": null,
+      "judge_reason": null,
+      "reader_passes": 1,
+      "validation_causes": [
+        null
+      ]
+    },
+    {
+      "question_id": "95228167",
+      "cohort": "originally-correct",
+      "answer": "Since you're planning to upgrade from your Fender Stratocaster to a Gibson Les Paul, here are a few things to look for when you visit the music store this weekend: \n\n1. **Model & Weight:** Les Pauls are known for being substantial and heavier than Stratocasters due to their mahogany bodies and maple caps. Pay attention to how different models (like standard weights vs. weight-relieved bodies) feel when standing and sitting.\n2. **Pickup Configuration & Tones:** Test out the humbuckers to see how you like their warmer, thicker sound compared to your Strat single-coils. You might also want to try out a model with a **coil-tap or coil-splitting feature** to get more tonal options and flexibility.\n3. **Neck Profile:** Les Paul necks come in various profiles (like the thicker '50s vintage style or the slimmer '60s slim-taper); see which one feels most comfortable in your hand.\n4. **Setup & Action:** Check the string action, intonation, and fretwork to ensure smooth playability right out of the box.",
+      "correct": null,
+      "judge_reason": null,
+      "reader_passes": 1,
+      "validation_causes": [
+        "validated_lookup"
+      ]
+    },
+    {
+      "question_id": "a89d7624",
+      "cohort": "originally-correct",
+      "answer": "For your trip to Denver, you can explore the city's amazing music scene and venues that were previously recommended, such as Red Rocks Park and Amphitheatre, The Ogden Theatre, The Bluebird Theater, The Fillmore Auditorium, and Larimer Lounge. Music festivals like Grandoozy, the Denver Folk Festival, Denver Jazz Festival, Westword Music Showcase, and Riot Fest Denver are also great to check out, along with spots like Twist & Shout Records, The hi-dive, and The Marquis Theater. If you are heading to Red Rocks, you can also grab dinner at The Ship Rock Grille.",
+      "correct": null,
+      "judge_reason": null,
+      "reader_passes": 1,
+      "validation_causes": [
+        "validated_lookup"
+      ]
+    },
+    {
+      "question_id": "af8d2e46",
+      "cohort": "originally-correct",
+      "answer": "You packed 7 shirts for your trip to Costa Rica.",
+      "correct": null,
+      "judge_reason": null,
+      "reader_passes": 1,
+      "validation_causes": [
+        "validated_lookup"
+      ]
+    },
+    {
+      "question_id": "ed4ddc30",
+      "cohort": "originally-correct",
+      "answer": "20 dozen eggs",
+      "correct": null,
+      "judge_reason": null,
+      "reader_passes": 1,
+      "validation_causes": [
+        null
+      ]
+    },
+    {
+      "question_id": "gpt4_2f8be40d",
+      "cohort": "originally-correct",
+      "answer": "I do not know.",
+      "correct": null,
+      "judge_reason": null,
+      "reader_passes": 2,
+      "validation_causes": [
+        "count_period_or_attendance_not_supported",
+        "count_period_or_attendance_not_supported"
+      ]
+    },
+    {
+      "question_id": "gpt4_7ddcf75f",
+      "cohort": "originally-correct",
+      "answer": "I do not know.",
+      "correct": null,
+      "judge_reason": null,
+      "reader_passes": 2,
+      "validation_causes": [
+        "observation_quote_invalid",
+        "observation_quote_invalid"
+      ]
+    },
+    {
+      "question_id": "gpt4_a2d1d1f6",
+      "cohort": "originally-correct",
+      "answer": "3 days",
+      "correct": null,
+      "judge_reason": null,
+      "reader_passes": 1,
+      "validation_causes": [
+        null
+      ]
+    }
+  ],
+  "generator_sha256": "821ae9db7a157aa5216eab6ded137658e4af42a1f2bf02390488bb9946d327b4"
+}

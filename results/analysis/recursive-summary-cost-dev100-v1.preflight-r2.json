@@ -1,0 +1,44 @@
+{
+  "provider_calls": 0,
+  "experiment_class": "exposed-split-offline-resource-preflight",
+  "pilot_questions": 21,
+  "inputs": {
+    "stores/train150.db": "9fba77af46c31d7569bbbb3ddad6b6bdfbedf8607b6bbbf6a56774ed548ce339",
+    "results/manifests/train150.json": "95a4c237ac3adce1def18a9ec7c602e4cc9ebf41cfe3e1e1f753b827887edfb4",
+    "stores/dev100.db": "053ec8905e1547490009d1eb2b4a6fb58179bfbe98ccd55ec0ed89c0fab55214",
+    "results/manifests/dev100.json": "fe6ae148da5f81730d698ecd10cc795d6bd69357e22eb26d47ba6cefe16d6072",
+    "tools/recursive_summary_preflight.py": "daa074b0db2ee659c30e2bbe480595f3ea18fbe0783852589b2133e3e3b45cf5"
+  },
+  "by_split": {
+    "train150": {
+      "questions": 21,
+      "personal_histories": 19,
+      "leaf_summary_calls": 85,
+      "parent_summary_calls": 28,
+      "total_nominal_initial_summary_calls": 113,
+      "max_leaf_count": 6,
+      "summary_call_attempt_ceiling": 678,
+      "query_call_upper_before_client_retries": 270,
+      "query_call_upper_by_arm": {
+        "control": 0,
+        "candidate": 270
+      },
+      "query_attempt_ceiling_both_arms": 810
+    },
+    "dev100": {
+      "questions": 100,
+      "personal_histories": 83,
+      "leaf_summary_calls": 369,
+      "parent_summary_calls": 120,
+      "total_nominal_initial_summary_calls": 489,
+      "max_leaf_count": 6,
+      "summary_call_attempt_ceiling": 2934,
+      "query_call_upper_before_client_retries": 3588,
+      "query_call_upper_by_arm": {
+        "control": 1380,
+        "candidate": 3588
+      },
+      "query_attempt_ceiling_both_arms": 14904
+    }
+  }
+}

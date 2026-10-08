@@ -1,0 +1,66 @@
+{
+  "scores": {
+    "two_stage_hydrated.train150-raw-v2-control": 98,
+    "two_stage_raw_primary.train150-raw-v2": 127
+  },
+  "primary": {
+    "wins": 32,
+    "losses": 3,
+    "net": 29
+  },
+  "by_type": {
+    "knowledge-update": {
+      "wins": 1,
+      "losses": 0,
+      "net": 1
+    },
+    "multi-session": {
+      "wins": 16,
+      "losses": 1,
+      "net": 15
+    },
+    "single-session-assistant": {
+      "wins": 2,
+      "losses": 0,
+      "net": 2
+    },
+    "single-session-preference": {
+      "wins": 2,
+      "losses": 1,
+      "net": 1
+    },
+    "single-session-user": {
+      "wins": 1,
+      "losses": 0,
+      "net": 1
+    },
+    "temporal-reasoning": {
+      "wins": 10,
+      "losses": 1,
+      "net": 9
+    }
+  },
+  "type_counts": {
+    "single-session-user": 21,
+    "knowledge-update": 23,
+    "multi-session": 40,
+    "temporal-reasoning": 40,
+    "single-session-assistant": 17,
+    "single-session-preference": 9
+  },
+  "median_context_tokens": {
+    "two_stage_hydrated.train150-raw-v2-control": 1593.0,
+    "two_stage_raw_primary.train150-raw-v2": 5685.5
+  },
+  "fallback_second_calls": {
+    "two_stage_hydrated.train150-raw-v2-control": 44,
+    "two_stage_raw_primary.train150-raw-v2": 16
+  },
+  "rules": {
+    "net_at_least_8": true,
+    "no_type_loses_more_than_2": true,
+    "median_total_context_at_most_6000": true
+  },
+  "pass": true,
+  "exact_mcnemar_p": 4.176981747150421e-07
+}

@@ -1,0 +1,37 @@
+{
+  "experiment_class": "regression",
+  "mean_net": -3.3333333333333335,
+  "mean_scores": {
+    "baseline": 77.66666666666667,
+    "candidate": 74.33333333333333
+  },
+  "by_type_mean_net": {
+    "temporal-reasoning": -2.0,
+    "single-session-user": 1.3333333333333333,
+    "knowledge-update": 1.0,
+    "single-session-preference": -0.3333333333333333,
+    "multi-session": -3.3333333333333335,
+    "single-session-assistant": 0.0
+  },
+  "type_counts": {
+    "single-session-preference": 6,
+    "knowledge-update": 16,
+    "multi-session": 27,
+    "temporal-reasoning": 26,
+    "single-session-user": 14,
+    "single-session-assistant": 11
+  },
+  "median_context": 5978.0,
+  "rules": {
+    "mean_net_at_least_4": false,
+    "no_type_loses_more_than_2": false,
+    "median_context_at_most_6000": true
+  },
+  "pass": false,
+  "questions_up_down": {
+    "up": 15,
+    "down": 21
+  },
+  "outcome_scope": "PASS_TO_SUMMARY_COST_COMPARISON only; no default promotion or unseen-final claim",
+  "execution_inventory": "results/analysis/paged-paired-dev100-v18-v1.execution.json"
+}

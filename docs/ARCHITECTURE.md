@@ -174,6 +174,7 @@ LongMemEval 的 `HaystackTurn` / `HaystackSession` 继承前两者并加上基�
 | `runners/reasoning.py` | `reasoned_v3` 通过问题措辞分类；时间/聚合/当前状态可触发 v3 hydration |
 | `runners/synthesis.py` | `synthesis_v4` 的模型输出操作数，Python 计算 count/duration；comparison 保留模型措辞 |
 | `retrieve/relation_router.py`, `scan.py` | v4.1 scan 变体，按问题路由后追加关系匹配事实；需要外部 predicate map，默认不注入 |
+| `retrieve/excerpts.py`, `time_notes.py`, `time_window.py` | 原文为主：按问题 BM25 检索本用户全部轮次，按 token 预算装入回答上下文。评测变体 `two_stage_raw_primary`（v1）、`_t3`、`_t4`；服务端只接了 `service.raw_primary_tokens` 与 `raw_primary_time_notes`，默认 0／关闭；用户原话优先和时间窗口检索只在评测变体里 |
 | `lifecycle.py` | 可选衰减、访问强化、容量淘汰；默认关闭 |
 | `consolidate/runner.py` | CLI 显式触发聚合，保留源 memory 证据；默认路径不执行 |
 | `influence/`, `pack/` | 离线消融产生效用数据，拟合预测器，再供可选预算打包；默认关闭 |

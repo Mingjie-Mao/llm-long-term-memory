@@ -1,0 +1,53 @@
+{
+  "store": "train150",
+  "checkable": 6456,
+  "accuracy": {
+    "stored": 0.8784076827757125,
+    "v1": 0.8784076827757125,
+    "v2": 0.9648389095415117,
+    "v3": 0.9563197026022305
+  },
+  "v1_equals_stored": 1.0,
+  "flips": {
+    "v1_wrong_v2_right": 611,
+    "v1_right_v2_wrong": 53
+  },
+  "v2_kept_of_v1_correct": 0.9906542056074766,
+  "v3_kept_of_v1_correct": 0.9790160465526362,
+  "v2_accuracy_by_reference_role": {
+    "user": 0.9848942598187311,
+    "assistant": 0.9596648480124708
+  },
+  "rules": {
+    "v2_at_least_3_points_above_v1": true,
+    "v2_keeps_99pct_of_v1_correct": true
+  },
+  "switch_to_v2": true,
+  "examples": [
+    {
+      "content": "The user's LiFePO4 battery cell measures 205mm height, 174mm width, and 72mm thick.",
+      "v1_turn": 1,
+      "reference_turn": 0
+    },
+    {
+      "content": "The assistant recommended L'Occitane, Dermalogica, The Body Shop, Burt's Bees, and Kiehl's as eco-friendly beauty brands.",
+      "v1_turn": 10,
+      "reference_turn": 9
+    },
+    {
+      "content": "The assistant recommended Leesa Hybrid, Casper Wave Hybrid, and WinkBeds Plus as hybrid mattresses with cooling features.",
+      "v1_turn": 7,
+      "reference_turn": 9
+    },
+    {
+      "content": "The assistant recommended M25 for Middle Eastern dishes in the Jaffa Flea Market.",
+      "v1_turn": 5,
+      "reference_turn": 7
+    },
+    {
+      "content": "The assistant recommended Sabich Tchernichovsky for Israeli sandwiches in the Jaffa Flea Market.",
+      "v1_turn": 1,
+      "reference_turn": 7
+    }
+  ]
+}

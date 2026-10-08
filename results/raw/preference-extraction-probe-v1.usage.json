@@ -1,0 +1,138 @@
+{
+  "summary": {
+    "total_requests": 13,
+    "total_tokens": 256535,
+    "failures": 1,
+    "by_role": {
+      "extractor": {
+        "role": "extractor",
+        "calls": 13,
+        "failures": 1,
+        "input_tokens": 221755,
+        "output_tokens": 34780,
+        "p50_ms": 10953.224208205938,
+        "p95_ms": 15235.858290921897,
+        "max_ms": 17720.173959154636
+      }
+    }
+  },
+  "calls": [
+    {
+      "role": "extractor",
+      "model": "gemini-3.1-flash-lite",
+      "input_tokens": 36470,
+      "output_tokens": 3746,
+      "latency_ms": 14353.513665962964,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "extractor",
+      "model": "gemini-3.1-flash-lite",
+      "input_tokens": 2223,
+      "output_tokens": 3338,
+      "latency_ms": 11131.866584066302,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "extractor",
+      "model": "gemini-3.1-flash-lite",
+      "input_tokens": 34069,
+      "output_tokens": 4091,
+      "latency_ms": 13900.823084171861,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "extractor",
+      "model": "gemini-3.1-flash-lite",
+      "input_tokens": 2386,
+      "output_tokens": 2475,
+      "latency_ms": 9642.759375274181,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "extractor",
+      "model": "gemini-3.1-flash-lite",
+      "input_tokens": 33927,
+      "output_tokens": 2295,
+      "latency_ms": 10811.656832695007,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "extractor",
+      "model": "gemini-3.1-flash-lite",
+      "input_tokens": 1680,
+      "output_tokens": 1280,
+      "latency_ms": 7723.131334409118,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "extractor",
+      "model": "gemini-3.1-flash-lite",
+      "input_tokens": 36584,
+      "output_tokens": 2542,
+      "latency_ms": 10449.690333101898,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "extractor",
+      "model": "gemini-3.1-flash-lite",
+      "input_tokens": 1654,
+      "output_tokens": 2132,
+      "latency_ms": 7827.479834202677,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "extractor",
+      "model": "gemini-3.1-flash-lite",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 5046.113417018205,
+      "ok": false,
+      "error": "ServerError: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+    },
+    {
+      "role": "extractor",
+      "model": "gemini-3.1-flash-lite",
+      "input_tokens": 34183,
+      "output_tokens": 3520,
+      "latency_ms": 15235.858290921897,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "extractor",
+      "model": "gemini-3.1-flash-lite",
+      "input_tokens": 2080,
+      "output_tokens": 2174,
+      "latency_ms": 10953.224208205938,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "extractor",
+      "model": "gemini-3.1-flash-lite",
+      "input_tokens": 34041,
+      "output_tokens": 3838,
+      "latency_ms": 17720.173959154636,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "extractor",
+      "model": "gemini-3.1-flash-lite",
+      "input_tokens": 2458,
+      "output_tokens": 3349,
+      "latency_ms": 11436.791666783392,
+      "ok": true,
+      "error": null
+    }
+  ]
+}

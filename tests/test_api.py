@@ -826,3 +826,31 @@ def test_evidence_is_none_when_a_memory_has_no_source_anchor(client):
     from llm_long_term_memory.api.app import get_service
 
     assert get_service().evidence("alice", "m_rec") is None
+
+
+def test_invalid_source_quote_rolls_back_new_turn_before_retry(client):
+    from llm_long_term_memory.api.app import get_service
+
+    service = get_service()
+
+    def invalid(**kwargs):
+        return SimpleNamespace(
+            memories=[
+                memory(
+                    "bad-quote",
+                    "alice",
+                    "fabricated",
+                    predicate="source_quote",
+                    source_turn_index=0,
+                    source_char_start=0,
+                    source_char_end=10,
+                )
+            ],
+            usage={},
+        )
+
+    service.extractor = SimpleNamespace(extract_turn=invalid)
+    with pytest.raises(ValueError, match="exact same-user"):
+        service.add_message("alice", "user", "I bought a book.", "quote-chat")
+    assert not service.store.turns_for_session(scoped_session_id("alice", "quote-chat"))
+    assert service.store.get_many(["bad-quote"]) == []

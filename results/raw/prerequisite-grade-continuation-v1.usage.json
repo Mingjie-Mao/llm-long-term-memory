@@ -1,0 +1,30 @@
+{
+  "summary": {
+    "total_requests": 1,
+    "total_tokens": 0,
+    "failures": 1,
+    "by_role": {
+      "judge": {
+        "role": "judge",
+        "calls": 1,
+        "failures": 1,
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "p50_ms": 862.0041660033166,
+        "p95_ms": 862.0041660033166,
+        "max_ms": 862.0041660033166
+      }
+    }
+  },
+  "calls": [
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 862.0041660033166,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    }
+  ]
+}

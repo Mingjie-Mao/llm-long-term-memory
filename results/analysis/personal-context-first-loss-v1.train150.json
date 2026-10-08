@@ -1,0 +1,1549 @@
+{
+  "experiment_class": "train150 archived extraction diagnosis; not QA accuracy",
+  "provider_calls": 0,
+  "questions": 9,
+  "proxy_counts": {
+    "plain": {
+      "old_preference_proxy": 1,
+      "user_personal_context_proxy": 5
+    },
+    "observer": {
+      "old_preference_proxy": 4,
+      "user_personal_context_proxy": 7
+    }
+  },
+  "limitations": "Proxies require semantic review. Numeric anchor alerts may be false positives.",
+  "rows": [
+    {
+      "question_id": "8a2466db",
+      "reference_turns": [
+        {
+          "session_id": "answer_edb03329",
+          "turn_index": 0,
+          "role": "user",
+          "text": "I'm trying to learn more about some advanced settings for video editing with Adobe Premiere Pro, which I enjoy to use. Can you give me some tips on where to start?"
+        }
+      ],
+      "arms": {
+        "plain": {
+          "old_preference_proxy": true,
+          "user_personal_context_proxy": true,
+          "memories": [
+            {
+              "content": "The user enjoys using Adobe Premiere Pro for video editing.",
+              "type": "preference",
+              "scope": "preference",
+              "session_id": "answer_edb03329",
+              "turn_index": 0,
+              "source_role": "user",
+              "on_reference_turn": true,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The assistant recommended mastering the Timeline Panel in Adobe Premiere Pro.",
+              "type": "semantic",
+              "scope": "recommendation",
+              "session_id": "answer_edb03329",
+              "turn_index": 1,
+              "source_role": "assistant",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The assistant recommended managing the Render Cache in Adobe Premiere Pro.",
+              "type": "semantic",
+              "scope": "recommendation",
+              "session_id": "answer_edb03329",
+              "turn_index": 1,
+              "source_role": "assistant",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The assistant recommended using the Lumetri Color Panel for color grading in Adobe Premiere Pro.",
+              "type": "semantic",
+              "scope": "recommendation",
+              "session_id": "answer_edb03329",
+              "turn_index": 3,
+              "source_role": "assistant",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The assistant recommended exploring audio advanced settings like the Audio Clip Mixer and plugins in Adobe Premiere Pro.",
+              "type": "preference",
+              "scope": "recommendation",
+              "session_id": "answer_edb03329",
+              "turn_index": 1,
+              "source_role": "assistant",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The assistant recommended using the Effects and Transitions panel and third-party plugins like Video Copilot's Orb.",
+              "type": "preference",
+              "scope": "recommendation",
+              "session_id": "answer_edb03329",
+              "turn_index": 1,
+              "source_role": "assistant",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The assistant recommended using Dynamic Link for After Effects integration.",
+              "type": "semantic",
+              "scope": "recommendation",
+              "session_id": "answer_edb03329",
+              "turn_index": 1,
+              "source_role": "assistant",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The assistant recommended using Proxy media and ingest settings to improve performance.",
+              "type": "semantic",
+              "scope": "recommendation",
+              "session_id": "answer_edb03329",
+              "turn_index": 1,
+              "source_role": "assistant",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The assistant recommended using multi-camera editing for sequences with multiple angles.",
+              "type": "semantic",
+              "scope": "recommendation",
+              "session_id": "answer_edb03329",
+              "turn_index": 1,
+              "source_role": "assistant",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The assistant recommended using Media Encoder for batch-processing and export settings.",
+              "type": "semantic",
+              "scope": "recommendation",
+              "session_id": "answer_edb03329",
+              "turn_index": 1,
+              "source_role": "assistant",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The assistant recommended resources including official Adobe documentation, YouTube channels like Premiere Bro and Video Copilot, and online courses on Udemy, LinkedIn Learning, and Skillshare.",
+              "type": "preference",
+              "scope": "recommendation",
+              "session_id": "answer_edb03329",
+              "turn_index": 1,
+              "source_role": "assistant",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The assistant recommended communities like Reddit's r/premierepro and Adobe's Premiere Pro forum.",
+              "type": "preference",
+              "scope": "recommendation",
+              "session_id": "answer_edb03329",
+              "turn_index": 1,
+              "source_role": "assistant",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The Color Match feature in the Lumetri Color Panel automatically matches the color and tone of a source clip to a reference clip.",
+              "type": "semantic",
+              "scope": "shared_context",
+              "session_id": "answer_edb03329",
+              "turn_index": 2,
+              "source_role": "user",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The Creative panel in Lumetri is designed for broad, intuitive adjustments to achieve a specific look or mood.",
+              "type": "semantic",
+              "scope": "shared_context",
+              "session_id": "answer_edb03329",
+              "turn_index": 5,
+              "source_role": "assistant",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The Curves panel in Lumetri provides precise, technical control over tonal range and color using graphs.",
+              "type": "semantic",
+              "scope": "shared_context",
+              "session_id": "answer_edb03329",
+              "turn_index": 5,
+              "source_role": "assistant",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The assistant recommended creating a gentle S-curve in the Curves panel to add cinematic contrast.",
+              "type": "semantic",
+              "scope": "recommendation",
+              "session_id": "answer_edb03329",
+              "turn_index": 7,
+              "source_role": "assistant",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The Toe control in the Curves panel adjusts the curve in the shadows between 0% and 20% on the x-axis.",
+              "type": "semantic",
+              "scope": "shared_context",
+              "session_id": "answer_edb03329",
+              "turn_index": 9,
+              "source_role": "assistant",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The Shoulder control in the Curves panel adjusts the curve in the highlights between 80% and 100% on the x-axis.",
+              "type": "semantic",
+              "scope": "shared_context",
+              "session_id": "answer_edb03329",
+              "turn_index": 9,
+              "source_role": "assistant",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The user decided to stick with the Lumetri Color Panel for color grading.",
+              "type": "semantic",
+              "scope": "plan",
+              "session_id": "answer_edb03329",
+              "turn_index": 14,
+              "source_role": "user",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The assistant recommended starting with a neutral grade when color grading.",
+              "type": "semantic",
+              "scope": "recommendation",
+              "session_id": "answer_edb03329",
+              "turn_index": 17,
+              "source_role": "assistant",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            }
+          ]
+        },
+        "observer": {
+          "old_preference_proxy": true,
+          "user_personal_context_proxy": true,
+          "memories": [
+            {
+              "content": "The user enjoys using Adobe Premiere Pro for video editing.",
+              "type": "preference",
+              "scope": "preference",
+              "session_id": "answer_edb03329",
+              "turn_index": 0,
+              "source_role": "user",
+              "on_reference_turn": true,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The assistant recommended mastering the Timeline Panel in Adobe Premiere Pro.",
+              "type": "semantic",
+              "scope": "recommendation",
+              "session_id": "answer_edb03329",
+              "turn_index": 1,
+              "source_role": "assistant",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The assistant recommended managing the Render Cache in Adobe Premiere Pro.",
+              "type": "semantic",
+              "scope": "recommendation",
+              "session_id": "answer_edb03329",
+              "turn_index": 1,
+              "source_role": "assistant",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The assistant recommended using the Lumetri Color Panel for advanced color grading.",
+              "type": "semantic",
+              "scope": "recommendation",
+              "session_id": "answer_edb03329",
+              "turn_index": 10,
+              "source_role": "user",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The assistant recommended exploring audio plugins like Dynamics and EQ effects in Adobe Premiere Pro.",
+              "type": "preference",
+              "scope": "recommendation",
+              "session_id": "answer_edb03329",
+              "turn_index": 1,
+              "source_role": "assistant",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The assistant recommended using third-party plugins like Video Copilot's Orb for effects.",
+              "type": "preference",
+              "scope": "recommendation",
+              "session_id": "answer_edb03329",
+              "turn_index": 1,
+              "source_role": "assistant",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The assistant recommended using Dynamic Link for After Effects integration.",
+              "type": "semantic",
+              "scope": "recommendation",
+              "session_id": "answer_edb03329",
+              "turn_index": 1,
+              "source_role": "assistant",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The assistant recommended using Proxy media and ingest settings to improve performance.",
+              "type": "semantic",
+              "scope": "recommendation",
+              "session_id": "answer_edb03329",
+              "turn_index": 1,
+              "source_role": "assistant",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The assistant recommended using the Multi-Camera editing feature for sequences with multiple angles.",
+              "type": "semantic",
+              "scope": "recommendation",
+              "session_id": "answer_edb03329",
+              "turn_index": 1,
+              "source_role": "assistant",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The assistant recommended using Media Encoder for batch-processing files.",
+              "type": "semantic",
+              "scope": "recommendation",
+              "session_id": "answer_edb03329",
+              "turn_index": 1,
+              "source_role": "assistant",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The assistant recommended resources including Adobe's official documentation, YouTube channels like Premiere Bro and Video Copilot, and online courses on Udemy, LinkedIn Learning, and Skillshare.",
+              "type": "preference",
+              "scope": "recommendation",
+              "session_id": "answer_edb03329",
+              "turn_index": 1,
+              "source_role": "assistant",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The Color Match feature in the Lumetri Color Panel allows automatic matching of color and tone between a Source clip and a Reference clip.",
+              "type": "semantic",
+              "scope": "shared_context",
+              "session_id": "answer_edb03329",
+              "turn_index": 2,
+              "source_role": "user",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The Creative panel in Lumetri is designed for broad, intuitive adjustments to achieve a specific look or mood.",
+              "type": "semantic",
+              "scope": "shared_context",
+              "session_id": "answer_edb03329",
+              "turn_index": 5,
+              "source_role": "assistant",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The Curves panel in Lumetri provides precise, technical control over tonal range and color using Luma, Color, and Hue vs. Saturation curves.",
+              "type": "semantic",
+              "scope": "shared_context",
+              "session_id": "answer_edb03329",
+              "turn_index": 5,
+              "source_role": "assistant",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The assistant recommended creating a gentle S-curve in the Curves panel to add cinematic contrast and depth.",
+              "type": "semantic",
+              "scope": "recommendation",
+              "session_id": "answer_edb03329",
+              "turn_index": 7,
+              "source_role": "assistant",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The Toe control in the Curves panel adjusts the curve in the shadows between 0% and 20% on the x-axis.",
+              "type": "semantic",
+              "scope": "shared_context",
+              "session_id": "answer_edb03329",
+              "turn_index": 9,
+              "source_role": "assistant",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The Shoulder control in the Curves panel adjusts the curve in the highlights between 80% and 100% on the x-axis.",
+              "type": "semantic",
+              "scope": "shared_context",
+              "session_id": "answer_edb03329",
+              "turn_index": 9,
+              "source_role": "assistant",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The user decided to stick with the Lumetri Color Panel for color grading.",
+              "type": "semantic",
+              "scope": "plan",
+              "session_id": "answer_edb03329",
+              "turn_index": 14,
+              "source_role": "user",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The assistant recommended starting with a neutral grade when color grading a video.",
+              "type": "semantic",
+              "scope": "recommendation",
+              "session_id": "answer_edb03329",
+              "turn_index": 17,
+              "source_role": "assistant",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            }
+          ]
+        }
+      }
+    },
+    {
+      "question_id": "35a27287",
+      "reference_turns": [
+        {
+          "session_id": "answer_9b182436",
+          "turn_index": 2,
+          "role": "user",
+          "text": "What are some cultural events or festivals in my area that celebrate language diversity and cultural exchange? I'd love to attend something like the cultural festival I volunteered at last month."
+        },
+        {
+          "session_id": "answer_9b182436",
+          "turn_index": 4,
+          "role": "user",
+          "text": "Can you recommend any language learning apps or websites that focus on idiomatic expressions and colloquialisms in French and Spanish? I've been trying to improve my conversational skills and want to learn more informal language."
+        },
+        {
+          "session_id": "answer_9b182436",
+          "turn_index": 12,
+          "role": "user",
+          "text": "I'd like to explore more language exchange opportunities and cultural events in my area. Can you suggest some ways to find language exchange partners or events that focus on French and Spanish languages?"
+        }
+      ],
+      "arms": {
+        "plain": {
+          "old_preference_proxy": false,
+          "user_personal_context_proxy": false,
+          "memories": [
+            {
+              "content": "The user is looking for French language learning podcasts.",
+              "type": "semantic",
+              "scope": "plan",
+              "session_id": "answer_9b182436",
+              "turn_index": 0,
+              "source_role": "user",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The assistant recommended Coffee Break French, French Pod 101, News in Slow French, French for Beginners, One Thing in a French Day, French Voices, Le Journal en Fran\u00e7ais Facile, Learn French with Alexa, French Obsession, and Duolingo French Podcast.",
+              "type": "semantic",
+              "scope": "recommendation",
+              "session_id": "answer_9b182436",
+              "turn_index": 1,
+              "source_role": "assistant",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The assistant recommended FluentU, FrenchPod101, Idiomaster, Bonjour, and French.org for learning French idioms.",
+              "type": "semantic",
+              "scope": "recommendation",
+              "session_id": "answer_9b182436",
+              "turn_index": 5,
+              "source_role": "assistant",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The assistant recommended SpanishDict, Coffee Break Spanish, SpanishPod101, Idiomas, and StudySpanish for learning Spanish idioms.",
+              "type": "semantic",
+              "scope": "recommendation",
+              "session_id": "answer_9b182436",
+              "turn_index": 5,
+              "source_role": "assistant",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The assistant recommended Conversation Exchange, Tandem, HelloTalk, Language Exchange Net, and Meetup for finding language exchange partners.",
+              "type": "semantic",
+              "scope": "recommendation",
+              "session_id": "answer_9b182436",
+              "turn_index": 7,
+              "source_role": "assistant",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            }
+          ]
+        },
+        "observer": {
+          "old_preference_proxy": true,
+          "user_personal_context_proxy": true,
+          "memories": [
+            {
+              "content": "The user is looking for French and Spanish language learning resources.",
+              "type": "semantic",
+              "scope": "plan",
+              "session_id": "answer_9b182436",
+              "turn_index": 0,
+              "source_role": "user",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The user wants to improve their conversational skills and learn informal language.",
+              "type": "semantic",
+              "scope": "preference",
+              "session_id": "answer_9b182436",
+              "turn_index": 4,
+              "source_role": "user",
+              "on_reference_turn": true,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            }
+          ]
+        }
+      }
+    },
+    {
+      "question_id": "195a1a1b",
+      "reference_turns": [
+        {
+          "session_id": "answer_6dc4305e",
+          "turn_index": 4,
+          "role": "user",
+          "text": "What else can I do for the later part of the day? I prefer winding down by 9:30 pm to prepare for a good night's sleep."
+        }
+      ],
+      "arms": {
+        "plain": {
+          "old_preference_proxy": false,
+          "user_personal_context_proxy": false,
+          "memories": [
+            {
+              "content": "The user has a project due soon and needs to finish a report and respond to emails.",
+              "type": "semantic",
+              "scope": "plan",
+              "session_id": "answer_6dc4305e",
+              "turn_index": 2,
+              "source_role": "user",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The user has 7-8 hours available for tasks each day.",
+              "type": "semantic",
+              "scope": "profile",
+              "session_id": "answer_6dc4305e",
+              "turn_index": 2,
+              "source_role": "user",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The user's most productive time is between 10 am and 12 pm.",
+              "type": "semantic",
+              "scope": "profile",
+              "session_id": "answer_6dc4305e",
+              "turn_index": 2,
+              "source_role": "user",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The assistant created a structured daily schedule for the user.",
+              "type": "semantic",
+              "scope": "recommendation",
+              "session_id": "answer_6dc4305e",
+              "turn_index": 1,
+              "source_role": "assistant",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The assistant recommended Headspace, Calm, Insight Timer, Meditation Studio, and Buddhify for meditation.",
+              "type": "semantic",
+              "scope": "recommendation",
+              "session_id": "answer_6dc4305e",
+              "turn_index": 5,
+              "source_role": "assistant",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The user tried the 'Sleep' guided meditation by Headspace and found it relaxing.",
+              "type": "semantic",
+              "scope": "event",
+              "session_id": "answer_6dc4305e",
+              "turn_index": 12,
+              "source_role": "user",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The user decided to try the 'Body Scan' meditation by Insight Timer.",
+              "type": "semantic",
+              "scope": "plan",
+              "session_id": "answer_6dc4305e",
+              "turn_index": 14,
+              "source_role": "user",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            }
+          ]
+        },
+        "observer": {
+          "old_preference_proxy": true,
+          "user_personal_context_proxy": true,
+          "memories": [
+            {
+              "content": "The user has 7-8 hours available for tasks each day.",
+              "type": "semantic",
+              "scope": "profile",
+              "session_id": "answer_6dc4305e",
+              "turn_index": 2,
+              "source_role": "user",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The user's most productive time is between 10 am and 12 pm.",
+              "type": "semantic",
+              "scope": "profile",
+              "session_id": "answer_6dc4305e",
+              "turn_index": 2,
+              "source_role": "user",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The user has a 30-minute exercise routine in the morning.",
+              "type": "procedural",
+              "scope": "profile",
+              "session_id": "answer_6dc4305e",
+              "turn_index": 2,
+              "source_role": "user",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The user prefers a structured schedule.",
+              "type": "preference",
+              "scope": "preference",
+              "session_id": "answer_6dc4305e",
+              "turn_index": 1,
+              "source_role": "assistant",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The user prefers winding down by 9:30 pm to prepare for sleep.",
+              "type": "preference",
+              "scope": "preference",
+              "session_id": "answer_6dc4305e",
+              "turn_index": 4,
+              "source_role": "user",
+              "on_reference_turn": true,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The user tried the 'Sleep' guided meditation by Headspace.",
+              "type": "semantic",
+              "scope": "event",
+              "session_id": "answer_6dc4305e",
+              "turn_index": 9,
+              "source_role": "assistant",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The user plans to try the 'Body Scan' meditation by Insight Timer.",
+              "type": "semantic",
+              "scope": "plan",
+              "session_id": "answer_6dc4305e",
+              "turn_index": 14,
+              "source_role": "user",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            }
+          ]
+        }
+      }
+    },
+    {
+      "question_id": "afdc33df",
+      "reference_turns": [
+        {
+          "session_id": "answer_8549e5e0",
+          "turn_index": 2,
+          "role": "user",
+          "text": "I also need some help with organizing my kitchen utensils, can you give me some tips on how to maximize the space in my utensil holder? I recently bought a new utensil holder to keep countertops clutter-free."
+        },
+        {
+          "session_id": "answer_8549e5e0",
+          "turn_index": 4,
+          "role": "user",
+          "text": "I noticed some scratches on my granite countertop near the sink. Do you have any tips on how to repair or remove those scratches?"
+        },
+        {
+          "session_id": "answer_8549e5e0",
+          "turn_index": 6,
+          "role": "user",
+          "text": "I'm also having some issues with my kitchen faucet, it's been leaking slightly. Can you give me some tips on how to fix it or know when it's time to replace it?"
+        }
+      ],
+      "arms": {
+        "plain": {
+          "old_preference_proxy": false,
+          "user_personal_context_proxy": true,
+          "memories": [
+            {
+              "content": "The assistant recommended cleaning a garbage disposal with baking soda and vinegar, ice and rock salt, or lemon juice and baking soda.",
+              "type": "semantic",
+              "scope": "recommendation",
+              "session_id": "answer_8549e5e0",
+              "turn_index": 1,
+              "source_role": "assistant",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The user bought a new utensil holder to keep countertops clutter-free.",
+              "type": "episodic",
+              "scope": "profile",
+              "session_id": "answer_8549e5e0",
+              "turn_index": 2,
+              "source_role": "user",
+              "on_reference_turn": true,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The assistant recommended using baking soda and water, stone soap, mineral oil, or a granite repair kit to remove scratches from granite countertops.",
+              "type": "semantic",
+              "scope": "recommendation",
+              "session_id": "answer_8549e5e0",
+              "turn_index": 5,
+              "source_role": "assistant",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The assistant recommended cleaning or replacing the aerator, O-rings, gaskets, or valve seats to fix a leaky kitchen faucet.",
+              "type": "semantic",
+              "scope": "recommendation",
+              "session_id": "answer_8549e5e0",
+              "turn_index": 7,
+              "source_role": "assistant",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The assistant provided a guide for making yogurt in a slow cooker, including heating milk to 180\u00b0F and incubating at 100\u00b0F to 110\u00b0F.",
+              "type": "semantic",
+              "scope": "recommendation",
+              "session_id": "answer_8549e5e0",
+              "turn_index": 9,
+              "source_role": "assistant",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The assistant recommended using thickening agents like tapioca starch, pectin, agar agar, guar gum, or xanthan gum for non-dairy yogurt.",
+              "type": "preference",
+              "scope": "recommendation",
+              "session_id": "answer_8549e5e0",
+              "turn_index": 11,
+              "source_role": "assistant",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            }
+          ]
+        },
+        "observer": {
+          "old_preference_proxy": false,
+          "user_personal_context_proxy": true,
+          "memories": [
+            {
+              "content": "The assistant recommended cleaning a garbage disposal with baking soda and vinegar, or ice and rock salt.",
+              "type": "semantic",
+              "scope": "recommendation",
+              "session_id": "answer_8549e5e0",
+              "turn_index": 1,
+              "source_role": "assistant",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The user bought a new utensil holder to keep countertops clutter-free.",
+              "type": "episodic",
+              "scope": "profile",
+              "session_id": "answer_8549e5e0",
+              "turn_index": 2,
+              "source_role": "user",
+              "on_reference_turn": true,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The assistant recommended using baking soda and water paste to remove shallow scratches from granite countertops.",
+              "type": "semantic",
+              "scope": "recommendation",
+              "session_id": "answer_8549e5e0",
+              "turn_index": 5,
+              "source_role": "assistant",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The assistant provided a guide for making yogurt in a slow cooker using milk and a yogurt starter culture.",
+              "type": "semantic",
+              "scope": "recommendation",
+              "session_id": "answer_8549e5e0",
+              "turn_index": 9,
+              "source_role": "assistant",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The assistant recommended using thickening agents like tapioca starch, pectin, agar agar, guar gum, or xanthan gum for non-dairy yogurt.",
+              "type": "preference",
+              "scope": "recommendation",
+              "session_id": "answer_8549e5e0",
+              "turn_index": 11,
+              "source_role": "assistant",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            }
+          ]
+        }
+      }
+    },
+    {
+      "question_id": "1a1907b4",
+      "reference_turns": [
+        {
+          "session_id": "answer_719502eb",
+          "turn_index": 2,
+          "role": "user",
+          "text": "I like the idea of the Pimm's Cup with a Twist, but I've already made a classic Pimm's Cup and classic cocktails recently from a mixology class that I attended. By the way, what's the difference between cucumber juice and muddling cucumber slices in a drink?"
+        }
+      ],
+      "arms": {
+        "plain": {
+          "old_preference_proxy": false,
+          "user_personal_context_proxy": false,
+          "memories": [
+            {
+              "content": "The user is looking for summer cocktail recipes using Hendrick's gin.",
+              "type": "semantic",
+              "scope": "plan",
+              "session_id": "answer_719502eb",
+              "turn_index": 1,
+              "source_role": "assistant",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The assistant recommended Pimm's Cup with a Twist, Cucumber Gimlet, Rose Petal Spritz, Gin-Gin Mule, Summer Solstice, and Hendrick's High Tea.",
+              "type": "semantic",
+              "scope": "recommendation",
+              "session_id": "answer_719502eb",
+              "turn_index": 1,
+              "source_role": "assistant",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The user decided to make a Pimm's Cup with a Twist and muddle cucumber slices.",
+              "type": "semantic",
+              "scope": "commitment",
+              "session_id": "answer_719502eb",
+              "turn_index": 4,
+              "source_role": "user",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The assistant provided a recipe for classic simple syrup using 1 cup granulated sugar and 1 cup water.",
+              "type": "semantic",
+              "scope": "recommendation",
+              "session_id": "answer_719502eb",
+              "turn_index": 5,
+              "source_role": "assistant",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The assistant recommended grapefruit, lemon-ginger, or orange-blossom simple syrup for the cocktail.",
+              "type": "semantic",
+              "scope": "recommendation",
+              "session_id": "answer_719502eb",
+              "turn_index": 13,
+              "source_role": "assistant",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The user decided to use Ruby Red Grapefruit for their simple syrup.",
+              "type": "semantic",
+              "scope": "commitment",
+              "session_id": "answer_719502eb",
+              "turn_index": 10,
+              "source_role": "user",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The user decided to serve the Pimm's Cup with a Twist in a Collins glass.",
+              "type": "semantic",
+              "scope": "commitment",
+              "session_id": "answer_719502eb",
+              "turn_index": 15,
+              "source_role": "assistant",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            }
+          ]
+        },
+        "observer": {
+          "old_preference_proxy": false,
+          "user_personal_context_proxy": false,
+          "memories": [
+            {
+              "content": "The user plans to make a Pimm's Cup with a Twist using Hendrick's gin.",
+              "type": "semantic",
+              "scope": "plan",
+              "session_id": "answer_719502eb",
+              "turn_index": 6,
+              "source_role": "user",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The user decided to use Ruby Red Grapefruit simple syrup in their cocktail.",
+              "type": "semantic",
+              "scope": "commitment",
+              "session_id": "answer_719502eb",
+              "turn_index": 10,
+              "source_role": "user",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The user plans to serve the cocktail in a Collins glass.",
+              "type": "semantic",
+              "scope": "plan",
+              "session_id": "answer_719502eb",
+              "turn_index": 15,
+              "source_role": "assistant",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            }
+          ]
+        }
+      }
+    },
+    {
+      "question_id": "57f827a0",
+      "reference_turns": [
+        {
+          "session_id": "answer_1bde8d3b",
+          "turn_index": 0,
+          "role": "user",
+          "text": "I'm looking for some mid-century modern design inspiration for a new bedroom dresser to replace my new one, do you have any recommendations for websites or designers I should check out?"
+        }
+      ],
+      "arms": {
+        "plain": {
+          "old_preference_proxy": false,
+          "user_personal_context_proxy": true,
+          "memories": [
+            {
+              "content": "The user is looking for mid-century modern design inspiration for a new bedroom dresser.",
+              "type": "semantic",
+              "scope": "plan",
+              "session_id": "answer_1bde8d3b",
+              "turn_index": 0,
+              "source_role": "user",
+              "on_reference_turn": true,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The assistant recommended Design Within Reach, West Elm, Crate & Barrel, AllModern, and Pinterest for design inspiration.",
+              "type": "semantic",
+              "scope": "recommendation",
+              "session_id": "answer_1bde8d3b",
+              "turn_index": 1,
+              "source_role": "assistant",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The assistant recommended walnut, oak, teak, and maple as wood types for mid-century modern furniture.",
+              "type": "semantic",
+              "scope": "recommendation",
+              "session_id": "answer_1bde8d3b",
+              "turn_index": 4,
+              "source_role": "user",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The user decided to use walnut wood with a satin finish for their dresser.",
+              "type": "semantic",
+              "scope": "commitment",
+              "session_id": "answer_1bde8d3b",
+              "turn_index": 11,
+              "source_role": "assistant",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The user decided to use brass accents and simple knobs for their dresser hardware.",
+              "type": "semantic",
+              "scope": "commitment",
+              "session_id": "answer_1bde8d3b",
+              "turn_index": 11,
+              "source_role": "assistant",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            }
+          ]
+        },
+        "observer": {
+          "old_preference_proxy": false,
+          "user_personal_context_proxy": true,
+          "memories": [
+            {
+              "content": "The user is designing a mid-century modern bedroom dresser.",
+              "type": "semantic",
+              "scope": "plan",
+              "session_id": "answer_1bde8d3b",
+              "turn_index": 0,
+              "source_role": "user",
+              "on_reference_turn": true,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The user decided to use walnut wood with a satin finish for their dresser.",
+              "type": "semantic",
+              "scope": "commitment",
+              "session_id": "answer_1bde8d3b",
+              "turn_index": 11,
+              "source_role": "assistant",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The user decided to use brass accents and simple knobs for their dresser hardware.",
+              "type": "semantic",
+              "scope": "commitment",
+              "session_id": "answer_1bde8d3b",
+              "turn_index": 11,
+              "source_role": "assistant",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            }
+          ]
+        }
+      }
+    },
+    {
+      "question_id": "95228167",
+      "reference_turns": [
+        {
+          "session_id": "answer_5e613445",
+          "turn_index": 0,
+          "role": "user",
+          "text": "I'm considering upgrading from a Fender Stratocaster to a Gibson Les Paul. Can you tell me the main differences between these two guitars?"
+        }
+      ],
+      "arms": {
+        "plain": {
+          "old_preference_proxy": false,
+          "user_personal_context_proxy": true,
+          "memories": [
+            {
+              "content": "The user is considering upgrading from a Fender Stratocaster to a Gibson Les Paul.",
+              "type": "semantic",
+              "scope": "plan",
+              "session_id": "answer_5e613445",
+              "turn_index": 0,
+              "source_role": "user",
+              "on_reference_turn": true,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The assistant recommended using a lighter touch when fingerpicking on a Les Paul.",
+              "type": "semantic",
+              "scope": "recommendation",
+              "session_id": "answer_5e613445",
+              "turn_index": 5,
+              "source_role": "assistant",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The assistant recommended using the neck pickup on a Les Paul for a warmer, more mellow tone.",
+              "type": "semantic",
+              "scope": "recommendation",
+              "session_id": "answer_5e613445",
+              "turn_index": 5,
+              "source_role": "assistant",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The assistant recommended using lighter string gauges on a Les Paul to make it more suitable for fingerpicking.",
+              "type": "semantic",
+              "scope": "recommendation",
+              "session_id": "answer_5e613445",
+              "turn_index": 5,
+              "source_role": "assistant",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "Open D tuning is DADF#AD.",
+              "type": "semantic",
+              "scope": "shared_context",
+              "session_id": "answer_5e613445",
+              "turn_index": 7,
+              "source_role": "assistant",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "Standard tuning is EADGBE.",
+              "type": "semantic",
+              "scope": "shared_context",
+              "session_id": "answer_5e613445",
+              "turn_index": 7,
+              "source_role": "assistant",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The assistant recommended using heavier string gauges (0.012 - 0.052 or 0.013 - 0.056) for open D tuning on a Les Paul.",
+              "type": "semantic",
+              "scope": "recommendation",
+              "session_id": "answer_5e613445",
+              "turn_index": 8,
+              "source_role": "user",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The assistant recommended reducing gain to 5-6 on the amp when using open D tuning on a Les Paul.",
+              "type": "semantic",
+              "scope": "recommendation",
+              "session_id": "answer_5e613445",
+              "turn_index": 9,
+              "source_role": "assistant",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The assistant suggested that a Les Paul with coil-tap or coil-splitting features provides more tonal flexibility.",
+              "type": "semantic",
+              "scope": "recommendation",
+              "session_id": "answer_5e613445",
+              "turn_index": 11,
+              "source_role": "assistant",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            }
+          ]
+        },
+        "observer": {
+          "old_preference_proxy": false,
+          "user_personal_context_proxy": true,
+          "memories": [
+            {
+              "content": "The user is considering upgrading from a Fender Stratocaster to a Gibson Les Paul.",
+              "type": "semantic",
+              "scope": "plan",
+              "session_id": "answer_5e613445",
+              "turn_index": 0,
+              "source_role": "user",
+              "on_reference_turn": true,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "A Fender Stratocaster typically has a bolt-on neck and three single-coil pickups.",
+              "type": "semantic",
+              "scope": "shared_context",
+              "session_id": "answer_5e613445",
+              "turn_index": 0,
+              "source_role": "user",
+              "on_reference_turn": true,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "A Gibson Les Paul typically has a set-in neck and two humbucker pickups.",
+              "type": "semantic",
+              "scope": "shared_context",
+              "session_id": "answer_5e613445",
+              "turn_index": 1,
+              "source_role": "assistant",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "Open D tuning is DADF#AD.",
+              "type": "semantic",
+              "scope": "shared_context",
+              "session_id": "answer_5e613445",
+              "turn_index": 7,
+              "source_role": "assistant",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "Standard tuning is EADGBE.",
+              "type": "semantic",
+              "scope": "shared_context",
+              "session_id": "answer_5e613445",
+              "turn_index": 7,
+              "source_role": "assistant",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The assistant recommended using heavier string gauges (0.012 - 0.052 or 0.013 - 0.056) for open D tuning on a Les Paul.",
+              "type": "semantic",
+              "scope": "recommendation",
+              "session_id": "answer_5e613445",
+              "turn_index": 8,
+              "source_role": "user",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The assistant suggested that a Les Paul with coil-tap or coil-splitting features provides more tonal flexibility.",
+              "type": "semantic",
+              "scope": "recommendation",
+              "session_id": "answer_5e613445",
+              "turn_index": 11,
+              "source_role": "assistant",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            }
+          ]
+        }
+      }
+    },
+    {
+      "question_id": "a89d7624",
+      "reference_turns": [
+        {
+          "session_id": "answer_8f15ac24",
+          "turn_index": 4,
+          "role": "user",
+          "text": "During my previous visit to Denver, where I had a great time meeting Brandon Flowers after The Killers' concert, I realized how much I love the city's music scene. Are there any good music venues or festivals in Denver that I shouldn't miss?"
+        },
+        {
+          "session_id": "answer_8f15ac24",
+          "turn_index": 6,
+          "role": "user",
+          "text": "I'm thinking of going back to Denver for another concert. Do you know if there are any good BBQ places near the Red Rocks Amphitheater?"
+        }
+      ],
+      "arms": {
+        "plain": {
+          "old_preference_proxy": false,
+          "user_personal_context_proxy": false,
+          "memories": [
+            {
+              "content": "The user attended a concert by The Killers at Red Rocks Amphitheater.",
+              "type": "episodic",
+              "scope": "event",
+              "session_id": "answer_8f15ac24",
+              "turn_index": 0,
+              "source_role": "user",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The user met Brandon Flowers, the lead singer of The Killers, in Denver.",
+              "type": "semantic",
+              "scope": "event",
+              "session_id": "answer_8f15ac24",
+              "turn_index": 2,
+              "source_role": "user",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The assistant recommended bands including The 1975, Imagine Dragons, Arctic Monkeys, The Black Keys, Walk the Moon, The Neighbourhood, Foals, Panic! At The Disco, The Vaccines, and Two Door Cinema Club.",
+              "type": "semantic",
+              "scope": "recommendation",
+              "session_id": "answer_8f15ac24",
+              "turn_index": 1,
+              "source_role": "assistant",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The assistant recommended concert discovery platforms Songkick and Bandsintown.",
+              "type": "semantic",
+              "scope": "recommendation",
+              "session_id": "answer_8f15ac24",
+              "turn_index": 3,
+              "source_role": "assistant",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The assistant recommended Denver music venues Red Rocks Park and Amphitheatre, The Ogden Theatre, The Bluebird Theater, The Fillmore Auditorium, and Larimer Lounge.",
+              "type": "semantic",
+              "scope": "recommendation",
+              "session_id": "answer_8f15ac24",
+              "turn_index": 5,
+              "source_role": "assistant",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The assistant recommended Denver music festivals Grandoozy, Denver Folk Festival, Denver Jazz Festival, Westword Music Showcase, and Riot Fest Denver.",
+              "type": "semantic",
+              "scope": "recommendation",
+              "session_id": "answer_8f15ac24",
+              "turn_index": 5,
+              "source_role": "assistant",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The assistant recommended BBQ places near Red Rocks including GQue BBQ, Dinosaur Bar-B-Que, Moe's Original BBQ, Big B's Delicious BBQ, and Wayne's Smoke Shack.",
+              "type": "semantic",
+              "scope": "recommendation",
+              "session_id": "answer_8f15ac24",
+              "turn_index": 7,
+              "source_role": "assistant",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The assistant recommended restaurants within walking distance of Red Rocks including The Ship Rock Grille, The Village Tavern, and Morrison Inn.",
+              "type": "semantic",
+              "scope": "recommendation",
+              "session_id": "answer_8f15ac24",
+              "turn_index": 9,
+              "source_role": "assistant",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The Ship Rock Grille has an outdoor patio with views of the red rock formations and is pet-friendly.",
+              "type": "semantic",
+              "scope": "shared_context",
+              "session_id": "answer_8f15ac24",
+              "turn_index": 13,
+              "source_role": "assistant",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            }
+          ]
+        },
+        "observer": {
+          "old_preference_proxy": false,
+          "user_personal_context_proxy": false,
+          "memories": [
+            {
+              "content": "The user attended a concert by The Killers at Red Rocks Amphitheater.",
+              "type": "episodic",
+              "scope": "event",
+              "session_id": "answer_8f15ac24",
+              "turn_index": 0,
+              "source_role": "user",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The user met Brandon Flowers, the lead singer of The Killers, in Denver.",
+              "type": "semantic",
+              "scope": "event",
+              "session_id": "answer_8f15ac24",
+              "turn_index": 2,
+              "source_role": "user",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The assistant recommended music venues in Denver including The Ogden Theatre, The Bluebird Theater, The Fillmore Auditorium, and Larimer Lounge.",
+              "type": "semantic",
+              "scope": "recommendation",
+              "session_id": "answer_8f15ac24",
+              "turn_index": 5,
+              "source_role": "assistant",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The assistant recommended BBQ restaurants near Red Rocks including GQue BBQ, Dinosaur Bar-B-Que, Moe's Original BBQ, Big B's Delicious BBQ, and Wayne's Smoke Shack.",
+              "type": "semantic",
+              "scope": "recommendation",
+              "session_id": "answer_8f15ac24",
+              "turn_index": 7,
+              "source_role": "assistant",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The Ship Rock Grille is located within walking distance of Red Rocks Amphitheater and has an outdoor patio with views of the rock formations.",
+              "type": "semantic",
+              "scope": "shared_context",
+              "session_id": "answer_8f15ac24",
+              "turn_index": 13,
+              "source_role": "assistant",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            }
+          ]
+        }
+      }
+    },
+    {
+      "question_id": "1c0ddc50",
+      "reference_turns": [
+        {
+          "session_id": "answer_8da8c7e0",
+          "turn_index": 0,
+          "role": "user",
+          "text": "I'm looking for some new podcast recommendations. I've been listening to a lot of true crime and self-improvement stuff. I enjoy listening to then during my commute, but I want to branch out into other genres."
+        },
+        {
+          "session_id": "answer_8da8c7e0",
+          "turn_index": 4,
+          "role": "user",
+          "text": "I'm particularly interested in the history podcasts. Can you give me some recommendations on how to organize my listening schedule, considering my commute is about 40 minutes each way?"
+        }
+      ],
+      "arms": {
+        "plain": {
+          "old_preference_proxy": false,
+          "user_personal_context_proxy": true,
+          "memories": [
+            {
+              "content": "The user is looking for podcast recommendations in history, science, and technology.",
+              "type": "semantic",
+              "scope": "plan",
+              "session_id": "answer_8da8c7e0",
+              "turn_index": 0,
+              "source_role": "user",
+              "on_reference_turn": true,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The assistant recommended Hardcore History, Lore, The Dollop, StarTalk Radio, Radiolab, and Stuff You Should Know.",
+              "type": "semantic",
+              "scope": "recommendation",
+              "session_id": "answer_8da8c7e0",
+              "turn_index": 5,
+              "source_role": "assistant",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The user has a 40-minute commute each way.",
+              "type": "semantic",
+              "scope": "profile",
+              "session_id": "answer_8da8c7e0",
+              "turn_index": 5,
+              "source_role": "assistant",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": [
+                4
+              ]
+            },
+            {
+              "content": "The assistant recommended 'Guns, Germs, and Steel' by Jared Diamond.",
+              "type": "semantic",
+              "scope": "recommendation",
+              "session_id": "answer_8da8c7e0",
+              "turn_index": 7,
+              "source_role": "assistant",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            }
+          ]
+        },
+        "observer": {
+          "old_preference_proxy": true,
+          "user_personal_context_proxy": true,
+          "memories": [
+            {
+              "content": "The user is interested in history and science podcasts.",
+              "type": "semantic",
+              "scope": "preference",
+              "session_id": "answer_8da8c7e0",
+              "turn_index": 4,
+              "source_role": "user",
+              "on_reference_turn": true,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            },
+            {
+              "content": "The user has a 40-minute commute each way.",
+              "type": "semantic",
+              "scope": "profile",
+              "session_id": "answer_8da8c7e0",
+              "turn_index": 5,
+              "source_role": "assistant",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": [
+                4
+              ]
+            },
+            {
+              "content": "The user is interested in reading 'Guns, Germs, and Steel' by Jared Diamond.",
+              "type": "semantic",
+              "scope": "plan",
+              "session_id": "answer_8da8c7e0",
+              "turn_index": 8,
+              "source_role": "user",
+              "on_reference_turn": false,
+              "user_turn_candidates_for_numeric_anchor_review": []
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "inputs": {
+    "tools/personal_context_audit.py": "4f76e8bbc611c01896a8fa917aca891b4b5456d526fb28d2e594f4da8cd75840",
+    "results/manifests/train150.json": "95a4c237ac3adce1def18a9ec7c602e4cc9ebf41cfe3e1e1f753b827887edfb4",
+    "results/raw/preference-extraction-probe-v1.json": "90e4f21153b03f483ed8ca171bc0835899fbb1821db92b0f2be5aff0df73386a",
+    "data/longmemeval_s_cleaned.json": "d6f21ea9d60a0d56f34a05b609c79c88a451d2ae03597821ea3d5a9678c3a442"
+  }
+}

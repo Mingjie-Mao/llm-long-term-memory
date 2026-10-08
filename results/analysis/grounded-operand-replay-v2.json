@@ -1,0 +1,315 @@
+{
+  "experiment_class": "saved-operand-regression-replay",
+  "provider_calls": 0,
+  "rows": [
+    {
+      "question_id": "09ba9854",
+      "operation": "difference",
+      "v1": {
+        "computed": false,
+        "answer": "",
+        "detail": {
+          "operation": "difference",
+          "records_supplied": [
+            "{\"source\":\"E23\",\"quote\":\"taking a taxi from the airport to my hotel would cost around $60\",\"value\":\"60\",\"unit\":\"$\",\"key\":\"taxi-fare\",\"time\":\"2023-05-26\"}",
+            "{\"source\":\"E24\",\"quote\":\"taking the train from the airport to my hotel, my friend told me it's only around $10.\",\"value\":\"10\",\"unit\":\"$\",\"key\":\"train-fare\",\"time\":\"2023-05-22\"}"
+          ],
+          "reviewed_sources": [
+            "E23",
+            "E24"
+          ],
+          "scope_complete": true,
+          "cause": "source_review_incomplete"
+        }
+      },
+      "v2": {
+        "computed": true,
+        "answer": "50 $",
+        "detail": {
+          "operation": "difference",
+          "records_supplied": [
+            "{\"source\":\"E23\",\"quote\":\"taking a taxi from the airport to my hotel would cost around $60\",\"value\":\"60\",\"unit\":\"$\",\"key\":\"taxi-fare\",\"time\":\"2023-05-26\"}",
+            "{\"source\":\"E24\",\"quote\":\"taking the train from the airport to my hotel, my friend told me it's only around $10.\",\"value\":\"10\",\"unit\":\"$\",\"key\":\"train-fare\",\"time\":\"2023-05-22\"}"
+          ],
+          "reviewed_sources": [
+            "E23",
+            "E24"
+          ],
+          "scope_complete": true,
+          "citations": [
+            {
+              "source": "E23",
+              "quote": "taking a taxi from the airport to my hotel would cost around $60",
+              "value": "60",
+              "unit": "$",
+              "key": "taxi-fare",
+              "time": "2023-05-26"
+            },
+            {
+              "source": "E24",
+              "quote": "taking the train from the airport to my hotel, my friend told me it's only around $10.",
+              "value": "10",
+              "unit": "$",
+              "key": "train-fare",
+              "time": "2023-05-22"
+            }
+          ],
+          "duplicates_removed": 0,
+          "result": "50",
+          "unit": "$"
+        }
+      },
+      "context_sha256": "ff1d5e7b72b2d87c71793ef186aeff6c8e13054c2d5842f576def214a0b03f85"
+    },
+    {
+      "question_id": "51a45a95",
+      "operation": "lookup",
+      "v1": {
+        "computed": false,
+        "answer": "",
+        "detail": {
+          "operation": "lookup",
+          "records_supplied": [],
+          "reviewed_sources": [
+            "E25"
+          ],
+          "scope_complete": true,
+          "cause": "no_calculation_requested"
+        }
+      },
+      "v2": {
+        "computed": false,
+        "answer": "",
+        "detail": {
+          "operation": "lookup",
+          "records_supplied": [],
+          "reviewed_sources": [
+            "E25"
+          ],
+          "scope_complete": true,
+          "cause": "no_calculation_requested"
+        }
+      },
+      "context_sha256": "c828a2e73745f786f01f54e5dc5b1b5a8b3b1f27b1f51f944c33466ff24c23c4"
+    },
+    {
+      "question_id": "6e984301",
+      "operation": "duration",
+      "v1": {
+        "computed": false,
+        "answer": "",
+        "detail": {
+          "operation": "duration",
+          "records_supplied": [
+            "{\"source\":\"E1\",\"quote\":\"The user started taking sculpting classes at a local art studio on February 11, 2023\",\"value\":\"\",\"unit\":\"\",\"key\":\"sculpting-start\",\"time\":\"February 11, 2023\"}",
+            "{\"source\":\"E24\",\"quote\":\"I actually got my own set of sculpting tools today\",\"value\":\"\",\"unit\":\"\",\"key\":\"sculpting-tools\",\"time\":\"today\"}"
+          ],
+          "reviewed_sources": [
+            "E1",
+            "E4",
+            "E21",
+            "E24"
+          ],
+          "scope_complete": true,
+          "cause": "source_review_incomplete"
+        }
+      },
+      "v2": {
+        "computed": true,
+        "answer": "3 weeks",
+        "detail": {
+          "operation": "duration",
+          "records_supplied": [
+            "{\"source\":\"E1\",\"quote\":\"The user started taking sculpting classes at a local art studio on February 11, 2023\",\"value\":\"\",\"unit\":\"\",\"key\":\"sculpting-start\",\"time\":\"February 11, 2023\"}",
+            "{\"source\":\"E24\",\"quote\":\"I actually got my own set of sculpting tools today\",\"value\":\"\",\"unit\":\"\",\"key\":\"sculpting-tools\",\"time\":\"today\"}"
+          ],
+          "reviewed_sources": [
+            "E1",
+            "E4",
+            "E21",
+            "E24"
+          ],
+          "scope_complete": true,
+          "citations": [
+            {
+              "source": "E1",
+              "quote": "The user started taking sculpting classes at a local art studio on February 11, 2023",
+              "value": "",
+              "unit": "",
+              "key": "sculpting-start",
+              "time": "February 11, 2023",
+              "resolved_date": "2023-02-11",
+              "precision": "day",
+              "conversation_date": "2023-02-11"
+            },
+            {
+              "source": "E24",
+              "quote": "I actually got my own set of sculpting tools today",
+              "value": "",
+              "unit": "",
+              "key": "sculpting-tools",
+              "time": "today",
+              "resolved_date": "2023-03-04",
+              "precision": "day",
+              "conversation_date": "2023-03-04"
+            }
+          ],
+          "days": 21,
+          "start": "2023-02-11",
+          "end": "2023-03-04",
+          "approximate": false
+        }
+      },
+      "context_sha256": "515a01fdb38e1452daa10ec10149fc3bc7e9232b1ac558150dfa702645abfb2c"
+    },
+    {
+      "question_id": "b46e15ed",
+      "operation": "duration",
+      "v1": {
+        "computed": false,
+        "answer": "",
+        "detail": {
+          "operation": "duration",
+          "records_supplied": [],
+          "reviewed_sources": [
+            "E1",
+            "E2",
+            "E3",
+            "E4",
+            "E5",
+            "E6",
+            "E7",
+            "E8",
+            "E9",
+            "E10",
+            "E11",
+            "E12",
+            "E13",
+            "E14",
+            "E15",
+            "E16",
+            "E17",
+            "E18",
+            "E19",
+            "E20",
+            "E21",
+            "E22",
+            "E23",
+            "E24",
+            "E25",
+            "E26",
+            "E27",
+            "E28",
+            "E29",
+            "E30",
+            "E31",
+            "E32",
+            "E33",
+            "E34",
+            "E35",
+            "E36",
+            "E37",
+            "E38",
+            "E39"
+          ],
+          "scope_complete": false,
+          "cause": "scope_incomplete"
+        }
+      },
+      "v2": {
+        "computed": false,
+        "answer": "",
+        "detail": {
+          "operation": "duration",
+          "records_supplied": [],
+          "reviewed_sources": [
+            "E1",
+            "E2",
+            "E3",
+            "E4",
+            "E5",
+            "E6",
+            "E7",
+            "E8",
+            "E9",
+            "E10",
+            "E11",
+            "E12",
+            "E13",
+            "E14",
+            "E15",
+            "E16",
+            "E17",
+            "E18",
+            "E19",
+            "E20",
+            "E21",
+            "E22",
+            "E23",
+            "E24",
+            "E25",
+            "E26",
+            "E27",
+            "E28",
+            "E29",
+            "E30",
+            "E31",
+            "E32",
+            "E33",
+            "E34",
+            "E35",
+            "E36",
+            "E37",
+            "E38",
+            "E39"
+          ],
+          "scope_complete": false,
+          "cause": "scope_incomplete"
+        }
+      },
+      "context_sha256": "16699d6578fbe6f0236a50cb2e4f1d81a868e4cf77dd2879676d96a4992bd1cc"
+    },
+    {
+      "question_id": "eaca4986",
+      "operation": "lookup",
+      "v1": {
+        "computed": false,
+        "answer": "",
+        "detail": {
+          "operation": "lookup",
+          "records_supplied": [],
+          "reviewed_sources": [
+            "E1",
+            "E21",
+            "E26",
+            "E31"
+          ],
+          "scope_complete": true,
+          "cause": "no_calculation_requested"
+        }
+      },
+      "v2": {
+        "computed": false,
+        "answer": "",
+        "detail": {
+          "operation": "lookup",
+          "records_supplied": [],
+          "reviewed_sources": [
+            "E1",
+            "E21",
+            "E26",
+            "E31"
+          ],
+          "scope_complete": true,
+          "cause": "no_calculation_requested"
+        }
+      },
+      "context_sha256": "801130fd8a10a4d4b92cab4e9d51da4fe33b586a66d846d75dc24ebfcd6b9d1e"
+    }
+  ],
+  "newly_computable": 2,
+  "input_sha256": "90c13a4f989e937a174ce4c96ef53bd81abd30299ecbac4de48a2d88c2aa3b73",
+  "source_sha256": "ff53e91513e9e7f569ed2c0fa3bb4985a6b9a49c1f0a5f82c37107f42e9af62f",
+  "generator_sha256": "5ee09813b1382a8eed3cd05bb830e9e367f201ccc8dfb119efacd1156cb7b626",
+  "interpretation": "Unchanged saved operands; no new model answers or accuracy estimate."
+}

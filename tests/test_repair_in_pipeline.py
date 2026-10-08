@@ -268,3 +268,19 @@ def test_a_session_shared_by_two_tenants_keeps_both_tenants_repairs(build):
         assert repaired[0].user_id == tenant
         assert repaired[0].source_session_id == scoped_session_id(tenant, "s1")
     assert len(index) == 4
+
+
+def test_personal_quote_repair_survives_actual_pipeline_under_two_tenants(build):
+    from llm_long_term_memory.ingest.personal_context import PersonalContextRepair
+
+    pipeline, store, index = build(PersonalContextRepair())
+    outcome = pipeline.run([("q1", _session("s1")), ("q2", _session("s1"))], resume=False)
+    for tenant in ("q1", "q2"):
+        quotes = [m for m in store.iter_all(tenant) if m.predicate == "source_quote"]
+        assert len(quotes) == 1
+        quote = quotes[0]
+        assert quote.source_session_id == scoped_session_id(tenant, "s1")
+        source = store.turns_for_session(quote.source_session_id)[quote.source_turn_index]
+        assert source.content[quote.source_char_start : quote.source_char_end] == quote.content
+    assert outcome.progress.repair_requests == 0
+    assert outcome.progress.repair_memories == 2 and len(index) == 4

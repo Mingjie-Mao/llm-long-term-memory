@@ -109,6 +109,20 @@
 已付费行：对照 12/30、候选 7/30，描述性 p = 0.125。**这说明结论对金标敏感**，既不能用来证明
 候选有害，也不能替换原注册结论。
 
+### 原文为主 v1（回归级开发比较，**已暴露题集**）
+
+在记忆上下文之外，按问题用 BM25 从整库原始轮次里取 4,000 token 原话一起给回答模型。
+两套题都已暴露，数字是开发证据，不是未见终测，也不能接在 72% 后面排成版本曲线。
+
+| 题集 | 对照 | 原文为主 | 配对胜/负 | 判定 |
+|---|---:|---:|---:|---|
+| `heldout100` | 69（4 次多数票；单次 70–73） | **83** | 18 / 4，净 +14 | `STOP`：中位上下文 5,598 超过注册上限 5,500 |
+| `train150` | 98 | **127** | 32 / 3，净 +29 | `PASS`（中位总上下文 5,686，上限 6,000） |
+
+两次都是单次运行，不宣称显著。之后的负结果：分页通读并逐条核验引用的 grounded v18 在
+`dev100` 上每臂三次，平均 74.33 对 v1 的 77.67，净 −3.33，判 `FAIL`。t3（回答侧）与 t4
+（回答侧＋检索侧）对 v1 的 `heldout100` 三次比较已预注册，正在运行。
+
 ### 抽取保真度 × 批大小（60 个留出会话，2026-09-16）
 
 尺子是 `ingest.fidelity`：用户自己说出的数字、时长、金额、日期、相对时间、专名，抽取后还在不在。
@@ -177,6 +191,7 @@
 | 失败分层 | [`results/failure-taxonomy.md`](../results/failure-taxonomy.md)、[`results/failure-stages.md`](../results/failure-stages.md) |
 | 检索权重 | [`results/retrieval-weights.md`](../results/retrieval-weights.md) |
 | 抽取保真度曲线 | [`results/batch-size-result.md`](../results/batch-size-result.md) |
+| 原文为主 | [heldout100](../results/raw-primary-heldout100-decision.md)、[train150](../results/analysis/raw-primary-train150-v2-gate.md)、[grounded v18](../results/paged-paired-dev100-v18-v1-decision.md)、[t3/t4 预注册](../results/prereg-raw-primary-t3-t4-heldout100-v1.md) |
 | 终测集现状 | [`results/hidden-set-status.md`](../results/hidden-set-status.md) |
 
 `results/` 下的预注册、冻结包与逐题行是这些数字的原始依据。**签过字的预注册不能编辑或删除**，

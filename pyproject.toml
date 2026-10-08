@@ -67,7 +67,9 @@ target-version = "py311"
 # an unrelated "evidence changed" error in whatever ran next. Excluding them is not a
 # style exemption: these files are finished and must never be edited again, so there is
 # nothing for either the linter or the formatter to act on.
-extend-exclude = ["tools/verify_*.py"]
+# Finished local acceptance/replay generators are also hash-bound evidence.
+# Active experiment generators live in tools/ and remain checked.
+extend-exclude = ["tools/verify_*.py", "results/analysis/*-generator.py"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]

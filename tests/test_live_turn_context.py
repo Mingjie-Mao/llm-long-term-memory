@@ -101,6 +101,51 @@ def test_the_first_turn_of_a_session_has_no_context_and_still_works():
     assert len(session.turns) == 1
 
 
+def test_personal_quote_repair_maps_window_offsets_to_actual_archive_indices():
+    from llm_long_term_memory.ingest.personal_context import PersonalContextRepair
+    from llm_long_term_memory.llm import UsageTracker
+
+    recorder = _Recorder()
+    history = [_turn("user", f"irrelevant {i}") for i in range(10)]
+    history[-2] = _turn("user", "I enjoy history podcasts.")
+    engine = LiveTurnExtractor(
+        recorder,
+        SimpleNamespace(
+            process=lambda memories, vectors: SimpleNamespace(
+                kept=memories, duplicates=0, updates=[]
+            )
+        ),
+        SimpleNamespace(encode=lambda texts: []),
+        UsageTracker(),
+        PersonalContextRepair(),
+    )
+    result = engine.extract_turn(
+        user_id="alice",
+        session_id="s",
+        role="user",
+        content="I prefer quiet music.",
+        now=datetime(2026, 10, 3),
+        context_turns=history,
+    )
+    assert [(m.content, m.source_turn_index) for m in result.memories] == [
+        ("I enjoy history podcasts.", 8),
+        ("I prefer quiet music.", 10),
+    ]
+    old_quote = result.memories[0]
+    history.append(_turn("user", "I prefer quiet music."))
+    repeated = engine.extract_turn(
+        user_id="alice",
+        session_id="s",
+        role="user",
+        content="I like hiking.",
+        now=datetime(2026, 10, 3),
+        context_turns=history,
+    )
+    same = next(m for m in repeated.memories if m.content == old_quote.content)
+    assert same.source_turn_index == old_quote.source_turn_index == 8
+    assert same.id == old_quote.id
+
+
 def test_a_deployment_can_turn_the_window_off_and_get_the_previous_behaviour(monkeypatch):
     monkeypatch.setattr(LiveTurnExtractor, "CONTEXT_TURNS", 0)
     recorder = _Recorder()

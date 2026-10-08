@@ -53,6 +53,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+from .provenance import ANCHOR_VERSION
+
 _SCHEMA = Path(__file__).resolve().parent.parent / "store" / "schema.sql"
 
 
@@ -98,6 +100,14 @@ class IngestSpec:
     than silently mixing.
     """
 
+    anchor: str = ANCHOR_VERSION
+    """How each memory is anchored to the turn it came from.
+
+    In the fingerprint because it decides which turn a memory points at, which the
+    hydrator and the raw-turn arms read. Stores written under v1 lack the key, so a
+    resume under v2 is refused rather than leaving two anchoring rules in one store.
+    """
+
     dedup_scope: str = "namespace"
     """Which memories deduplication is allowed to compare a candidate against.
 
@@ -123,6 +133,7 @@ class IngestSpec:
             "model": self.model,
             "sessions_per_request": self.sessions_per_request,
             "prompts": self.prompts,
+            "anchor": self.anchor,
         }
         if self.specificity_repair != "off":
             # Omitted when off, so a fingerprint written before this existed still
@@ -183,8 +194,8 @@ def from_config(cfg: Any, *, sessions_per_request: int) -> IngestSpec:
     Callers resolve it with `pipeline.resolved_sessions_per_request` so that the
     cap is applied identically on both sides.
     """
-    from . import repair as repair_module
     from .extract import Extractor
+    from .personal_context import configured_repair
     from .two_stage import TwoStageExtractor
 
     extractor = TwoStageExtractor if cfg.ingest.two_stage else Extractor
@@ -197,11 +208,7 @@ def from_config(cfg: Any, *, sessions_per_request: int) -> IngestSpec:
         # Unconditional, because ingestion builds a Deduplicator unconditionally.
         # `ingest.dedupe_sessions` is a corpus-planning flag and does not gate it.
         dedup_threshold=_threshold(cfg.ingest.dedupe_similarity_threshold),
-        specificity_repair=(
-            f"{repair_module.REPAIR_VERSION}:{digest(*repair_module.GroundedExtractor.prompt_texts())}"
-            if cfg.ingest.specificity_repair
-            else "off"
-        ),
+        specificity_repair=_repair(configured_repair(cfg)),
     )
 
 
