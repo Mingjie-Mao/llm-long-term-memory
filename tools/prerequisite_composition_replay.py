@@ -19,12 +19,12 @@ def measure():
     from llm_long_term_memory.config import Settings
     from llm_long_term_memory.conversation import AnswerRequest
     from llm_long_term_memory.evaluation.datasets.longmemeval import load
-    from llm_long_term_memory.runtime.evidence_pages import PageSelection
-    from llm_long_term_memory.runtime.grounded_answering import (
+    from llm_long_term_memory.evaluation.grounded.answering import (
         GroundedAnswererV15,
         GroundedAnswererV17,
         GroundedAnswererV18,
     )
+    from llm_long_term_memory.evaluation.grounded.evidence_pages import PageSelection
     from llm_long_term_memory.store import external_session_id
 
     saved_path = REPO / "results/raw/prerequisite-reader-v18-v3.readers.jsonl"

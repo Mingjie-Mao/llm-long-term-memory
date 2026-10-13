@@ -1,0 +1,178 @@
+{
+  "provider_calls": 0,
+  "experiment_class": "exposed-heldout100-regression-audit",
+  "new_answers": 900,
+  "grades": 900,
+  "registered_inputs_current": true,
+  "gate_reproduces": true,
+  "gate": {
+    "scores": {
+      "two_stage_raw_primary.heldout100-t3t4-rep1": 82,
+      "two_stage_raw_primary.heldout100-t3t4-rep2": 81,
+      "two_stage_raw_primary.heldout100-t3t4-rep3": 80,
+      "two_stage_raw_primary_t3.heldout100-t3t4-rep1": 87,
+      "two_stage_raw_primary_t3.heldout100-t3t4-rep2": 86,
+      "two_stage_raw_primary_t3.heldout100-t3t4-rep3": 87,
+      "two_stage_raw_primary_t4.heldout100-t3t4-rep1": 89,
+      "two_stage_raw_primary_t4.heldout100-t3t4-rep2": 86,
+      "two_stage_raw_primary_t4.heldout100-t3t4-rep3": 88
+    },
+    "mean_scores": {
+      "v1": 81,
+      "t3": 86.66666666666667,
+      "t4": 87.66666666666667
+    },
+    "mean_net": 6.666666666666667,
+    "by_type_mean_net": {
+      "knowledge-update": 1.6666666666666667,
+      "multi-session": 2.0,
+      "single-session-assistant": 0.0,
+      "single-session-preference": 0.6666666666666667,
+      "single-session-user": -1.0,
+      "temporal-reasoning": 3.3333333333333335
+    },
+    "type_counts": {
+      "multi-session": 27,
+      "knowledge-update": 15,
+      "single-session-user": 14,
+      "single-session-preference": 6,
+      "temporal-reasoning": 27,
+      "single-session-assistant": 11
+    },
+    "median_context_t4": 6147.0,
+    "median_output_tokens": {
+      "v1": 48.0,
+      "t3": 106.5,
+      "t4": 113.5
+    },
+    "fallback_second_calls_per_run": {
+      "v1": 13.666666666666666,
+      "t3": 7.666666666666667,
+      "t4": 7.666666666666667
+    },
+    "questions_up_down": {
+      "up": 19,
+      "down": 6
+    },
+    "sign_test_p": 0.01463329792022705,
+    "rules": {
+      "t4_mean_net_at_least_4": true,
+      "no_type_loses_more_than_2": true,
+      "median_total_context_at_most_6500": true
+    },
+    "attribution": {
+      "t3_vs_v1_mean_net": 5.666666666666667,
+      "t4_vs_t3_mean_net": 0.9999999999999999,
+      "answering_contributes": true,
+      "retrieval_contributes": false,
+      "t3_by_type_vs_v1": {
+        "knowledge-update": 1.3333333333333335,
+        "multi-session": 1.6666666666666667,
+        "single-session-assistant": 0.0,
+        "single-session-preference": 1.0,
+        "single-session-user": 0.0,
+        "temporal-reasoning": 1.6666666666666667
+      },
+      "median_context_t3": 5739.0
+    },
+    "pass": true
+  },
+  "resources_by_model": {
+    "v1": {
+      "gemini-3.5-flash-lite": {
+        "calls": 383,
+        "failures": 22,
+        "input_tokens": 2065695,
+        "output_tokens": 18484
+      },
+      "gemma-4-31b-it": {
+        "calls": 648,
+        "failures": 348,
+        "input_tokens": 65225,
+        "output_tokens": 9702
+      }
+    },
+    "t3": {
+      "gemini-3.5-flash-lite": {
+        "calls": 372,
+        "failures": 29,
+        "input_tokens": 2183456,
+        "output_tokens": 35610
+      },
+      "gemma-4-31b-it": {
+        "calls": 670,
+        "failures": 370,
+        "input_tokens": 63977,
+        "output_tokens": 9521
+      }
+    },
+    "t4": {
+      "gemini-3.5-flash-lite": {
+        "calls": 364,
+        "failures": 26,
+        "input_tokens": 2385035,
+        "output_tokens": 36287
+      },
+      "gemma-4-31b-it": {
+        "calls": 615,
+        "failures": 315,
+        "input_tokens": 64307,
+        "output_tokens": 9370
+      }
+    }
+  },
+  "prompt_versions": {
+    "two_stage_raw_primary.heldout100-t3t4-rep1": [
+      "memory-aware-v2"
+    ],
+    "two_stage_raw_primary.heldout100-t3t4-rep2": [
+      "memory-aware-v2"
+    ],
+    "two_stage_raw_primary.heldout100-t3t4-rep3": [
+      "memory-aware-v2"
+    ],
+    "two_stage_raw_primary_t3.heldout100-t3t4-rep1": [
+      "memory-aware-v2-clt"
+    ],
+    "two_stage_raw_primary_t3.heldout100-t3t4-rep2": [
+      "memory-aware-v2-clt"
+    ],
+    "two_stage_raw_primary_t3.heldout100-t3t4-rep3": [
+      "memory-aware-v2-clt"
+    ],
+    "two_stage_raw_primary_t4.heldout100-t3t4-rep1": [
+      "memory-aware-v2-clt"
+    ],
+    "two_stage_raw_primary_t4.heldout100-t3t4-rep2": [
+      "memory-aware-v2-clt"
+    ],
+    "two_stage_raw_primary_t4.heldout100-t3t4-rep3": [
+      "memory-aware-v2-clt"
+    ]
+  },
+  "inputs": {
+    "results/raw/two_stage_raw_primary.heldout100-t3t4-rep1.jsonl": "ec00545befcbaf80d881af90852cda759cc25e284741e7880d3f00f9ef63ad6c",
+    "results/raw/two_stage_raw_primary.heldout100-t3t4-rep1.usage.json": "3186a576422fc31b1fde19eea234f349c102e353eedfeb64fca22550ccabecb2",
+    "results/raw/two_stage_raw_primary.heldout100-t3t4-rep2.jsonl": "fa996be9a1a0c06bed30248e79c9ed52b5a3d5a37fcb52c2df805c6555c62b6e",
+    "results/raw/two_stage_raw_primary.heldout100-t3t4-rep2.usage.json": "f8030e9d8ce01405738ec1b1d70553094047cea11223e70830754271a6db0f88",
+    "results/raw/two_stage_raw_primary.heldout100-t3t4-rep3.jsonl": "8d50853e67416e86ace1be85eaf1ee8b27f0a64bd24e6b477b3a90118ad2831b",
+    "results/raw/two_stage_raw_primary.heldout100-t3t4-rep3.usage.json": "0a7acf3223ea987b1f8f8eb02f1fe3e0d76b3301a6360e85cd80da59ba803b57",
+    "results/raw/two_stage_raw_primary_t3.heldout100-t3t4-rep1.jsonl": "9e7197e4391e324b6ab49ab8321d7adbf7d0f60da6e6979afc889ca9ccd0e5a2",
+    "results/raw/two_stage_raw_primary_t3.heldout100-t3t4-rep1.usage.json": "44ef2bfbe7ab68b9f9bcee3264d5a1fbde9dd793b1da14f8a5f59bb340d825a0",
+    "results/raw/two_stage_raw_primary_t3.heldout100-t3t4-rep2.jsonl": "90548cfe67c1a3827e8f243c167b6be1d80292c088b5332468b7e428e7a4c112",
+    "results/raw/two_stage_raw_primary_t3.heldout100-t3t4-rep2.usage.json": "1622efaaec423d9b3ae786206d38f038354921b1b5e4eca23a5e710810f950a2",
+    "results/raw/two_stage_raw_primary_t3.heldout100-t3t4-rep3.jsonl": "d4f27b1779ab7afa9565c908c9d04c2f21c7bca6734cd3c5846b8f41f7b69a20",
+    "results/raw/two_stage_raw_primary_t3.heldout100-t3t4-rep3.usage.json": "356f68da6e92f02568dae911def996de04330796d0e672bbdb042735f340bd8d",
+    "results/raw/two_stage_raw_primary_t4.heldout100-t3t4-rep1.jsonl": "f1d165c45aa4460e7f10ceb568da979ea24ab782ac461892f50cd6b650fc469f",
+    "results/raw/two_stage_raw_primary_t4.heldout100-t3t4-rep1.usage.json": "1db929d2be174482128b40696cfe4d7e551f65312e37cdc512c88fa408105655",
+    "results/raw/two_stage_raw_primary_t4.heldout100-t3t4-rep2.jsonl": "4ddf3e3d1d3a8e069ac7a9dcee6a53e31ed414f85781fcb4c5fe470a7924d433",
+    "results/raw/two_stage_raw_primary_t4.heldout100-t3t4-rep2.usage.json": "eb7ba80fb59152bfe37d2b66a2f395c380f1925936e2d591a707b371d3eea3eb",
+    "results/raw/two_stage_raw_primary_t4.heldout100-t3t4-rep3.jsonl": "2a40231b8bd4e69974586e65035154a1c3bdb6d91eb7a31972df80177ae3db12",
+    "results/raw/two_stage_raw_primary_t4.heldout100-t3t4-rep3.usage.json": "0ad6259dacb954d313222ae75c0b04b3e23a1c2ab8c21cea1ca0bc5143f3c9d5",
+    "results/prereg-raw-primary-t3-t4-heldout100-v1.md": "128e00437f87b4aa70f316b9234c7770dce3d1b49dbbb594907ab72a6fb4009e",
+    "results/analysis/raw-primary-t3-t4-heldout100-gate.json": "707a1d03f75d9593329fc860739cc2dd24190f5f423b4d3de8e683d32c73392d",
+    "results/manifests/heldout100.json": "19f833d8d9457706aa78c3d7bc6fd6d12758596b40dc40d3db0f753963fc7c05"
+  },
+  "generator_sha256": "9ecb75dcc1d497f44154544ceca33967d13829999016f8b4b853b54b56c642ed",
+  "limitations": "Not unseen-final; no item failures inspected; no significance claim."
+}

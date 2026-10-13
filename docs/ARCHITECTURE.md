@@ -29,7 +29,7 @@
 
 横向主图区分写入与读取：对话进入抽取和持久化，顶部问题路径绕过写入直接进入召回；存储到检索的箭头表示读取关系，不表示每次写入会自动生成回答。REST/MCP 通过单轮 adapter 复用抽取与去重组件，CLI 使用批处理入口，实际注册原文与时序消解顺序见图 2。
 
-租户/状态过滤发生在召回阶段；`temporal=true` 只保留 active 状态，不是自动推断问题日期。候选并集后计算五路信号，默认只有语义权重为 1，其余为 0；重排可选。服务默认 K=10，冻结 v2 评测 K=20，图中明确区分。
+租户/状态过滤发生在召回阶段；`temporal=true` 只保留 active 状态，不是自动推断问题日期。候选并集后计算五路信号，默认只有语义权重为 1，其余为 0；重排可选。服务与评测现在都取 K=20（服务的 t4 配置就是按 K=20 测的）。
 
 `answer` 直接返回；`need_source` 和 `no_evidence` 都可能进入原文回退，后者不带所选记忆的来源锚点。下方回退区表示同一命名空间内的 source-local / archive-wide 选择，只有找到原文才再次调用回答器；无命中保留判定或返回未知。输出画为答案与来源/恢复摘要，不保证每次自然语言回答都有完整、正确的引用。
 
@@ -96,7 +96,7 @@ SQLite 保存源数据、状态、词法索引以及辅助关系。向量索引�
 
 五路信号都被计算。默认 `semantic=1.0`，其余四路权重为零；BM25 仍参与候选召回。语义信号映射为 `(cosine + 1) / 2`，BM25 在当前候选中归一化，时间、importance、实体信号再进入加权公式。
 
-服务默认 `service.top_k=10`，v2 评测配置的 `retrieval.top_k=20`。`temporal=True` 表示排除 superseded 行；不是自动理解问题时间并执行 `as_of` 查询。历史问题仍可能需要专门的时间线访问或原文恢复。
+服务默认 `service.top_k=20`，与评测配置的 `retrieval.top_k=20` 相同。`temporal=True` 表示排除 superseded 行；不是自动理解问题时间并执行 `as_of` 查询。历史问题仍可能需要专门的时间线访问或原文恢复。
 
 启用 fallback 后，第一次回答是一个结构化 verdict：
 
@@ -112,7 +112,18 @@ SQLite 保存源数据、状态、词法索引以及辅助关系。向量索引�
 
 `/v1/memories/search` 的 `explain` 返回候选信号和部分被拒原因；`/v1/answer` 返回答案及选择/回退摘要。它们不是同一个响应结构，不应在图中将所有输出都画在 answer 响应上。
 
-代码：[hybrid.py](../src/llm_long_term_memory/retrieve/hybrid.py)、[fallback.py](../src/llm_long_term_memory/retrieve/fallback.py)、[MemoryRunner](../src/llm_long_term_memory/evaluation/runners/memory.py)、[API models](../src/llm_long_term_memory/api/models.py)。
+服务按 `ServiceConfig.answer_profile` 选择回答方式（[ANSWER_PROFILES](../src/llm_long_term_memory/runtime/answer_engine.py)）：
+
+| 配置 | 上下文 | 回答规则 |
+|---|---|---|
+| `t4`（默认） | 上表的记忆＋每条记忆的来源原句（证据补全）＋按问题从本用户全部原话取 4,000 token：用户原话优先、问题里的时间（如“上周六”）换算成时间窗口检索、相对日期标注绝对日期 | 最近一次的值为当前值；计数／求和和日期类问题先写 `notes` 再作答 |
+| `v2` | 只有记忆 | 冻结 v2 的回答提示词 |
+
+两种配置都保留上面的条件原文回退。`t4` 与评测变体 `two_stage_raw_primary_t4` 发出的请求逐字相同，
+由 [等价测试](../tests/test_product_t4_equivalence.py) 保证；上下文渲染和提示词模板只有一份，
+在 [runtime/context.py](../src/llm_long_term_memory/runtime/context.py)。
+
+代码：[hybrid.py](../src/llm_long_term_memory/retrieve/hybrid.py)、[fallback.py](../src/llm_long_term_memory/retrieve/fallback.py)、[excerpts.py](../src/llm_long_term_memory/retrieve/excerpts.py)、[AnswerEngine](../src/llm_long_term_memory/runtime/answer_engine.py)、[API models](../src/llm_long_term_memory/api/models.py)。
 
 对应测试：[hybrid retrieval](../tests/test_hybrid_retrieval.py)、[raw fallback](../tests/test_raw_fallback.py)、[memory runner](../tests/test_memory_runner.py)、[API](../tests/test_api.py)。
 
@@ -122,7 +133,7 @@ SQLite 保存源数据、状态、词法索引以及辅助关系。向量索引�
 
 **图 5.** 同一 `(user_id, subject, predicate)` 上，后到达的旧事实不会直接成为当前值。resolver 读取包括 superseded 在内的全链，按 `(event_time, id)` 排序，重算状态和有效期；因此三月事实晚到时可以把一月事实的 `valid_to` 从八月改为三月。
 
-这个示例显式假设每个新值都是 replacement。实际代码不会因为“同 key 有一个 replacement”就把所有事实排成互斥链：`coexists` 允许并存；`replaces` 用 `target_object` 关闭旧值并让 `object` 成为新值；`removes` 只关闭 `target_object`，自身作为 `historical` 事件保留，不能成为当前值。目标不明确时 resolver 保守地不关闭任何事实并记录 ambiguity。重复值可能折叠到最早的区间 owner，新增数字会阻止部分有损折叠。无日期事实被跳过，evicted 行不参与重建。
+这个示例显式假设每个新值都是 replacement。实际代码不会因为“同 key 有一个 replacement”就把所有事实排成互斥链：`coexists` 允许并存；`replaces` 用 `target_object` 关闭旧值并让 `object` 成为新值；`removes` 只关闭 `target_object`，自身作为 `historical` 事件保留，不能成为当前值。目标不明确时 resolver 保守地不关闭任何事实并记录 ambiguity。重复值可能折叠到最早的区间 owner，新增数字（阿拉伯数字或英文数字词）会阻止有损折叠。无日期事实被跳过，evicted 行不参与重建。
 
 `event_time`、`observed_at`、相对时间原文/估计与 `ingested_at` 是不同信息。只有天级精确的事件时间能影响上述时间线；近似日期不能凭估计日关闭有效区间。当前实现没有保存每次数据库状态变更的完整事务时间历史。文档宜写“有效期 + 写入时间”，不宜让“bi-temporal”暗示已经具备任意事务时间快照查询。
 
@@ -137,7 +148,7 @@ SQLite 保存源数据、状态、词法索引以及辅助关系。向量索引�
 | 入口 | 真实连接 | 写入/回答边界 |
 |---|---|---|
 | `lltm ingest run` | 配置 → Extractor/TwoStageExtractor → IngestionPipeline | 完整批量抽取、去重、持久化、可选时序消解与检查点 |
-| REST、Inspector、MCP | `MemoryService` | 共享搜索、读取、时间线、软遗忘和单轮抽取写入；REST 回答复用 MemoryRunner 的 `answer_request` 引擎 |
+| REST、Inspector、MCP | `MemoryService` | 共享搜索、读取、时间线、软遗忘和单轮抽取写入；REST 回答用产品引擎 `runtime.AnswerEngine` |
 | `demo-api/app.py` | `Playground` | 接收显式结构化事实，直接写入、嵌入和 resolve；原始 turns 单独写入；没有 LLM 抽取或自然语言回答 |
 
 `MemoryService.add_message()` 在配置 API key 后按需创建 `LiveTurnExtractor`，适配真实批量抽取器，并执行去重、出处关联、索引保存和可选时序消解；测试仍可注入 adapter。服务使用进程内 `RLock` 串行化共享资源访问，回答的 `limit` 作为参数传递。`/healthz` 在嵌入器不可用时返回 503，`/livez` 单独报告进程存活。上述修复于 2026-09-12 从未合入的审计分支接入当前工作区。
@@ -153,14 +164,15 @@ LongMemEval 的 `HaystackTurn` / `HaystackSession` 继承前两者并加上基�
 ——prompt、prompt 版本、结构化 verdict 和 `Answer` 记录——在
 [answering.py](../src/llm_long_term_memory/answering.py)，`evaluation/runners/base.py` 原样再导出。
 
-`MemoryRunner` 由此分成两半：`answer(instance)` 是评测适配器，`answer_request(request)` 是引擎，
-没有任何基准对象进入引擎。REST 回答走引擎，不再像以前那样构造一个 `answer=""`、
-`question_type="live"` 的假 `Instance`。ingest 全线不再依赖基准类型。
+产品回答走 [runtime/answer_engine.py](../src/llm_long_term_memory/runtime/answer_engine.py)，
+不 import 评测包（`tests/test_prompt_versions.py` 检查 `api/service.py` 与 `runtime/` 下所有文件）。
+评测的 `MemoryRunner` 仍保留全部历史变体，`answer(instance)` 是评测适配器、`answer_request(request)`
+是它自己的引擎；它和产品共用 `runtime/context.py` 的渲染与模板。已放弃的 grounded v1–v18
+在 `evaluation/grounded/`，只供复现，不在产品路径上。ingest 全线不依赖基准类型。
 
-仍然耦合的部分，以及为什么：`api/service.py` 仍按需 import `MemoryRunner`（引擎在物理上还位于
-`evaluation/runners/`），并为 golden run 指纹 import `JUDGE_PROMPT_VERSION`；
-`ingest/coverage.py` 和 `influence/runner.py` 确实按金标答案打分——它们是放错包的评测代码，
-不是 import 了基准的产品代码。
+仍然在产品包里但按金标打分的：`commands/ingest_coverage.py` 和 `influence/runner.py`，它们是放错包的
+评测代码，不是 import 了基准的产品代码。服务为 golden run 指纹读 `prompt_versions.JUDGE_PROMPT_VERSION`，
+那是产品模块里的版本常量。
 
 评测由 `Runner.prepare()/answer()` 与 `Judge.grade()` 协作。full-context 基线使用完整会话；naive RAG 以**会话为块**取 top-5；MemoryRunner 复用已抽取的 store。普通回答不使用 gold labels；显式 oracle arm 是上限诊断。冻结、运行锁、检查点、usage 和 aggregate 由不同模块及脚本协作，不是独立在线服务。
 
@@ -174,7 +186,9 @@ LongMemEval 的 `HaystackTurn` / `HaystackSession` 继承前两者并加上基�
 | `runners/reasoning.py` | `reasoned_v3` 通过问题措辞分类；时间/聚合/当前状态可触发 v3 hydration |
 | `runners/synthesis.py` | `synthesis_v4` 的模型输出操作数，Python 计算 count/duration；comparison 保留模型措辞 |
 | `retrieve/relation_router.py`, `scan.py` | v4.1 scan 变体，按问题路由后追加关系匹配事实；需要外部 predicate map，默认不注入 |
-| `retrieve/excerpts.py`, `time_notes.py`, `time_window.py` | 原文为主：按问题 BM25 检索本用户全部轮次，按 token 预算装入回答上下文。评测变体 `two_stage_raw_primary`（v1）、`_t3`、`_t4`；服务端只接了 `service.raw_primary_tokens` 与 `raw_primary_time_notes`，默认 0／关闭；用户原话优先和时间窗口检索只在评测变体里 |
+| `retrieve/excerpts.py`, `time_notes.py`, `time_window.py` | 原文为主：按问题 BM25 检索本用户全部轮次，按 token 预算装入回答上下文。评测变体 `two_stage_raw_primary`（v1）、`_t3`、`_t4`；服务默认的 `t4` 配置开启全部 t4 选项 |
+| `answer_compute.py` | 阶段 C：评测变体 `two_stage_raw_primary_t4c` 对计数／日期／先后题让程序计算；v1 用程序结果覆盖为负结果，产品不使用 |
+| `temporal/transition.py` | 阶段 D：按向量找同一用户、相似度 ≥0.65 的候选事实，逐对判定替换／并存等关系（两条事实按时间先后呈现），确认的替换移到旧事实的键上再由解析器重建。`ingest.update_linking` 打开时在批量写入后运行，默认关闭；服务端单轮写入未接入 |
 | `lifecycle.py` | 可选衰减、访问强化、容量淘汰；默认关闭 |
 | `consolidate/runner.py` | CLI 显式触发聚合，保留源 memory 证据；默认路径不执行 |
 | `influence/`, `pack/` | 离线消融产生效用数据，拟合预测器，再供可选预算打包；默认关闭 |

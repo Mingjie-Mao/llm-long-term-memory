@@ -14,7 +14,8 @@ import numpy as np
 import pytest
 
 from llm_long_term_memory.evaluation.datasets.longmemeval import Instance
-from llm_long_term_memory.evaluation.runners.memory import MemoryRunner, render_memory
+from llm_long_term_memory.evaluation.runners.memory import MemoryRunner
+from llm_long_term_memory.runtime.context import render_memory
 from llm_long_term_memory.store import Memory, NumpyFlatIndex, Session, SQLiteMemoryStore, Turn
 
 

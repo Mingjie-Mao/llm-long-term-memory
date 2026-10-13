@@ -14,7 +14,7 @@ sys.path.insert(0, str(REPO / "tools"))
 
 from analysis_io import rows_by_question, sha256_file, write_report  # noqa: E402
 
-from llm_long_term_memory.runtime.grounded_answering import (  # noqa: E402
+from llm_long_term_memory.evaluation.grounded.answering import (  # noqa: E402
     EvidenceLedger,
     EvidenceSource,
     GroundedVerdict,

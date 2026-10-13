@@ -1,0 +1,3163 @@
+{
+  "summary": {
+    "total_requests": 348,
+    "total_tokens": 769418,
+    "failures": 134,
+    "by_role": {
+      "answerer": {
+        "role": "answerer",
+        "calls": 122,
+        "failures": 8,
+        "input_tokens": 733059,
+        "output_tokens": 11921,
+        "p50_ms": 1617.602750658989,
+        "p95_ms": 2158.3026656880975,
+        "max_ms": 35050.42479094118
+      },
+      "judge": {
+        "role": "judge",
+        "calls": 226,
+        "failures": 126,
+        "input_tokens": 21270,
+        "output_tokens": 3168,
+        "p50_ms": 21839.5667495206,
+        "p95_ms": 40780.11879045516,
+        "max_ms": 127806.39979057014
+      }
+    }
+  },
+  "calls": [
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 1495.6272076815367,
+      "ok": false,
+      "error": "ClientError: 400 INVALID_ARGUMENT. {'error': {'code': 400, 'message': 'Request contains an invalid argument.', 'status': 'INVALID_ARGUMENT'}}"
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 6474,
+      "output_tokens": 143,
+      "latency_ms": 1625.3380421549082,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 994.5431249216199,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 204,
+      "output_tokens": 36,
+      "latency_ms": 27524.083665572107,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 7130,
+      "output_tokens": 149,
+      "latency_ms": 1574.3634579703212,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 193,
+      "output_tokens": 30,
+      "latency_ms": 28539.01420813054,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 6455,
+      "output_tokens": 146,
+      "latency_ms": 1610.6548747047782,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 1084.2446675524116,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 177,
+      "output_tokens": 26,
+      "latency_ms": 29855.19445873797,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 6855,
+      "output_tokens": 29,
+      "latency_ms": 1442.3691667616367,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 38469.41087581217,
+      "ok": false,
+      "error": "ServerError: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 33975.5014590919,
+      "ok": false,
+      "error": "ServerError: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 27328.16862501204,
+      "ok": false,
+      "error": "ServerError: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 178,
+      "output_tokens": 37,
+      "latency_ms": 26309.479207731783,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 6796,
+      "output_tokens": 39,
+      "latency_ms": 1498.73954243958,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 582,
+      "output_tokens": 24,
+      "latency_ms": 1137.6729160547256,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 784.2980828136206,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 182,
+      "output_tokens": 30,
+      "latency_ms": 21662.65616659075,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 6763,
+      "output_tokens": 72,
+      "latency_ms": 1446.3852904736996,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 817.889042198658,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 185,
+      "output_tokens": 23,
+      "latency_ms": 27016.192542389035,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 5703,
+      "output_tokens": 35,
+      "latency_ms": 1407.1702500805259,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 881.2016667798162,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 185,
+      "output_tokens": 28,
+      "latency_ms": 38418.01445931196,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 6601,
+      "output_tokens": 164,
+      "latency_ms": 1743.8045414164662,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 890.6130837276578,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 873.1388747692108,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 869.81291603297,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 21839.5667495206,
+      "ok": false,
+      "error": "ServerError: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 400,
+      "output_tokens": 41,
+      "latency_ms": 35575.71512553841,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 6751,
+      "output_tokens": 149,
+      "latency_ms": 1789.3061246722937,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 195,
+      "output_tokens": 26,
+      "latency_ms": 29133.761291392148,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 6908,
+      "output_tokens": 124,
+      "latency_ms": 1681.7898331210017,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 976.8943339586258,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 790.5861251056194,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 189,
+      "output_tokens": 39,
+      "latency_ms": 30590.50591569394,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 6422,
+      "output_tokens": 216,
+      "latency_ms": 1872.1954999491572,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 127806.39979057014,
+      "ok": false,
+      "error": "RemoteProtocolError: Server disconnected without sending a response."
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 231,
+      "output_tokens": 32,
+      "latency_ms": 46940.18308259547,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 7002,
+      "output_tokens": 29,
+      "latency_ms": 1559.623041190207,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 177,
+      "output_tokens": 34,
+      "latency_ms": 36289.61633425206,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 7090,
+      "output_tokens": 64,
+      "latency_ms": 1571.5656243264675,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 168,
+      "output_tokens": 37,
+      "latency_ms": 31731.90337512642,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 6554,
+      "output_tokens": 49,
+      "latency_ms": 1794.399917125702,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 25260.78329142183,
+      "ok": false,
+      "error": "ServerError: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 1140.0915421545506,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 1033.3681674674153,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 315,
+      "output_tokens": 30,
+      "latency_ms": 36959.4268752262,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 6837,
+      "output_tokens": 110,
+      "latency_ms": 1863.0498331040144,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 1301.43304169178,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 829.9711244180799,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 969.8434164747596,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 1107.566500082612,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 379,
+      "output_tokens": 56,
+      "latency_ms": 35633.339083753526,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 7336,
+      "output_tokens": 130,
+      "latency_ms": 1730.5577909573913,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 206,
+      "output_tokens": 33,
+      "latency_ms": 27623.593665659428,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 6210,
+      "output_tokens": 60,
+      "latency_ms": 1404.1905831545591,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 221,
+      "output_tokens": 28,
+      "latency_ms": 20244.079125113785,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 6668,
+      "output_tokens": 227,
+      "latency_ms": 1922.4935425445437,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 1058.047667145729,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 794.9446253478527,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 29417.720291763544,
+      "ok": false,
+      "error": "ServerError: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 220,
+      "output_tokens": 29,
+      "latency_ms": 46148.14604166895,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 7469,
+      "output_tokens": 98,
+      "latency_ms": 1546.569749712944,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 34013.60641699284,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 935.7057921588421,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 814.8251669481397,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 199,
+      "output_tokens": 26,
+      "latency_ms": 21693.168125115335,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 7125,
+      "output_tokens": 82,
+      "latency_ms": 1804.7987073659897,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 995.2522497624159,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 187,
+      "output_tokens": 26,
+      "latency_ms": 33857.93541651219,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 7180,
+      "output_tokens": 102,
+      "latency_ms": 1718.8146244734526,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 206,
+      "output_tokens": 45,
+      "latency_ms": 32180.35479169339,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 6734,
+      "output_tokens": 30,
+      "latency_ms": 1579.4316669926047,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 776.9368337467313,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 185,
+      "output_tokens": 36,
+      "latency_ms": 19877.1934164688,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 6476,
+      "output_tokens": 43,
+      "latency_ms": 1432.265542447567,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 212,
+      "output_tokens": 30,
+      "latency_ms": 38303.13508398831,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 6971,
+      "output_tokens": 66,
+      "latency_ms": 1733.8271252810955,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 330,
+      "output_tokens": 36,
+      "latency_ms": 35661.78466659039,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 6487,
+      "output_tokens": 32,
+      "latency_ms": 1358.9711673557758,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 180,
+      "output_tokens": 23,
+      "latency_ms": 39307.6693341136,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 6974,
+      "output_tokens": 173,
+      "latency_ms": 1861.9857914745808,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 177,
+      "output_tokens": 28,
+      "latency_ms": 43337.99633290619,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 7278,
+      "output_tokens": 364,
+      "latency_ms": 2178.8182919844985,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 238,
+      "output_tokens": 26,
+      "latency_ms": 19727.648999541998,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 6892,
+      "output_tokens": 132,
+      "latency_ms": 1608.8785827159882,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 226,
+      "output_tokens": 28,
+      "latency_ms": 27053.44079155475,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 6953,
+      "output_tokens": 26,
+      "latency_ms": 1451.8355000764132,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 172,
+      "output_tokens": 26,
+      "latency_ms": 38636.56600005925,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 7114,
+      "output_tokens": 176,
+      "latency_ms": 1985.4325419291854,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 893.4890832751989,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 207,
+      "output_tokens": 33,
+      "latency_ms": 33962.55812514573,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 6794,
+      "output_tokens": 103,
+      "latency_ms": 1529.1719576343894,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 846.8641247600317,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 771.6589588671923,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 234,
+      "output_tokens": 33,
+      "latency_ms": 51330.45204170048,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 6584,
+      "output_tokens": 197,
+      "latency_ms": 1782.6481247320771,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 855.4677926003933,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 206,
+      "output_tokens": 30,
+      "latency_ms": 32398.285957984626,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 6435,
+      "output_tokens": 122,
+      "latency_ms": 1861.3387094810605,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 944.411207921803,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 226,
+      "output_tokens": 34,
+      "latency_ms": 32669.832415878773,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 6837,
+      "output_tokens": 89,
+      "latency_ms": 1519.7072075679898,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 357,
+      "output_tokens": 51,
+      "latency_ms": 32971.81395813823,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 6665,
+      "output_tokens": 97,
+      "latency_ms": 1541.1423332989216,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 23613.42208366841,
+      "ok": false,
+      "error": "ServerError: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 205,
+      "output_tokens": 33,
+      "latency_ms": 26248.290750198066,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 6591,
+      "output_tokens": 29,
+      "latency_ms": 1554.9895828589797,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 14137.411666102707,
+      "ok": false,
+      "error": "ServerError: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 176,
+      "output_tokens": 31,
+      "latency_ms": 22265.547917224467,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 6029,
+      "output_tokens": 61,
+      "latency_ms": 1394.4372506812215,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 1125.521583482623,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 245,
+      "output_tokens": 29,
+      "latency_ms": 25723.662042059004,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 6575,
+      "output_tokens": 146,
+      "latency_ms": 1676.6145415604115,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 185,
+      "output_tokens": 32,
+      "latency_ms": 31584.1351673007,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 6683,
+      "output_tokens": 27,
+      "latency_ms": 1732.3944168165326,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 168,
+      "output_tokens": 27,
+      "latency_ms": 32503.70266661048,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 7458,
+      "output_tokens": 143,
+      "latency_ms": 1819.2878337576985,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 211,
+      "output_tokens": 44,
+      "latency_ms": 23314.10075072199,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 6645,
+      "output_tokens": 134,
+      "latency_ms": 1665.7158331945539,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 846.4949578046799,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 784.5304170623422,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 190,
+      "output_tokens": 36,
+      "latency_ms": 31609.802749939263,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 7180,
+      "output_tokens": 203,
+      "latency_ms": 2158.3026656880975,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 218,
+      "output_tokens": 28,
+      "latency_ms": 32294.32958457619,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 7108,
+      "output_tokens": 50,
+      "latency_ms": 1428.5343326628208,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 1039.3669595941901,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 248,
+      "output_tokens": 28,
+      "latency_ms": 26298.903541639447,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 7203,
+      "output_tokens": 149,
+      "latency_ms": 1620.7758327946067,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 858.7392074987292,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 760.7751665636897,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 32560.80133281648,
+      "ok": false,
+      "error": "ServerError: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 1659.7774997353554,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 1119.5992091670632,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 828.573165461421,
+      "ok": false,
+      "error": "ClientError: 400 INVALID_ARGUMENT. {'error': {'code': 400, 'message': 'Request contains an invalid argument.', 'status': 'INVALID_ARGUMENT'}}"
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 7203,
+      "output_tokens": 124,
+      "latency_ms": 1529.316708445549,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 1106.1418745666742,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 844.5412507280707,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 30429.322374984622,
+      "ok": false,
+      "error": "ServerError: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 987.6179993152618,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 1074.902500025928,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 958.561584353447,
+      "ok": false,
+      "error": "ClientError: 400 INVALID_ARGUMENT. {'error': {'code': 400, 'message': 'Request contains an invalid argument.', 'status': 'INVALID_ARGUMENT'}}"
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 7203,
+      "output_tokens": 118,
+      "latency_ms": 1760.1235006004572,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 1568.6028748750687,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 192,
+      "output_tokens": 38,
+      "latency_ms": 23401.253334246576,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 6964,
+      "output_tokens": 39,
+      "latency_ms": 1348.0489999055862,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 681,
+      "output_tokens": 20,
+      "latency_ms": 868.5582913458347,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 185,
+      "output_tokens": 26,
+      "latency_ms": 33849.22149963677,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 6644,
+      "output_tokens": 196,
+      "latency_ms": 2218.722542747855,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 182,
+      "output_tokens": 28,
+      "latency_ms": 8275.452165864408,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 6879,
+      "output_tokens": 52,
+      "latency_ms": 1628.0931252986193,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 200,
+      "output_tokens": 25,
+      "latency_ms": 27332.431166432798,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 6715,
+      "output_tokens": 93,
+      "latency_ms": 1578.8411255925894,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 243,
+      "output_tokens": 31,
+      "latency_ms": 50289.72304146737,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 6414,
+      "output_tokens": 95,
+      "latency_ms": 1511.4208748564124,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 891.1877078935504,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 829.7504596412182,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 817.9546659812331,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 304,
+      "output_tokens": 34,
+      "latency_ms": 26009.52595844865,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 7875,
+      "output_tokens": 89,
+      "latency_ms": 1991.6610829532146,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 900.6005823612213,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 944.4855423644185,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 876.1572083458304,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 29449.836333282292,
+      "ok": false,
+      "error": "ServerError: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 1023.008625023067,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 1081.0774583369493,
+      "ok": false,
+      "error": "ClientError: 400 INVALID_ARGUMENT. {'error': {'code': 400, 'message': 'Request contains an invalid argument.', 'status': 'INVALID_ARGUMENT'}}"
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 7875,
+      "output_tokens": 89,
+      "latency_ms": 1408.2372086122632,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 1046.823374927044,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 934.2643329873681,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 178,
+      "output_tokens": 30,
+      "latency_ms": 15700.38237515837,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 6715,
+      "output_tokens": 164,
+      "latency_ms": 1558.2083333283663,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 1021.721332333982,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 1075.3437913954258,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 171,
+      "output_tokens": 32,
+      "latency_ms": 26542.940916493535,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 6371,
+      "output_tokens": 82,
+      "latency_ms": 1701.1245414614677,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 250,
+      "output_tokens": 39,
+      "latency_ms": 31882.801874540746,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 6893,
+      "output_tokens": 43,
+      "latency_ms": 1270.331292413175,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 939,
+      "output_tokens": 32,
+      "latency_ms": 1111.2805837765336,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 34714.36099987477,
+      "ok": false,
+      "error": "ServerError: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 972.2680831328034,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 954.8347499221563,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 191,
+      "output_tokens": 35,
+      "latency_ms": 29304.261374287307,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 6849,
+      "output_tokens": 168,
+      "latency_ms": 1729.326124303043,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 972.0198754221201,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 192,
+      "output_tokens": 31,
+      "latency_ms": 19766.95308368653,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 6842,
+      "output_tokens": 242,
+      "latency_ms": 1765.2828749269247,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 205,
+      "output_tokens": 41,
+      "latency_ms": 31780.233083292842,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 5883,
+      "output_tokens": 50,
+      "latency_ms": 1475.3392087295651,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 695,
+      "output_tokens": 23,
+      "latency_ms": 1106.3561653718352,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 34946.38237543404,
+      "ok": false,
+      "error": "ServerError: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 188,
+      "output_tokens": 28,
+      "latency_ms": 30116.05583317578,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 6688,
+      "output_tokens": 141,
+      "latency_ms": 1693.2006673887372,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 1239.659583196044,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 1376.190708950162,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 784.8839592188597,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 191,
+      "output_tokens": 34,
+      "latency_ms": 31492.072290740907,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 7263,
+      "output_tokens": 128,
+      "latency_ms": 1541.0693744197488,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 17687.711083330214,
+      "ok": false,
+      "error": "ServerError: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 1344.3230418488383,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 939.794541336596,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 999.3911255151033,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 947.4005829542875,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 839.5124170929193,
+      "ok": false,
+      "error": "ClientError: 400 INVALID_ARGUMENT. {'error': {'code': 400, 'message': 'Request contains an invalid argument.', 'status': 'INVALID_ARGUMENT'}}"
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 7263,
+      "output_tokens": 127,
+      "latency_ms": 1631.9687915965915,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 36339.754374697804,
+      "ok": false,
+      "error": "ServerError: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 820.3236656263471,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 218,
+      "output_tokens": 28,
+      "latency_ms": 25997.889750637114,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 6780,
+      "output_tokens": 94,
+      "latency_ms": 1534.0076256543398,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 897.1235426142812,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 790.3214171528816,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 194,
+      "output_tokens": 33,
+      "latency_ms": 26690.228832885623,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 7092,
+      "output_tokens": 127,
+      "latency_ms": 1666.245791129768,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 217,
+      "output_tokens": 43,
+      "latency_ms": 35022.70741574466,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 6225,
+      "output_tokens": 122,
+      "latency_ms": 1765.3231248259544,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 886.3544585183263,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 840.9296665340662,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 181,
+      "output_tokens": 28,
+      "latency_ms": 15748.554707504809,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 7342,
+      "output_tokens": 37,
+      "latency_ms": 1484.6426248550415,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 933.9856244623661,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 182,
+      "output_tokens": 47,
+      "latency_ms": 38058.30174963921,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 6673,
+      "output_tokens": 126,
+      "latency_ms": 1652.5516249239445,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 202,
+      "output_tokens": 29,
+      "latency_ms": 32313.464041799307,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 6568,
+      "output_tokens": 34,
+      "latency_ms": 1484.0770000591874,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 186,
+      "output_tokens": 22,
+      "latency_ms": 30494.863416068256,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 6193,
+      "output_tokens": 100,
+      "latency_ms": 1764.1228754073381,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 182,
+      "output_tokens": 37,
+      "latency_ms": 19045.050041750073,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 6578,
+      "output_tokens": 120,
+      "latency_ms": 6679.873083718121,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 831.2841653823853,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 30489.190041087568,
+      "ok": false,
+      "error": "ServerError: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 171,
+      "output_tokens": 23,
+      "latency_ms": 41249.07145835459,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 6343,
+      "output_tokens": 33,
+      "latency_ms": 1538.5755840688944,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 935.7677502557635,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 27452.013459056616,
+      "ok": false,
+      "error": "ServerError: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 28091.29041712731,
+      "ok": false,
+      "error": "ServerError: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 181,
+      "output_tokens": 37,
+      "latency_ms": 38255.5643748492,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 6984,
+      "output_tokens": 124,
+      "latency_ms": 1624.405083246529,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 194,
+      "output_tokens": 36,
+      "latency_ms": 30569.556166417897,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 6603,
+      "output_tokens": 63,
+      "latency_ms": 1488.977000117302,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 251,
+      "output_tokens": 24,
+      "latency_ms": 31231.38220794499,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 6468,
+      "output_tokens": 29,
+      "latency_ms": 1449.192624539137,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 175,
+      "output_tokens": 22,
+      "latency_ms": 23275.260667316616,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 6431,
+      "output_tokens": 42,
+      "latency_ms": 1644.4343756884336,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 932.7152920886874,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 24481.224125251174,
+      "ok": false,
+      "error": "ServerError: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 756.7660417407751,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 955.1163334399462,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 1099.1907501593232,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 1406.7015424370766,
+      "ok": false,
+      "error": "ClientError: 400 INVALID_ARGUMENT. {'error': {'code': 400, 'message': 'Request contains an invalid argument.', 'status': 'INVALID_ARGUMENT'}}"
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 6431,
+      "output_tokens": 38,
+      "latency_ms": 1583.2130005583167,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 1086.6205412894487,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 788.6139582842588,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 1079.1773749515414,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 1333.0378336831927,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 1092.5221256911755,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 884.6503747627139,
+      "ok": false,
+      "error": "ClientError: 400 INVALID_ARGUMENT. {'error': {'code': 400, 'message': 'Request contains an invalid argument.', 'status': 'INVALID_ARGUMENT'}}"
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 6431,
+      "output_tokens": 42,
+      "latency_ms": 1394.3303329870105,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 943.3971242979169,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 764.8364156484604,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 213,
+      "output_tokens": 33,
+      "latency_ms": 21907.788459211588,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 7166,
+      "output_tokens": 83,
+      "latency_ms": 1523.3615832403302,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 180,
+      "output_tokens": 23,
+      "latency_ms": 24167.937292717397,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 6316,
+      "output_tokens": 142,
+      "latency_ms": 1734.9500423297286,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 27339.227915741503,
+      "ok": false,
+      "error": "ServerError: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 217,
+      "output_tokens": 34,
+      "latency_ms": 26013.151499442756,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 6821,
+      "output_tokens": 52,
+      "latency_ms": 1657.4357924982905,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 671,
+      "output_tokens": 38,
+      "latency_ms": 1179.5997498556972,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 827.345042489469,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 912.2525826096535,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 205,
+      "output_tokens": 28,
+      "latency_ms": 17298.29058330506,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 6600,
+      "output_tokens": 97,
+      "latency_ms": 35050.42479094118,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 177,
+      "output_tokens": 26,
+      "latency_ms": 36219.56112422049,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 6635,
+      "output_tokens": 186,
+      "latency_ms": 1873.8477090373635,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 1000,
+      "output_tokens": 65,
+      "latency_ms": 1105.2743745967746,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 229,
+      "output_tokens": 43,
+      "latency_ms": 20823.764958418906,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 6614,
+      "output_tokens": 123,
+      "latency_ms": 2040.4669176787138,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 206,
+      "output_tokens": 40,
+      "latency_ms": 23802.89537459612,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 7090,
+      "output_tokens": 95,
+      "latency_ms": 1493.699749931693,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 869.6327079087496,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 805.164291523397,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 182,
+      "output_tokens": 27,
+      "latency_ms": 23863.80362510681,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 6743,
+      "output_tokens": 84,
+      "latency_ms": 1698.6302910372615,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 999.7070413082838,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 370,
+      "output_tokens": 36,
+      "latency_ms": 26546.875917352736,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 7345,
+      "output_tokens": 40,
+      "latency_ms": 1425.6234159693122,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 39635.40499936789,
+      "ok": false,
+      "error": "ServerError: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 30391.057958826423,
+      "ok": false,
+      "error": "ServerError: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 957.2164993733168,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 51162.49758284539,
+      "ok": false,
+      "error": "ServerError: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 1480.9125000610948,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 880.1139164716005,
+      "ok": false,
+      "error": "ClientError: 400 INVALID_ARGUMENT. {'error': {'code': 400, 'message': 'Request contains an invalid argument.', 'status': 'INVALID_ARGUMENT'}}"
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 7345,
+      "output_tokens": 40,
+      "latency_ms": 1347.555541433394,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 1053.5025838762522,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 210,
+      "output_tokens": 31,
+      "latency_ms": 26508.20141658187,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 6817,
+      "output_tokens": 187,
+      "latency_ms": 1792.810999788344,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 227,
+      "output_tokens": 25,
+      "latency_ms": 30515.057750046253,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 6808,
+      "output_tokens": 201,
+      "latency_ms": 1789.7432912141085,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 35166.833417490125,
+      "ok": false,
+      "error": "ServerError: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 31099.578334018588,
+      "ok": false,
+      "error": "ServerError: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 349,
+      "output_tokens": 25,
+      "latency_ms": 31850.261624902487,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 6984,
+      "output_tokens": 268,
+      "latency_ms": 2199.9073745682836,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 233,
+      "output_tokens": 41,
+      "latency_ms": 29588.01691699773,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 7081,
+      "output_tokens": 116,
+      "latency_ms": 1522.1581663936377,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 208,
+      "output_tokens": 27,
+      "latency_ms": 43169.7342088446,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 6714,
+      "output_tokens": 131,
+      "latency_ms": 2237.8003746271133,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 197,
+      "output_tokens": 32,
+      "latency_ms": 45093.16979255527,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 7299,
+      "output_tokens": 139,
+      "latency_ms": 1622.6322501897812,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 30830.856791697443,
+      "ok": false,
+      "error": "ServerError: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 1103.0952082946897,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 203,
+      "output_tokens": 35,
+      "latency_ms": 28094.25970725715,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 6464,
+      "output_tokens": 128,
+      "latency_ms": 1728.5601254552603,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 213,
+      "output_tokens": 32,
+      "latency_ms": 35225.54933279753,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 6808,
+      "output_tokens": 126,
+      "latency_ms": 1668.4290412813425,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 815.4655415564775,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 215,
+      "output_tokens": 30,
+      "latency_ms": 31345.973832532763,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 6567,
+      "output_tokens": 128,
+      "latency_ms": 1698.3514996245503,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 807.5858345255256,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 220,
+      "output_tokens": 27,
+      "latency_ms": 29301.40525009483,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 6837,
+      "output_tokens": 110,
+      "latency_ms": 1697.4498331546783,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 189,
+      "output_tokens": 27,
+      "latency_ms": 35678.85754164308,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 6652,
+      "output_tokens": 152,
+      "latency_ms": 1808.3555847406387,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 212,
+      "output_tokens": 30,
+      "latency_ms": 29630.815416574478,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 7189,
+      "output_tokens": 139,
+      "latency_ms": 1704.8609592020512,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 802.2001655772328,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 220,
+      "output_tokens": 27,
+      "latency_ms": 25641.05479232967,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 6935,
+      "output_tokens": 69,
+      "latency_ms": 1629.7202501446009,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 921.1561670526862,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 217,
+      "output_tokens": 28,
+      "latency_ms": 34588.756333105266,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 6749,
+      "output_tokens": 127,
+      "latency_ms": 1682.6438326388597,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 200,
+      "output_tokens": 30,
+      "latency_ms": 45647.485584020615,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 6859,
+      "output_tokens": 130,
+      "latency_ms": 2095.120166428387,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 197,
+      "output_tokens": 27,
+      "latency_ms": 40780.11879045516,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 6679,
+      "output_tokens": 148,
+      "latency_ms": 1617.602750658989,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 804.9590419977903,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 30644.160958006978,
+      "ok": false,
+      "error": "ServerError: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 221,
+      "output_tokens": 32,
+      "latency_ms": 34026.22624952346,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 6487,
+      "output_tokens": 132,
+      "latency_ms": 1611.8627088144422,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 196,
+      "output_tokens": 29,
+      "latency_ms": 36644.03975009918,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 6638,
+      "output_tokens": 149,
+      "latency_ms": 1769.727417267859,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 763.1898326799273,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 206,
+      "output_tokens": 30,
+      "latency_ms": 2687.4784165993333,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 7034,
+      "output_tokens": 124,
+      "latency_ms": 1613.2460832595825,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 758.6610829457641,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 788.464792072773,
+      "ok": false,
+      "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 194,
+      "output_tokens": 33,
+      "latency_ms": 35983.359166420996,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 6562,
+      "output_tokens": 88,
+      "latency_ms": 1758.315458893776,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "answerer",
+      "model": "gemini-3.5-flash-lite",
+      "input_tokens": 977,
+      "output_tokens": 5,
+      "latency_ms": 1230.1260828971863,
+      "ok": true,
+      "error": null
+    },
+    {
+      "role": "judge",
+      "model": "gemma-4-31b-it",
+      "input_tokens": 165,
+      "output_tokens": 25,
+      "latency_ms": 23066.026041284204,
+      "ok": true,
+      "error": null
+    }
+  ]
+}

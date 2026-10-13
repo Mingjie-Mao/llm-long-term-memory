@@ -297,8 +297,8 @@ def build_overview(figure_class, *, chinese=False):
         112,
         "Top-K memories",
         [
-            tr("服务默认 K = 10", "Service default K = 10"),
-            tr("v2 评测 K = 20", "v2 evaluation K = 20"),
+            tr("服务默认 K = 20", "Service default K = 20"),
+            tr("评测 K = 20", "Evaluation K = 20"),
         ],
         PURPLE,
         size=18,

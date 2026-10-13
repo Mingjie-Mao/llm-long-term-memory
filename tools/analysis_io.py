@@ -28,7 +28,9 @@ def read_json(path: Path):
 def read_jsonl(path: Path) -> list[dict]:
     """The rows of a JSONL artifact, in file order, blank lines skipped."""
     text = path.read_text(encoding="utf-8")
-    return [json.loads(line) for line in text.splitlines() if line.strip()]
+    # JSON strings may contain literal U+2028/U+2029/NEL. str.splitlines()
+    # treats them as record boundaries, although JSONL records end at LF.
+    return [json.loads(line) for line in text.split("\n") if line.strip()]
 
 
 def rows_by_question(path: Path) -> dict[str, dict]:

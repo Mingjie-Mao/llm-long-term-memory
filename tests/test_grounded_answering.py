@@ -9,7 +9,7 @@ import numpy as np
 import pytest
 
 from llm_long_term_memory.conversation import AnswerRequest
-from llm_long_term_memory.runtime.grounded_answering import (
+from llm_long_term_memory.evaluation.grounded.answering import (
     EvidenceLedger,
     EvidenceSource,
     GroundedAnswerer,
@@ -909,7 +909,7 @@ def test_raw_recovery_keeps_first_evidence_and_uses_the_calculation_schema_again
     monkeypatch.setattr(excerpts, "archive_excerpts", lambda *a, **k: ArchiveExcerpts())
     # The function is imported into the shared module, patch that binding too.
     monkeypatch.setattr(
-        "llm_long_term_memory.runtime.grounded_answering.archive_excerpts",
+        "llm_long_term_memory.evaluation.grounded.answering.archive_excerpts",
         lambda *a, **k: ArchiveExcerpts(),
     )
     calls = []
@@ -976,122 +976,6 @@ def test_invalid_response_and_unverified_arithmetic_do_not_escape_as_prose(store
         )
         assert answer.text == "I do not know."
         assert "9999" not in engine.client.calls[0]["prompt"]
-
-
-@pytest.mark.parametrize(
-    "policy",
-    [
-        "grounded_v1",
-        "grounded_v2",
-        "grounded_v3",
-        "grounded_v4",
-        "grounded_v5",
-        "grounded_v6",
-        "grounded_v7",
-        "grounded_v8",
-        "grounded_v9",
-        "grounded_v10",
-        "grounded_v11",
-        "grounded_v12",
-        "grounded_v13",
-        "grounded_v14",
-        "grounded_v15",
-        "grounded_v16",
-        "grounded_v17",
-        "grounded_v18",
-    ],
-)
-def test_product_and_evaluation_use_identical_candidate_prompts_and_same_model(
-    store, tmp_path, policy
-):
-    from llm_long_term_memory.evaluation.runners.memory import MemoryRunner
-    from llm_long_term_memory.runtime import AnswerEngine
-
-    mem = memory()
-    store.add_memories([mem])
-    memories = NumpyFlatIndex(tmp_path / "memories", dim=2)
-    memories.add([mem.id], np.array([[1.0, 0.0]], dtype=np.float32))
-    turns = index(tmp_path, ["a-0", "b-0", "x-0"])
-
-    def reply(kwargs):
-        ids = re.findall(r"^\[(E\d+)\]", kwargs["prompt"], re.M)
-        extra = {}
-        from llm_long_term_memory.runtime.evidence_pages import PageSelection
-
-        if kwargs["schema"] is PageSelection:
-            return PageSelection(
-                reviewed_sources=ids, selected_sources=ids, scope_complete=True
-            ).model_dump_json()
-        if policy in {
-            "grounded_v6",
-            "grounded_v7",
-            "grounded_v8",
-            "grounded_v9",
-            "grounded_v10",
-            "grounded_v11",
-            "grounded_v12",
-            "grounded_v13",
-            "grounded_v14",
-            "grounded_v15",
-            "grounded_v16",
-            "grounded_v17",
-            "grounded_v18",
-        }:
-            body = re.search(r"^\[(E\d+)\].*?\n(.+)", kwargs["prompt"], re.M)
-            extra["observations"] = (
-                [{"source": body[1], "interpretation": "Relevant", "decision": "include"}]
-                if policy
-                in {
-                    "grounded_v7",
-                    "grounded_v8",
-                    "grounded_v9",
-                    "grounded_v10",
-                    "grounded_v11",
-                    "grounded_v12",
-                    "grounded_v13",
-                    "grounded_v14",
-                    "grounded_v15",
-                    "grounded_v16",
-                    "grounded_v17",
-                    "grounded_v18",
-                }
-                else [observation(body[1], body[2])]
-            )
-        return kwargs["schema"](
-            reviewed_sources=ids, scope_complete=True, status="answer", answer="ring", **extra
-        ).model_dump_json()
-
-    clients = [Client([reply] * 10), Client([reply] * 10)]
-    runners = [
-        MemoryRunner(
-            clients[0],
-            model="same-lite",
-            encoder=Encoder(),
-            store=store,
-            index=memories,
-            temporal=True,
-            top_k=20,
-            answer_policy=policy,
-            raw_primary_turn_index=turns,
-            max_output_tokens=2048,
-        ),
-        AnswerEngine(
-            clients[1],
-            model="same-lite",
-            encoder=Encoder(),
-            store=store,
-            index=memories,
-            temporal=True,
-            top_k=20,
-            answer_policy=policy,
-            raw_primary_turn_index=turns,
-        ),
-    ]
-    request = AnswerRequest("Any suggestions based on what I bought?", "2026-10-01", "alice")
-    answers = [runner.answer_request(request) for runner in runners]
-    assert answers[0].text == answers[1].text == "ring"
-    assert clients[0].calls == clients[1].calls
-    assert "9999" not in clients[0].calls[0]["prompt"]
 
 
 def test_provider_schema_keeps_records_before_answer_and_has_no_nested_definitions():
@@ -1335,7 +1219,7 @@ def test_v3_same_pool_repair_is_bounded_and_preserves_actual_evidence(
     from llm_long_term_memory.retrieve.excerpts import ArchiveExcerpts
 
     monkeypatch.setattr(
-        "llm_long_term_memory.runtime.grounded_answering.archive_excerpts",
+        "llm_long_term_memory.evaluation.grounded.answering.archive_excerpts",
         lambda *a, **k: ArchiveExcerpts(),
     )
     mem = memory(content="I paid $800.")
@@ -1419,8 +1303,8 @@ def test_v5_routes_the_asked_subject_instead_of_incidental_introduction_pronouns
 
 
 def test_evaluation_returns_incomplete_review_without_assuming_a_final_reader(store, tmp_path):
+    from llm_long_term_memory.evaluation.grounded.evidence_pages import PageSelection
     from llm_long_term_memory.evaluation.runners.memory import MemoryRunner
-    from llm_long_term_memory.runtime.evidence_pages import PageSelection
 
     memories = NumpyFlatIndex(tmp_path / "memories", 2)
     mem = memory()

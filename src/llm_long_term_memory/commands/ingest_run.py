@@ -87,6 +87,11 @@ def ingest_run(
             index=index,
             threshold=cfg.ingest.dedupe_similarity_threshold,
         )
+        linker = None
+        if cfg.ingest.update_linking:
+            from llm_long_term_memory.temporal.transition import UpdateLinker
+
+            linker = UpdateLinker(client, cfg.models.extractor)
         repair = None
         if cfg.ingest.personal_context_repair:
             from llm_long_term_memory.ingest.personal_context import configured_repair
@@ -131,6 +136,7 @@ def ingest_run(
             sessions_per_request=per_request,
             checkpoint_every=cfg.ingest.checkpoint_every,
             repair=repair,
+            update_linker=linker,
         )
 
         with console.status("Loading corpus…"):

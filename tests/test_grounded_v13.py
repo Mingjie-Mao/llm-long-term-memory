@@ -4,7 +4,7 @@ from datetime import datetime
 import pytest
 
 from llm_long_term_memory.conversation import AnswerRequest
-from llm_long_term_memory.runtime.grounded_answering import (
+from llm_long_term_memory.evaluation.grounded.answering import (
     EvidenceLedger,
     EvidenceSource,
     GroundedAnswererV12,

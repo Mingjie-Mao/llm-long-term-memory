@@ -47,6 +47,8 @@ class IngestProgress:
     repair_memories: int = 0
     superseded: int = 0
     undated: int = 0
+    update_judgments: int = 0
+    updates_linked: int = 0
     blocked_sessions: set[str] = field(default_factory=set)
     """Sessions in a batch the provider refused on content policy. They yielded no
     memories and never will, so the gap is named rather than left to look like an
@@ -68,6 +70,8 @@ class IngestProgress:
             "repair_memories": self.repair_memories,
             "superseded": self.superseded,
             "undated": self.undated,
+            "update_judgments": self.update_judgments,
+            "updates_linked": self.updates_linked,
         }
 
     @classmethod
@@ -94,6 +98,8 @@ class IngestProgress:
             "repair_memories",
             "superseded",
             "undated",
+            "update_judgments",
+            "updates_linked",
         ):
             setattr(p, key, d.get(key, 0))
         return p
@@ -241,6 +247,7 @@ class IngestionPipeline:
         resolver=None,
         config_spec: fingerprint.IngestSpec | None = None,
         repair=None,
+        update_linker=None,
     ) -> None:
         self.extractor = extractor
         self.deduplicator = deduplicator
@@ -263,6 +270,11 @@ class IngestionPipeline:
         # and temporal path as everything else, because a repaired memory that skipped
         # deduplication would be a second copy of a fact the store already holds.
         self.repair = repair
+        # Stage D's `UpdateLinker`, or None. It applies confirmed replacements through
+        # the resolver, so it needs one.
+        if update_linker is not None and resolver is None:
+            raise ValueError("update linking needs the temporal resolver")
+        self.update_linker = update_linker
 
     def run(
         self,
@@ -300,6 +312,7 @@ class IngestionPipeline:
                 sessions_per_request=self.sessions_per_request,
                 dedup=self.deduplicator,
                 repair=self.repair,
+                linker=self.update_linker,
             )
             # The second layer. Preflight compares the store against a fingerprint
             # derived from configuration, which is only evidence about this run if
@@ -489,6 +502,11 @@ class IngestionPipeline:
             stats = self.resolver.resolve_memories(deduped.kept)
             progress.superseded += stats.superseded
             progress.undated += stats.skipped_undated
+
+        if self.update_linker is not None:
+            linked = self.update_linker.link(self.store, self.index, self.resolver, deduped.kept)
+            progress.update_judgments += linked["judgments"]
+            progress.updates_linked += linked["linked"]
 
     def _repair_batch(
         self,

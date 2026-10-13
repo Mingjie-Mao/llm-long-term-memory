@@ -15,7 +15,7 @@ from analysis_io import rows_by_question, sha256_file, write_report  # noqa: E40
 from grounded_operand_replay import restore_ledger  # noqa: E402
 
 from llm_long_term_memory.conversation import AnswerRequest  # noqa: E402
-from llm_long_term_memory.runtime.grounded_answering import (  # noqa: E402
+from llm_long_term_memory.evaluation.grounded.answering import (  # noqa: E402
     FocusSessionEvidenceLedger,
     GroundedAnswererV9,
     GroundedAnswererV10,

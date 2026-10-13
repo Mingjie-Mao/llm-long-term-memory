@@ -561,7 +561,7 @@ def retrieval(chinese=False):
     )
     f.arrow([(870, 267), (915, 267)])
     f.label(630, 373, tr("其余四路权重为 0", "Other four score weights: 0"))
-    f.label(926, 373, tr("服务 k=10；v2 评测 k=20", "Service k=10; v2 eval k=20"))
+    f.label(926, 373, tr("服务与评测 k=20", "Service and eval k=20"))
     f.arrow([(1140, 344), (1140, 424), (177, 424), (177, 480)])
     f.box(
         40,
@@ -853,13 +853,13 @@ def runtime(chinese=False):
         tr(
             [
                 "检索、原文查找、时间线",
-                "经 MemoryRunner 回答",
+                "经 AnswerEngine（t4）回答",
                 "按需构造单轮抽取器",
                 "去重 + 时间线重建",
             ],
             [
                 "Search, raw lookup, timeline",
-                "Answer via MemoryRunner",
+                "Answer via AnswerEngine (t4)",
                 "Lazy batch-extractor adapter",
                 "Dedup + temporal resolution",
             ],
@@ -977,10 +977,10 @@ def runtime(chinese=False):
     )
     f.footer(
         tr(
-            "当前依赖：MemoryService 从 evaluation/ 导入 MemoryRunner 和 Instance。"
-            "拟议的拆分尚未实现。",
-            "Current dependency: MemoryService imports MemoryRunner and Instance "
-            "from evaluation/. The proposed split is not built.",
+            "MemoryService 用 runtime/ 的 AnswerEngine 回答，不导入 evaluation/；"
+            "上下文渲染由产品与评测共用。",
+            "MemoryService answers through runtime/AnswerEngine and imports nothing "
+            "from evaluation/; context rendering is shared with evaluation.",
         ),
         tr(
             "评测金标只用于评分和显式 oracle 诊断；普通检索不使用它们。",

@@ -1,0 +1,119 @@
+{
+  "experiment": "link-backfill-d1-resume-20261013",
+  "class": "development",
+  "dataset": "LongMemEval-S",
+  "exposure": "both manifests previously inspected",
+  "baseline": "original stores/dev100 and heldout100; t4 unchanged",
+  "candidate": "existing d1; transition-pair-v3:t0.65:k5",
+  "config": "configs/fallback.yaml",
+  "model": "gemini-3.1-flash-lite",
+  "sampling": {
+    "temperature": 0.0,
+    "sample": "rep1",
+    "samples_per_pair": 1,
+    "max_output_tokens": 256
+  },
+  "git_sha": "d02ccdb4debfe80235958d327dbee275b55c9b36",
+  "environment": "macOS-26.5.2-arm64-arm-64bit",
+  "python": "3.12.13",
+  "started_at": "2026-10-13T19:18:18.059269+11:00",
+  "splits": {
+    "dev100": {
+      "manifest": "results/manifests/dev100.json",
+      "manifest_sha256": "fe6ae148da5f81730d698ecd10cc795d6bd69357e22eb26d47ba6cefe16d6072",
+      "original_store_sha256": "92efa932cdcfc16cc63209f7a0c8b48e1808e50d2d015a89e9d26abd859def44",
+      "users": 100,
+      "users_done_before": 27,
+      "judgments_done_before": 131,
+      "remaining_pairs_estimate": 366,
+      "remaining_pair_prompt_characters": 62666,
+      "expected_output_token_ceiling": 93696,
+      "checkpoint": "stores/dev100-d1-link.json",
+      "output_store": "stores/dev100-d1.db",
+      "users_done_after": 100,
+      "judgments_after": 497,
+      "replace_applications_after": 36,
+      "stopped_after": null,
+      "original_store_sha256_after": "92efa932cdcfc16cc63209f7a0c8b48e1808e50d2d015a89e9d26abd859def44",
+      "original_store_unchanged": true
+    },
+    "heldout100": {
+      "manifest": "results/manifests/heldout100.json",
+      "manifest_sha256": "19f833d8d9457706aa78c3d7bc6fd6d12758596b40dc40d3db0f753963fc7c05",
+      "original_store_sha256": "c8db4c2c0cec5f0a432c37815d099a8fae5196202f9c0a6e2bc987e805c6a985",
+      "users": 100,
+      "users_done_before": 0,
+      "judgments_done_before": 0,
+      "remaining_pairs_estimate": 554,
+      "remaining_pair_prompt_characters": 94695,
+      "expected_output_token_ceiling": 141824,
+      "checkpoint": "stores/heldout100-d1-link.json",
+      "output_store": "stores/heldout100-d1.db",
+      "users_done_after": 18,
+      "judgments_after": 110,
+      "replace_applications_after": 4,
+      "stopped_after": "daily quota at 2ebe6c90: daily quota exhausted for gemini-3.1-flash-lite; resets in 21.8h",
+      "original_store_sha256_after": "c8db4c2c0cec5f0a432c37815d099a8fae5196202f9c0a6e2bc987e805c6a985",
+      "original_store_unchanged": true
+    }
+  },
+  "resolution_note": "This run only constructs stores and reviews transitions; no new answer-accuracy claim. Existing answer-run resolution will be checked before end-to-end evaluation.",
+  "status": "partial_daily_quota",
+  "finished_at": "2026-10-13T20:19:13.174972+11:00",
+  "estimated_quota_reset_sydney": "2026-10-14T18:00:00.000426+11:00",
+  "quota_state": {
+    "day": "2026-10-13",
+    "count": 500
+  },
+  "seed": null,
+  "seed_note": "No explicit provider seed; unchanged single rep1 sample at temperature 0.0",
+  "cache_usage": {
+    "cumulative": {
+      "successful_responses": 614,
+      "input_tokens": 165579,
+      "output_tokens": 21705,
+      "recorded_attempts": 627
+    },
+    "this_resume": {
+      "successful_responses": 483,
+      "input_tokens": 130057,
+      "output_tokens": 17093,
+      "recorded_attempts": 494
+    }
+  },
+  "baseline_cache_reconstruction": {
+    "users": 27,
+    "unique_keys": 131,
+    "equals_original_first_131_rows": true
+  },
+  "usage_limitations": "Recorded attempts belong to successful cached responses; terminal failures and other processes are not fully captured. The daily counter may be pinned to the limit by server refusal; it is not an exact attempt total.",
+  "pending_user": {
+    "question_id": "2ebe6c90",
+    "split": "heldout100",
+    "cached_judgments_not_in_done_stats": 7,
+    "changed_closures_reviewed_separately": 1,
+    "included_in_completed_user_metrics": false
+  },
+  "checks": {
+    "pytest_command": "pytest -q tests/test_transition.py tests/test_update_linking.py tests/test_response_cache.py tests/test_temporal.py tests/test_temporal_gold.py",
+    "pytest_passed": 99,
+    "full_suite_run": false,
+    "ruff_lint": "passed",
+    "ruff_format": "passed",
+    "cache_miss_guard": "passed; misses raise without provider calls"
+  },
+  "audit_outputs": [
+    "results/analysis/link-backfill-d1-dev100-reviewed-20261013.json",
+    "results/analysis/link-backfill-d1-dev100-reviewed-20261013.md",
+    "results/analysis/link-backfill-d1-heldout100-reviewed-20261013.json",
+    "results/analysis/link-backfill-d1-heldout100-reviewed-20261013.md",
+    "research/link-backfill-d1-close-review-v1.json",
+    "research/link-backfill-d1-failure-notes-v1.json"
+  ],
+  "source_sha256": {
+    "tools/link_backfill.py": "03e8f9bb59275cfee0398b450b5a7102f02b7e7de7b92dde79752d2ed6b197ec",
+    "tools/link_backfill_audit.py": "c86470c3de72f2086f129bba29b2782d777aa96a6d1006c0dc7bf7388dfa2981",
+    "src/llm_long_term_memory/temporal/transition.py": "7d8ebc80ef7cbe767451dcab838a3ad971a087789f752c40260ead5d0b52c31c",
+    "configs/fallback.yaml": "397c0c59908079c965a96a690206c27320a3e0c0eb3b6a30eadc1ada19d8a0e8"
+  }
+}

@@ -16,8 +16,8 @@ from history_growth_retention import _copy_store, _grow  # noqa: E402
 
 from llm_long_term_memory.config import Settings  # noqa: E402
 from llm_long_term_memory.evaluation.datasets.longmemeval import load  # noqa: E402
+from llm_long_term_memory.evaluation.grounded.evidence_pages import archive_pages  # noqa: E402
 from llm_long_term_memory.evaluation.manifest import load_manifest  # noqa: E402
-from llm_long_term_memory.runtime.evidence_pages import archive_pages  # noqa: E402
 from llm_long_term_memory.store import (  # noqa: E402
     NumpyFlatIndex,
     SQLiteMemoryStore,

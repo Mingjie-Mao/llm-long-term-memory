@@ -16,7 +16,7 @@ def main():
     from llm_long_term_memory import cli
     from llm_long_term_memory.conversation import AnswerRequest
     from llm_long_term_memory.evaluation.datasets.longmemeval import load
-    from llm_long_term_memory.runtime.evidence_pages import (
+    from llm_long_term_memory.evaluation.grounded.evidence_pages import (
         PageSelectionError,
         archive_pages,
         select_page,

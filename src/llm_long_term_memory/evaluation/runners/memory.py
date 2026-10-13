@@ -21,6 +21,14 @@ from time import perf_counter
 
 import numpy as np
 
+from llm_long_term_memory.answer_compute import (
+    COMPUTE_PROMPT_VERSION,
+    COMPUTE_RULES,
+    compute_mode,
+    count_mode_v2,
+)
+from llm_long_term_memory.answer_compute import SCHEMAS as COMPUTE_SCHEMAS
+from llm_long_term_memory.answer_compute import apply as apply_compute
 from llm_long_term_memory.answering import (
     COUNT_LATEST_PROMPT_VERSION,
     COUNT_LATEST_SYSTEM,
@@ -36,23 +44,13 @@ from llm_long_term_memory.answering import (
 from llm_long_term_memory.conversation import AnswerRequest
 from llm_long_term_memory.embed import Encoder
 from llm_long_term_memory.evaluation.datasets.longmemeval import Instance
-from llm_long_term_memory.llm.client import GeminiClient
-from llm_long_term_memory.retrieve import (
-    EvidenceHydrator,
-    HybridRetriever,
-    HydrationResult,
-    RetrievedMemory,
-    SessionBudget,
-    build_coherent_context,
-    render_evidence,
-)
-from llm_long_term_memory.runtime.grounded_answering import (
+from llm_long_term_memory.evaluation.grounded.answering import (
     PROMPT_VERSION as GROUNDED_PROMPT_VERSION,
 )
-from llm_long_term_memory.runtime.grounded_answering import (
+from llm_long_term_memory.evaluation.grounded.answering import (
     SYSTEM as GROUNDED_SYSTEM,
 )
-from llm_long_term_memory.runtime.grounded_answering import (
+from llm_long_term_memory.evaluation.grounded.answering import (
     GroundedAnswerer,
     GroundedAnswererV2,
     GroundedAnswererV3,
@@ -74,6 +72,23 @@ from llm_long_term_memory.runtime.grounded_answering import (
     GroundedVerdict,
     GroundedVerdictV6,
     GroundedVerdictV7,
+)
+from llm_long_term_memory.llm.client import GeminiClient
+from llm_long_term_memory.retrieve import (
+    EvidenceHydrator,
+    HybridRetriever,
+    HydrationResult,
+    RetrievedMemory,
+    SessionBudget,
+    build_coherent_context,
+    render_evidence,
+)
+from llm_long_term_memory.runtime.context import (
+    ANSWER_TEMPLATE,
+    FALLBACK_TEMPLATE,
+    TEMPORAL_NOTE,
+    label_memories,
+    render_grouped,
 )
 from llm_long_term_memory.store import (
     Memory,
@@ -110,22 +125,6 @@ from .v2d import (
     compute as compute_v2d,
 )
 
-_TEMPLATE = """\
-Here is what is known about the user, drawn from their chat history.
-
-{context}
-
-Today's date is {date}.
-
-Question: {question}
-"""
-
-TEMPORAL_NOTE = (
-    "Each fact is shown with the period it was true for. `(since <date>)` means it "
-    "is still true now; `(<date> to <date>)` means it was replaced and is no longer "
-    "current. Answer with what is true now unless the question asks about the past."
-)
-
 
 def _as_of(question_date: str) -> datetime | None:
     """The question's date, or None when it cannot be read.
@@ -149,171 +148,6 @@ def _session_coverage(evidence: set[str], values) -> float | None:
         return None
     present = evidence & _external_session_ids(values)
     return len(present) / len(evidence)
-
-
-# Scope -> heading, in the order they are shown. Ordering is semantic rather than
-# alphabetical: what the user wants and is planning comes before what happened and
-# what was previously suggested.
-#
-# Grouping exists because an undifferentiated bullet list makes every memory look
-# like a candidate answer. A model told "User preferences: dislikes raw fish" knows
-# to constrain a restaurant recommendation; the same line in a flat list reads as a
-# fact it should either quote or ignore.
-_SCOPE_HEADINGS: tuple[tuple[str, str], ...] = (
-    ("profile", "About the user"),
-    ("preference", "User preferences"),
-    ("plan", "Current plans"),
-    ("event", "Past events"),
-    ("recommendation", "Previously recommended by the assistant"),
-    ("commitment", "The assistant agreed to"),
-    ("shared_context", "Other people and things discussed"),
-)
-# Pre-P10 memories carry no scope. They are not dropped or guessed at — an
-# unlabelled group is honest about what is known.
-_UNSCOPED_HEADING = "Other things known about the user"
-
-
-def label_memories(memories: list[Memory]) -> dict[str, str]:
-    """Stable citation handles in rank order: M1, M2, ... one per memory in context.
-
-    Positional rather than derived from `memory.id`: the model has to copy these, and a
-    sixteen-character hex id is a transcription error waiting to happen, while the
-    position is also the reading order the prompt asks it to work through.
-    """
-    return {memory.id: f"M{i}" for i, memory in enumerate(memories, start=1)}
-
-
-def render_grouped(
-    memories: list[Memory],
-    temporal: bool,
-    timelines_enabled: bool = True,
-    labels: dict[str, str] | None = None,
-    mark_unstated: bool = False,
-) -> str:
-    """Group memories by scope under headings, preserving rank order within a group.
-
-    Falls back to a plain list when nothing carries a scope, so a store built before
-    P10 renders exactly as it did before.
-    """
-    # Chains first, so a superseded value is never also listed flat under a scope
-    # heading — seeing it twice, once marked "no longer current" and once not, is
-    # worse than either rendering alone.
-    timelines, memories = render_timelines(memories, temporal and timelines_enabled, labels)
-    tag = (lambda m: labels.get(m.id, "")) if labels else (lambda m: "")
-    prefix = [timelines] if timelines else []
-
-    if not any(memory.scope for memory in memories):
-        flat = "\n".join(
-            render_memory(memory, temporal, tag(memory), mark_unstated) for memory in memories
-        )
-        return "\n\n".join([*prefix, flat]) if flat else "\n\n".join(prefix)
-
-    by_scope: dict[str, list[Memory]] = {}
-    for memory in memories:
-        by_scope.setdefault(memory.scope or "", []).append(memory)
-
-    blocks: list[str] = []
-    for scope, heading in _SCOPE_HEADINGS:
-        group = by_scope.pop(scope, None)
-        if group:
-            lines = "\n".join(render_memory(m, temporal, tag(m), mark_unstated) for m in group)
-            blocks.append(f"{heading}:\n{lines}")
-    # Anything left: unscoped memories, plus any scope the model invented that the
-    # validator let through.
-    leftovers = [m for group in by_scope.values() for m in group]
-    if leftovers:
-        lines = "\n".join(render_memory(m, temporal, tag(m), mark_unstated) for m in leftovers)
-        blocks.append(f"{_UNSCOPED_HEADING}:\n{lines}")
-    return "\n\n".join([*prefix, *blocks])
-
-
-def render_timelines(
-    memories: list[Memory], temporal: bool, labels: dict[str, str] | None = None
-) -> tuple[str, list[Memory]]:
-    """Render supersession chains as chains, and return what was not part of one.
-
-    The store has already decided which value of a key is current: it closed the old
-    one's validity window and set its status. Flat rendering throws that away and asks
-    the model to rediscover it from two adjacent bullet points that differ only in a
-    parenthesised date — and on `train150` it does not: a question about where a guitar
-    was serviced was answered "you *plan* to send it", with both the plan and the
-    completion in context.
-
-    So a key with more than one value is rendered as one block, in event order, with
-    the current value marked. No new memory is fetched and no new field is computed;
-    this is the same data the flat renderer already had.
-
-    Only for `temporal=True`. Without dates there is no order to show, and grouping
-    undated values would assert a sequence the store never established.
-    """
-    if not temporal:
-        return "", list(memories)
-
-    chains: dict[tuple[str, str], list[Memory]] = {}
-    for memory in memories:
-        if memory.subject and memory.predicate:
-            chains.setdefault((memory.subject, memory.predicate), []).append(memory)
-
-    blocks: list[str] = []
-    claimed: set[str] = set()
-    for (subject, predicate), group in chains.items():
-        # One value is not a timeline. Rendering it as one would add a heading and a
-        # "current" label to a fact nothing ever contradicted.
-        if len(group) < 2:
-            continue
-        ordered = sorted(
-            group,
-            key=lambda m: (m.valid_from or m.occurred_at or datetime.max, m.id),
-        )
-        lines = []
-        for memory in ordered:
-            when = memory.valid_from or memory.occurred_at
-            stamp = f"{when:%Y-%m-%d}" if when else "date unknown"
-            mark = "[CURRENT]" if memory.status == "active" and not memory.valid_to else "[was]"
-            # Chain members are labelled too. A count question can have a member that is
-            # also part of a supersession chain, and an unlabelled one would be a member
-            # the answerer has no way to cite.
-            tag = f"[{labels[memory.id]}] " if labels and memory.id in labels else ""
-            lines.append(f"    {stamp}  {tag}{memory.content} {mark}")
-            claimed.add(memory.id)
-        label = f"{subject} {predicate}".replace("_", " ").strip()
-        blocks.append(f"{label} — how this changed over time:\n" + "\n".join(lines))
-
-    remaining = [memory for memory in memories if memory.id not in claimed]
-    return "\n\n".join(blocks), remaining
-
-
-def render_memory(
-    memory: Memory, temporal: bool, label: str = "", mark_unstated: bool = False
-) -> str:
-    """One memory as a context line.
-
-    `mark_unstated` is the v2e difference and nothing else changes with it. `valid_from`
-    is the date a fact was *stated*, so an undated fact has always rendered as
-    "(since <the day it was mentioned>)" — which reads as the day it became true. On
-    every one of the thirty temporal questions in reasoning-48 some selected evidence
-    is undated, so a reader asked "how many days between X and Y" is routinely given a
-    mention date wearing an event date's clothes. Saying "mentioned" instead is the
-    whole mechanism.
-
-    Off by default, because turning it on changes the context of every recorded arm.
-    """
-    # The label is a citation handle, not content. It goes first so that a model working
-    # through the context in order reads it before the sentence it belongs to.
-    tag = f"[{label}] " if label else ""
-    if not temporal:
-        return f"- {tag}{memory.content}"
-
-    start = memory.valid_from or memory.occurred_at
-    if start and memory.valid_to:
-        window = f"({start:%Y-%m-%d} to {memory.valid_to:%Y-%m-%d}, no longer current)"
-    elif start and mark_unstated and not memory.event_time_is_stated:
-        window = f"(mentioned {start:%Y-%m-%d}; the fact states no date)"
-    elif start:
-        window = f"(since {start:%Y-%m-%d})"
-    else:
-        window = "(date unknown)"
-    return f"- {tag}{memory.content} {window}"
 
 
 class MemoryRunner:
@@ -389,6 +223,8 @@ class MemoryRunner:
             "v2_notes",
             "v2_cl",
             "v2_clt",
+            "v2_clt_compute",
+            "v2_clt_compute2",
             "grounded_v1",
             "grounded_v2",
             "grounded_v3",
@@ -415,6 +251,9 @@ class MemoryRunner:
         }:
             raise ValueError(f"unknown answer policy {answer_policy!r}")
         self.answer_policy = answer_policy
+        # Stage C: under v2_clt_compute, whether code may replace the model's answer
+        # with the computed one, or only records the computation.
+        self.compute_override = answer_policy != "v2_clt_compute2"
         # Attempt 1 bundled three answerer changes and moved in two directions.
         # `current_state` is the one operation deterministic arithmetic never touches —
         # `compute` returns computed=False for it — so its -6.1 points on clean rows can
@@ -432,6 +271,8 @@ class MemoryRunner:
             "v2_notes": (NOTED_ANSWER_SYSTEM, NOTED_ANSWER_PROMPT_VERSION, NotedAnswerVerdict),
             "v2_cl": (COUNT_LATEST_SYSTEM, COUNT_LATEST_PROMPT_VERSION, AnswerVerdict),
             "v2_clt": (COUNT_LATEST_SYSTEM, COUNT_TIME_PROMPT_VERSION, AnswerVerdict),
+            "v2_clt_compute": (COUNT_LATEST_SYSTEM, COMPUTE_PROMPT_VERSION, AnswerVerdict),
+            "v2_clt_compute2": (COUNT_LATEST_SYSTEM, COMPUTE_PROMPT_VERSION, AnswerVerdict),
             "grounded_v1": (GROUNDED_SYSTEM, GROUNDED_PROMPT_VERSION, GroundedVerdict),
             "grounded_v2": (
                 GroundedAnswererV2.system,
@@ -805,12 +646,19 @@ class MemoryRunner:
         self._computation: dict | None = None
         self._answer_was_raw_structure = False
         self._scan_route = None
-        if self.answer_policy in {"v2_cl", "v2_clt"}:
+        self._compute_mode = None
+        self._asked_on = _as_of(request.asked_on)
+        self._question = request.question
+        if self.answer_policy in {"v2_cl", "v2_clt", "v2_clt_compute", "v2_clt_compute2"}:
             # Per question: a count or total (and under v2_clt a question about dates,
             # durations or order) is answered from notes, with room for them; every
             # other question keeps v2's verdict and output limit.
             counting = asks_for_aggregate(request.question)
-            timing = self.answer_policy == "v2_clt" and asks_about_time(request.question)
+            timing = self.answer_policy in {
+                "v2_clt",
+                "v2_clt_compute",
+                "v2_clt_compute2",
+            } and asks_about_time(request.question)
             noted = counting or timing
             self._answer_mode = (
                 "_".join(m for m, on in (("count", counting), ("time", timing)) if on) + "_notes"
@@ -819,7 +667,7 @@ class MemoryRunner:
             )
             self.answer_system = (
                 count_time_system(counting, timing)
-                if self.answer_policy == "v2_clt"
+                if self.answer_policy in {"v2_clt", "v2_clt_compute", "v2_clt_compute2"}
                 else COUNT_NOTES_SYSTEM
                 if counting
                 else COUNT_LATEST_SYSTEM
@@ -828,6 +676,24 @@ class MemoryRunner:
             self.max_output_tokens = (
                 max(1024, self._base_max_output_tokens) if noted else self._base_max_output_tokens
             )
+            if self.answer_policy in {"v2_clt_compute", "v2_clt_compute2"}:
+                # Stage C. Only the three narrow shapes `compute_mode` names change; for
+                # every other question this block leaves the t4 request as it was
+                # (tests/test_answer_compute.py holds that byte for byte).
+                self._compute_mode = (
+                    count_mode_v2(request.question)
+                    if self.answer_policy == "v2_clt_compute2"
+                    else compute_mode(request.question)
+                )
+                if self._compute_mode:
+                    self.answer_system = (
+                        f"{self.answer_system}\n\n{COMPUTE_RULES[self._compute_mode]}"
+                    )
+                    self.verdict_schema = COMPUTE_SCHEMAS[self._compute_mode]
+                    # Structured records are longer than free-text notes; a truncated
+                    # JSON reply would become "I do not know".
+                    self.max_output_tokens = max(2048, self._base_max_output_tokens)
+                    self._answer_mode = f"compute_{self._compute_mode}"
         now = datetime.now()
         if self.decay_enabled:
             from llm_long_term_memory.lifecycle import apply_decay
@@ -1276,20 +1142,6 @@ class MemoryRunner:
                 )
         return context, hydration
 
-    _FALLBACK_TEMPLATE = """\
-Your earlier attempt could not answer this from structured memory alone:
-{reason}
-
-Here are the original conversation turns those memories were extracted from. They
-are verbatim, so the exact wording, links and figures are present.
-
-{evidence}
-
-Today's date is {date}.
-
-Question: {question}
-"""
-
     def _readable_fallback_answer(self, text: str) -> str:
         """Apply the existing object/fence guard at every fallback return boundary.
 
@@ -1371,7 +1223,7 @@ Question: {question}
             # final answerer never saw the very repair that triggered the second pass.
             # Keep the complete first-pass evidence plan and add, rather than replace
             # it with, fallback evidence.
-            prompt = _TEMPLATE.format(
+            prompt = ANSWER_TEMPLATE.format(
                 context=(
                     f"{context}\n\nThe first pass requested more source because: "
                     f"{verdict.reason or 'the requested detail was missing'}\n\n"
@@ -1384,7 +1236,7 @@ Question: {question}
                 question=request.question,
             )
         else:
-            prompt = self._FALLBACK_TEMPLATE.format(
+            prompt = FALLBACK_TEMPLATE.format(
                 reason=verdict.reason or "the requested detail was missing",
                 evidence=rendered_evidence,
                 date=request.asked_on,
@@ -1404,7 +1256,7 @@ Question: {question}
                 else ANSWER_SYSTEM
                 if self.answer_policy in {"synthesis_v4", "synthesis_v4_enumerate"}
                 else COUNT_LATEST_SYSTEM
-                if self.answer_policy in {"v2_cl", "v2_clt"}
+                if self.answer_policy in {"v2_cl", "v2_clt", "v2_clt_compute", "v2_clt_compute2"}
                 else self.answer_system
             ),
             temperature=0.0,
@@ -1425,6 +1277,18 @@ Question: {question}
         earlier does not say which described event it belongs to — so its derivation is
         recorded and the wording is left alone.
         """
+        if self.answer_policy in {"v2_clt_compute", "v2_clt_compute2"}:
+            if not self._compute_mode:
+                return text
+            answer, self._computation = apply_compute(
+                self._compute_mode,
+                verdict,
+                text,
+                self._question,
+                self._asked_on,
+                override=self.compute_override,
+            )
+            return answer
         if self.answer_policy == "v2d":
             result = compute_v2d(verdict, self._context_labels)
             self._computation = result.detail
@@ -1444,7 +1308,7 @@ Question: {question}
         prompt = (
             render_reasoned_prompt(context, request.asked_on, request.question)
             if self.answer_policy == "reasoned_v3"
-            else _TEMPLATE.format(
+            else ANSWER_TEMPLATE.format(
                 context=context,
                 date=request.asked_on,
                 question=request.question,

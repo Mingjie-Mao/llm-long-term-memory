@@ -105,6 +105,11 @@ Set in the Render dashboard, never in the repository.
 | `LLTM_STORE_DIR` | `/data/stores` | already in the blueprint, and must agree with the disk mount |
 | `LLTM_RESULTS_DIR` | `/data/results` | same |
 
+**Answer cost.** `/v1/answer` uses `service.answer_profile` from `configs/fallback.yaml`
+(default `t4`): retrieved memories plus about 4,000 tokens of the user's own turns, roughly
+6,100 context tokens per question. Set `answer_profile: v2` under `service:` for the
+memory-only path (about 600 tokens) when cost matters more than accuracy.
+
 A malformed `LLTM_API_TOKENS` is refused rather than downgraded to open access, and an
 unparseable `LLTM_REQUIRE_AUTH` is an error rather than False — `LLTM_REQUIRE_AUTH=ture`
 silently disabling the guard is the accident the guard exists to prevent.

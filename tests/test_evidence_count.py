@@ -13,7 +13,7 @@ import json
 
 import pytest
 
-from llm_long_term_memory.runtime.evidence_count import (
+from llm_long_term_memory.evaluation.grounded.evidence_count import (
     CountEvidence,
     Member,
     Source,

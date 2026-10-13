@@ -24,7 +24,7 @@ def parent_count(leaves):
 
 def estimate():
     from llm_long_term_memory import cli
-    from llm_long_term_memory.runtime.grounded_answering import personal_archive_review
+    from llm_long_term_memory.evaluation.grounded.answering import personal_archive_review
 
     result = {
         "provider_calls": 0,

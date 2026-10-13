@@ -9,9 +9,9 @@ lltm eval failure-audit :: --config|-c --out variant
 lltm eval failure-report :: worksheet
 lltm eval freeze :: --exclude --force --n --note --seed --variant name
 lltm eval label :: --config|-c --n variant
-lltm eval repeat :: --config|-c --fresh --limit --runs --store-name variant
+lltm eval repeat :: --cache --config|-c --fresh --limit --runs --store-name variant
 lltm eval report :: --out variants
-lltm eval run :: --config|-c --experiment-class --fresh --label --limit --questions --rerank --store-name --top-k variant
+lltm eval run :: --cache --config|-c --experiment-class --fresh --label --limit --questions --rerank --sample --store-name --top-k variant
 lltm eval variability :: variant
 lltm influence cost :: --leave-one-in --questions --top-k
 lltm influence fit :: --alpha --labels --out

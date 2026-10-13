@@ -23,13 +23,10 @@ from llm_long_term_memory.config import ExperimentConfig, Settings  # noqa: E402
 from llm_long_term_memory.embed import Encoder  # noqa: E402
 from llm_long_term_memory.evaluation.datasets import longmemeval as lme  # noqa: E402
 from llm_long_term_memory.evaluation.manifest import load_manifest  # noqa: E402
-from llm_long_term_memory.evaluation.runners.memory import (  # noqa: E402
-    TEMPORAL_NOTE,
-    MemoryRunner,
-    render_grouped,
-)
+from llm_long_term_memory.evaluation.runners.memory import MemoryRunner  # noqa: E402
 from llm_long_term_memory.evaluation.runners.reasoning import reasoning_kind  # noqa: E402
 from llm_long_term_memory.retrieve import EvidenceHydrator, render_evidence  # noqa: E402
+from llm_long_term_memory.runtime.context import TEMPORAL_NOTE, render_grouped  # noqa: E402
 from llm_long_term_memory.store import (  # noqa: E402
     NumpyFlatIndex,
     SQLiteMemoryStore,

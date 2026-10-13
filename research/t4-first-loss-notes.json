@@ -1,0 +1,182 @@
+{
+ "_about": "Hand-written first-loss labels for every question a t4 baseline run got wrong (dev100 + heldout100, 3 runs each). Drafted by the assistant on 2026-10-12 from the saved answers, judge reasons, replayed contexts and gold turns; to be confirmed by the maintainer. first_loss: answer | retrieval | grading | gold_scope. failure names the answer-side pattern. contributing records a memory-layer signal that pointed the reader the wrong way even though the raw turns were in context. ambiguous items are reported separately and never counted as improvements. Read by tools/t4_baseline_audit.py.",
+ "031748ae_abs": {
+  "first_loss": "answer",
+  "failure": "false_premise",
+  "note": "Question says 'Software Engineer Manager'; history says Senior Software Engineer. Answered 4 engineers instead of flagging the premise."
+ },
+ "09ba9854_abs": {
+  "first_loss": "answer",
+  "failure": "false_premise",
+  "note": "No user-stated bus fare; answered from assistant estimates ($10-20 vs $60)."
+ },
+ "gpt4_93159ced_abs": {
+  "first_loss": "answer",
+  "failure": "false_premise",
+  "note": "User works at NovaTech, not Google; one run answered 9 years without challenging the premise."
+ },
+ "gpt4_c27434e8_abs": {
+  "first_loss": "answer",
+  "failure": "false_premise",
+  "note": "No Porsche 991 model in history; one run still answered 'the Ferrari model'."
+ },
+ "88432d0a_abs": {
+  "first_loss": "grading",
+  "failure": "abstention_wording",
+  "ambiguous": true,
+  "note": "'You haven't baked any egg tarts' graded as a factual assertion rather than an abstention."
+ },
+ "6456829e_abs": {
+  "first_loss": "grading",
+  "failure": "abstention_wording",
+  "ambiguous": true,
+  "note": "Answers state 5 tomato plants (true) and that chili peppers were never mentioned; graded wrong for giving the tomato count."
+ },
+ "gpt4_fe651585_abs": {
+  "first_loss": "grading",
+  "failure": "abstention_wording",
+  "ambiguous": true,
+  "note": "One run said it does not know about Tom and added the true fact about Alex; graded wrong for the added fact."
+ },
+ "07741c45": {
+  "first_loss": "answer",
+  "failure": "latest_value",
+  "note": "Under the bed (05-25) vs shoe rack in the closet (05-29); two runs kept the older location."
+ },
+ "59524333": {
+  "first_loss": "answer",
+  "failure": "latest_value",
+  "contributing": "stale_memory",
+  "note": "7:00 pm (02-11) vs 6:00 pm (05-30), both turns in context. Memory holds only the 7 pm value (from an assistant recommendation) as current; the 6 pm statement was never extracted."
+ },
+ "945e3d21": {
+  "first_loss": "answer",
+  "failure": "latest_value",
+  "contributing": "stale_memory",
+  "note": "Twice a week (08) vs three times (11-30). Memory holds only 'twice a week' as active; the newer frequency was never extracted."
+ },
+ "c4ea545c": {
+  "first_loss": "answer",
+  "failure": "latest_value",
+  "contributing": "cross_key",
+  "note": "Tue/Thu/Sat (3 days) then 'four times a week': gold Yes. Memory keeps them under gym_schedule and exercise_frequency, a replacement with no predecessor on its own key."
+ },
+ "0977f2af": {
+  "first_loss": "answer",
+  "failure": "temporal_order",
+  "note": "Instant Pot called 'new' on 05-21; Air Fryer 'got yesterday' on 05-21. Declined in all runs; needs ordering from relative dates."
+ },
+ "gpt4_fe651585": {
+  "first_loss": "answer",
+  "failure": "temporal_order",
+  "note": "Alex adopted in January, Rachel's twins born Feb 12; one run reversed the order."
+ },
+ "gpt4_59149c78": {
+  "first_loss": "answer",
+  "failure": "temporal_window",
+  "note": "One run chose another museum visit near the window instead of the event dated two weeks before."
+ },
+ "gpt4_e414231f": {
+  "first_loss": "answer",
+  "failure": "temporal_window",
+  "note": "Mountain bike fixed on a Wednesday vs road bike serviced on the weekend; two runs picked the mountain bike."
+ },
+ "gpt4_f420262d": {
+  "first_loss": "answer",
+  "failure": "temporal_window",
+  "note": "On Feb 14 the user is 'still recovering from my American Airlines flight'; all runs declined or chose a booking instead."
+ },
+ "gpt4_468eb063": {
+  "first_loss": "answer",
+  "failure": "date_arithmetic",
+  "note": "One run answered 16 days (another Emma mention) instead of 9."
+ },
+ "gpt4_85da3956": {
+  "first_loss": "answer",
+  "failure": "date_arithmetic",
+  "note": "'3 weeks before July 15, which is 6 weeks ago': the offset applied twice in two runs."
+ },
+ "gpt4_93159ced": {
+  "first_loss": "answer",
+  "failure": "derivation",
+  "note": "9 years total minus 4y3m at NovaTech; one run garbled the subtraction ('4 years and 9 years')."
+ },
+ "9ee3ecd6": {
+  "first_loss": "answer",
+  "failure": "derivation",
+  "note": "Needs 300 total, has 200: gold 100 more. Runs 2-3 stop at the total. Run 1 says 'you need to earn 100 more points' and was graded wrong, a grading error on that row."
+ },
+ "e6041065": {
+  "first_loss": "answer",
+  "failure": "derivation",
+  "note": "Wore 2 shoes (one session) out of 5 packed (another session): 40%. Two runs did not join the operands across sessions."
+ },
+ "60159905": {
+  "first_loss": "answer",
+  "failure": "count_or_sum",
+  "note": "Three dinner parties; one run counted two."
+ },
+ "bf659f65": {
+  "first_loss": "answer",
+  "failure": "count_or_sum",
+  "note": "Missed the signed Tame Impala vinyl, a purchase implied in passing; all runs counted 2 of 3."
+ },
+ "gpt4_59c863d7": {
+  "first_loss": "answer",
+  "failure": "count_or_sum",
+  "note": "Lists all five kits, then states 4: counting the listed members wrong."
+ },
+ "gpt4_e05b82a6": {
+  "first_loss": "answer",
+  "failure": "count_or_sum",
+  "note": "Lists 3+1+3+3 and answers 8 in two runs."
+ },
+ "gpt4_9a159967": {
+  "first_loss": "answer",
+  "failure": "count_or_sum",
+  "note": "Most-flown airline: two runs reported a United/Southwest tie; flights were not counted per airline."
+ },
+ "0a995998": {
+  "first_loss": "gold_scope",
+  "failure": "count_or_sum",
+  "ambiguous": true,
+  "note": "Gold 3 counts the dry-cleaning pickup and the Zara boots twice (return and pick up). Answering 1 is defensible; scope is ambiguous."
+ },
+ "d851d5ba": {
+  "first_loss": "gold_scope",
+  "failure": "count_or_sum",
+  "ambiguous": true,
+  "note": "Gold $3,750 excludes a concert 'back in April' that raised over $5,000; the year is not stated (see the t4 postmortem)."
+ },
+ "8a137a7f": {
+  "first_loss": "grading",
+  "failure": "presupposition",
+  "ambiguous": true,
+  "note": "History only says 'the Philips LED bulb I have in my bedside lamp'; no replacement is stated. Answers name the Philips LED bulb but deny the presupposed replacement and were graded wrong."
+ },
+ "5d3d2817": {
+  "first_loss": "answer",
+  "failure": "missed_detail",
+  "note": "'my previous role as a marketing specialist at a small startup' was in context; runs answered LPC Associate or said the title was not mentioned."
+ },
+ "54026fce": {
+  "first_loss": "answer",
+  "failure": "preference_use",
+  "note": "One run gave generic remote-work suggestions without the user's own experience."
+ },
+ "ba358f49": {
+  "first_loss": "retrieval",
+  "failure": "profile_fact",
+  "note": "'I'm 32' is in another session and never reached the excerpts; all runs declined. Profile facts score low against the question."
+ },
+ "75499fd8": {
+  "first_loss": "retrieval",
+  "failure": "detail_in_passing",
+  "note": "'a Golden Retriever like Max' in a collar question was not packed; all runs declined."
+ },
+ "gpt4_2f56ae70": {
+  "first_loss": "answer",
+  "failure": "temporal_order",
+  "note": "The Disney+ raw turn was not packed in any run, but the memory 'watched on Disney+ during a free trial in April' was in the memory context (rank 8 of 20) in all three. Two runs still chose Apple TV+ ('a few months')."
+ }
+}

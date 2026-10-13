@@ -157,3 +157,31 @@ def test_resume_does_not_duplicate_grades_and_rejects_tampered_reader_before_cal
     with pytest.raises(ValueError, match="exact original"):
         grade_pending(judge, {"q": instance}, {"q": reader}, grades, sink)
     assert len(judge.calls) == 1
+
+
+def test_dns_and_transport_failures_are_transient(tmp_path):
+    import httpx
+
+    judge = Judge([httpx.ConnectError("nodename nor servname provided"), True])
+    wrapped, sleeps = build(tmp_path, judge)
+    assert wrapped.grade(question="q").correct
+    assert len(judge.calls) == 2 and sum(sleeps) == 15
+
+
+def test_cooldown_never_sleeps_a_negative_interval(tmp_path):
+    # A clock that jumps past the deadline between the loop check and the subtraction
+    # used to hand sleep() a negative number.
+    ticks = iter([100.0, 100.0, 114.9, 115.1, 115.1, 115.1, 115.1])
+    sleeps = []
+    judge = Judge([ProviderError(503), True])
+    wrapped = RecoveringJudge(
+        judge,
+        UsageTracker(),
+        tmp_path / "usage.json",
+        tmp_path / "recovery.json",
+        "identity",
+        clock=lambda: next(ticks, 200.0),
+        sleep=sleeps.append,
+    )
+    assert wrapped.grade(question="q").correct
+    assert all(s > 0 for s in sleeps)

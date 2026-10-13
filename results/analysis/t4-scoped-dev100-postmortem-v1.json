@@ -1,0 +1,5687 @@
+{
+  "provider_calls": 0,
+  "experiment_class": "exposed-dev100-postmortem-no-new-grading",
+  "source_experiment": "t4-scoped-regression-dev100-v3",
+  "source_gate_reproduces": true,
+  "questions": 100,
+  "reader_rows": 600,
+  "grade_rows": 600,
+  "git_sha": "1339587ba98adee93ed4012d481a904a3da5207e",
+  "python": "3.12.13",
+  "source_models": {
+    "answerer": "gemini-3.5-flash-lite",
+    "judge": "gemma-4-31b-it",
+    "extractor_not_called": "gemini-3.1-flash-lite",
+    "embedder": "sentence-transformers/all-MiniLM-L6-v2"
+  },
+  "source_prompt_versions": {
+    "control": "memory-aware-v2-clt",
+    "candidate": "memory-t4-scoped-selection-v3"
+  },
+  "rows": [
+    {
+      "question_id": "06f04340",
+      "question_type": "single-session-preference",
+      "correct_out_of_three": {
+        "control": 3,
+        "candidate": 3
+      },
+      "mean_delta": 0.0,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "02cbf2ea90cd32edfc0959ea5b920594c78d9c40882ac991195443a0b9df42c8",
+          "02cbf2ea90cd32edfc0959ea5b920594c78d9c40882ac991195443a0b9df42c8",
+          "02cbf2ea90cd32edfc0959ea5b920594c78d9c40882ac991195443a0b9df42c8"
+        ],
+        "candidate": [
+          "ea4149c6239321f8c7f676b8e21e35505a2ae9c3933d3913f5460ebba167db49",
+          "ea4149c6239321f8c7f676b8e21e35505a2ae9c3933d3913f5460ebba167db49",
+          "ea4149c6239321f8c7f676b8e21e35505a2ae9c3933d3913f5460ebba167db49"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          1,
+          1,
+          1
+        ],
+        "candidate": [
+          1,
+          1,
+          1
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "07741c44",
+      "question_type": "knowledge-update",
+      "correct_out_of_three": {
+        "control": 3,
+        "candidate": 3
+      },
+      "mean_delta": 0.0,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "ca1d4033c62105e63c0086f541720f81eea31a342b1bbcef592d81238e849069",
+          "ca1d4033c62105e63c0086f541720f81eea31a342b1bbcef592d81238e849069",
+          "ca1d4033c62105e63c0086f541720f81eea31a342b1bbcef592d81238e849069"
+        ],
+        "candidate": [
+          "0a7a4977e4ebc7eb7d0ac7dde772bbf840c978e90518dbbbfc4d5a13afd423ae",
+          "0a7a4977e4ebc7eb7d0ac7dde772bbf840c978e90518dbbbfc4d5a13afd423ae",
+          "0a7a4977e4ebc7eb7d0ac7dde772bbf840c978e90518dbbbfc4d5a13afd423ae"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          1,
+          1,
+          1
+        ],
+        "candidate": [
+          1,
+          1,
+          1
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "078150f1",
+      "question_type": "multi-session",
+      "correct_out_of_three": {
+        "control": 3,
+        "candidate": 3
+      },
+      "mean_delta": 0.0,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "e4784f7315b6d7f6ae03eb834b6ec849f13d29d6ec795aff8daf49b92be5f368",
+          "e4784f7315b6d7f6ae03eb834b6ec849f13d29d6ec795aff8daf49b92be5f368",
+          "e4784f7315b6d7f6ae03eb834b6ec849f13d29d6ec795aff8daf49b92be5f368"
+        ],
+        "candidate": [
+          "f4ddbcd0f90c18f09196b0a860dd9a17a9ae111e23b395bc6f548f15ac932f8e",
+          "f4ddbcd0f90c18f09196b0a860dd9a17a9ae111e23b395bc6f548f15ac932f8e",
+          "f4ddbcd0f90c18f09196b0a860dd9a17a9ae111e23b395bc6f548f15ac932f8e"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          1,
+          1,
+          1
+        ],
+        "candidate": [
+          1,
+          1,
+          1
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "07b6f563",
+      "question_type": "single-session-preference",
+      "correct_out_of_three": {
+        "control": 3,
+        "candidate": 3
+      },
+      "mean_delta": 0.0,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "2570a7b58ccc6692d120c751592b0a6dc91e8055d3fe17c7c13a5fe435279d28",
+          "2570a7b58ccc6692d120c751592b0a6dc91e8055d3fe17c7c13a5fe435279d28",
+          "2570a7b58ccc6692d120c751592b0a6dc91e8055d3fe17c7c13a5fe435279d28"
+        ],
+        "candidate": [
+          "fcc734278d9ee75aa295e5efb3f7046b731d19be080ce5b4bfb803eb35f5b2be",
+          "fcc734278d9ee75aa295e5efb3f7046b731d19be080ce5b4bfb803eb35f5b2be",
+          "fcc734278d9ee75aa295e5efb3f7046b731d19be080ce5b4bfb803eb35f5b2be"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          1,
+          1,
+          1
+        ],
+        "candidate": [
+          1,
+          1,
+          1
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "08f4fc43",
+      "question_type": "temporal-reasoning",
+      "correct_out_of_three": {
+        "control": 3,
+        "candidate": 3
+      },
+      "mean_delta": 0.0,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "295163548e37597dcd2197890172e8e4132d0947191699ec316d8761da7f4fc6",
+          "295163548e37597dcd2197890172e8e4132d0947191699ec316d8761da7f4fc6",
+          "295163548e37597dcd2197890172e8e4132d0947191699ec316d8761da7f4fc6"
+        ],
+        "candidate": [
+          "8f7ca3eec0af021bc3ac4878d0271661427d5867e461bf4b9ddabe5d6da9baf1",
+          "8f7ca3eec0af021bc3ac4878d0271661427d5867e461bf4b9ddabe5d6da9baf1",
+          "8f7ca3eec0af021bc3ac4878d0271661427d5867e461bf4b9ddabe5d6da9baf1"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          1,
+          1,
+          1
+        ],
+        "candidate": [
+          1,
+          1,
+          1
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "09ba9854_abs",
+      "question_type": "multi-session",
+      "correct_out_of_three": {
+        "control": 0,
+        "candidate": 0
+      },
+      "mean_delta": 0.0,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "c4bd313d59cf25df56c1d7d080e65972d8f44a827d530463d55d2473e04e923f",
+          "c4bd313d59cf25df56c1d7d080e65972d8f44a827d530463d55d2473e04e923f",
+          "c4bd313d59cf25df56c1d7d080e65972d8f44a827d530463d55d2473e04e923f"
+        ],
+        "candidate": [
+          "5ec45f93591d62afc6477d5f6b16a08ea00c1ab185668f43927ab0a964643cc8",
+          "5ec45f93591d62afc6477d5f6b16a08ea00c1ab185668f43927ab0a964643cc8",
+          "5ec45f93591d62afc6477d5f6b16a08ea00c1ab185668f43927ab0a964643cc8"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          1,
+          1,
+          1
+        ],
+        "candidate": [
+          1,
+          1,
+          1
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "0bc8ad93",
+      "question_type": "temporal-reasoning",
+      "correct_out_of_three": {
+        "control": 3,
+        "candidate": 2
+      },
+      "mean_delta": -0.3333333333333333,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "b8fbdc352f120df99fa4d0b020c280e415e31e4b1ff7c32cb90c18ef6bc25082",
+          "b8fbdc352f120df99fa4d0b020c280e415e31e4b1ff7c32cb90c18ef6bc25082",
+          "b8fbdc352f120df99fa4d0b020c280e415e31e4b1ff7c32cb90c18ef6bc25082"
+        ],
+        "candidate": [
+          "732bea7d568d5e872890b4b0aae463c5e8e2a4209cf27286471f409aabac30e7",
+          "732bea7d568d5e872890b4b0aae463c5e8e2a4209cf27286471f409aabac30e7",
+          "732bea7d568d5e872890b4b0aae463c5e8e2a4209cf27286471f409aabac30e7"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          1,
+          1,
+          1
+        ],
+        "candidate": [
+          1,
+          1,
+          1
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "118b2229",
+      "question_type": "single-session-user",
+      "correct_out_of_three": {
+        "control": 3,
+        "candidate": 3
+      },
+      "mean_delta": 0.0,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "9d9fef18c1cd9085fb49e101f4b4a83e811f1be6f307ee5eaa10d2435e04c9cd",
+          "9d9fef18c1cd9085fb49e101f4b4a83e811f1be6f307ee5eaa10d2435e04c9cd",
+          "9d9fef18c1cd9085fb49e101f4b4a83e811f1be6f307ee5eaa10d2435e04c9cd"
+        ],
+        "candidate": [
+          "6c184cd62e9678de31e332917deb78cf553576446c2a2fbaa4df8fcca6c3f936",
+          "6c184cd62e9678de31e332917deb78cf553576446c2a2fbaa4df8fcca6c3f936",
+          "6c184cd62e9678de31e332917deb78cf553576446c2a2fbaa4df8fcca6c3f936"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          1,
+          1,
+          1
+        ],
+        "candidate": [
+          1,
+          1,
+          1
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "184da446",
+      "question_type": "knowledge-update",
+      "correct_out_of_three": {
+        "control": 3,
+        "candidate": 3
+      },
+      "mean_delta": 0.0,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "2e7bc98ac903905241a2b5c3b510d2ed1d5098f170f9a4f3b19790bb9ae78679",
+          "2e7bc98ac903905241a2b5c3b510d2ed1d5098f170f9a4f3b19790bb9ae78679",
+          "2e7bc98ac903905241a2b5c3b510d2ed1d5098f170f9a4f3b19790bb9ae78679"
+        ],
+        "candidate": [
+          "1771c1a38e4dd1bc139791bed0a79b35b2748fffbe99a136ee2ccd063f8281a5",
+          "1771c1a38e4dd1bc139791bed0a79b35b2748fffbe99a136ee2ccd063f8281a5",
+          "1771c1a38e4dd1bc139791bed0a79b35b2748fffbe99a136ee2ccd063f8281a5"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          1,
+          1,
+          1
+        ],
+        "candidate": [
+          1,
+          1,
+          1
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "1d4da289",
+      "question_type": "single-session-assistant",
+      "correct_out_of_three": {
+        "control": 3,
+        "candidate": 3
+      },
+      "mean_delta": 0.0,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "3efae7645b68b4c467e55bb1b6e2113cb29e101d9d2937edd0f0a03933439db2",
+          "3efae7645b68b4c467e55bb1b6e2113cb29e101d9d2937edd0f0a03933439db2",
+          "3efae7645b68b4c467e55bb1b6e2113cb29e101d9d2937edd0f0a03933439db2"
+        ],
+        "candidate": [
+          "a63d759d01192ef3e12fdb2dfb21770ef1d15367062b7d484bf32c755ca9057d",
+          "a63d759d01192ef3e12fdb2dfb21770ef1d15367062b7d484bf32c755ca9057d",
+          "a63d759d01192ef3e12fdb2dfb21770ef1d15367062b7d484bf32c755ca9057d"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          1,
+          1,
+          1
+        ],
+        "candidate": [
+          1,
+          1,
+          1
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "21436231",
+      "question_type": "single-session-user",
+      "correct_out_of_three": {
+        "control": 3,
+        "candidate": 3
+      },
+      "mean_delta": 0.0,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "98abe1aaf9b5cdf304c450f516e0c1a17ff3faafd65a8512a37eb8434a0cccdc",
+          "98abe1aaf9b5cdf304c450f516e0c1a17ff3faafd65a8512a37eb8434a0cccdc",
+          "98abe1aaf9b5cdf304c450f516e0c1a17ff3faafd65a8512a37eb8434a0cccdc"
+        ],
+        "candidate": [
+          "09951a2f11e1205291493472770be3284d0f2c7ebafad46ecbc2b7a8ba4784f5",
+          "09951a2f11e1205291493472770be3284d0f2c7ebafad46ecbc2b7a8ba4784f5",
+          "09951a2f11e1205291493472770be3284d0f2c7ebafad46ecbc2b7a8ba4784f5"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          1,
+          1,
+          1
+        ],
+        "candidate": [
+          1,
+          1,
+          1
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "2311e44b",
+      "question_type": "multi-session",
+      "correct_out_of_three": {
+        "control": 3,
+        "candidate": 3
+      },
+      "mean_delta": 0.0,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "8707973ede3f3433db1b4cd43bb64b72ab1fdd0f3175da53ebc93c74ab23f5e4",
+          "8707973ede3f3433db1b4cd43bb64b72ab1fdd0f3175da53ebc93c74ab23f5e4",
+          "8707973ede3f3433db1b4cd43bb64b72ab1fdd0f3175da53ebc93c74ab23f5e4"
+        ],
+        "candidate": [
+          "d37c72f8206db7e1a39d34d6f7da09956f07a609e24409560196562265544590",
+          "d37c72f8206db7e1a39d34d6f7da09956f07a609e24409560196562265544590",
+          "d37c72f8206db7e1a39d34d6f7da09956f07a609e24409560196562265544590"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          1,
+          1,
+          1
+        ],
+        "candidate": [
+          1,
+          1,
+          1
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "2698e78f",
+      "question_type": "knowledge-update",
+      "correct_out_of_three": {
+        "control": 3,
+        "candidate": 3
+      },
+      "mean_delta": 0.0,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "2debedab2798cd51e41add68fcb068879dbdb7d7c1174b92137f084623e911a1",
+          "2debedab2798cd51e41add68fcb068879dbdb7d7c1174b92137f084623e911a1",
+          "2debedab2798cd51e41add68fcb068879dbdb7d7c1174b92137f084623e911a1"
+        ],
+        "candidate": [
+          "35655469dc3da686df653723e7a584dda5faa00d25f18fc3f31f9951fb3874c5",
+          "35655469dc3da686df653723e7a584dda5faa00d25f18fc3f31f9951fb3874c5",
+          "35655469dc3da686df653723e7a584dda5faa00d25f18fc3f31f9951fb3874c5"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          1,
+          1,
+          1
+        ],
+        "candidate": [
+          1,
+          1,
+          1
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "26bdc477",
+      "question_type": "knowledge-update",
+      "correct_out_of_three": {
+        "control": 3,
+        "candidate": 3
+      },
+      "mean_delta": 0.0,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "c04c8bbb79596b7adff312255663fee098166e0debfbebee49131441602c0fd8",
+          "c04c8bbb79596b7adff312255663fee098166e0debfbebee49131441602c0fd8",
+          "c04c8bbb79596b7adff312255663fee098166e0debfbebee49131441602c0fd8"
+        ],
+        "candidate": [
+          "c255c71d539b96c147140e144e10b234b4bb1b1c4fadc2e918ee04ba1ae29a37",
+          "c255c71d539b96c147140e144e10b234b4bb1b1c4fadc2e918ee04ba1ae29a37",
+          "c255c71d539b96c147140e144e10b234b4bb1b1c4fadc2e918ee04ba1ae29a37"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          1,
+          1,
+          1
+        ],
+        "candidate": [
+          1,
+          1,
+          1
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "2788b940",
+      "question_type": "multi-session",
+      "correct_out_of_three": {
+        "control": 3,
+        "candidate": 3
+      },
+      "mean_delta": 0.0,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "a2ac2b41b765d4cebf0c9316b2c9a7950aaa1d7929c9678bf6beadfb14ead597",
+          "a2ac2b41b765d4cebf0c9316b2c9a7950aaa1d7929c9678bf6beadfb14ead597",
+          "a2ac2b41b765d4cebf0c9316b2c9a7950aaa1d7929c9678bf6beadfb14ead597"
+        ],
+        "candidate": [
+          "1ecfa994a02437313af6044a73b46184cb72a02e11b58c01ac635741b2592461",
+          "1ecfa994a02437313af6044a73b46184cb72a02e11b58c01ac635741b2592461",
+          "1ecfa994a02437313af6044a73b46184cb72a02e11b58c01ac635741b2592461"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          1,
+          1,
+          1
+        ],
+        "candidate": [
+          1,
+          1,
+          1
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "28bcfaac",
+      "question_type": "single-session-assistant",
+      "correct_out_of_three": {
+        "control": 3,
+        "candidate": 3
+      },
+      "mean_delta": 0.0,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "39a77945512d6c06f586a8d380b2018a97eb1417897f287889559dd5a0acd0c2",
+          "39a77945512d6c06f586a8d380b2018a97eb1417897f287889559dd5a0acd0c2",
+          "39a77945512d6c06f586a8d380b2018a97eb1417897f287889559dd5a0acd0c2"
+        ],
+        "candidate": [
+          "78bdfea1e0aa21b208136c8a73c9bd73f446463ce7bd984d3917adbb12ea9ad6",
+          "78bdfea1e0aa21b208136c8a73c9bd73f446463ce7bd984d3917adbb12ea9ad6",
+          "78bdfea1e0aa21b208136c8a73c9bd73f446463ce7bd984d3917adbb12ea9ad6"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          1,
+          1,
+          1
+        ],
+        "candidate": [
+          1,
+          1,
+          1
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "29f2956b_abs",
+      "question_type": "single-session-user",
+      "correct_out_of_three": {
+        "control": 3,
+        "candidate": 3
+      },
+      "mean_delta": 0.0,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "ab7b096daad954f4e66e5747ee634a235233f62b545fcbb5bcc83a68906a5d60",
+          "ab7b096daad954f4e66e5747ee634a235233f62b545fcbb5bcc83a68906a5d60",
+          "ab7b096daad954f4e66e5747ee634a235233f62b545fcbb5bcc83a68906a5d60"
+        ],
+        "candidate": [
+          "9c31897c7c48382cd9450a84928f9b492bf49ea865327c08ec79c94267402f23",
+          "9c31897c7c48382cd9450a84928f9b492bf49ea865327c08ec79c94267402f23",
+          "9c31897c7c48382cd9450a84928f9b492bf49ea865327c08ec79c94267402f23"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          1,
+          1,
+          1
+        ],
+        "candidate": [
+          1,
+          1,
+          1
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "32260d93",
+      "question_type": "single-session-preference",
+      "correct_out_of_three": {
+        "control": 3,
+        "candidate": 3
+      },
+      "mean_delta": 0.0,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "93e1f3759834a27fa2dd7ef22278b1a220b47cfb53c47b9647443411f762992b",
+          "93e1f3759834a27fa2dd7ef22278b1a220b47cfb53c47b9647443411f762992b",
+          "93e1f3759834a27fa2dd7ef22278b1a220b47cfb53c47b9647443411f762992b"
+        ],
+        "candidate": [
+          "cdcdd7cc76deefebe64d026d5fe0d22dfe9b449f9bb5829ea7225c245290c339",
+          "cdcdd7cc76deefebe64d026d5fe0d22dfe9b449f9bb5829ea7225c245290c339",
+          "cdcdd7cc76deefebe64d026d5fe0d22dfe9b449f9bb5829ea7225c245290c339"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          1,
+          1,
+          1
+        ],
+        "candidate": [
+          1,
+          1,
+          1
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "352ab8bd",
+      "question_type": "single-session-assistant",
+      "correct_out_of_three": {
+        "control": 3,
+        "candidate": 3
+      },
+      "mean_delta": 0.0,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "e13a9e709f4626dee4d4cfd21ffd58049e13fb8e2192e1638eaf5579713a180a",
+          "e13a9e709f4626dee4d4cfd21ffd58049e13fb8e2192e1638eaf5579713a180a",
+          "e13a9e709f4626dee4d4cfd21ffd58049e13fb8e2192e1638eaf5579713a180a"
+        ],
+        "candidate": [
+          "dc8fb5a9f642c7b3a4041fd917d5b9b9820bae480b754e83ea7f4bb367f1c617",
+          "dc8fb5a9f642c7b3a4041fd917d5b9b9820bae480b754e83ea7f4bb367f1c617",
+          "dc8fb5a9f642c7b3a4041fd917d5b9b9820bae480b754e83ea7f4bb367f1c617"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          1,
+          1,
+          1
+        ],
+        "candidate": [
+          1,
+          1,
+          1
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "3e321797",
+      "question_type": "single-session-assistant",
+      "correct_out_of_three": {
+        "control": 3,
+        "candidate": 3
+      },
+      "mean_delta": 0.0,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "4fd9590e0451160bc26099c064302a1798634a664d652c9fc53403f4ab152527",
+          "4fd9590e0451160bc26099c064302a1798634a664d652c9fc53403f4ab152527",
+          "4fd9590e0451160bc26099c064302a1798634a664d652c9fc53403f4ab152527"
+        ],
+        "candidate": [
+          "0b8f31912a14414e95b327b75656e420b1de6faf50b165fbe3ffa04bf4f54284",
+          "0b8f31912a14414e95b327b75656e420b1de6faf50b165fbe3ffa04bf4f54284",
+          "0b8f31912a14414e95b327b75656e420b1de6faf50b165fbe3ffa04bf4f54284"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          1,
+          1,
+          1
+        ],
+        "candidate": [
+          1,
+          1,
+          1
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "3fe836c9",
+      "question_type": "multi-session",
+      "correct_out_of_three": {
+        "control": 3,
+        "candidate": 3
+      },
+      "mean_delta": 0.0,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "669f86fda1dc67c210f78ed50a6ac9728cae66b562ff7666223dfbf3d76c0111",
+          "669f86fda1dc67c210f78ed50a6ac9728cae66b562ff7666223dfbf3d76c0111",
+          "669f86fda1dc67c210f78ed50a6ac9728cae66b562ff7666223dfbf3d76c0111"
+        ],
+        "candidate": [
+          "8739f62ef4df3441ddbc043fbe27dd8778bcf3b37b08a2e14c5bad02193b71ad",
+          "8739f62ef4df3441ddbc043fbe27dd8778bcf3b37b08a2e14c5bad02193b71ad",
+          "8739f62ef4df3441ddbc043fbe27dd8778bcf3b37b08a2e14c5bad02193b71ad"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          1,
+          1,
+          1
+        ],
+        "candidate": [
+          1,
+          1,
+          1
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "41698283",
+      "question_type": "knowledge-update",
+      "correct_out_of_three": {
+        "control": 3,
+        "candidate": 3
+      },
+      "mean_delta": 0.0,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "c61b144bfaa8ab7712c43b9c5541f27ffefd5e69a9b5452f7d3ad9ac4435d5d2",
+          "c61b144bfaa8ab7712c43b9c5541f27ffefd5e69a9b5452f7d3ad9ac4435d5d2",
+          "c61b144bfaa8ab7712c43b9c5541f27ffefd5e69a9b5452f7d3ad9ac4435d5d2"
+        ],
+        "candidate": [
+          "cc0fccf4a2bfdd612a6820fc06a925ffc3bcc556fd34071089ab3d914786b293",
+          "cc0fccf4a2bfdd612a6820fc06a925ffc3bcc556fd34071089ab3d914786b293",
+          "cc0fccf4a2bfdd612a6820fc06a925ffc3bcc556fd34071089ab3d914786b293"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          1,
+          1,
+          1
+        ],
+        "candidate": [
+          1,
+          1,
+          1
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "488d3006",
+      "question_type": "single-session-assistant",
+      "correct_out_of_three": {
+        "control": 3,
+        "candidate": 3
+      },
+      "mean_delta": 0.0,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "dcf95f2ec6b7cbf5100e1ededc3e0bd38f4af3f08f111a4240d675a117c7b5e4",
+          "dcf95f2ec6b7cbf5100e1ededc3e0bd38f4af3f08f111a4240d675a117c7b5e4",
+          "dcf95f2ec6b7cbf5100e1ededc3e0bd38f4af3f08f111a4240d675a117c7b5e4"
+        ],
+        "candidate": [
+          "4d4b7489eec6c2e7582963c7d11748c8360e3f5c2f0570618332869b6425ab94",
+          "4d4b7489eec6c2e7582963c7d11748c8360e3f5c2f0570618332869b6425ab94",
+          "4d4b7489eec6c2e7582963c7d11748c8360e3f5c2f0570618332869b6425ab94"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          1,
+          1,
+          1
+        ],
+        "candidate": [
+          1,
+          1,
+          1
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "4bc144e2",
+      "question_type": "multi-session",
+      "correct_out_of_three": {
+        "control": 3,
+        "candidate": 3
+      },
+      "mean_delta": 0.0,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "fcfe25e4861158611206c72bd11fca2c0a78d679fb787c94086f4057f1191dca",
+          "fcfe25e4861158611206c72bd11fca2c0a78d679fb787c94086f4057f1191dca",
+          "fcfe25e4861158611206c72bd11fca2c0a78d679fb787c94086f4057f1191dca"
+        ],
+        "candidate": [
+          "c7c99d9b431a1e2524fa31e2d4b26e8000611ffeb94b77cf0c11d5871ff7410a",
+          "c7c99d9b431a1e2524fa31e2d4b26e8000611ffeb94b77cf0c11d5871ff7410a",
+          "c7c99d9b431a1e2524fa31e2d4b26e8000611ffeb94b77cf0c11d5871ff7410a"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          1,
+          1,
+          1
+        ],
+        "candidate": [
+          1,
+          1,
+          1
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "4d6b87c8",
+      "question_type": "knowledge-update",
+      "correct_out_of_three": {
+        "control": 3,
+        "candidate": 3
+      },
+      "mean_delta": 0.0,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "b8abfb52b0e8ad7f5e9a35ace9d9d45730c975a93fd1e44c83ddafb70e01b442",
+          "b8abfb52b0e8ad7f5e9a35ace9d9d45730c975a93fd1e44c83ddafb70e01b442",
+          "b8abfb52b0e8ad7f5e9a35ace9d9d45730c975a93fd1e44c83ddafb70e01b442"
+        ],
+        "candidate": [
+          "5e570c7bca9c261285dcf7e73fdfc8c6d2d052326c4942778143253de81d2428",
+          "5e570c7bca9c261285dcf7e73fdfc8c6d2d052326c4942778143253de81d2428",
+          "5e570c7bca9c261285dcf7e73fdfc8c6d2d052326c4942778143253de81d2428"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          1,
+          1,
+          1
+        ],
+        "candidate": [
+          1,
+          1,
+          1
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "4dfccbf7",
+      "question_type": "temporal-reasoning",
+      "correct_out_of_three": {
+        "control": 3,
+        "candidate": 3
+      },
+      "mean_delta": 0.0,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "4fb57056e90ac4f03094b8e49ce4fead8f74137f3192f928da8da3a0fec28070",
+          "4fb57056e90ac4f03094b8e49ce4fead8f74137f3192f928da8da3a0fec28070",
+          "4fb57056e90ac4f03094b8e49ce4fead8f74137f3192f928da8da3a0fec28070"
+        ],
+        "candidate": [
+          "310d1030d31838f8e46218f75abc4a2ec33af1d79817fa824fb2f7055ed4e2d3",
+          "310d1030d31838f8e46218f75abc4a2ec33af1d79817fa824fb2f7055ed4e2d3",
+          "310d1030d31838f8e46218f75abc4a2ec33af1d79817fa824fb2f7055ed4e2d3"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          1,
+          1,
+          1
+        ],
+        "candidate": [
+          1,
+          1,
+          1
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "4dfccbf8",
+      "question_type": "temporal-reasoning",
+      "correct_out_of_three": {
+        "control": 3,
+        "candidate": 3
+      },
+      "mean_delta": 0.0,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "c0938f108ee34535d031dc47cf58faf1df2b3e2f4c473b97bf772e6c92589ff3",
+          "c0938f108ee34535d031dc47cf58faf1df2b3e2f4c473b97bf772e6c92589ff3",
+          "c0938f108ee34535d031dc47cf58faf1df2b3e2f4c473b97bf772e6c92589ff3"
+        ],
+        "candidate": [
+          "9757bc8c74752caec7c04191eadec3940e6b3add12355dd0fca2c502608f7255",
+          "9757bc8c74752caec7c04191eadec3940e6b3add12355dd0fca2c502608f7255",
+          "9757bc8c74752caec7c04191eadec3940e6b3add12355dd0fca2c502608f7255"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          1,
+          1,
+          1
+        ],
+        "candidate": [
+          1,
+          1,
+          1
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "4fd1909e",
+      "question_type": "single-session-user",
+      "correct_out_of_three": {
+        "control": 3,
+        "candidate": 3
+      },
+      "mean_delta": 0.0,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "20d4d5378466cd2fa9105742deb162749cfbb036b3b56c4158d93ed7b46aee2b",
+          "20d4d5378466cd2fa9105742deb162749cfbb036b3b56c4158d93ed7b46aee2b",
+          "20d4d5378466cd2fa9105742deb162749cfbb036b3b56c4158d93ed7b46aee2b"
+        ],
+        "candidate": [
+          "28fa7b23de5fac6bcb9afea37d5105485f4f7fb3818d3174b13dc13c17a90887",
+          "28fa7b23de5fac6bcb9afea37d5105485f4f7fb3818d3174b13dc13c17a90887",
+          "28fa7b23de5fac6bcb9afea37d5105485f4f7fb3818d3174b13dc13c17a90887"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          1,
+          1,
+          1
+        ],
+        "candidate": [
+          1,
+          1,
+          1
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "505af2f5",
+      "question_type": "single-session-preference",
+      "correct_out_of_three": {
+        "control": 3,
+        "candidate": 3
+      },
+      "mean_delta": 0.0,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "c8b1896f175fee12a84a31b16962f1b027285f6a5364ae6feb0ffef79bca16cb",
+          "c8b1896f175fee12a84a31b16962f1b027285f6a5364ae6feb0ffef79bca16cb",
+          "c8b1896f175fee12a84a31b16962f1b027285f6a5364ae6feb0ffef79bca16cb"
+        ],
+        "candidate": [
+          "8a754e556f7b50634a600f52de5e9315dcb6c03e63b9b3ee69f000d6e8608cea",
+          "8a754e556f7b50634a600f52de5e9315dcb6c03e63b9b3ee69f000d6e8608cea",
+          "8a754e556f7b50634a600f52de5e9315dcb6c03e63b9b3ee69f000d6e8608cea"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          1,
+          1,
+          1
+        ],
+        "candidate": [
+          1,
+          1,
+          1
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "545bd2b5",
+      "question_type": "single-session-user",
+      "correct_out_of_three": {
+        "control": 3,
+        "candidate": 3
+      },
+      "mean_delta": 0.0,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "22c27da64e3de9e42801f1702a82ba176a805e83b589d068bd959868f561ddd6",
+          "22c27da64e3de9e42801f1702a82ba176a805e83b589d068bd959868f561ddd6",
+          "22c27da64e3de9e42801f1702a82ba176a805e83b589d068bd959868f561ddd6"
+        ],
+        "candidate": [
+          "4f40335884e4d90d12610e569dbda0483621835f63bfe739f7b429b469d125be",
+          "4f40335884e4d90d12610e569dbda0483621835f63bfe739f7b429b469d125be",
+          "4f40335884e4d90d12610e569dbda0483621835f63bfe739f7b429b469d125be"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          1,
+          1,
+          1
+        ],
+        "candidate": [
+          1,
+          1,
+          1
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "577d4d32",
+      "question_type": "single-session-user",
+      "correct_out_of_three": {
+        "control": 3,
+        "candidate": 3
+      },
+      "mean_delta": 0.0,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "25efe0850f5a544465530e86b25b4aaff23dec405aff58eef60562c41f753aeb",
+          "25efe0850f5a544465530e86b25b4aaff23dec405aff58eef60562c41f753aeb",
+          "25efe0850f5a544465530e86b25b4aaff23dec405aff58eef60562c41f753aeb"
+        ],
+        "candidate": [
+          "a35f681672d681cd5eae58a9291c3e78675f21e2750af7530e38e329e8b16c7d",
+          "a35f681672d681cd5eae58a9291c3e78675f21e2750af7530e38e329e8b16c7d",
+          "a35f681672d681cd5eae58a9291c3e78675f21e2750af7530e38e329e8b16c7d"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          1,
+          1,
+          1
+        ],
+        "candidate": [
+          1,
+          1,
+          1
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "59524333",
+      "question_type": "knowledge-update",
+      "correct_out_of_three": {
+        "control": 0,
+        "candidate": 0
+      },
+      "mean_delta": 0.0,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "efffae5603f58d49336e9e0001e091e9e991c43a9fdacdf97a77d3591f6688ba",
+          "efffae5603f58d49336e9e0001e091e9e991c43a9fdacdf97a77d3591f6688ba",
+          "efffae5603f58d49336e9e0001e091e9e991c43a9fdacdf97a77d3591f6688ba"
+        ],
+        "candidate": [
+          "153ce14755a49961a2dc2aeaaf9c58928be240e815d9a797c68b0d2465440991",
+          "153ce14755a49961a2dc2aeaaf9c58928be240e815d9a797c68b0d2465440991",
+          "153ce14755a49961a2dc2aeaaf9c58928be240e815d9a797c68b0d2465440991"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          1,
+          1,
+          1
+        ],
+        "candidate": [
+          1,
+          1,
+          1
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "5a4f22c0",
+      "question_type": "knowledge-update",
+      "correct_out_of_three": {
+        "control": 3,
+        "candidate": 3
+      },
+      "mean_delta": 0.0,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "09a7cba9f8dd39b35ceb3c33d32dcdd3530c14ffbc26c0741234358ec8a012f1",
+          "09a7cba9f8dd39b35ceb3c33d32dcdd3530c14ffbc26c0741234358ec8a012f1",
+          "09a7cba9f8dd39b35ceb3c33d32dcdd3530c14ffbc26c0741234358ec8a012f1"
+        ],
+        "candidate": [
+          "3c2b97b3e535fb77596f9f05d6b919a7b47532af4c3e6d9d1192c281ef85aa42",
+          "3c2b97b3e535fb77596f9f05d6b919a7b47532af4c3e6d9d1192c281ef85aa42",
+          "3c2b97b3e535fb77596f9f05d6b919a7b47532af4c3e6d9d1192c281ef85aa42"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          1,
+          1,
+          1
+        ],
+        "candidate": [
+          1,
+          1,
+          1
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "5d3d2817",
+      "question_type": "single-session-user",
+      "correct_out_of_three": {
+        "control": 0,
+        "candidate": 1
+      },
+      "mean_delta": 0.3333333333333333,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "907b36edb510b4685ca776c1582841c5903da28a85e776d84fb571b91a6b9a67",
+          "907b36edb510b4685ca776c1582841c5903da28a85e776d84fb571b91a6b9a67",
+          "907b36edb510b4685ca776c1582841c5903da28a85e776d84fb571b91a6b9a67"
+        ],
+        "candidate": [
+          "a04e07bf7a51a6d67163b2a863235c48034d8e0f666a4ec55e012a348e081fbd",
+          "a04e07bf7a51a6d67163b2a863235c48034d8e0f666a4ec55e012a348e081fbd",
+          "a04e07bf7a51a6d67163b2a863235c48034d8e0f666a4ec55e012a348e081fbd"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          2,
+          2,
+          2
+        ],
+        "candidate": [
+          2,
+          2,
+          2
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "60472f9c",
+      "question_type": "multi-session",
+      "correct_out_of_three": {
+        "control": 3,
+        "candidate": 3
+      },
+      "mean_delta": 0.0,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "dc95013cc80429749b9e1fbadcb26b33653e4735fc27deadfa4f069981913955",
+          "dc95013cc80429749b9e1fbadcb26b33653e4735fc27deadfa4f069981913955",
+          "dc95013cc80429749b9e1fbadcb26b33653e4735fc27deadfa4f069981913955"
+        ],
+        "candidate": [
+          "0c255c478cbd08bb14bfcca3d2532f317f6fce044b03461f634858eb3e652ef2",
+          "0c255c478cbd08bb14bfcca3d2532f317f6fce044b03461f634858eb3e652ef2",
+          "0c255c478cbd08bb14bfcca3d2532f317f6fce044b03461f634858eb3e652ef2"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          1,
+          1,
+          1
+        ],
+        "candidate": [
+          1,
+          1,
+          1
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "6456829e_abs",
+      "question_type": "multi-session",
+      "correct_out_of_three": {
+        "control": 0,
+        "candidate": 0
+      },
+      "mean_delta": 0.0,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "deecbebfd8abcf6457efe0f42fd727cddd0352c395c878ca0016f29c116cf02e",
+          "deecbebfd8abcf6457efe0f42fd727cddd0352c395c878ca0016f29c116cf02e",
+          "deecbebfd8abcf6457efe0f42fd727cddd0352c395c878ca0016f29c116cf02e"
+        ],
+        "candidate": [
+          "da2f8c1e58e72f92cc3d86d9facc5b23803cfa1ad77c6cd0ba76ad0469247d64",
+          "da2f8c1e58e72f92cc3d86d9facc5b23803cfa1ad77c6cd0ba76ad0469247d64",
+          "da2f8c1e58e72f92cc3d86d9facc5b23803cfa1ad77c6cd0ba76ad0469247d64"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          1,
+          1,
+          1
+        ],
+        "candidate": [
+          1,
+          1,
+          1
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "681a1674",
+      "question_type": "multi-session",
+      "correct_out_of_three": {
+        "control": 3,
+        "candidate": 2
+      },
+      "mean_delta": -0.3333333333333333,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "1d22e6f41c32c4e95bafc151c0bc542b33a99a2853d5b2989cec3c51fcab7527",
+          "1d22e6f41c32c4e95bafc151c0bc542b33a99a2853d5b2989cec3c51fcab7527",
+          "1d22e6f41c32c4e95bafc151c0bc542b33a99a2853d5b2989cec3c51fcab7527"
+        ],
+        "candidate": [
+          "785f90ee09727b065530916906a5fbb421b012be5de59823a2be2aba6cf7ebb6",
+          "785f90ee09727b065530916906a5fbb421b012be5de59823a2be2aba6cf7ebb6",
+          "785f90ee09727b065530916906a5fbb421b012be5de59823a2be2aba6cf7ebb6"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          1,
+          1,
+          1
+        ],
+        "candidate": [
+          1,
+          1,
+          1
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "7024f17c",
+      "question_type": "multi-session",
+      "correct_out_of_three": {
+        "control": 3,
+        "candidate": 3
+      },
+      "mean_delta": 0.0,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "f3017c88a4905a4639e249567aec449e16ba00aee6cd85b8b38dd290bda155c6",
+          "f3017c88a4905a4639e249567aec449e16ba00aee6cd85b8b38dd290bda155c6",
+          "f3017c88a4905a4639e249567aec449e16ba00aee6cd85b8b38dd290bda155c6"
+        ],
+        "candidate": [
+          "54f03bb6a93c90c7091a0c58ceb4fc641ccb451ff9ab41af2e2f3b6429819377",
+          "54f03bb6a93c90c7091a0c58ceb4fc641ccb451ff9ab41af2e2f3b6429819377",
+          "54f03bb6a93c90c7091a0c58ceb4fc641ccb451ff9ab41af2e2f3b6429819377"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          1,
+          1,
+          1
+        ],
+        "candidate": [
+          1,
+          1,
+          1
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "71a3fd6b",
+      "question_type": "single-session-assistant",
+      "correct_out_of_three": {
+        "control": 3,
+        "candidate": 3
+      },
+      "mean_delta": 0.0,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "61b3540e0e7291c3f2ce353b07c44e081fa3ead4947caf2763b1373fda803291",
+          "61b3540e0e7291c3f2ce353b07c44e081fa3ead4947caf2763b1373fda803291",
+          "61b3540e0e7291c3f2ce353b07c44e081fa3ead4947caf2763b1373fda803291"
+        ],
+        "candidate": [
+          "5122e1d4c4a40e67a3aecf1d7b222ef262a99b2bb1db40cf4a66891f647ca71d",
+          "5122e1d4c4a40e67a3aecf1d7b222ef262a99b2bb1db40cf4a66891f647ca71d",
+          "5122e1d4c4a40e67a3aecf1d7b222ef262a99b2bb1db40cf4a66891f647ca71d"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          1,
+          1,
+          1
+        ],
+        "candidate": [
+          1,
+          1,
+          1
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "72e3ee87",
+      "question_type": "knowledge-update",
+      "correct_out_of_three": {
+        "control": 3,
+        "candidate": 3
+      },
+      "mean_delta": 0.0,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "a57e31a94ae59372b390b1b25d9496b806852a4c67ef6c8df5711393f02ccaa8",
+          "a57e31a94ae59372b390b1b25d9496b806852a4c67ef6c8df5711393f02ccaa8",
+          "a57e31a94ae59372b390b1b25d9496b806852a4c67ef6c8df5711393f02ccaa8"
+        ],
+        "candidate": [
+          "a9930fc7db87066fcd3dd59f5934b35dc35be6e57e3e4ef6e89cebca53e68038",
+          "a9930fc7db87066fcd3dd59f5934b35dc35be6e57e3e4ef6e89cebca53e68038",
+          "a9930fc7db87066fcd3dd59f5934b35dc35be6e57e3e4ef6e89cebca53e68038"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          1,
+          1,
+          1
+        ],
+        "candidate": [
+          1,
+          1,
+          1
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "7405e8b1",
+      "question_type": "multi-session",
+      "correct_out_of_three": {
+        "control": 3,
+        "candidate": 3
+      },
+      "mean_delta": 0.0,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "637e13e22332ef7cacfa57483768ad7283cfda27b70d9dd45087ebe55f0e017c",
+          "637e13e22332ef7cacfa57483768ad7283cfda27b70d9dd45087ebe55f0e017c",
+          "637e13e22332ef7cacfa57483768ad7283cfda27b70d9dd45087ebe55f0e017c"
+        ],
+        "candidate": [
+          "11f17c0d9ea862ba523f133c3f02fe362ccd41b10cd7293ae575fcc9edf029df",
+          "11f17c0d9ea862ba523f133c3f02fe362ccd41b10cd7293ae575fcc9edf029df",
+          "11f17c0d9ea862ba523f133c3f02fe362ccd41b10cd7293ae575fcc9edf029df"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          1,
+          1,
+          1
+        ],
+        "candidate": [
+          1,
+          1,
+          1
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "7a87bd0c",
+      "question_type": "knowledge-update",
+      "correct_out_of_three": {
+        "control": 3,
+        "candidate": 3
+      },
+      "mean_delta": 0.0,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "d3d97ae9f5b6ce9d850b963240cce71f5daa57ff0838d1bf3691324ef854cf19",
+          "d3d97ae9f5b6ce9d850b963240cce71f5daa57ff0838d1bf3691324ef854cf19",
+          "d3d97ae9f5b6ce9d850b963240cce71f5daa57ff0838d1bf3691324ef854cf19"
+        ],
+        "candidate": [
+          "4f2c9da2c0f50cedf5e245a3e7f0773cca2737026337edd9fe7b5187b064bc8c",
+          "4f2c9da2c0f50cedf5e245a3e7f0773cca2737026337edd9fe7b5187b064bc8c",
+          "4f2c9da2c0f50cedf5e245a3e7f0773cca2737026337edd9fe7b5187b064bc8c"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          1,
+          1,
+          1
+        ],
+        "candidate": [
+          1,
+          1,
+          1
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "7e974930",
+      "question_type": "knowledge-update",
+      "correct_out_of_three": {
+        "control": 3,
+        "candidate": 3
+      },
+      "mean_delta": 0.0,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "ecc09717381481bb1d8c6948aef22f4aba4b1b371605e43ed261c957f20b03d7",
+          "ecc09717381481bb1d8c6948aef22f4aba4b1b371605e43ed261c957f20b03d7",
+          "ecc09717381481bb1d8c6948aef22f4aba4b1b371605e43ed261c957f20b03d7"
+        ],
+        "candidate": [
+          "95ab12e1295d38791327d7e5031b0b55aafdc792dee307ee8fef7e8bbf1c98df",
+          "95ab12e1295d38791327d7e5031b0b55aafdc792dee307ee8fef7e8bbf1c98df",
+          "95ab12e1295d38791327d7e5031b0b55aafdc792dee307ee8fef7e8bbf1c98df"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          1,
+          1,
+          1
+        ],
+        "candidate": [
+          1,
+          1,
+          1
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "8077ef71",
+      "question_type": "temporal-reasoning",
+      "correct_out_of_three": {
+        "control": 3,
+        "candidate": 3
+      },
+      "mean_delta": 0.0,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "b8004b908cc69039773660453914dcef81bdeec955611f6ac95ccd5436b2d017",
+          "b8004b908cc69039773660453914dcef81bdeec955611f6ac95ccd5436b2d017",
+          "b8004b908cc69039773660453914dcef81bdeec955611f6ac95ccd5436b2d017"
+        ],
+        "candidate": [
+          "c3572bc82f079a1a9babda52fbfc58b11cdc34accf7618c0da56dd010785ad15",
+          "c3572bc82f079a1a9babda52fbfc58b11cdc34accf7618c0da56dd010785ad15",
+          "c3572bc82f079a1a9babda52fbfc58b11cdc34accf7618c0da56dd010785ad15"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          1,
+          1,
+          1
+        ],
+        "candidate": [
+          1,
+          1,
+          1
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "86f00804",
+      "question_type": "single-session-user",
+      "correct_out_of_three": {
+        "control": 3,
+        "candidate": 3
+      },
+      "mean_delta": 0.0,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "f358f992f355775252749d7a683077784d229960afdf8bdc3535f3112a7e8f00",
+          "f358f992f355775252749d7a683077784d229960afdf8bdc3535f3112a7e8f00",
+          "f358f992f355775252749d7a683077784d229960afdf8bdc3535f3112a7e8f00"
+        ],
+        "candidate": [
+          "5e00b87373ffe9d726351164b142fe3cd1fcfba5fecdc79b1fd6190ea5eae9ad",
+          "5e00b87373ffe9d726351164b142fe3cd1fcfba5fecdc79b1fd6190ea5eae9ad",
+          "5e00b87373ffe9d726351164b142fe3cd1fcfba5fecdc79b1fd6190ea5eae9ad"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          1,
+          1,
+          1
+        ],
+        "candidate": [
+          1,
+          1,
+          1
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "89527b6b",
+      "question_type": "single-session-assistant",
+      "correct_out_of_three": {
+        "control": 3,
+        "candidate": 3
+      },
+      "mean_delta": 0.0,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "5347dfe76d0b44a60aefcec340d58b0d0b58494fa069ad4f5431f90df5e946d6",
+          "5347dfe76d0b44a60aefcec340d58b0d0b58494fa069ad4f5431f90df5e946d6",
+          "5347dfe76d0b44a60aefcec340d58b0d0b58494fa069ad4f5431f90df5e946d6"
+        ],
+        "candidate": [
+          "91f939468bdde0b031df1026d219fc8750ac493c667b15cc248e6507d033f2e7",
+          "91f939468bdde0b031df1026d219fc8750ac493c667b15cc248e6507d033f2e7",
+          "91f939468bdde0b031df1026d219fc8750ac493c667b15cc248e6507d033f2e7"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          1,
+          1,
+          1
+        ],
+        "candidate": [
+          1,
+          1,
+          1
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "8b9d4367",
+      "question_type": "single-session-assistant",
+      "correct_out_of_three": {
+        "control": 3,
+        "candidate": 3
+      },
+      "mean_delta": 0.0,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "7233f59513791cb7ef4c342d897f0709e2005623c36a75aeb3693b2fefda2ee5",
+          "7233f59513791cb7ef4c342d897f0709e2005623c36a75aeb3693b2fefda2ee5",
+          "7233f59513791cb7ef4c342d897f0709e2005623c36a75aeb3693b2fefda2ee5"
+        ],
+        "candidate": [
+          "8ce0fad3d529f47c82e2461e6664c665e00433290526ec45593b5f2954ded09f",
+          "8ce0fad3d529f47c82e2461e6664c665e00433290526ec45593b5f2954ded09f",
+          "8ce0fad3d529f47c82e2461e6664c665e00433290526ec45593b5f2954ded09f"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          1,
+          1,
+          1
+        ],
+        "candidate": [
+          1,
+          1,
+          1
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "945e3d21",
+      "question_type": "knowledge-update",
+      "correct_out_of_three": {
+        "control": 2,
+        "candidate": 0
+      },
+      "mean_delta": -0.6666666666666666,
+      "majority_regression": true,
+      "first_request_sha256": {
+        "control": [
+          "1177da60a6dcf1e59dc6c0288c8f35a365ecf9b194e63b7c00444a06e8bbc025",
+          "1177da60a6dcf1e59dc6c0288c8f35a365ecf9b194e63b7c00444a06e8bbc025",
+          "1177da60a6dcf1e59dc6c0288c8f35a365ecf9b194e63b7c00444a06e8bbc025"
+        ],
+        "candidate": [
+          "a03c6e59159cb11e15bbd0667934dc2c8f14c22a4ac0f2a0e3aef659b319032c",
+          "a03c6e59159cb11e15bbd0667934dc2c8f14c22a4ac0f2a0e3aef659b319032c",
+          "a03c6e59159cb11e15bbd0667934dc2c8f14c22a4ac0f2a0e3aef659b319032c"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          1,
+          1,
+          1
+        ],
+        "candidate": [
+          1,
+          1,
+          1
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "94f70d80",
+      "question_type": "single-session-user",
+      "correct_out_of_three": {
+        "control": 3,
+        "candidate": 3
+      },
+      "mean_delta": 0.0,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "bff6e720b463fcbc1386bbea37eb7c15785220f0616b1b6c24e172c261d98446",
+          "bff6e720b463fcbc1386bbea37eb7c15785220f0616b1b6c24e172c261d98446",
+          "bff6e720b463fcbc1386bbea37eb7c15785220f0616b1b6c24e172c261d98446"
+        ],
+        "candidate": [
+          "2aca7db2c5c925c3554cc13539f880d4223ebb07a28c054c00e25ac73b74c7f8",
+          "2aca7db2c5c925c3554cc13539f880d4223ebb07a28c054c00e25ac73b74c7f8",
+          "2aca7db2c5c925c3554cc13539f880d4223ebb07a28c054c00e25ac73b74c7f8"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          1,
+          1,
+          1
+        ],
+        "candidate": [
+          1,
+          1,
+          1
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "9aaed6a3",
+      "question_type": "multi-session",
+      "correct_out_of_three": {
+        "control": 3,
+        "candidate": 3
+      },
+      "mean_delta": 0.0,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "e5d3fcfcae3d73c858d8c01a7e8e97e297f26db58210cd01704a5ef6d6f02db1",
+          "e5d3fcfcae3d73c858d8c01a7e8e97e297f26db58210cd01704a5ef6d6f02db1",
+          "e5d3fcfcae3d73c858d8c01a7e8e97e297f26db58210cd01704a5ef6d6f02db1"
+        ],
+        "candidate": [
+          "49f6a082e43757f56067ff37742d57afdd3fbb98655da1def1fa316b9424a696",
+          "49f6a082e43757f56067ff37742d57afdd3fbb98655da1def1fa316b9424a696",
+          "49f6a082e43757f56067ff37742d57afdd3fbb98655da1def1fa316b9424a696"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          1,
+          1,
+          1
+        ],
+        "candidate": [
+          1,
+          1,
+          1
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "a1eacc2a",
+      "question_type": "knowledge-update",
+      "correct_out_of_three": {
+        "control": 3,
+        "candidate": 3
+      },
+      "mean_delta": 0.0,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "c7cf4aa16947eaeab92791438eab4d500a86289b0b8b00d0fe9c8430873285a0",
+          "c7cf4aa16947eaeab92791438eab4d500a86289b0b8b00d0fe9c8430873285a0",
+          "c7cf4aa16947eaeab92791438eab4d500a86289b0b8b00d0fe9c8430873285a0"
+        ],
+        "candidate": [
+          "3e4ead8241dacf9f6eeb0a0e799e49cbd9f44a0ebeda4592c48aef1984997fec",
+          "3e4ead8241dacf9f6eeb0a0e799e49cbd9f44a0ebeda4592c48aef1984997fec",
+          "3e4ead8241dacf9f6eeb0a0e799e49cbd9f44a0ebeda4592c48aef1984997fec"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          1,
+          1,
+          1
+        ],
+        "candidate": [
+          1,
+          1,
+          1
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "aae3761f",
+      "question_type": "multi-session",
+      "correct_out_of_three": {
+        "control": 3,
+        "candidate": 2
+      },
+      "mean_delta": -0.3333333333333333,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "4863e2d9469def6645c882024c274c6f60823559a8ccdb8f321906a38b1414ac",
+          "4863e2d9469def6645c882024c274c6f60823559a8ccdb8f321906a38b1414ac",
+          "4863e2d9469def6645c882024c274c6f60823559a8ccdb8f321906a38b1414ac"
+        ],
+        "candidate": [
+          "87ce3e5a2517392ca26c51d1f95d8310bd364e9fb1baadae5d6c79421221ccb3",
+          "87ce3e5a2517392ca26c51d1f95d8310bd364e9fb1baadae5d6c79421221ccb3",
+          "87ce3e5a2517392ca26c51d1f95d8310bd364e9fb1baadae5d6c79421221ccb3"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          1,
+          1,
+          1
+        ],
+        "candidate": [
+          1,
+          1,
+          1
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "ad7109d1",
+      "question_type": "single-session-user",
+      "correct_out_of_three": {
+        "control": 3,
+        "candidate": 3
+      },
+      "mean_delta": 0.0,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "37597424e1828e6d0e4a93220a9ad196474eb9899fea09b8d128424c50cf0e78",
+          "37597424e1828e6d0e4a93220a9ad196474eb9899fea09b8d128424c50cf0e78",
+          "37597424e1828e6d0e4a93220a9ad196474eb9899fea09b8d128424c50cf0e78"
+        ],
+        "candidate": [
+          "08b1f653c4d8c4dc15bee3883bf83e7a6a83b659c7232ac840123e11febb8d65",
+          "08b1f653c4d8c4dc15bee3883bf83e7a6a83b659c7232ac840123e11febb8d65",
+          "08b1f653c4d8c4dc15bee3883bf83e7a6a83b659c7232ac840123e11febb8d65"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          1,
+          1,
+          1
+        ],
+        "candidate": [
+          1,
+          1,
+          1
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "b01defab",
+      "question_type": "knowledge-update",
+      "correct_out_of_three": {
+        "control": 3,
+        "candidate": 3
+      },
+      "mean_delta": 0.0,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "1fb038d9f80d0af878b92f61a7d3ecea9fbf8109cec0834a49304382e322dd31",
+          "1fb038d9f80d0af878b92f61a7d3ecea9fbf8109cec0834a49304382e322dd31",
+          "1fb038d9f80d0af878b92f61a7d3ecea9fbf8109cec0834a49304382e322dd31"
+        ],
+        "candidate": [
+          "6478008405a9f1f638f8d0fd383b4e327adde66a543e51ab0eded80f7a7d21df",
+          "6478008405a9f1f638f8d0fd383b4e327adde66a543e51ab0eded80f7a7d21df",
+          "6478008405a9f1f638f8d0fd383b4e327adde66a543e51ab0eded80f7a7d21df"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          1,
+          1,
+          1
+        ],
+        "candidate": [
+          1,
+          1,
+          1
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "b46e15ee",
+      "question_type": "temporal-reasoning",
+      "correct_out_of_three": {
+        "control": 3,
+        "candidate": 3
+      },
+      "mean_delta": 0.0,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "1e60077551dd769d987c50189249396b4ff623b5629245c430ded615c04937f1",
+          "1e60077551dd769d987c50189249396b4ff623b5629245c430ded615c04937f1",
+          "1e60077551dd769d987c50189249396b4ff623b5629245c430ded615c04937f1"
+        ],
+        "candidate": [
+          "196483c8b55c5a79fb94327147759e237e9d4a4795fdf1ea8dde7899e676fe7f",
+          "196483c8b55c5a79fb94327147759e237e9d4a4795fdf1ea8dde7899e676fe7f",
+          "196483c8b55c5a79fb94327147759e237e9d4a4795fdf1ea8dde7899e676fe7f"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          1,
+          1,
+          1
+        ],
+        "candidate": [
+          1,
+          1,
+          1
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "b6025781",
+      "question_type": "single-session-preference",
+      "correct_out_of_three": {
+        "control": 3,
+        "candidate": 3
+      },
+      "mean_delta": 0.0,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "0740a3dae09490621fa4555a7ef3b011b3bd5bd3c086000d703b769608397c59",
+          "0740a3dae09490621fa4555a7ef3b011b3bd5bd3c086000d703b769608397c59",
+          "0740a3dae09490621fa4555a7ef3b011b3bd5bd3c086000d703b769608397c59"
+        ],
+        "candidate": [
+          "654facc564eba6bc8d988efd21f1bbeab99e9ca6fa1791b2f279cf85509917b5",
+          "654facc564eba6bc8d988efd21f1bbeab99e9ca6fa1791b2f279cf85509917b5",
+          "654facc564eba6bc8d988efd21f1bbeab99e9ca6fa1791b2f279cf85509917b5"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          1,
+          1,
+          1
+        ],
+        "candidate": [
+          1,
+          1,
+          1
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "ba358f49",
+      "question_type": "multi-session",
+      "correct_out_of_three": {
+        "control": 0,
+        "candidate": 0
+      },
+      "mean_delta": 0.0,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "1fc2adc7ab95f9d1cba72ef299d9abf1beeba19fa2a2dba3e6adf8c083e2378c",
+          "1fc2adc7ab95f9d1cba72ef299d9abf1beeba19fa2a2dba3e6adf8c083e2378c",
+          "1fc2adc7ab95f9d1cba72ef299d9abf1beeba19fa2a2dba3e6adf8c083e2378c"
+        ],
+        "candidate": [
+          "c72e1cb413f4fdb63f42fb010bef42efc70ea6541da1b326969e95a7a759d162",
+          "c72e1cb413f4fdb63f42fb010bef42efc70ea6541da1b326969e95a7a759d162",
+          "c72e1cb413f4fdb63f42fb010bef42efc70ea6541da1b326969e95a7a759d162"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          2,
+          2,
+          2
+        ],
+        "candidate": [
+          2,
+          2,
+          2
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "ba358f49_abs",
+      "question_type": "multi-session",
+      "correct_out_of_three": {
+        "control": 3,
+        "candidate": 3
+      },
+      "mean_delta": 0.0,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "63a7002d49a29a99a93d4cb9dcb79d0ea0b389944c091e039184b96ffd4106d5",
+          "63a7002d49a29a99a93d4cb9dcb79d0ea0b389944c091e039184b96ffd4106d5",
+          "63a7002d49a29a99a93d4cb9dcb79d0ea0b389944c091e039184b96ffd4106d5"
+        ],
+        "candidate": [
+          "9dead8430cc80c9c6f686cb4df26e26457fd74e15b93f0a2b85aa861781922ce",
+          "9dead8430cc80c9c6f686cb4df26e26457fd74e15b93f0a2b85aa861781922ce",
+          "9dead8430cc80c9c6f686cb4df26e26457fd74e15b93f0a2b85aa861781922ce"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          2,
+          2,
+          2
+        ],
+        "candidate": [
+          2,
+          2,
+          2
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "bb7c3b45",
+      "question_type": "multi-session",
+      "correct_out_of_three": {
+        "control": 3,
+        "candidate": 3
+      },
+      "mean_delta": 0.0,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "3c43429140537b613fdac75486093693d96d10bb90aa835bf0e98fb51366a825",
+          "3c43429140537b613fdac75486093693d96d10bb90aa835bf0e98fb51366a825",
+          "3c43429140537b613fdac75486093693d96d10bb90aa835bf0e98fb51366a825"
+        ],
+        "candidate": [
+          "2559aacd6b3f7d390891cacb90b21c90ffe3be488470ba8d3f026297bcfa82b2",
+          "2559aacd6b3f7d390891cacb90b21c90ffe3be488470ba8d3f026297bcfa82b2",
+          "2559aacd6b3f7d390891cacb90b21c90ffe3be488470ba8d3f026297bcfa82b2"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          1,
+          1,
+          1
+        ],
+        "candidate": [
+          1,
+          1,
+          1
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "c14c00dd",
+      "question_type": "single-session-user",
+      "correct_out_of_three": {
+        "control": 3,
+        "candidate": 3
+      },
+      "mean_delta": 0.0,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "0cc86f01a297fa92938755c4b62e4b0061db8e22ac06e09993e34419d10cd2a9",
+          "0cc86f01a297fa92938755c4b62e4b0061db8e22ac06e09993e34419d10cd2a9",
+          "0cc86f01a297fa92938755c4b62e4b0061db8e22ac06e09993e34419d10cd2a9"
+        ],
+        "candidate": [
+          "127620c5a5123b7e52a1470a87446bfbf1518badefb11317236bc3aab043816e",
+          "127620c5a5123b7e52a1470a87446bfbf1518badefb11317236bc3aab043816e",
+          "127620c5a5123b7e52a1470a87446bfbf1518badefb11317236bc3aab043816e"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          1,
+          1,
+          1
+        ],
+        "candidate": [
+          1,
+          1,
+          1
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "c4ea545c",
+      "question_type": "knowledge-update",
+      "correct_out_of_three": {
+        "control": 0,
+        "candidate": 0
+      },
+      "mean_delta": 0.0,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "df2c2102c1f65a2aa0d868e88ecf4498cba34e647ef62e5919478fde47b2aa98",
+          "df2c2102c1f65a2aa0d868e88ecf4498cba34e647ef62e5919478fde47b2aa98",
+          "df2c2102c1f65a2aa0d868e88ecf4498cba34e647ef62e5919478fde47b2aa98"
+        ],
+        "candidate": [
+          "c14f4364a2cf1ab6ed76cae02fafe478fa65b8c7adfcf29792f0aedb260a9c35",
+          "c14f4364a2cf1ab6ed76cae02fafe478fa65b8c7adfcf29792f0aedb260a9c35",
+          "c14f4364a2cf1ab6ed76cae02fafe478fa65b8c7adfcf29792f0aedb260a9c35"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          1,
+          1,
+          1
+        ],
+        "candidate": [
+          1,
+          1,
+          1
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "c8f1aeed",
+      "question_type": "single-session-assistant",
+      "correct_out_of_three": {
+        "control": 3,
+        "candidate": 3
+      },
+      "mean_delta": 0.0,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "183bcb24162f05438dd917ccf2a85db9e80317e1b4f0050d1938ba9d08d3b231",
+          "183bcb24162f05438dd917ccf2a85db9e80317e1b4f0050d1938ba9d08d3b231",
+          "183bcb24162f05438dd917ccf2a85db9e80317e1b4f0050d1938ba9d08d3b231"
+        ],
+        "candidate": [
+          "ece5fdb07d993fdc9d5ae5160b9c94862fa3c3f066f4b3d8da5004662e183326",
+          "ece5fdb07d993fdc9d5ae5160b9c94862fa3c3f066f4b3d8da5004662e183326",
+          "ece5fdb07d993fdc9d5ae5160b9c94862fa3c3f066f4b3d8da5004662e183326"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          1,
+          1,
+          1
+        ],
+        "candidate": [
+          1,
+          1,
+          1
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "caf03d32",
+      "question_type": "single-session-preference",
+      "correct_out_of_three": {
+        "control": 3,
+        "candidate": 3
+      },
+      "mean_delta": 0.0,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "db5287c9fdb828b1583d1188777a88d2bfc2715fb32ecabc74b29dfcae9627ad",
+          "db5287c9fdb828b1583d1188777a88d2bfc2715fb32ecabc74b29dfcae9627ad",
+          "db5287c9fdb828b1583d1188777a88d2bfc2715fb32ecabc74b29dfcae9627ad"
+        ],
+        "candidate": [
+          "a36373e633450d6e437e667e4ddaf7464292016e844f23d64601fe8343d112f9",
+          "a36373e633450d6e437e667e4ddaf7464292016e844f23d64601fe8343d112f9",
+          "a36373e633450d6e437e667e4ddaf7464292016e844f23d64601fe8343d112f9"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          1,
+          1,
+          1
+        ],
+        "candidate": [
+          1,
+          1,
+          1
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "ce6d2d27",
+      "question_type": "knowledge-update",
+      "correct_out_of_three": {
+        "control": 3,
+        "candidate": 3
+      },
+      "mean_delta": 0.0,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "903754d1fcd2ab964748b7a685218a81a1c5124e784f00a8f04d44cd725d1b14",
+          "903754d1fcd2ab964748b7a685218a81a1c5124e784f00a8f04d44cd725d1b14",
+          "903754d1fcd2ab964748b7a685218a81a1c5124e784f00a8f04d44cd725d1b14"
+        ],
+        "candidate": [
+          "be0b3fe1dc563168c8cc31bf661744ad63cf68de24d4e8a1a35a41755f48db83",
+          "be0b3fe1dc563168c8cc31bf661744ad63cf68de24d4e8a1a35a41755f48db83",
+          "be0b3fe1dc563168c8cc31bf661744ad63cf68de24d4e8a1a35a41755f48db83"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          1,
+          1,
+          1
+        ],
+        "candidate": [
+          1,
+          1,
+          1
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "d3ab962e",
+      "question_type": "multi-session",
+      "correct_out_of_three": {
+        "control": 3,
+        "candidate": 3
+      },
+      "mean_delta": 0.0,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "3b35d68e6ec43ac8189fb8a4ba8752b099188f17aa69e3b172ee41f0ae2f8a01",
+          "3b35d68e6ec43ac8189fb8a4ba8752b099188f17aa69e3b172ee41f0ae2f8a01",
+          "3b35d68e6ec43ac8189fb8a4ba8752b099188f17aa69e3b172ee41f0ae2f8a01"
+        ],
+        "candidate": [
+          "49814399f51d8a93f8eccf4beff988422c1e76e2b8d9b2b903cf919d1f7ca5a1",
+          "49814399f51d8a93f8eccf4beff988422c1e76e2b8d9b2b903cf919d1f7ca5a1",
+          "49814399f51d8a93f8eccf4beff988422c1e76e2b8d9b2b903cf919d1f7ca5a1"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          1,
+          1,
+          1
+        ],
+        "candidate": [
+          1,
+          1,
+          1
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "d596882b",
+      "question_type": "single-session-assistant",
+      "correct_out_of_three": {
+        "control": 3,
+        "candidate": 3
+      },
+      "mean_delta": 0.0,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "3489004a018bdcd334ba97fde3e0a5f3234b89b0badeb54f1bb4c7f12c08ede7",
+          "3489004a018bdcd334ba97fde3e0a5f3234b89b0badeb54f1bb4c7f12c08ede7",
+          "3489004a018bdcd334ba97fde3e0a5f3234b89b0badeb54f1bb4c7f12c08ede7"
+        ],
+        "candidate": [
+          "b88ce1998dadf3af56eb90650015c07d746284fd7d6af2480e3733a97a88892b",
+          "b88ce1998dadf3af56eb90650015c07d746284fd7d6af2480e3733a97a88892b",
+          "b88ce1998dadf3af56eb90650015c07d746284fd7d6af2480e3733a97a88892b"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          1,
+          1,
+          1
+        ],
+        "candidate": [
+          1,
+          1,
+          1
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "d851d5ba",
+      "question_type": "multi-session",
+      "correct_out_of_three": {
+        "control": 1,
+        "candidate": 0
+      },
+      "mean_delta": -0.3333333333333333,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "a892c17fb565b5b5f693f82e947998f91a5428b772f96d81bca97f3115318444",
+          "a892c17fb565b5b5f693f82e947998f91a5428b772f96d81bca97f3115318444",
+          "a892c17fb565b5b5f693f82e947998f91a5428b772f96d81bca97f3115318444"
+        ],
+        "candidate": [
+          "c3766263163892fd5dc55bb80b30e1140f2b9d7a9ff591c714e8eb0569655753",
+          "c3766263163892fd5dc55bb80b30e1140f2b9d7a9ff591c714e8eb0569655753",
+          "c3766263163892fd5dc55bb80b30e1140f2b9d7a9ff591c714e8eb0569655753"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          1,
+          1,
+          1
+        ],
+        "candidate": [
+          1,
+          1,
+          1
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "e25c3b8d",
+      "question_type": "multi-session",
+      "correct_out_of_three": {
+        "control": 3,
+        "candidate": 3
+      },
+      "mean_delta": 0.0,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "1bbf7e95c3c1a92e8f1ac4ff35dafd0344996572124283470479be4894f59c25",
+          "1bbf7e95c3c1a92e8f1ac4ff35dafd0344996572124283470479be4894f59c25",
+          "1bbf7e95c3c1a92e8f1ac4ff35dafd0344996572124283470479be4894f59c25"
+        ],
+        "candidate": [
+          "042392fa7065abd00c5a13a489cf7bd07dd0840c33720988e2eb52752512c368",
+          "042392fa7065abd00c5a13a489cf7bd07dd0840c33720988e2eb52752512c368",
+          "042392fa7065abd00c5a13a489cf7bd07dd0840c33720988e2eb52752512c368"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          1,
+          1,
+          1
+        ],
+        "candidate": [
+          1,
+          1,
+          2
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "e47becba",
+      "question_type": "single-session-user",
+      "correct_out_of_three": {
+        "control": 3,
+        "candidate": 3
+      },
+      "mean_delta": 0.0,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "f0b1accbef14c1760396bf77144a4937d900d76588700c241178e98f88145840",
+          "f0b1accbef14c1760396bf77144a4937d900d76588700c241178e98f88145840",
+          "f0b1accbef14c1760396bf77144a4937d900d76588700c241178e98f88145840"
+        ],
+        "candidate": [
+          "cdedc0a967e0c1f3b4e990f3af41434767f27d78f11a6e4a8a1bc70ec67f65ee",
+          "cdedc0a967e0c1f3b4e990f3af41434767f27d78f11a6e4a8a1bc70ec67f65ee",
+          "cdedc0a967e0c1f3b4e990f3af41434767f27d78f11a6e4a8a1bc70ec67f65ee"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          1,
+          1,
+          1
+        ],
+        "candidate": [
+          1,
+          1,
+          1
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "e831120c",
+      "question_type": "multi-session",
+      "correct_out_of_three": {
+        "control": 3,
+        "candidate": 3
+      },
+      "mean_delta": 0.0,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "8df9c067200dac8cba32e98ac8d1d34911ab993b6009de7aa41405a195e0c59c",
+          "8df9c067200dac8cba32e98ac8d1d34911ab993b6009de7aa41405a195e0c59c",
+          "8df9c067200dac8cba32e98ac8d1d34911ab993b6009de7aa41405a195e0c59c"
+        ],
+        "candidate": [
+          "cb1938a98b8105cac75b0b98de0abdb677dc0849f1077687ab745259df5693ef",
+          "cb1938a98b8105cac75b0b98de0abdb677dc0849f1077687ab745259df5693ef",
+          "cb1938a98b8105cac75b0b98de0abdb677dc0849f1077687ab745259df5693ef"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          1,
+          1,
+          1
+        ],
+        "candidate": [
+          1,
+          1,
+          1
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "e982271f",
+      "question_type": "single-session-assistant",
+      "correct_out_of_three": {
+        "control": 3,
+        "candidate": 3
+      },
+      "mean_delta": 0.0,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "42e1ff024db302544b2caaa1f7fa8473dea01b1a675375a3cdeed2395ef7c9fd",
+          "42e1ff024db302544b2caaa1f7fa8473dea01b1a675375a3cdeed2395ef7c9fd",
+          "42e1ff024db302544b2caaa1f7fa8473dea01b1a675375a3cdeed2395ef7c9fd"
+        ],
+        "candidate": [
+          "9ae87e59a8207e8cda7439659cb583310824755d0f3b3d37c0c2fcd61991710c",
+          "9ae87e59a8207e8cda7439659cb583310824755d0f3b3d37c0c2fcd61991710c",
+          "9ae87e59a8207e8cda7439659cb583310824755d0f3b3d37c0c2fcd61991710c"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          1,
+          1,
+          1
+        ],
+        "candidate": [
+          1,
+          1,
+          1
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "ec81a493",
+      "question_type": "single-session-user",
+      "correct_out_of_three": {
+        "control": 3,
+        "candidate": 3
+      },
+      "mean_delta": 0.0,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "ee9e02dfa72f75275dda7109da9f8a38824e2047256fb3b667ddf6defdeb23d5",
+          "ee9e02dfa72f75275dda7109da9f8a38824e2047256fb3b667ddf6defdeb23d5",
+          "ee9e02dfa72f75275dda7109da9f8a38824e2047256fb3b667ddf6defdeb23d5"
+        ],
+        "candidate": [
+          "6cb92c79d2a93a58ce868764f379a5c8f82c11040a6365a844ab870b17fd7567",
+          "6cb92c79d2a93a58ce868764f379a5c8f82c11040a6365a844ab870b17fd7567",
+          "6cb92c79d2a93a58ce868764f379a5c8f82c11040a6365a844ab870b17fd7567"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          1,
+          1,
+          1
+        ],
+        "candidate": [
+          1,
+          1,
+          1
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "edced276_abs",
+      "question_type": "multi-session",
+      "correct_out_of_three": {
+        "control": 3,
+        "candidate": 3
+      },
+      "mean_delta": 0.0,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "20ccde4d745ffa3cfefb7df031733e6f2f2abf152176923da8c12be9d0760570",
+          "20ccde4d745ffa3cfefb7df031733e6f2f2abf152176923da8c12be9d0760570",
+          "20ccde4d745ffa3cfefb7df031733e6f2f2abf152176923da8c12be9d0760570"
+        ],
+        "candidate": [
+          "2d6baa7f4b905205e1117dfd660d18ab750fe8a18afdf3e9a49d8d71fc28a09a",
+          "2d6baa7f4b905205e1117dfd660d18ab750fe8a18afdf3e9a49d8d71fc28a09a",
+          "2d6baa7f4b905205e1117dfd660d18ab750fe8a18afdf3e9a49d8d71fc28a09a"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          2,
+          2,
+          2
+        ],
+        "candidate": [
+          2,
+          2,
+          2
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "f4f1d8a4_abs",
+      "question_type": "single-session-user",
+      "correct_out_of_three": {
+        "control": 3,
+        "candidate": 3
+      },
+      "mean_delta": 0.0,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "56ee5037454502187829100193aec78493141c3e6004fcaf1cbb5bbc7bbbd769",
+          "56ee5037454502187829100193aec78493141c3e6004fcaf1cbb5bbc7bbbd769",
+          "56ee5037454502187829100193aec78493141c3e6004fcaf1cbb5bbc7bbbd769"
+        ],
+        "candidate": [
+          "39d91a90d4e4e4df113c43bd303b49ebacd8fdef2abea13130a0700cde02177e",
+          "39d91a90d4e4e4df113c43bd303b49ebacd8fdef2abea13130a0700cde02177e",
+          "39d91a90d4e4e4df113c43bd303b49ebacd8fdef2abea13130a0700cde02177e"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          2,
+          2,
+          2
+        ],
+        "candidate": [
+          2,
+          2,
+          2
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "gpt4_1a1dc16d",
+      "question_type": "temporal-reasoning",
+      "correct_out_of_three": {
+        "control": 3,
+        "candidate": 3
+      },
+      "mean_delta": 0.0,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "2f6a8047d18972ac706aa252564e307b35fa216e834dbdb83b003b52056f08d2",
+          "2f6a8047d18972ac706aa252564e307b35fa216e834dbdb83b003b52056f08d2",
+          "2f6a8047d18972ac706aa252564e307b35fa216e834dbdb83b003b52056f08d2"
+        ],
+        "candidate": [
+          "435c3802e96888b90adbcecdebceae61bd21e05229cfc23bc266243f89174e28",
+          "435c3802e96888b90adbcecdebceae61bd21e05229cfc23bc266243f89174e28",
+          "435c3802e96888b90adbcecdebceae61bd21e05229cfc23bc266243f89174e28"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          1,
+          1,
+          1
+        ],
+        "candidate": [
+          1,
+          1,
+          1
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "gpt4_1d4ab0c9",
+      "question_type": "temporal-reasoning",
+      "correct_out_of_three": {
+        "control": 3,
+        "candidate": 3
+      },
+      "mean_delta": 0.0,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "220d51426399d9d780e2d6e83afbbf62da411a877a8554b8351f0969d3b03927",
+          "220d51426399d9d780e2d6e83afbbf62da411a877a8554b8351f0969d3b03927",
+          "220d51426399d9d780e2d6e83afbbf62da411a877a8554b8351f0969d3b03927"
+        ],
+        "candidate": [
+          "52230e785cb0b08de25d07c91d19cda5a994b6c26a911236fdf97da14e23ccc7",
+          "52230e785cb0b08de25d07c91d19cda5a994b6c26a911236fdf97da14e23ccc7",
+          "52230e785cb0b08de25d07c91d19cda5a994b6c26a911236fdf97da14e23ccc7"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          1,
+          1,
+          1
+        ],
+        "candidate": [
+          1,
+          1,
+          1
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "gpt4_213fd887",
+      "question_type": "temporal-reasoning",
+      "correct_out_of_three": {
+        "control": 3,
+        "candidate": 3
+      },
+      "mean_delta": 0.0,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "2e38d143ea672aea10c9e18e295ba22e6d7d7e44fde0bc6a9c24715109fff5b0",
+          "2e38d143ea672aea10c9e18e295ba22e6d7d7e44fde0bc6a9c24715109fff5b0",
+          "2e38d143ea672aea10c9e18e295ba22e6d7d7e44fde0bc6a9c24715109fff5b0"
+        ],
+        "candidate": [
+          "33bcda6336756c8719520a80c4257f12da3914468b1b7c79fb29c5b29316370e",
+          "33bcda6336756c8719520a80c4257f12da3914468b1b7c79fb29c5b29316370e",
+          "33bcda6336756c8719520a80c4257f12da3914468b1b7c79fb29c5b29316370e"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          1,
+          1,
+          1
+        ],
+        "candidate": [
+          1,
+          1,
+          1
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "gpt4_2655b836",
+      "question_type": "temporal-reasoning",
+      "correct_out_of_three": {
+        "control": 3,
+        "candidate": 3
+      },
+      "mean_delta": 0.0,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "c4fbb809c82b469ab0e5409f09568bfadeb6255e180bac03a8af0e347e033914",
+          "c4fbb809c82b469ab0e5409f09568bfadeb6255e180bac03a8af0e347e033914",
+          "c4fbb809c82b469ab0e5409f09568bfadeb6255e180bac03a8af0e347e033914"
+        ],
+        "candidate": [
+          "6e99e1d4108c15549e814f002780e617502b11c5a68489857d76a6d71fb99b67",
+          "6e99e1d4108c15549e814f002780e617502b11c5a68489857d76a6d71fb99b67",
+          "6e99e1d4108c15549e814f002780e617502b11c5a68489857d76a6d71fb99b67"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          1,
+          1,
+          1
+        ],
+        "candidate": [
+          1,
+          1,
+          1
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "gpt4_2ba83207",
+      "question_type": "multi-session",
+      "correct_out_of_three": {
+        "control": 3,
+        "candidate": 3
+      },
+      "mean_delta": 0.0,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "3a24fab71bc4a1b22b9a91af92218438d53f16fd2b357cea2d3385a3f799ca58",
+          "3a24fab71bc4a1b22b9a91af92218438d53f16fd2b357cea2d3385a3f799ca58",
+          "3a24fab71bc4a1b22b9a91af92218438d53f16fd2b357cea2d3385a3f799ca58"
+        ],
+        "candidate": [
+          "2cda759248075f378300e8e2286fe3dc6e8fd5e0bba0db051f8636a57eb7b181",
+          "2cda759248075f378300e8e2286fe3dc6e8fd5e0bba0db051f8636a57eb7b181",
+          "2cda759248075f378300e8e2286fe3dc6e8fd5e0bba0db051f8636a57eb7b181"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          1,
+          1,
+          1
+        ],
+        "candidate": [
+          1,
+          1,
+          1
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "gpt4_2c50253f",
+      "question_type": "temporal-reasoning",
+      "correct_out_of_three": {
+        "control": 3,
+        "candidate": 3
+      },
+      "mean_delta": 0.0,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "dcf740d69b2bbc84cbf6582710fe0989167b966ad2232c67e361cc45579db75b",
+          "dcf740d69b2bbc84cbf6582710fe0989167b966ad2232c67e361cc45579db75b",
+          "dcf740d69b2bbc84cbf6582710fe0989167b966ad2232c67e361cc45579db75b"
+        ],
+        "candidate": [
+          "fef52519c8692321b467eae56d6d1351fa1a2747edb4f977d12d344520fd968c",
+          "fef52519c8692321b467eae56d6d1351fa1a2747edb4f977d12d344520fd968c",
+          "fef52519c8692321b467eae56d6d1351fa1a2747edb4f977d12d344520fd968c"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          1,
+          1,
+          1
+        ],
+        "candidate": [
+          1,
+          1,
+          1
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "gpt4_385a5000",
+      "question_type": "temporal-reasoning",
+      "correct_out_of_three": {
+        "control": 3,
+        "candidate": 3
+      },
+      "mean_delta": 0.0,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "2e11f3c05226b2ca89f57bb10bb5a41e0fa5c22498c1cf6f90d10b5bbc6e5ece",
+          "2e11f3c05226b2ca89f57bb10bb5a41e0fa5c22498c1cf6f90d10b5bbc6e5ece",
+          "2e11f3c05226b2ca89f57bb10bb5a41e0fa5c22498c1cf6f90d10b5bbc6e5ece"
+        ],
+        "candidate": [
+          "038dfe5b794ac864e4d82cc38b7d1852f59664cf8297a7d283573087c4f75532",
+          "038dfe5b794ac864e4d82cc38b7d1852f59664cf8297a7d283573087c4f75532",
+          "038dfe5b794ac864e4d82cc38b7d1852f59664cf8297a7d283573087c4f75532"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          1,
+          1,
+          1
+        ],
+        "candidate": [
+          1,
+          1,
+          1
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "gpt4_483dd43c",
+      "question_type": "temporal-reasoning",
+      "correct_out_of_three": {
+        "control": 3,
+        "candidate": 3
+      },
+      "mean_delta": 0.0,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "243161a573b8bdef8de409326512cfe3e4b8404b395675ec6dfca71c222ac561",
+          "243161a573b8bdef8de409326512cfe3e4b8404b395675ec6dfca71c222ac561",
+          "243161a573b8bdef8de409326512cfe3e4b8404b395675ec6dfca71c222ac561"
+        ],
+        "candidate": [
+          "6f2443f49b2cdb65dba1dcd7869fb12f27e98aeeadd299c05f9b08686adabbb3",
+          "6f2443f49b2cdb65dba1dcd7869fb12f27e98aeeadd299c05f9b08686adabbb3",
+          "6f2443f49b2cdb65dba1dcd7869fb12f27e98aeeadd299c05f9b08686adabbb3"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          1,
+          1,
+          1
+        ],
+        "candidate": [
+          1,
+          1,
+          1
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "gpt4_4ef30696",
+      "question_type": "temporal-reasoning",
+      "correct_out_of_three": {
+        "control": 3,
+        "candidate": 3
+      },
+      "mean_delta": 0.0,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "e14d7abe069579ec492c7acfd0d37dfa4c4ec104c74bd2405110259ac0e4b888",
+          "e14d7abe069579ec492c7acfd0d37dfa4c4ec104c74bd2405110259ac0e4b888",
+          "e14d7abe069579ec492c7acfd0d37dfa4c4ec104c74bd2405110259ac0e4b888"
+        ],
+        "candidate": [
+          "d7110d9e83d3d531ed3bd90a53589eca27fd043a4349ecd4bb816779ecdd3ac7",
+          "d7110d9e83d3d531ed3bd90a53589eca27fd043a4349ecd4bb816779ecdd3ac7",
+          "d7110d9e83d3d531ed3bd90a53589eca27fd043a4349ecd4bb816779ecdd3ac7"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          1,
+          1,
+          1
+        ],
+        "candidate": [
+          1,
+          1,
+          1
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "gpt4_5501fe77",
+      "question_type": "multi-session",
+      "correct_out_of_three": {
+        "control": 3,
+        "candidate": 3
+      },
+      "mean_delta": 0.0,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "6cbc92947960caec22e00f3a4e5406367ae2892c756478dd700100614c12138f",
+          "6cbc92947960caec22e00f3a4e5406367ae2892c756478dd700100614c12138f",
+          "6cbc92947960caec22e00f3a4e5406367ae2892c756478dd700100614c12138f"
+        ],
+        "candidate": [
+          "509560ef743dfc87b26deae95b3493036ba3ca7239f4c8966d523f3214369131",
+          "509560ef743dfc87b26deae95b3493036ba3ca7239f4c8966d523f3214369131",
+          "509560ef743dfc87b26deae95b3493036ba3ca7239f4c8966d523f3214369131"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          1,
+          1,
+          1
+        ],
+        "candidate": [
+          1,
+          1,
+          1
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "gpt4_59149c78",
+      "question_type": "temporal-reasoning",
+      "correct_out_of_three": {
+        "control": 2,
+        "candidate": 1
+      },
+      "mean_delta": -0.3333333333333333,
+      "majority_regression": true,
+      "first_request_sha256": {
+        "control": [
+          "855844bf90338a0b49f34b7d758121054bbcf3d8aa5dd0e452d05843a5709854",
+          "855844bf90338a0b49f34b7d758121054bbcf3d8aa5dd0e452d05843a5709854",
+          "855844bf90338a0b49f34b7d758121054bbcf3d8aa5dd0e452d05843a5709854"
+        ],
+        "candidate": [
+          "5e588a1308db94e8a8def26689256f9c127e52d80342f4f95da0f94339da8b77",
+          "5e588a1308db94e8a8def26689256f9c127e52d80342f4f95da0f94339da8b77",
+          "5e588a1308db94e8a8def26689256f9c127e52d80342f4f95da0f94339da8b77"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          1,
+          1,
+          1
+        ],
+        "candidate": [
+          1,
+          1,
+          1
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "gpt4_59c863d7",
+      "question_type": "multi-session",
+      "correct_out_of_three": {
+        "control": 1,
+        "candidate": 1
+      },
+      "mean_delta": 0.0,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "0f0180741b6ed7799d66f0fc10e2e1c71bd061d3904c74a77a00588cf12296fa",
+          "0f0180741b6ed7799d66f0fc10e2e1c71bd061d3904c74a77a00588cf12296fa",
+          "0f0180741b6ed7799d66f0fc10e2e1c71bd061d3904c74a77a00588cf12296fa"
+        ],
+        "candidate": [
+          "d60ea3bd2f5644c7128632b43c1b7191e8c40ae4fce68bd052313932558b8373",
+          "d60ea3bd2f5644c7128632b43c1b7191e8c40ae4fce68bd052313932558b8373",
+          "d60ea3bd2f5644c7128632b43c1b7191e8c40ae4fce68bd052313932558b8373"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          1,
+          1,
+          1
+        ],
+        "candidate": [
+          1,
+          1,
+          1
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "gpt4_65aabe59",
+      "question_type": "temporal-reasoning",
+      "correct_out_of_three": {
+        "control": 3,
+        "candidate": 3
+      },
+      "mean_delta": 0.0,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "48c1c36b12deddfad22a459ec91ce7174cee8fb9a43c73d5f046740956ea8711",
+          "48c1c36b12deddfad22a459ec91ce7174cee8fb9a43c73d5f046740956ea8711",
+          "48c1c36b12deddfad22a459ec91ce7174cee8fb9a43c73d5f046740956ea8711"
+        ],
+        "candidate": [
+          "4abab31a263d4eacad3fc735b22b84abaca4890a6626e8e8846c01630c007a1a",
+          "4abab31a263d4eacad3fc735b22b84abaca4890a6626e8e8846c01630c007a1a",
+          "4abab31a263d4eacad3fc735b22b84abaca4890a6626e8e8846c01630c007a1a"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          1,
+          1,
+          1
+        ],
+        "candidate": [
+          1,
+          1,
+          1
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "gpt4_76048e76",
+      "question_type": "temporal-reasoning",
+      "correct_out_of_three": {
+        "control": 3,
+        "candidate": 3
+      },
+      "mean_delta": 0.0,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "dc730dfe62f3c3e9ea6f686cea02f8d27dac41eb3fa9e7ed0e9856ea6c0f6974",
+          "dc730dfe62f3c3e9ea6f686cea02f8d27dac41eb3fa9e7ed0e9856ea6c0f6974",
+          "dc730dfe62f3c3e9ea6f686cea02f8d27dac41eb3fa9e7ed0e9856ea6c0f6974"
+        ],
+        "candidate": [
+          "de04e48b62fab3fca4b6bfe11660323db4b6427f3ace9ec80c721bd0c75e429a",
+          "de04e48b62fab3fca4b6bfe11660323db4b6427f3ace9ec80c721bd0c75e429a",
+          "de04e48b62fab3fca4b6bfe11660323db4b6427f3ace9ec80c721bd0c75e429a"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          1,
+          1,
+          1
+        ],
+        "candidate": [
+          1,
+          1,
+          1
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "gpt4_7bc6cf22",
+      "question_type": "temporal-reasoning",
+      "correct_out_of_three": {
+        "control": 3,
+        "candidate": 3
+      },
+      "mean_delta": 0.0,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "d8bedeb5c8269c6ab78c74debc92ee5f25331f73d0620cf67109657992c55d1d",
+          "d8bedeb5c8269c6ab78c74debc92ee5f25331f73d0620cf67109657992c55d1d",
+          "d8bedeb5c8269c6ab78c74debc92ee5f25331f73d0620cf67109657992c55d1d"
+        ],
+        "candidate": [
+          "1a5537292147c93a40ea8d5fe740be022b1c7fcc66a35b198830027d08d059a7",
+          "1a5537292147c93a40ea8d5fe740be022b1c7fcc66a35b198830027d08d059a7",
+          "1a5537292147c93a40ea8d5fe740be022b1c7fcc66a35b198830027d08d059a7"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          1,
+          1,
+          1
+        ],
+        "candidate": [
+          1,
+          1,
+          1
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "gpt4_7ca326fa",
+      "question_type": "temporal-reasoning",
+      "correct_out_of_three": {
+        "control": 3,
+        "candidate": 3
+      },
+      "mean_delta": 0.0,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "d74411662ffe8a73fef9a69ea3c4696829d81151700f929eac59441e9011a2bc",
+          "d74411662ffe8a73fef9a69ea3c4696829d81151700f929eac59441e9011a2bc",
+          "d74411662ffe8a73fef9a69ea3c4696829d81151700f929eac59441e9011a2bc"
+        ],
+        "candidate": [
+          "727f98b5d1556a937bc213ef3993604ed09146dae3b1f0c93ebc2ca978205ca1",
+          "727f98b5d1556a937bc213ef3993604ed09146dae3b1f0c93ebc2ca978205ca1",
+          "727f98b5d1556a937bc213ef3993604ed09146dae3b1f0c93ebc2ca978205ca1"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          1,
+          1,
+          1
+        ],
+        "candidate": [
+          1,
+          1,
+          1
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "gpt4_7fce9456",
+      "question_type": "multi-session",
+      "correct_out_of_three": {
+        "control": 3,
+        "candidate": 3
+      },
+      "mean_delta": 0.0,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "fff78e56b72e28508750b1bf297ef6da53b86af0a3835c3c8265ba7c590f4e52",
+          "fff78e56b72e28508750b1bf297ef6da53b86af0a3835c3c8265ba7c590f4e52",
+          "fff78e56b72e28508750b1bf297ef6da53b86af0a3835c3c8265ba7c590f4e52"
+        ],
+        "candidate": [
+          "958a54e43c8e5aedee374639a7a73c0adfdd4d0bbfa92f258496ef6130746d08",
+          "958a54e43c8e5aedee374639a7a73c0adfdd4d0bbfa92f258496ef6130746d08",
+          "958a54e43c8e5aedee374639a7a73c0adfdd4d0bbfa92f258496ef6130746d08"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          1,
+          1,
+          1
+        ],
+        "candidate": [
+          1,
+          1,
+          1
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "gpt4_8279ba03",
+      "question_type": "temporal-reasoning",
+      "correct_out_of_three": {
+        "control": 3,
+        "candidate": 3
+      },
+      "mean_delta": 0.0,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "0d4cd6fc8492b65038abff5624133b604b5ef297545700e5adf7b964fd298da0",
+          "0d4cd6fc8492b65038abff5624133b604b5ef297545700e5adf7b964fd298da0",
+          "0d4cd6fc8492b65038abff5624133b604b5ef297545700e5adf7b964fd298da0"
+        ],
+        "candidate": [
+          "c4fae3dae018ba447c5257fe9bea43eb2e04ec4e657d16a2d8cf703874e56d26",
+          "c4fae3dae018ba447c5257fe9bea43eb2e04ec4e657d16a2d8cf703874e56d26",
+          "c4fae3dae018ba447c5257fe9bea43eb2e04ec4e657d16a2d8cf703874e56d26"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          1,
+          1,
+          1
+        ],
+        "candidate": [
+          1,
+          1,
+          1
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "gpt4_85da3956",
+      "question_type": "temporal-reasoning",
+      "correct_out_of_three": {
+        "control": 1,
+        "candidate": 1
+      },
+      "mean_delta": 0.0,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "522ecfbdea7e15332064009ab2876fb0e6f5c26278177e5bb423ca8582f7f1ca",
+          "522ecfbdea7e15332064009ab2876fb0e6f5c26278177e5bb423ca8582f7f1ca",
+          "522ecfbdea7e15332064009ab2876fb0e6f5c26278177e5bb423ca8582f7f1ca"
+        ],
+        "candidate": [
+          "cbb3d4db5066a26697824ba654c804e58c0799f552e6b9954f09a0b2da5fbc99",
+          "cbb3d4db5066a26697824ba654c804e58c0799f552e6b9954f09a0b2da5fbc99",
+          "cbb3d4db5066a26697824ba654c804e58c0799f552e6b9954f09a0b2da5fbc99"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          1,
+          1,
+          1
+        ],
+        "candidate": [
+          1,
+          1,
+          1
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "gpt4_93159ced",
+      "question_type": "temporal-reasoning",
+      "correct_out_of_three": {
+        "control": 2,
+        "candidate": 2
+      },
+      "mean_delta": 0.0,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "7b075169fab20232dbd5fe3f9ae3513a1fa89f5b776c3d6db311daf0ca0568c7",
+          "7b075169fab20232dbd5fe3f9ae3513a1fa89f5b776c3d6db311daf0ca0568c7",
+          "7b075169fab20232dbd5fe3f9ae3513a1fa89f5b776c3d6db311daf0ca0568c7"
+        ],
+        "candidate": [
+          "477514921cb827d0bcfac43c33f06eade4a156aab72a6dd50f1ab980d161232e",
+          "477514921cb827d0bcfac43c33f06eade4a156aab72a6dd50f1ab980d161232e",
+          "477514921cb827d0bcfac43c33f06eade4a156aab72a6dd50f1ab980d161232e"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          1,
+          1,
+          1
+        ],
+        "candidate": [
+          1,
+          1,
+          1
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "gpt4_af6db32f",
+      "question_type": "temporal-reasoning",
+      "correct_out_of_three": {
+        "control": 3,
+        "candidate": 3
+      },
+      "mean_delta": 0.0,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "fa2f06e57a77b7031f70346d43ba0f8b3f258d8fe0b9deb18f57a463b88153dc",
+          "fa2f06e57a77b7031f70346d43ba0f8b3f258d8fe0b9deb18f57a463b88153dc",
+          "fa2f06e57a77b7031f70346d43ba0f8b3f258d8fe0b9deb18f57a463b88153dc"
+        ],
+        "candidate": [
+          "0692f4c27c594dbd6d7f384e1444de55a160300b695dcba8538efe99083560aa",
+          "0692f4c27c594dbd6d7f384e1444de55a160300b695dcba8538efe99083560aa",
+          "0692f4c27c594dbd6d7f384e1444de55a160300b695dcba8538efe99083560aa"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          1,
+          1,
+          1
+        ],
+        "candidate": [
+          1,
+          1,
+          1
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "gpt4_c27434e8_abs",
+      "question_type": "temporal-reasoning",
+      "correct_out_of_three": {
+        "control": 2,
+        "candidate": 2
+      },
+      "mean_delta": 0.0,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "fc5c03b8cfb664a4dcd2edebaf87b85598604e96971cd16445b2dbfc7fb53cfa",
+          "fc5c03b8cfb664a4dcd2edebaf87b85598604e96971cd16445b2dbfc7fb53cfa",
+          "fc5c03b8cfb664a4dcd2edebaf87b85598604e96971cd16445b2dbfc7fb53cfa"
+        ],
+        "candidate": [
+          "d0a263eab42fbb2c078363125df9651627e1b28a4f0dc1eb9d007915eec9e629",
+          "d0a263eab42fbb2c078363125df9651627e1b28a4f0dc1eb9d007915eec9e629",
+          "d0a263eab42fbb2c078363125df9651627e1b28a4f0dc1eb9d007915eec9e629"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          2,
+          1,
+          2
+        ],
+        "candidate": [
+          2,
+          2,
+          2
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "gpt4_e05b82a6",
+      "question_type": "multi-session",
+      "correct_out_of_three": {
+        "control": 1,
+        "candidate": 0
+      },
+      "mean_delta": -0.3333333333333333,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "bf11ba4bbb592e3b60cf24f7ee206a800e350cd0c43905f1328d6829d99a2eb0",
+          "bf11ba4bbb592e3b60cf24f7ee206a800e350cd0c43905f1328d6829d99a2eb0",
+          "bf11ba4bbb592e3b60cf24f7ee206a800e350cd0c43905f1328d6829d99a2eb0"
+        ],
+        "candidate": [
+          "8c3de79dc3752747031ced51a0faddeadecd5889d98f2a55a544e4a2e6b5ed25",
+          "8c3de79dc3752747031ced51a0faddeadecd5889d98f2a55a544e4a2e6b5ed25",
+          "8c3de79dc3752747031ced51a0faddeadecd5889d98f2a55a544e4a2e6b5ed25"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          1,
+          1,
+          1
+        ],
+        "candidate": [
+          1,
+          1,
+          1
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "gpt4_e414231f",
+      "question_type": "temporal-reasoning",
+      "correct_out_of_three": {
+        "control": 1,
+        "candidate": 1
+      },
+      "mean_delta": 0.0,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "630fc895f03f344db2a2720857c80b16d4d1ea4bad50e3b00dda10b3a9b42c82",
+          "630fc895f03f344db2a2720857c80b16d4d1ea4bad50e3b00dda10b3a9b42c82",
+          "630fc895f03f344db2a2720857c80b16d4d1ea4bad50e3b00dda10b3a9b42c82"
+        ],
+        "candidate": [
+          "251f81af5a8d5575da43cb65b08a661c0a3cccf0d8554fa4b48b092db9884bf1",
+          "251f81af5a8d5575da43cb65b08a661c0a3cccf0d8554fa4b48b092db9884bf1",
+          "251f81af5a8d5575da43cb65b08a661c0a3cccf0d8554fa4b48b092db9884bf1"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          1,
+          1,
+          1
+        ],
+        "candidate": [
+          1,
+          1,
+          1
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "gpt4_f2262a51",
+      "question_type": "multi-session",
+      "correct_out_of_three": {
+        "control": 3,
+        "candidate": 2
+      },
+      "mean_delta": -0.3333333333333333,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "a75199fa8574890b7b46dafd2f95f75d16bde598660ba1144cf0c9a1e6a87321",
+          "a75199fa8574890b7b46dafd2f95f75d16bde598660ba1144cf0c9a1e6a87321",
+          "a75199fa8574890b7b46dafd2f95f75d16bde598660ba1144cf0c9a1e6a87321"
+        ],
+        "candidate": [
+          "631e1e56c4e0d2bfa779a53cb9fc233202e6f792fdca65cf357a1f4811389833",
+          "631e1e56c4e0d2bfa779a53cb9fc233202e6f792fdca65cf357a1f4811389833",
+          "631e1e56c4e0d2bfa779a53cb9fc233202e6f792fdca65cf357a1f4811389833"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          1,
+          1,
+          1
+        ],
+        "candidate": [
+          1,
+          1,
+          1
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    },
+    {
+      "question_id": "gpt4_f420262d",
+      "question_type": "temporal-reasoning",
+      "correct_out_of_three": {
+        "control": 0,
+        "candidate": 1
+      },
+      "mean_delta": 0.3333333333333333,
+      "majority_regression": false,
+      "first_request_sha256": {
+        "control": [
+          "56c9c786c3615ec5bd98d1cf7d7d5d622d868d67e216d1a2e24d5c72254649c1",
+          "56c9c786c3615ec5bd98d1cf7d7d5d622d868d67e216d1a2e24d5c72254649c1",
+          "56c9c786c3615ec5bd98d1cf7d7d5d622d868d67e216d1a2e24d5c72254649c1"
+        ],
+        "candidate": [
+          "27e78f49b77ee93a6bdda5ec740120a48439be7f0dc2524de90efec37e8dfe16",
+          "27e78f49b77ee93a6bdda5ec740120a48439be7f0dc2524de90efec37e8dfe16",
+          "27e78f49b77ee93a6bdda5ec740120a48439be7f0dc2524de90efec37e8dfe16"
+        ]
+      },
+      "unique_nonempty_first_requests": {
+        "control": 1,
+        "candidate": 1
+      },
+      "same_first_request_across_arms": [
+        false,
+        false,
+        false
+      ],
+      "actual_generation_counts": {
+        "control": [
+          1,
+          2,
+          2
+        ],
+        "candidate": [
+          1,
+          1,
+          1
+        ]
+      },
+      "deterministic_mechanism": {
+        "control": [
+          null,
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null,
+          null
+        ]
+      },
+      "first_loss": "not assigned by request/score audit alone"
+    }
+  ],
+  "summary": {
+    "majority_regressions": [
+      "945e3d21",
+      "gpt4_59149c78"
+    ],
+    "negative_questions": [
+      "0bc8ad93",
+      "681a1674",
+      "945e3d21",
+      "aae3761f",
+      "d851d5ba",
+      "gpt4_59149c78",
+      "gpt4_e05b82a6",
+      "gpt4_f2262a51"
+    ],
+    "positive_questions": [
+      "5d3d2817",
+      "gpt4_f420262d"
+    ],
+    "all_captured_first_requests_changed": true,
+    "deterministic_override_questions": [],
+    "detail_inspection_ids": [
+      "0bc8ad93",
+      "681a1674",
+      "945e3d21",
+      "aae3761f",
+      "d851d5ba",
+      "gpt4_59149c78",
+      "gpt4_e05b82a6",
+      "gpt4_f2262a51"
+    ]
+  },
+  "inputs": {
+    "results/raw/t4-scoped-regression-dev100-v3-control-rep1.readers.jsonl": "a519cd6b25c25e3b7e0b77ddc1ae8e082041177b0bcc86ef35d5b7ee67cbca6c",
+    "results/raw/t4-scoped-regression-dev100-v3-control-rep1.grades.jsonl": "f64687ecfa2af5838740647171aa2f0cb5eb62e91eafeefc42e1ea11da6634cc",
+    "results/raw/t4-scoped-regression-dev100-v3-control-rep1.jsonl": "f4cf794ec1369024d86b2c13c0729467621e10052a1d86810f47f122ccc077b5",
+    "results/raw/t4-scoped-regression-dev100-v3-control-rep1.usage.json": "ec1ef449f1e7bf41e456c6a98152a69037c1577759e72c7b816c12e4c60acdc0",
+    "results/raw/t4-scoped-regression-dev100-v3-candidate-rep1.readers.jsonl": "06095197172166cb131e904c545dd8a415de0fce17a4e5fb0cf969429883d5ee",
+    "results/raw/t4-scoped-regression-dev100-v3-candidate-rep1.grades.jsonl": "6955360bb0cf4b9bd0616705b7a05c6900a8b5ce61e79645c0e3972802dce826",
+    "results/raw/t4-scoped-regression-dev100-v3-candidate-rep1.jsonl": "8ac612a06c4ed5e6df180c32934dcde74a96d482e4c18b988c4952a4ff9963d4",
+    "results/raw/t4-scoped-regression-dev100-v3-candidate-rep1.usage.json": "73049079737aee30a1ff9f56b0dd355203cf0e7a99ee3963206525b65e36e755",
+    "results/raw/t4-scoped-regression-dev100-v3-control-rep2.readers.jsonl": "2bcdd2d7a6a6c0e65562fbd1b77916b688f87eb20d244e4fa1317e5578018ba8",
+    "results/raw/t4-scoped-regression-dev100-v3-control-rep2.grades.jsonl": "de2633716d002ef63f8a1d6f4a8532707560cbe74f4e2bc31e496d00d434a43d",
+    "results/raw/t4-scoped-regression-dev100-v3-control-rep2.jsonl": "4ddc24b372d9ac3aaa8b8734df8fd07e013ffca5801c62b41cf7a0c87d0d3de7",
+    "results/raw/t4-scoped-regression-dev100-v3-control-rep2.usage.json": "da7948675b9435025558325511ed8ae72810f6c3c110f8a945bf7084e72798bb",
+    "results/raw/t4-scoped-regression-dev100-v3-candidate-rep2.readers.jsonl": "25467e5b165b669d00a1cdb5e21e6840f01f2be1b49a33b379d34493c800afa6",
+    "results/raw/t4-scoped-regression-dev100-v3-candidate-rep2.grades.jsonl": "e9a20e738154eb9dc626348fa46547b7b1525b7cededca8d81bf9969f0c7a888",
+    "results/raw/t4-scoped-regression-dev100-v3-candidate-rep2.jsonl": "99764e904891b3d2ddf95e08fbe46d2faa7dc0dda451bfd477f3abdf8ec49e6d",
+    "results/raw/t4-scoped-regression-dev100-v3-candidate-rep2.usage.json": "4c8b317edff3e386e7c1e3cfe6db97685f12c0a1914db3883ddcb280fbca3323",
+    "results/raw/t4-scoped-regression-dev100-v3-control-rep3.readers.jsonl": "baeba9d23a05745e4b3a53f763e3b3c9e6b91fbfd32f9401f12a858dbadec7e4",
+    "results/raw/t4-scoped-regression-dev100-v3-control-rep3.grades.jsonl": "13b3764ebf81b0f9737d8c11a45c99ac4529012ddde70460e3eef899152c3859",
+    "results/raw/t4-scoped-regression-dev100-v3-control-rep3.jsonl": "f4a837f5cdaf2fc6501d9aece0f1436d23233137b6e59c920e341a3beafd5375",
+    "results/raw/t4-scoped-regression-dev100-v3-control-rep3.usage.json": "0f3fa551df251e8893ef25813dc82d3fbae8ce752b5c6c2190f5da55435683ad",
+    "results/raw/t4-scoped-regression-dev100-v3-candidate-rep3.readers.jsonl": "01aa0938cb3c29b1c3a5ef875bbb32605fd4b4e91738ea632a462c1db1f1241e",
+    "results/raw/t4-scoped-regression-dev100-v3-candidate-rep3.grades.jsonl": "3d6196e466944fabd80b97650bbc019c942b60423ee600a5b9effd98abe00955",
+    "results/raw/t4-scoped-regression-dev100-v3-candidate-rep3.jsonl": "ba6d3fb6bbe3a19d577aea48c22cf67212474de71406930d0fdbf4d282936625",
+    "results/raw/t4-scoped-regression-dev100-v3-candidate-rep3.usage.json": "243b29476e836b55e0f46a90c01ae3b6a66ff36901e9a12f1b582950967e4d27",
+    "results/analysis/t4-scoped-regression-dev100-v3.execution.json": "28e6112efa85263b83d667c434b73b4d2f3a3d3d222da888d555eef789dddb24",
+    "results/analysis/t4-scoped-regression-dev100-v3.gate.json": "df2b2b522f2d4d66a5e64c68badb257971bd1d22bab5bd364fec9dc796162d0c",
+    "results/manifests/dev100.json": "fe6ae148da5f81730d698ecd10cc795d6bd69357e22eb26d47ba6cefe16d6072",
+    "results/prereg-t4-scoped-dev100-postmortem-v1.md": "94fdd4eaaadf5cf34c3710006b0dc2b938888cd7ec9c4ec087ddae5b30177241",
+    "tools/t4_scoped_postmortem.py": "fcadddd41f12229d8782d023366b877cb59816331d89fcd6e75260ab70d458a4"
+  },
+  "limitations": "Scores and request differences alone do not establish causation or first-loss. All original outcomes are retained; this is not fresh accuracy."
+}

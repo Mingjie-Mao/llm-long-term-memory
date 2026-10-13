@@ -159,6 +159,9 @@ def test_the_arms_differ_from_the_control_only_where_registered():
         "two_stage_raw_primary_t2",
         "two_stage_raw_primary_t3",
         "two_stage_raw_primary_t4",
+        # Stage C: t4 with code-side counts, intervals and order; hydration as t4.
+        "two_stage_raw_primary_t4c",
+        "two_stage_raw_primary_t4c2",
         "two_stage_raw_primary_v2",
         "two_stage_raw_primary_v4",
     }

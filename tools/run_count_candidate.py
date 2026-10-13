@@ -19,7 +19,12 @@ import json
 import os
 from pathlib import Path
 
-from llm_long_term_memory.runtime.evidence_count import PROMPT_VERSION, Source, answer, make_prompt
+from llm_long_term_memory.evaluation.grounded.evidence_count import (
+    PROMPT_VERSION,
+    Source,
+    answer,
+    make_prompt,
+)
 
 REPO = Path(__file__).resolve().parent.parent
 GOLD = REPO / "results/review/count-v1/gold.json"

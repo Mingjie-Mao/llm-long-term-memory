@@ -119,6 +119,14 @@ class IngestSpec:
     `differences()` reports it and the resume is refused rather than silently mixed.
     """
 
+    update_linking: str = "off"
+    """Stage D's cross-key update linking, with its judge prompt and gate.
+
+    It changes which facts are current, so a store built with it is not the system a
+    store built without it is. Omitted from the stored form when off, like
+    `specificity_repair`, so fingerprints already on disk keep matching.
+    """
+
     def as_dict(self) -> dict[str, str]:
         """The stored form. Kept as a flat string dict because it is what is written
         to `meta` and compared against stores written before this refactor — the
@@ -139,6 +147,8 @@ class IngestSpec:
             # Omitted when off, so a fingerprint written before this existed still
             # matches a run that does not use it, and no store needs rebuilding.
             fp["specificity_repair"] = self.specificity_repair
+        if self.update_linking != "off":
+            fp["update_linking"] = self.update_linking
         if self.dedup_threshold is not None:
             fp["dedup_threshold"] = self.dedup_threshold
             # Only meaningful where deduplication runs at all, and kept beside the
@@ -153,7 +163,12 @@ def _threshold(value: Any) -> str | None:
 
 
 def from_runtime(
-    extractor: Any, *, sessions_per_request: int, dedup: Any = None, repair: Any = None
+    extractor: Any,
+    *,
+    sessions_per_request: int,
+    dedup: Any = None,
+    repair: Any = None,
+    linker: Any = None,
 ) -> IngestSpec:
     """The spec of the objects that are about to write rows.
 
@@ -174,6 +189,7 @@ def from_runtime(
         # built with a different comparison rule then fingerprints as what it is.
         dedup_scope=str(getattr(dedup, "scope", "namespace")),
         specificity_repair=_repair(repair),
+        update_linking=linker.identity if linker is not None else "off",
     )
 
 
@@ -209,7 +225,16 @@ def from_config(cfg: Any, *, sessions_per_request: int) -> IngestSpec:
         # `ingest.dedupe_sessions` is a corpus-planning flag and does not gate it.
         dedup_threshold=_threshold(cfg.ingest.dedupe_similarity_threshold),
         specificity_repair=_repair(configured_repair(cfg)),
+        update_linking=_configured_linking(cfg),
     )
+
+
+def _configured_linking(cfg: Any) -> str:
+    if not getattr(cfg.ingest, "update_linking", False):
+        return "off"
+    from llm_long_term_memory.temporal.transition import UpdateLinker
+
+    return UpdateLinker.identity_for()
 
 
 def differences(previous: dict[str, str], current: dict[str, str]) -> list[str]:

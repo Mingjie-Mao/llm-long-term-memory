@@ -1,0 +1,269 @@
+{
+ "targets": 22,
+ "questions": [
+  {
+   "question_id": "07741c45",
+   "split": "heldout100",
+   "failure": "latest_value",
+   "t4_correct_of_3": 1,
+   "oracle_correct_of_3": 0,
+   "oracle_answers": [
+    "I do not know.",
+    "I do not know.",
+    "I do not know."
+   ]
+  },
+  {
+   "question_id": "59524333",
+   "split": "dev100",
+   "failure": "latest_value",
+   "t4_correct_of_3": 0,
+   "oracle_correct_of_3": 3,
+   "oracle_answers": [
+    "You usually go to the gym at 6:00 pm, as updated in your recent schedule (previously you went at 7:00 pm on Mondays, Wednesdays, and Fridays).",
+    "You usually go to the gym at 6:00 pm, as of your most recent update on May 30, 2023 (previously it was 7:00 pm on Mondays, Wednesdays, and Fridays).",
+    "You usually go to the gym at 6:00 pm, as updated in your recent schedule."
+   ]
+  },
+  {
+   "question_id": "945e3d21",
+   "split": "dev100",
+   "failure": "latest_value",
+   "t4_correct_of_3": 2,
+   "oracle_correct_of_3": 3,
+   "oracle_answers": [
+    "You attend yoga classes three times a week to help clear your head and focus.",
+    "You attend yoga classes three times a week to help clear your head and focus.",
+    "You attend yoga classes three times a week to help clear your head and focus."
+   ]
+  },
+  {
+   "question_id": "c4ea545c",
+   "split": "dev100",
+   "failure": "latest_value",
+   "t4_correct_of_3": 0,
+   "oracle_correct_of_3": 3,
+   "oracle_answers": [
+    "Yes, your gym frequency has increased. Previously, you went three times a week (Tuesdays, Thursdays, and Saturdays), but you recently updated your routine to four times a week.",
+    "Yes, you go to the gym more frequently now. Previously you worked out three times a week (Tuesdays, Thursdays, and Saturdays), but your recent routine has increased to four times a week.",
+    "Yes, you go to the gym more frequently now. Previously you went three days a week (Tuesdays, Thursdays, and Saturdays), but more recently you mentioned going four times a week."
+   ]
+  },
+  {
+   "question_id": "0977f2af",
+   "split": "heldout100",
+   "failure": "temporal_order",
+   "t4_correct_of_3": 0,
+   "oracle_correct_of_3": 0,
+   "oracle_answers": [
+    "I do not know.",
+    "I do not know.",
+    "I do not know."
+   ]
+  },
+  {
+   "question_id": "gpt4_fe651585",
+   "split": "heldout100",
+   "failure": "temporal_order",
+   "t4_correct_of_3": 2,
+   "oracle_correct_of_3": 3,
+   "oracle_answers": [
+    "Alex became a parent first.",
+    "Alex became a parent first, about a month ago, whereas Rachel had her baby in February 2023.",
+    "Alex became a parent first."
+   ]
+  },
+  {
+   "question_id": "gpt4_59149c78",
+   "split": "dev100",
+   "failure": "temporal_window",
+   "t4_correct_of_3": 2,
+   "oracle_correct_of_3": 3,
+   "oracle_answers": [
+    "You attended the \"Ancient Civilizations\" exhibit at the Metropolitan Museum of Art.",
+    "The event you attended two weeks ago, the \"Ancient Civilizations\" exhibit, was held at the Metropolitan Museum of Art in New York City.",
+    "You attended the \"Ancient Civilizations\" exhibit at the Metropolitan Museum of Art."
+   ]
+  },
+  {
+   "question_id": "gpt4_e414231f",
+   "split": "dev100",
+   "failure": "temporal_window",
+   "t4_correct_of_3": 1,
+   "oracle_correct_of_3": 3,
+   "oracle_answers": [
+    "You worked on your road bike this past weekend, upgrading its pedals to Shimano Ultegra clipless pedals.",
+    "You worked on your road bike this past weekend, upgrading its pedals to Shimano Ultegra clipless pedals.",
+    "You worked on your road bike this past weekend, upgrading its pedals to Shimano Ultegra clipless pedals."
+   ]
+  },
+  {
+   "question_id": "gpt4_f420262d",
+   "split": "dev100",
+   "failure": "temporal_window",
+   "t4_correct_of_3": 0,
+   "oracle_correct_of_3": 0,
+   "oracle_answers": [
+    "I do not know.",
+    "I do not know.",
+    "I do not know."
+   ]
+  },
+  {
+   "question_id": "gpt4_468eb063",
+   "split": "heldout100",
+   "failure": "date_arithmetic",
+   "t4_correct_of_3": 2,
+   "oracle_correct_of_3": 0,
+   "oracle_answers": [
+    "I do not know.",
+    "I do not know.",
+    "I do not know."
+   ]
+  },
+  {
+   "question_id": "gpt4_85da3956",
+   "split": "dev100",
+   "failure": "date_arithmetic",
+   "t4_correct_of_3": 1,
+   "oracle_correct_of_3": 3,
+   "oracle_answers": [
+    "You attended the 'Summer Nights' festival at Universal Studios Hollywood about 3.0 weeks ago (or 21 days ago, on July 15, 2023).",
+    "You attended the 'Summer Nights' festival at Universal Studios Hollywood about 3.0 weeks ago (21 days ago, on July 15, 2023).",
+    "You attended the 'Summer Nights' festival at Universal Studios Hollywood 3 weeks ago (on July 15, 2023)."
+   ]
+  },
+  {
+   "question_id": "gpt4_93159ced",
+   "split": "dev100",
+   "failure": "derivation",
+   "t4_correct_of_3": 2,
+   "oracle_correct_of_3": 3,
+   "oracle_answers": [
+    "You had been working professionally for about 4 years and 9 months before you started your job at NovaTech (having worked for 9 years total and about 4 years and 3 months at NovaTech).",
+    "You had been working professionally for about 4 years and 9 months before starting your job at NovaTech (9 years total professional experience minus 4 years and 3 months at NovaTech).",
+    "You have been working professionally for about 4 years and 9 months before you started your current job at NovaTech (9 years total experience minus 4 years and 3 months at NovaTech)."
+   ]
+  },
+  {
+   "question_id": "9ee3ecd6",
+   "split": "heldout100",
+   "failure": "derivation",
+   "t4_correct_of_3": 0,
+   "oracle_correct_of_3": 0,
+   "oracle_answers": [
+    "I do not know.",
+    "I do not know.",
+    "I do not know."
+   ]
+  },
+  {
+   "question_id": "e6041065",
+   "split": "heldout100",
+   "failure": "derivation",
+   "t4_correct_of_3": 1,
+   "oracle_correct_of_3": 0,
+   "oracle_answers": [
+    "I do not know.",
+    "I do not know.",
+    "I do not know."
+   ]
+  },
+  {
+   "question_id": "60159905",
+   "split": "heldout100",
+   "failure": "count_or_sum",
+   "t4_correct_of_3": 2,
+   "oracle_correct_of_3": 0,
+   "oracle_answers": [
+    "I do not know.",
+    "I do not know.",
+    "I do not know."
+   ]
+  },
+  {
+   "question_id": "bf659f65",
+   "split": "heldout100",
+   "failure": "count_or_sum",
+   "t4_correct_of_3": 0,
+   "oracle_correct_of_3": 0,
+   "oracle_answers": [
+    "I do not know.",
+    "I do not know.",
+    "I do not know."
+   ]
+  },
+  {
+   "question_id": "gpt4_59c863d7",
+   "split": "dev100",
+   "failure": "count_or_sum",
+   "t4_correct_of_3": 1,
+   "oracle_correct_of_3": 0,
+   "oracle_answers": [
+    "You have worked on or bought 4 model kits: a 1/72 scale B-29 bomber, a 1/24 scale '69 Camaro, a Revell F-15 Eagle, a 1/16 scale German Tiger I tank, and a Tamiya 1/48 scale Spitfire Mk.V.",
+    "You have worked on or bought 4 model kits: the 1/72 scale B-29 bomber, the 1/24 scale '69 Camaro, the Revell F-15 Eagle, the 1/16 scale German Tiger I tank, and the Tamiya 1/48 scale Spitfire Mk.V.",
+    "You have worked on or bought 4 model kits: a 1/72 scale B-29 bomber, a 1/24 scale '69 Camaro, a Revell F-15 Eagle, a 1/16 scale German Tiger I tank, and a Tamiya 1/48 scale Spitfire Mk.V."
+   ]
+  },
+  {
+   "question_id": "gpt4_e05b82a6",
+   "split": "dev100",
+   "failure": "count_or_sum",
+   "t4_correct_of_3": 1,
+   "oracle_correct_of_3": 0,
+   "oracle_answers": [
+    "You rode rollercoasters 8 times across the events you attended from July to October (3 times on Revenge of the Mummy, 1 time on Xcelerator, 3 times on Space Mountain: Ghost Galaxy, and 1 ride each on Mako, Kraken, and Manta).",
+    "You rode rollercoasters 8 times in total across those events (3 times on Revenge of the Mummy, 1 time on Xcelerator, 3 times on Space Mountain: Ghost Galaxy, and 3 rollercoasters — Mako, Kraken, and Manta — at SeaWorld San Diego).",
+    "You rode rollercoasters 8 times across those events: 3 times on Revenge of the Mummy on October 15th, 1 time on Xcelerator on October 8th, 3 times on Space Mountain: Ghost Galaxy on September 24th, and 3 rollercoasters (Mako, Kraken, and Manta) in July."
+   ]
+  },
+  {
+   "question_id": "gpt4_9a159967",
+   "split": "heldout100",
+   "failure": "count_or_sum",
+   "t4_correct_of_3": 1,
+   "oracle_correct_of_3": 0,
+   "oracle_answers": [
+    "I do not know.",
+    "I do not know.",
+    "I do not know."
+   ]
+  },
+  {
+   "question_id": "5d3d2817",
+   "split": "dev100",
+   "failure": "missed_detail",
+   "t4_correct_of_3": 0,
+   "oracle_correct_of_3": 3,
+   "oracle_answers": [
+    "Your previous occupation was a marketing specialist at a small startup.",
+    "Your previous occupation was a marketing specialist at a small startup.",
+    "Your previous occupation was a marketing specialist at a small startup."
+   ]
+  },
+  {
+   "question_id": "54026fce",
+   "split": "heldout100",
+   "failure": "preference_use",
+   "t4_correct_of_3": 2,
+   "oracle_correct_of_3": 0,
+   "oracle_answers": [
+    "I do not know.",
+    "I do not know.",
+    "I do not know."
+   ]
+  },
+  {
+   "question_id": "gpt4_2f56ae70",
+   "split": "heldout100",
+   "failure": "temporal_order",
+   "t4_correct_of_3": 1,
+   "oracle_correct_of_3": 0,
+   "oracle_answers": [
+    "You started using Netflix most recently.",
+    "I do not know.",
+    "I do not know."
+   ]
+  }
+ ]
+}

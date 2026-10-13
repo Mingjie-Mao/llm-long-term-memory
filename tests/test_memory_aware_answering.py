@@ -21,7 +21,7 @@ from llm_long_term_memory.evaluation.judge import (
     Judge,
 )
 from llm_long_term_memory.evaluation.runners.base import ANSWER_SYSTEM
-from llm_long_term_memory.evaluation.runners.memory import render_grouped
+from llm_long_term_memory.runtime.context import render_grouped
 from llm_long_term_memory.store import Memory
 
 NOW = datetime(2026, 8, 14)

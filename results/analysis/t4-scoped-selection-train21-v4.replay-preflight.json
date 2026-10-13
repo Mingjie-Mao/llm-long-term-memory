@@ -1,0 +1,1023 @@
+{
+  "provider_calls": 0,
+  "experiment_class": "exposed-train150-exact-request-replay-preflight",
+  "selection_basis": "exact request sequence, response/output and source/calculation audit; not correctness",
+  "replay_ids": [
+    "0ddfec37_abs",
+    "1568498a",
+    "51a45a95",
+    "6456829e",
+    "6e984301",
+    "95228167",
+    "9d25d4e0",
+    "a89d7624",
+    "af8d2e46",
+    "b46e15ed",
+    "eaca4986",
+    "ed4ddc30",
+    "f685340e",
+    "f9e8c073",
+    "gpt4_2f8be40d",
+    "gpt4_7a0daae1",
+    "gpt4_7ddcf75f",
+    "gpt4_a1b77f9c",
+    "gpt4_a2d1d1f6"
+  ],
+  "fresh_ids": [
+    "09ba9854",
+    "gpt4_731e37d7"
+  ],
+  "questions": 21,
+  "rows": [
+    {
+      "question_id": "09ba9854",
+      "replay_eligible": false,
+      "proof": null,
+      "context_tokens": 6667,
+      "calculation": {
+        "mechanism": "user_quote_savings",
+        "quotes": {
+          "train": [
+            {
+              "source": "E2",
+              "source_id": "scoped-session-v1:8:09ba9854answer_96c743d0_2:8",
+              "quote": "No, I'm pretty sure my friend said it's $10 to get from the airport to the hotel by train.",
+              "said": "2023-05-22",
+              "amount": "10",
+              "currency": "$"
+            },
+            {
+              "source": "E3",
+              "source_id": "scoped-session-v1:8:09ba9854answer_96c743d0_2:4",
+              "quote": "I was thinking of taking the train from the airport to my hotel, my friend told me it's only around $10.",
+              "said": "2023-05-22",
+              "amount": "10",
+              "currency": "$"
+            },
+            {
+              "source": "E5",
+              "source_id": "scoped-session-v1:8:09ba9854answer_96c743d0_2:6",
+              "quote": "I think I got the price from my friend wrong, yeah it's actually $10 to get to my hotel from the airport by train.",
+              "said": "2023-05-22",
+              "amount": "10",
+              "currency": "$"
+            }
+          ],
+          "taxi": [
+            {
+              "source": "E1",
+              "source_id": "scoped-session-v1:8:09ba9854answer_96c743d0_1:6",
+              "quote": "By the way, I was told that taking a taxi from the airport to my hotel would cost around $60, which is a bit pricey for me.",
+              "said": "2023-05-26",
+              "amount": "60",
+              "currency": "$"
+            }
+          ]
+        },
+        "formula": "original minus chosen",
+        "result": "50",
+        "currency": "$",
+        "approximate": true
+      }
+    },
+    {
+      "question_id": "0ddfec37_abs",
+      "replay_eligible": true,
+      "proof": {
+        "source_reader_sha256": "9dbcf6707f15f3dbecb2199e85a500b471886d91bbe3effd81ee8e86c6d621db",
+        "source_files": {
+          "results/analysis/t4-scoped-selection-train21-v3.execution.json": "8c8246b4e37e3cfbd97dce637a7e7f22157b3fb6c90c62db3ff031374dd01c72",
+          "results/raw/t4-scoped-selection-train21-v3.readers.jsonl": "dcaca22ffec94ca35654877b4aa7ba8746b7276ef8a30bcd0e9ce6b6df3adf33",
+          "results/raw/t4-scoped-selection-train21-v3.grades.jsonl": "55a9a6ddf2e0e038ff8840aea5c4a9dbdbac333dd1f4329e9e9cf98aa9c99da6",
+          "results/raw/t4-scoped-selection-train21-v3.gap-grades.jsonl": "40266f9dbe8e47d30c5cf834618afc3767311f3f4cc56a375d2cff5d7e4ac9f5"
+        },
+        "judge_request_sha256": {
+          "original": "b6c8bd0651991b84ff43c7f78b6e818595d8d46b64e7c0c70bc02357dbb1f889"
+        },
+        "judge_prompt_version": "lme-type-aware-v2",
+        "kind": "historical exact logical requests/responses/output/calculation audit; zero fresh generations"
+      },
+      "context_tokens": 6473,
+      "calculation": {
+        "mechanism": "requested_collection_category_absent",
+        "requested_category": "football",
+        "reviewed_sources": [
+          "E1",
+          "E2",
+          "E3",
+          "E4",
+          "E5",
+          "E6",
+          "E7",
+          "E8",
+          "E9",
+          "E10",
+          "E11",
+          "E12",
+          "E13",
+          "E14",
+          "E15",
+          "E16",
+          "E17",
+          "E18",
+          "E19",
+          "E20",
+          "E21",
+          "E22",
+          "E23",
+          "E24",
+          "E25",
+          "E26",
+          "E27",
+          "E28",
+          "E29",
+          "E30",
+          "E31",
+          "E32",
+          "E33",
+          "E34",
+          "E35",
+          "E36",
+          "E37",
+          "E38",
+          "E39",
+          "E40",
+          "E41",
+          "E42",
+          "E43",
+          "E44",
+          "E45",
+          "E46",
+          "E47",
+          "E48",
+          "E49",
+          "E50",
+          "E51",
+          "E52",
+          "E53"
+        ],
+        "scope": "supplied sources only"
+      }
+    },
+    {
+      "question_id": "1568498a",
+      "replay_eligible": true,
+      "proof": {
+        "source_reader_sha256": "5bea5a7d9394c5b8baab6fb9fdb696c3cd3f2c92d977eebdbc8a1a10b2e35191",
+        "source_files": {
+          "results/analysis/t4-scoped-selection-train21-v3.execution.json": "8c8246b4e37e3cfbd97dce637a7e7f22157b3fb6c90c62db3ff031374dd01c72",
+          "results/raw/t4-scoped-selection-train21-v3.readers.jsonl": "dcaca22ffec94ca35654877b4aa7ba8746b7276ef8a30bcd0e9ce6b6df3adf33",
+          "results/raw/t4-scoped-selection-train21-v3.grades.jsonl": "55a9a6ddf2e0e038ff8840aea5c4a9dbdbac333dd1f4329e9e9cf98aa9c99da6",
+          "results/raw/t4-scoped-selection-train21-v3.gap-grades.jsonl": "40266f9dbe8e47d30c5cf834618afc3767311f3f4cc56a375d2cff5d7e4ac9f5"
+        },
+        "judge_request_sha256": {
+          "original": "7a0aef559b353ebd71f0082385e5fd7ad07ae3739f7c39b4a9f13bf4b8bd5c0a"
+        },
+        "judge_prompt_version": "lme-type-aware-v2",
+        "kind": "historical exact logical requests/responses/output/calculation audit; zero fresh generations"
+      },
+      "context_tokens": 6347,
+      "calculation": null
+    },
+    {
+      "question_id": "51a45a95",
+      "replay_eligible": true,
+      "proof": {
+        "source_reader_sha256": "0a5dafa033149cd6c8e12a1cb99fc351934b01d25e5b0937e5c01a416baf2573",
+        "source_files": {
+          "results/analysis/t4-scoped-selection-train21-v3.execution.json": "8c8246b4e37e3cfbd97dce637a7e7f22157b3fb6c90c62db3ff031374dd01c72",
+          "results/raw/t4-scoped-selection-train21-v3.readers.jsonl": "dcaca22ffec94ca35654877b4aa7ba8746b7276ef8a30bcd0e9ce6b6df3adf33",
+          "results/raw/t4-scoped-selection-train21-v3.grades.jsonl": "55a9a6ddf2e0e038ff8840aea5c4a9dbdbac333dd1f4329e9e9cf98aa9c99da6",
+          "results/raw/t4-scoped-selection-train21-v3.gap-grades.jsonl": "40266f9dbe8e47d30c5cf834618afc3767311f3f4cc56a375d2cff5d7e4ac9f5"
+        },
+        "judge_request_sha256": {
+          "original": "6a9a4b57249064ef8ea1b2d99bc727ba2981e801f7c01e66b496e3a3f33be6cd"
+        },
+        "judge_prompt_version": "lme-type-aware-v2",
+        "kind": "historical exact logical requests/responses/output/calculation audit; zero fresh generations"
+      },
+      "context_tokens": 6564,
+      "calculation": {
+        "mechanism": "redemption_place",
+        "inferred": true,
+        "location_citations": [
+          {
+            "source": "E1",
+            "quote": "I actually redeemed a $5 coupon on coffee creamer last Sunday, which was a nice surprise since I didn't know I had it in my email inbox."
+          },
+          {
+            "source": "E49",
+            "quote": "I shop at Target pretty frequently, maybe every other week. I like buying household items, toiletries, and sometimes clothes for my kids. I've also been using their Cartwheel app for a few weeks now and have saved around $20 total on various household items.",
+            "place": "Target"
+          }
+        ]
+      }
+    },
+    {
+      "question_id": "6456829e",
+      "replay_eligible": true,
+      "proof": {
+        "source_reader_sha256": "9a4ac8856d523e703ae73cc64b80c8dce6b5492aa912e6bc1d06eefc70da3a3e",
+        "source_files": {
+          "results/analysis/t4-scoped-selection-train21-v3.execution.json": "8c8246b4e37e3cfbd97dce637a7e7f22157b3fb6c90c62db3ff031374dd01c72",
+          "results/raw/t4-scoped-selection-train21-v3.readers.jsonl": "dcaca22ffec94ca35654877b4aa7ba8746b7276ef8a30bcd0e9ce6b6df3adf33",
+          "results/raw/t4-scoped-selection-train21-v3.grades.jsonl": "55a9a6ddf2e0e038ff8840aea5c4a9dbdbac333dd1f4329e9e9cf98aa9c99da6",
+          "results/raw/t4-scoped-selection-train21-v3.gap-grades.jsonl": "40266f9dbe8e47d30c5cf834618afc3767311f3f4cc56a375d2cff5d7e4ac9f5"
+        },
+        "judge_request_sha256": {
+          "original": "44a5ce9c78f467b08e95ac8e8dad78e266493c18afd7286fe138f4dd8ccf4bcb"
+        },
+        "judge_prompt_version": "lme-type-aware-v2",
+        "kind": "historical exact logical requests/responses/output/calculation audit; zero fresh generations"
+      },
+      "context_tokens": 6393,
+      "calculation": null
+    },
+    {
+      "question_id": "6e984301",
+      "replay_eligible": true,
+      "proof": {
+        "source_reader_sha256": "f8fd30303df767ea56c694a86bd2b6cd71a5fe519223302f012adb3870205974",
+        "source_files": {
+          "results/analysis/t4-scoped-selection-train21-v3.execution.json": "8c8246b4e37e3cfbd97dce637a7e7f22157b3fb6c90c62db3ff031374dd01c72",
+          "results/raw/t4-scoped-selection-train21-v3.readers.jsonl": "dcaca22ffec94ca35654877b4aa7ba8746b7276ef8a30bcd0e9ce6b6df3adf33",
+          "results/raw/t4-scoped-selection-train21-v3.grades.jsonl": "55a9a6ddf2e0e038ff8840aea5c4a9dbdbac333dd1f4329e9e9cf98aa9c99da6",
+          "results/raw/t4-scoped-selection-train21-v3.gap-grades.jsonl": "40266f9dbe8e47d30c5cf834618afc3767311f3f4cc56a375d2cff5d7e4ac9f5"
+        },
+        "judge_request_sha256": {
+          "original": "d9408f4eae6713814c9defea39c8c9ba81d67aaed031be04b7a1ea21ab4b839b"
+        },
+        "judge_prompt_version": "lme-type-aware-v2",
+        "kind": "historical exact logical requests/responses/output/calculation audit; zero fresh generations"
+      },
+      "context_tokens": 6363,
+      "calculation": null
+    },
+    {
+      "question_id": "95228167",
+      "replay_eligible": true,
+      "proof": {
+        "source_reader_sha256": "ea83656b9949deb3216bd50ac8cf49db8b783445a4f3a956bc75bb13914d3094",
+        "source_files": {
+          "results/analysis/t4-scoped-selection-train21-v3.execution.json": "8c8246b4e37e3cfbd97dce637a7e7f22157b3fb6c90c62db3ff031374dd01c72",
+          "results/raw/t4-scoped-selection-train21-v3.readers.jsonl": "dcaca22ffec94ca35654877b4aa7ba8746b7276ef8a30bcd0e9ce6b6df3adf33",
+          "results/raw/t4-scoped-selection-train21-v3.grades.jsonl": "55a9a6ddf2e0e038ff8840aea5c4a9dbdbac333dd1f4329e9e9cf98aa9c99da6",
+          "results/raw/t4-scoped-selection-train21-v3.gap-grades.jsonl": "40266f9dbe8e47d30c5cf834618afc3767311f3f4cc56a375d2cff5d7e4ac9f5"
+        },
+        "judge_request_sha256": {
+          "original": "c1a7dde7001a991a1627b67684b5a73ee75de46f5eb9a940bd8fa8467b0a68fa"
+        },
+        "judge_prompt_version": "lme-type-aware-v2",
+        "kind": "historical exact logical requests/responses/output/calculation audit; zero fresh generations"
+      },
+      "context_tokens": 6351,
+      "calculation": null
+    },
+    {
+      "question_id": "9d25d4e0",
+      "replay_eligible": true,
+      "proof": {
+        "source_reader_sha256": "a47448aa995942cc78aced08c997a1c9c017bcd872e2327af7d16eb40e90c22a",
+        "source_files": {
+          "results/analysis/t4-scoped-selection-train21-v3.execution.json": "8c8246b4e37e3cfbd97dce637a7e7f22157b3fb6c90c62db3ff031374dd01c72",
+          "results/raw/t4-scoped-selection-train21-v3.readers.jsonl": "dcaca22ffec94ca35654877b4aa7ba8746b7276ef8a30bcd0e9ce6b6df3adf33",
+          "results/raw/t4-scoped-selection-train21-v3.grades.jsonl": "55a9a6ddf2e0e038ff8840aea5c4a9dbdbac333dd1f4329e9e9cf98aa9c99da6",
+          "results/raw/t4-scoped-selection-train21-v3.gap-grades.jsonl": "40266f9dbe8e47d30c5cf834618afc3767311f3f4cc56a375d2cff5d7e4ac9f5"
+        },
+        "judge_request_sha256": {
+          "original": "fd4cc0057a62a9dd2b713517a84c0dc20f33b84c0d12002b2602ad704ae407e5"
+        },
+        "judge_prompt_version": "lme-type-aware-v2",
+        "kind": "historical exact logical requests/responses/output/calculation audit; zero fresh generations"
+      },
+      "context_tokens": 6502,
+      "calculation": null
+    },
+    {
+      "question_id": "a89d7624",
+      "replay_eligible": true,
+      "proof": {
+        "source_reader_sha256": "b9b6385d201134027b5b860d50ea02b669afe1cca7deb15ec569584258b933f3",
+        "source_files": {
+          "results/analysis/t4-scoped-selection-train21-v3.execution.json": "8c8246b4e37e3cfbd97dce637a7e7f22157b3fb6c90c62db3ff031374dd01c72",
+          "results/raw/t4-scoped-selection-train21-v3.readers.jsonl": "dcaca22ffec94ca35654877b4aa7ba8746b7276ef8a30bcd0e9ce6b6df3adf33",
+          "results/raw/t4-scoped-selection-train21-v3.grades.jsonl": "55a9a6ddf2e0e038ff8840aea5c4a9dbdbac333dd1f4329e9e9cf98aa9c99da6",
+          "results/raw/t4-scoped-selection-train21-v3.gap-grades.jsonl": "40266f9dbe8e47d30c5cf834618afc3767311f3f4cc56a375d2cff5d7e4ac9f5"
+        },
+        "judge_request_sha256": {
+          "original": "46c94e54e16932115d320046bfd6847807c2609273453af05b4d4c3ee6c0b4ba"
+        },
+        "judge_prompt_version": "lme-type-aware-v2",
+        "kind": "historical exact logical requests/responses/output/calculation audit; zero fresh generations"
+      },
+      "context_tokens": 6459,
+      "calculation": null
+    },
+    {
+      "question_id": "af8d2e46",
+      "replay_eligible": true,
+      "proof": {
+        "source_reader_sha256": "e9b514d30fbaf90ae3dd38b0bca0af9160ec9eee666701af58aac47cd1ed0a99",
+        "source_files": {
+          "results/analysis/t4-scoped-selection-train21-v3.execution.json": "8c8246b4e37e3cfbd97dce637a7e7f22157b3fb6c90c62db3ff031374dd01c72",
+          "results/raw/t4-scoped-selection-train21-v3.readers.jsonl": "dcaca22ffec94ca35654877b4aa7ba8746b7276ef8a30bcd0e9ce6b6df3adf33",
+          "results/raw/t4-scoped-selection-train21-v3.grades.jsonl": "55a9a6ddf2e0e038ff8840aea5c4a9dbdbac333dd1f4329e9e9cf98aa9c99da6",
+          "results/raw/t4-scoped-selection-train21-v3.gap-grades.jsonl": "40266f9dbe8e47d30c5cf834618afc3767311f3f4cc56a375d2cff5d7e4ac9f5"
+        },
+        "judge_request_sha256": {
+          "original": "2d4aa6d4d50ef261bc43b9c9ecc899c00d7bf44c086448ff023ad357a1291a61"
+        },
+        "judge_prompt_version": "lme-type-aware-v2",
+        "kind": "historical exact logical requests/responses/output/calculation audit; zero fresh generations"
+      },
+      "context_tokens": 6282,
+      "calculation": null
+    },
+    {
+      "question_id": "b46e15ed",
+      "replay_eligible": true,
+      "proof": {
+        "source_reader_sha256": "e39882bb952529a55c2f1cec758d502635a9b6132e761c64bdcbb1d18c620b98",
+        "source_files": {
+          "results/analysis/t4-scoped-selection-train21-v3.execution.json": "8c8246b4e37e3cfbd97dce637a7e7f22157b3fb6c90c62db3ff031374dd01c72",
+          "results/raw/t4-scoped-selection-train21-v3.readers.jsonl": "dcaca22ffec94ca35654877b4aa7ba8746b7276ef8a30bcd0e9ce6b6df3adf33",
+          "results/raw/t4-scoped-selection-train21-v3.grades.jsonl": "55a9a6ddf2e0e038ff8840aea5c4a9dbdbac333dd1f4329e9e9cf98aa9c99da6",
+          "results/raw/t4-scoped-selection-train21-v3.gap-grades.jsonl": "40266f9dbe8e47d30c5cf834618afc3767311f3f4cc56a375d2cff5d7e4ac9f5"
+        },
+        "judge_request_sha256": {
+          "original": "5a8a52d6b18ac30b89db5f90288f2de95d26ec66f738e5f99cb46b5ca884b156"
+        },
+        "judge_prompt_version": "lme-type-aware-v2",
+        "kind": "historical exact logical requests/responses/output/calculation audit; zero fresh generations"
+      },
+      "context_tokens": 6306,
+      "calculation": null
+    },
+    {
+      "question_id": "eaca4986",
+      "replay_eligible": true,
+      "proof": {
+        "source_reader_sha256": "35bf9458bf8453d7fd3d7990d31dec25854fbb46d93f62e67a44ed3e1207590e",
+        "source_files": {
+          "results/analysis/t4-scoped-selection-train21-v3.execution.json": "8c8246b4e37e3cfbd97dce637a7e7f22157b3fb6c90c62db3ff031374dd01c72",
+          "results/raw/t4-scoped-selection-train21-v3.readers.jsonl": "dcaca22ffec94ca35654877b4aa7ba8746b7276ef8a30bcd0e9ce6b6df3adf33",
+          "results/raw/t4-scoped-selection-train21-v3.grades.jsonl": "55a9a6ddf2e0e038ff8840aea5c4a9dbdbac333dd1f4329e9e9cf98aa9c99da6",
+          "results/raw/t4-scoped-selection-train21-v3.gap-grades.jsonl": "40266f9dbe8e47d30c5cf834618afc3767311f3f4cc56a375d2cff5d7e4ac9f5"
+        },
+        "judge_request_sha256": {
+          "original": "651eb431076dce4853306d8064791afce10c249b3999a54072ff274f171922e8"
+        },
+        "judge_prompt_version": "lme-type-aware-v2",
+        "kind": "historical exact logical requests/responses/output/calculation audit; zero fresh generations"
+      },
+      "context_tokens": 2630,
+      "calculation": {
+        "mechanism": "ordinal_song_progression",
+        "ordinal": 2,
+        "structural_citation": {
+          "source": "E4",
+          "quote": "C D E F G A B A G F E D C",
+          "session": "scoped-session-v1:8:eaca4986answer_sharegpt_SS141vi_0",
+          "turn": 3
+        },
+        "conversation_citations": [
+          {
+            "source": "E1",
+            "turn": 0,
+            "role": "user"
+          },
+          {
+            "source": "E2",
+            "turn": 1,
+            "role": "assistant"
+          },
+          {
+            "source": "E3",
+            "turn": 2,
+            "role": "user"
+          },
+          {
+            "source": "E4",
+            "turn": 3,
+            "role": "assistant"
+          }
+        ]
+      }
+    },
+    {
+      "question_id": "ed4ddc30",
+      "replay_eligible": true,
+      "proof": {
+        "source_reader_sha256": "9e33751812b7700bb2dce8d82ca0e82402f0433d5948c54dba39ddf363ce8dd5",
+        "source_files": {
+          "results/analysis/t4-scoped-selection-train21-v3.execution.json": "8c8246b4e37e3cfbd97dce637a7e7f22157b3fb6c90c62db3ff031374dd01c72",
+          "results/raw/t4-scoped-selection-train21-v3.readers.jsonl": "dcaca22ffec94ca35654877b4aa7ba8746b7276ef8a30bcd0e9ce6b6df3adf33",
+          "results/raw/t4-scoped-selection-train21-v3.grades.jsonl": "55a9a6ddf2e0e038ff8840aea5c4a9dbdbac333dd1f4329e9e9cf98aa9c99da6",
+          "results/raw/t4-scoped-selection-train21-v3.gap-grades.jsonl": "40266f9dbe8e47d30c5cf834618afc3767311f3f4cc56a375d2cff5d7e4ac9f5"
+        },
+        "judge_request_sha256": {
+          "original": "3289fc92011bbce77052c3d860480a5ee0b10bc54315abf23907b32d5d76c27c"
+        },
+        "judge_prompt_version": "lme-type-aware-v2",
+        "kind": "historical exact logical requests/responses/output/calculation audit; zero fresh generations"
+      },
+      "context_tokens": 6420,
+      "calculation": null
+    },
+    {
+      "question_id": "f685340e",
+      "replay_eligible": true,
+      "proof": {
+        "source_reader_sha256": "03fea7d42472435847056df55f605ad7f174aa8c6a12cf942b6207f730b5ac2a",
+        "source_files": {
+          "results/analysis/t4-scoped-selection-train21-v3.execution.json": "8c8246b4e37e3cfbd97dce637a7e7f22157b3fb6c90c62db3ff031374dd01c72",
+          "results/raw/t4-scoped-selection-train21-v3.readers.jsonl": "dcaca22ffec94ca35654877b4aa7ba8746b7276ef8a30bcd0e9ce6b6df3adf33",
+          "results/raw/t4-scoped-selection-train21-v3.grades.jsonl": "55a9a6ddf2e0e038ff8840aea5c4a9dbdbac333dd1f4329e9e9cf98aa9c99da6",
+          "results/raw/t4-scoped-selection-train21-v3.gap-grades.jsonl": "40266f9dbe8e47d30c5cf834618afc3767311f3f4cc56a375d2cff5d7e4ac9f5"
+        },
+        "judge_request_sha256": {
+          "original": "cb1526ad428c310c34de416f89ec2b2f8abab075bf37c1648c44ab27ed21b347"
+        },
+        "judge_prompt_version": "lme-type-aware-v2",
+        "kind": "historical exact logical requests/responses/output/calculation audit; zero fresh generations"
+      },
+      "context_tokens": 6211,
+      "calculation": null
+    },
+    {
+      "question_id": "f9e8c073",
+      "replay_eligible": true,
+      "proof": {
+        "source_reader_sha256": "c756d82f581264efd39090d8a458397ef878d1dddf81024ff63e8313ce33372e",
+        "source_files": {
+          "results/analysis/t4-scoped-selection-train21-v3.execution.json": "8c8246b4e37e3cfbd97dce637a7e7f22157b3fb6c90c62db3ff031374dd01c72",
+          "results/raw/t4-scoped-selection-train21-v3.readers.jsonl": "dcaca22ffec94ca35654877b4aa7ba8746b7276ef8a30bcd0e9ce6b6df3adf33",
+          "results/raw/t4-scoped-selection-train21-v3.grades.jsonl": "55a9a6ddf2e0e038ff8840aea5c4a9dbdbac333dd1f4329e9e9cf98aa9c99da6",
+          "results/raw/t4-scoped-selection-train21-v3.gap-grades.jsonl": "40266f9dbe8e47d30c5cf834618afc3767311f3f4cc56a375d2cff5d7e4ac9f5"
+        },
+        "judge_request_sha256": {
+          "original": "58ea50ea8b6775a6d74bb1465ac2b49d0ec7c8733644cdb9e4e2f2bd0d6ec447",
+          "gap": "321e0ab2e2f7e1a982fe4c3f2da4c8bb0431065ffb183bea931323126f56b206"
+        },
+        "judge_prompt_version": "lme-type-aware-v2",
+        "kind": "historical exact logical requests/responses/output/calculation audit; zero fresh generations"
+      },
+      "context_tokens": 6861,
+      "calculation": {
+        "mechanism": "scoped_quantity_disclosure",
+        "quantity_citations": [
+          {
+            "source": "E1",
+            "quote": "I did attend three sessions of the bereavement support group, and it really helped me process my emotions. I was wondering if you can provide more information on how to create a memorial or ritual to honor my loved ones. I'm not sure where to start or what kind of ritual would be meaningful to me.",
+            "value": "3",
+            "unit": "sessions",
+            "period": "period unspecified"
+          },
+          {
+            "source": "E3",
+            "quote": "I think I'll start with \"Wild: From Lost to Found on the Pacific Crest Trail\" by Cheryl Strayed. I've heard great things about it and I've always been interested in memoirs. I'm also curious about the self-help books you mentioned, especially \"Daring Greatly\" by Bren\u00e9 Brown. I've heard her TED talks and found them really inspiring. I'll probably check out her book as well. By the way, I was thinking about the bereavement support group I attended last year. I remember attending five sessions and finding it really helpful in processing my emotions.",
+            "value": "5",
+            "unit": "sessions",
+            "period": "last year"
+          }
+        ]
+      }
+    },
+    {
+      "question_id": "gpt4_2f8be40d",
+      "replay_eligible": true,
+      "proof": {
+        "source_reader_sha256": "fdbc62c6294f57198b5d97e6a4f412210f79d5041c8a556c0bed30e555ed30c8",
+        "source_files": {
+          "results/analysis/t4-scoped-selection-train21-v3.execution.json": "8c8246b4e37e3cfbd97dce637a7e7f22157b3fb6c90c62db3ff031374dd01c72",
+          "results/raw/t4-scoped-selection-train21-v3.readers.jsonl": "dcaca22ffec94ca35654877b4aa7ba8746b7276ef8a30bcd0e9ce6b6df3adf33",
+          "results/raw/t4-scoped-selection-train21-v3.grades.jsonl": "55a9a6ddf2e0e038ff8840aea5c4a9dbdbac333dd1f4329e9e9cf98aa9c99da6",
+          "results/raw/t4-scoped-selection-train21-v3.gap-grades.jsonl": "40266f9dbe8e47d30c5cf834618afc3767311f3f4cc56a375d2cff5d7e4ac9f5"
+        },
+        "judge_request_sha256": {
+          "original": "8289803621bff665a66417c25adefcecaf422340c077cc5de4b2e535fa1230c9",
+          "gap": "360e7bf8ad957b802a699cf6ffdf97079ac90e7bb152e547133176b496eb6cab"
+        },
+        "judge_prompt_version": "lme-type-aware-v2",
+        "kind": "historical exact logical requests/responses/output/calculation audit; zero fresh generations"
+      },
+      "context_tokens": 3359,
+      "calculation": {
+        "mechanism": "unresolved_personal_event_references",
+        "category": "wedding",
+        "missing_fields": [
+          "event_identity",
+          "event_date",
+          "report_period",
+          "attendance"
+        ],
+        "repeated_unnamed_relations": [
+          "cousin"
+        ],
+        "mentions": [
+          {
+            "source": "E1",
+            "source_id": "scoped-session-v1:13:gpt4_2f8be40danswer_e7b0637e_1:0",
+            "session_id": "scoped-session-v1:13:gpt4_2f8be40danswer_e7b0637e_1",
+            "quote": "I'm getting married soon and I'm looking for some wedding venue ideas. I've been to a few weddings recently and one of them was my cousin's wedding at a vineyard in August, which was just stunning. Do you have any recommendations for outdoor wedding venues that could accommodate a similar atmosphere?",
+            "owner": "cousin",
+            "relation": "cousin",
+            "named": false,
+            "dated": true,
+            "event_clause": "I've been to a few weddings recently and one of them was my cousin's wedding at a vineyard in August, which was just stunning"
+          },
+          {
+            "source": "E5",
+            "source_id": "scoped-session-v1:13:gpt4_2f8be40d81b971b8_2:4",
+            "session_id": "scoped-session-v1:13:gpt4_2f8be40d81b971b8_2",
+            "quote": "I think I've got a good idea of how to keep the conversation light and fun. Thanks for the tips! By the way, speaking of weddings, my sister's wedding was just amazing, and I'm still on a high from it. We had such a great time planning it together, from choosing the dress to deciding on the menu. It was really special to be a part of it.",
+            "owner": "sister",
+            "relation": "sister",
+            "named": false,
+            "dated": false,
+            "event_clause": "By the way, speaking of weddings, my sister's wedding was just amazing, and I'm still on a high from it"
+          },
+          {
+            "source": "E11",
+            "source_id": "scoped-session-v1:13:gpt4_2f8be40danswer_e7b0637e_2:0",
+            "session_id": "scoped-session-v1:13:gpt4_2f8be40danswer_e7b0637e_2",
+            "quote": "I'm planning my own wedding and I need some help with finding a venue. I've always dreamed of having a small, outdoor ceremony, maybe at a beach or in a park. Do you have any recommendations or resources for finding the perfect spot? By the way, I just got back from my college roommate's wedding in the city, and it was beautiful - they had a rooftop garden ceremony overlooking the skyline, and it was so romantic. My friend Emily finally got to tie the knot with her partner Sarah, and it was amazing to see them so happy after waiting for marriage equality.",
+            "owner": "college roommate",
+            "relation": "roommate",
+            "named": false,
+            "dated": false,
+            "event_clause": "By the way, I just got back from my college roommate's wedding in the city, and it was beautiful - they had a rooftop garden ceremony overlooking the skyline, and it was so romantic"
+          },
+          {
+            "source": "E14",
+            "source_id": "scoped-session-v1:13:gpt4_2f8be40d1d6e01e8:0",
+            "session_id": "scoped-session-v1:13:gpt4_2f8be40d1d6e01e8",
+            "quote": "I'm trying to find my grandmother's silver locket that she gave me on my 18th birthday. I last wore it to my cousin's wedding last month, but now it's nowhere to be found. Can you help me think of where I might have misplaced it?",
+            "owner": "cousin",
+            "relation": "cousin",
+            "named": false,
+            "dated": true,
+            "event_clause": "I last wore it to my cousin's wedding last month, but now it's nowhere to be found"
+          },
+          {
+            "source": "E17",
+            "source_id": "scoped-session-v1:13:gpt4_2f8be40danswer_e7b0637e_1:4",
+            "session_id": "scoped-session-v1:13:gpt4_2f8be40danswer_e7b0637e_1",
+            "quote": "That's really helpful, thanks! I'm thinking of having a smaller, intimate ceremony, and I was wondering if you could suggest some ways to make it feel more personal and special for our guests. My cousin Rachel's wedding at the vineyard was really lovely, and I think part of what made it so special was the fact that it was a family affair - I was a bridesmaid, and it was great to catch up with family members I hadn't seen in years.",
+            "owner": "cousin Rachel",
+            "relation": "rachel",
+            "named": true,
+            "dated": false,
+            "event_clause": "My cousin Rachel's wedding at the vineyard was really lovely, and I think part of what made it so special was the fact that it was a family affair - I was a bridesmaid, and it was great to catch up with family members I hadn't seen in years"
+          }
+        ],
+        "ledger": {
+          "sources": [
+            {
+              "id": "E1",
+              "kind": "raw",
+              "source_id": "scoped-session-v1:13:gpt4_2f8be40danswer_e7b0637e_1:0",
+              "role": "user",
+              "conversation_date": "2023-10-15",
+              "session_id": "scoped-session-v1:13:gpt4_2f8be40danswer_e7b0637e_1",
+              "turn_index": 0,
+              "state": null,
+              "valid_from": null,
+              "valid_to": null,
+              "event_date": null,
+              "date_expression": null,
+              "date_precision": null,
+              "text_sha256": "cd77b7e6f321cc8b153e8d447f98c259f25d0a3f96d37e80cacb6c23b29bccea"
+            },
+            {
+              "id": "E2",
+              "kind": "raw",
+              "source_id": "scoped-session-v1:13:gpt4_2f8be40danswer_e7b0637e_2:6",
+              "role": "user",
+              "conversation_date": "2023-10-15",
+              "session_id": "scoped-session-v1:13:gpt4_2f8be40danswer_e7b0637e_2",
+              "turn_index": 6,
+              "state": null,
+              "valid_from": null,
+              "valid_to": null,
+              "event_date": null,
+              "date_expression": null,
+              "date_precision": null,
+              "text_sha256": "b41901b1ced67575180abaab410aca26f3eb66ff1e7f8b8d6e18cf35391dcc2d"
+            },
+            {
+              "id": "E3",
+              "kind": "raw",
+              "source_id": "scoped-session-v1:13:gpt4_2f8be40danswer_e7b0637e_2:4",
+              "role": "user",
+              "conversation_date": "2023-10-15",
+              "session_id": "scoped-session-v1:13:gpt4_2f8be40danswer_e7b0637e_2",
+              "turn_index": 4,
+              "state": null,
+              "valid_from": null,
+              "valid_to": null,
+              "event_date": null,
+              "date_expression": null,
+              "date_precision": null,
+              "text_sha256": "f40a52a2b69aee5a75bb7e7f592266cb2397dc6a7621f12a366cc7d66dcad455"
+            },
+            {
+              "id": "E4",
+              "kind": "raw",
+              "source_id": "scoped-session-v1:13:gpt4_2f8be40danswer_e7b0637e_1:2",
+              "role": "user",
+              "conversation_date": "2023-10-15",
+              "session_id": "scoped-session-v1:13:gpt4_2f8be40danswer_e7b0637e_1",
+              "turn_index": 2,
+              "state": null,
+              "valid_from": null,
+              "valid_to": null,
+              "event_date": null,
+              "date_expression": null,
+              "date_precision": null,
+              "text_sha256": "f3c1bac357e56b2691d18e24715c75445345bdb762a52aca2e6237b716016c6d"
+            },
+            {
+              "id": "E5",
+              "kind": "raw",
+              "source_id": "scoped-session-v1:13:gpt4_2f8be40d81b971b8_2:4",
+              "role": "user",
+              "conversation_date": "2023-10-15",
+              "session_id": "scoped-session-v1:13:gpt4_2f8be40d81b971b8_2",
+              "turn_index": 4,
+              "state": null,
+              "valid_from": null,
+              "valid_to": null,
+              "event_date": null,
+              "date_expression": null,
+              "date_precision": null,
+              "text_sha256": "11f9fe8aa8564781df150609950200ededd3b02ddc05e7626c673693d6319229"
+            },
+            {
+              "id": "E6",
+              "kind": "raw",
+              "source_id": "scoped-session-v1:13:gpt4_2f8be40danswer_e7b0637e_3:0",
+              "role": "user",
+              "conversation_date": "2023-10-15",
+              "session_id": "scoped-session-v1:13:gpt4_2f8be40danswer_e7b0637e_3",
+              "turn_index": 0,
+              "state": null,
+              "valid_from": null,
+              "valid_to": null,
+              "event_date": null,
+              "date_expression": "last weekend",
+              "date_precision": "unresolved",
+              "text_sha256": "f0cc4d849a0ef93517566307dcb515942397fccd813c6475bfd72efe6f6da7e3"
+            },
+            {
+              "id": "E7",
+              "kind": "raw",
+              "source_id": "scoped-session-v1:13:gpt4_2f8be40dultrachat_217382:0",
+              "role": "user",
+              "conversation_date": "2023-10-15",
+              "session_id": "scoped-session-v1:13:gpt4_2f8be40dultrachat_217382",
+              "turn_index": 0,
+              "state": null,
+              "valid_from": null,
+              "valid_to": null,
+              "event_date": null,
+              "date_expression": null,
+              "date_precision": null,
+              "text_sha256": "3179e9e72e5e1ad0cf7f8f01081a048cfa911c4aedfa88b4a4dacd06047d0dde"
+            },
+            {
+              "id": "E8",
+              "kind": "raw",
+              "source_id": "scoped-session-v1:13:gpt4_2f8be40danswer_e7b0637e_1:6",
+              "role": "user",
+              "conversation_date": "2023-10-15",
+              "session_id": "scoped-session-v1:13:gpt4_2f8be40danswer_e7b0637e_1",
+              "turn_index": 6,
+              "state": null,
+              "valid_from": null,
+              "valid_to": null,
+              "event_date": null,
+              "date_expression": null,
+              "date_precision": null,
+              "text_sha256": "59b0a1dc7613cca154009dc0e24595e45804804a04106b670fc045d5cdcfa64c"
+            },
+            {
+              "id": "E9",
+              "kind": "raw",
+              "source_id": "scoped-session-v1:13:gpt4_2f8be40dultrachat_217382:2",
+              "role": "user",
+              "conversation_date": "2023-10-15",
+              "session_id": "scoped-session-v1:13:gpt4_2f8be40dultrachat_217382",
+              "turn_index": 2,
+              "state": null,
+              "valid_from": null,
+              "valid_to": null,
+              "event_date": null,
+              "date_expression": null,
+              "date_precision": null,
+              "text_sha256": "78de45884e764ffb4cc3130d3242a345300833a9f0604374244257b4a2e981fe"
+            },
+            {
+              "id": "E10",
+              "kind": "raw",
+              "source_id": "scoped-session-v1:13:gpt4_2f8be40dultrachat_217382:4",
+              "role": "user",
+              "conversation_date": "2023-10-15",
+              "session_id": "scoped-session-v1:13:gpt4_2f8be40dultrachat_217382",
+              "turn_index": 4,
+              "state": null,
+              "valid_from": null,
+              "valid_to": null,
+              "event_date": null,
+              "date_expression": null,
+              "date_precision": null,
+              "text_sha256": "3c63951e6fbfad7c6d1260000c94f12bafbe82dd409ebc28262466aa6a227f3e"
+            },
+            {
+              "id": "E11",
+              "kind": "raw",
+              "source_id": "scoped-session-v1:13:gpt4_2f8be40danswer_e7b0637e_2:0",
+              "role": "user",
+              "conversation_date": "2023-10-15",
+              "session_id": "scoped-session-v1:13:gpt4_2f8be40danswer_e7b0637e_2",
+              "turn_index": 0,
+              "state": null,
+              "valid_from": null,
+              "valid_to": null,
+              "event_date": null,
+              "date_expression": null,
+              "date_precision": null,
+              "text_sha256": "cd9ef8587157f361b07c3a33a69b7fc50985abd6a845b08f0e020071283e32ed"
+            },
+            {
+              "id": "E12",
+              "kind": "raw",
+              "source_id": "scoped-session-v1:13:gpt4_2f8be40danswer_e7b0637e_2:10",
+              "role": "user",
+              "conversation_date": "2023-10-15",
+              "session_id": "scoped-session-v1:13:gpt4_2f8be40danswer_e7b0637e_2",
+              "turn_index": 10,
+              "state": null,
+              "valid_from": null,
+              "valid_to": null,
+              "event_date": null,
+              "date_expression": null,
+              "date_precision": null,
+              "text_sha256": "ac437dcc9ec801d51239b32d5e00baf01fa07e78e8fe7dc1916a3eb043cf83b0"
+            },
+            {
+              "id": "E13",
+              "kind": "raw",
+              "source_id": "scoped-session-v1:13:gpt4_2f8be40danswer_e7b0637e_1:10",
+              "role": "user",
+              "conversation_date": "2023-10-15",
+              "session_id": "scoped-session-v1:13:gpt4_2f8be40danswer_e7b0637e_1",
+              "turn_index": 10,
+              "state": null,
+              "valid_from": null,
+              "valid_to": null,
+              "event_date": null,
+              "date_expression": null,
+              "date_precision": null,
+              "text_sha256": "fa290e20e0c34b699af3fb3415a08b372f2e3473a22fbb0d06676abd5998929c"
+            },
+            {
+              "id": "E14",
+              "kind": "raw",
+              "source_id": "scoped-session-v1:13:gpt4_2f8be40d1d6e01e8:0",
+              "role": "user",
+              "conversation_date": "2023-10-15",
+              "session_id": "scoped-session-v1:13:gpt4_2f8be40d1d6e01e8",
+              "turn_index": 0,
+              "state": null,
+              "valid_from": null,
+              "valid_to": null,
+              "event_date": null,
+              "date_expression": "last month",
+              "date_precision": "unresolved",
+              "text_sha256": "e840433fadc44dab0fe109e758bf3596411756bad6dbd5312360b05273f90b0c"
+            },
+            {
+              "id": "E15",
+              "kind": "raw",
+              "source_id": "scoped-session-v1:13:gpt4_2f8be40danswer_e7b0637e_2:2",
+              "role": "user",
+              "conversation_date": "2023-10-15",
+              "session_id": "scoped-session-v1:13:gpt4_2f8be40danswer_e7b0637e_2",
+              "turn_index": 2,
+              "state": null,
+              "valid_from": null,
+              "valid_to": null,
+              "event_date": null,
+              "date_expression": null,
+              "date_precision": null,
+              "text_sha256": "684458b2107597b54fc37968fa10cff731cef3989c028532b88207f912524a49"
+            },
+            {
+              "id": "E16",
+              "kind": "raw",
+              "source_id": "scoped-session-v1:13:gpt4_2f8be40danswer_e7b0637e_1:8",
+              "role": "user",
+              "conversation_date": "2023-10-15",
+              "session_id": "scoped-session-v1:13:gpt4_2f8be40danswer_e7b0637e_1",
+              "turn_index": 8,
+              "state": null,
+              "valid_from": null,
+              "valid_to": null,
+              "event_date": null,
+              "date_expression": null,
+              "date_precision": null,
+              "text_sha256": "6714a45c01548bf326809c392d7ff008a629760f6d72146b75051149d717e560"
+            },
+            {
+              "id": "E17",
+              "kind": "raw",
+              "source_id": "scoped-session-v1:13:gpt4_2f8be40danswer_e7b0637e_1:4",
+              "role": "user",
+              "conversation_date": "2023-10-15",
+              "session_id": "scoped-session-v1:13:gpt4_2f8be40danswer_e7b0637e_1",
+              "turn_index": 4,
+              "state": null,
+              "valid_from": null,
+              "valid_to": null,
+              "event_date": null,
+              "date_expression": null,
+              "date_precision": null,
+              "text_sha256": "f2baf5032a7aa464a83e3ef9a40f66f768605205b4e0c9f73a6421fcb4644894"
+            },
+            {
+              "id": "E18",
+              "kind": "raw",
+              "source_id": "scoped-session-v1:13:gpt4_2f8be40danswer_e7b0637e_2:8",
+              "role": "user",
+              "conversation_date": "2023-10-15",
+              "session_id": "scoped-session-v1:13:gpt4_2f8be40danswer_e7b0637e_2",
+              "turn_index": 8,
+              "state": null,
+              "valid_from": null,
+              "valid_to": null,
+              "event_date": null,
+              "date_expression": null,
+              "date_precision": null,
+              "text_sha256": "c2430afa2e03a7d1b8e2c0afdedbfd6ba92466ff8c6b2921cf8c139f21f2d98a"
+            }
+          ],
+          "dropped": [],
+          "context_sha256": "2fe40ee7ee595d0b18d42c6337548084df882ab266f886b73497bb83fc0009d3",
+          "max_tokens": 6500
+        },
+        "keyword_search_truncated": false
+      }
+    },
+    {
+      "question_id": "gpt4_731e37d7",
+      "replay_eligible": false,
+      "proof": null,
+      "context_tokens": 6673,
+      "calculation": {
+        "mechanism": "scoped_payment_conflict",
+        "scope_complete": false,
+        "reported_total": "720",
+        "payments": [
+          {
+            "source": "E16",
+            "source_id": "scoped-session-v1:13:gpt4_731e37d7answer_826d51da_2:0",
+            "quote": "I paid $500 to attend",
+            "amount": "500",
+            "unit": "$",
+            "event": "digital marketing workshop"
+          },
+          {
+            "source": "E13",
+            "source_id": "scoped-session-v1:13:gpt4_731e37d7answer_826d51da_3:10",
+            "quote": "I paid $20 to attend",
+            "amount": "20",
+            "unit": "$",
+            "event": "mindfulness workshop"
+          },
+          {
+            "source": "E9",
+            "source_id": "scoped-session-v1:13:gpt4_731e37d7answer_826d51da_4:0",
+            "quote": "I paid $200 to attend",
+            "amount": "200",
+            "unit": "$",
+            "event": "writing workshop"
+          }
+        ],
+        "temporal_conflicts": [
+          {
+            "source": "E16",
+            "source_id": "scoped-session-v1:13:gpt4_731e37d7answer_826d51da_2:0",
+            "quote": "I'm looking to improve my business's online presence and I was wondering if you can recommend some tools for social media analytics. By the way, I just attended a digital marketing workshop at the city convention center on March 15-16, and it was really helpful in understanding the importance of tracking my online engagement. I paid $500 to attend, and it was worth it!",
+            "conversation_date": "2023-02-26",
+            "original_event_expression": "March 15",
+            "inferred_event_date": "2022-03-15",
+            "amount": "500"
+          }
+        ],
+        "duplicate_payment_mentions": [
+          {
+            "source_id": "scoped-session-v1:13:gpt4_731e37d7answer_826d51da_4:4",
+            "quote": "I paid $200 to attend",
+            "event": "writing workshop",
+            "event_date_key": [
+              "november",
+              "original_month_expression"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "question_id": "gpt4_7a0daae1",
+      "replay_eligible": true,
+      "proof": {
+        "source_reader_sha256": "43c29490e2b3c204f095b21012d2f3b7356ff7aa261f5ce08d8fd15296d4f11f",
+        "source_files": {
+          "results/analysis/t4-scoped-selection-train21-v3.execution.json": "8c8246b4e37e3cfbd97dce637a7e7f22157b3fb6c90c62db3ff031374dd01c72",
+          "results/raw/t4-scoped-selection-train21-v3.readers.jsonl": "dcaca22ffec94ca35654877b4aa7ba8746b7276ef8a30bcd0e9ce6b6df3adf33",
+          "results/raw/t4-scoped-selection-train21-v3.grades.jsonl": "55a9a6ddf2e0e038ff8840aea5c4a9dbdbac333dd1f4329e9e9cf98aa9c99da6",
+          "results/raw/t4-scoped-selection-train21-v3.gap-grades.jsonl": "40266f9dbe8e47d30c5cf834618afc3767311f3f4cc56a375d2cff5d7e4ac9f5"
+        },
+        "judge_request_sha256": {
+          "original": "889715944816c0dff2b567d619b11348a2151cdb31a38545e346ec5362ac2d62"
+        },
+        "judge_prompt_version": "lme-type-aware-v2",
+        "kind": "historical exact logical requests/responses/output/calculation audit; zero fresh generations"
+      },
+      "context_tokens": 6213,
+      "calculation": null
+    },
+    {
+      "question_id": "gpt4_7ddcf75f",
+      "replay_eligible": true,
+      "proof": {
+        "source_reader_sha256": "24b6fd18d074ca5410490ab2210f733c8c73bc7e3fc702a9761424613b1f7ae3",
+        "source_files": {
+          "results/analysis/t4-scoped-selection-train21-v3.execution.json": "8c8246b4e37e3cfbd97dce637a7e7f22157b3fb6c90c62db3ff031374dd01c72",
+          "results/raw/t4-scoped-selection-train21-v3.readers.jsonl": "dcaca22ffec94ca35654877b4aa7ba8746b7276ef8a30bcd0e9ce6b6df3adf33",
+          "results/raw/t4-scoped-selection-train21-v3.grades.jsonl": "55a9a6ddf2e0e038ff8840aea5c4a9dbdbac333dd1f4329e9e9cf98aa9c99da6",
+          "results/raw/t4-scoped-selection-train21-v3.gap-grades.jsonl": "40266f9dbe8e47d30c5cf834618afc3767311f3f4cc56a375d2cff5d7e4ac9f5"
+        },
+        "judge_request_sha256": {
+          "original": "0334611769c159af11d49b28c11fb6f9645734f5fd5ae20590b218bc27922b75"
+        },
+        "judge_prompt_version": "lme-type-aware-v2",
+        "kind": "historical exact logical requests/responses/output/calculation audit; zero fresh generations"
+      },
+      "context_tokens": 6451,
+      "calculation": null
+    },
+    {
+      "question_id": "gpt4_a1b77f9c",
+      "replay_eligible": true,
+      "proof": {
+        "source_reader_sha256": "5d1f741ebd7b77abc91c3e52a967e08ecf56239b8deeede939303655f7b7c4ea",
+        "source_files": {
+          "results/analysis/t4-scoped-selection-train21-v3.execution.json": "8c8246b4e37e3cfbd97dce637a7e7f22157b3fb6c90c62db3ff031374dd01c72",
+          "results/raw/t4-scoped-selection-train21-v3.readers.jsonl": "dcaca22ffec94ca35654877b4aa7ba8746b7276ef8a30bcd0e9ce6b6df3adf33",
+          "results/raw/t4-scoped-selection-train21-v3.grades.jsonl": "55a9a6ddf2e0e038ff8840aea5c4a9dbdbac333dd1f4329e9e9cf98aa9c99da6",
+          "results/raw/t4-scoped-selection-train21-v3.gap-grades.jsonl": "40266f9dbe8e47d30c5cf834618afc3767311f3f4cc56a375d2cff5d7e4ac9f5"
+        },
+        "judge_request_sha256": {
+          "original": "7c2ce075626b6151dd42eafd26890e68c165610d10173011b0add46ce6c83241"
+        },
+        "judge_prompt_version": "lme-type-aware-v2",
+        "kind": "historical exact logical requests/responses/output/calculation audit; zero fresh generations"
+      },
+      "context_tokens": 6499,
+      "calculation": null
+    },
+    {
+      "question_id": "gpt4_a2d1d1f6",
+      "replay_eligible": true,
+      "proof": {
+        "source_reader_sha256": "633d93457410e75378e54a0633170f8d3f29f42136b2e4608c89c3e0acdbbaaa",
+        "source_files": {
+          "results/analysis/t4-scoped-selection-train21-v3.execution.json": "8c8246b4e37e3cfbd97dce637a7e7f22157b3fb6c90c62db3ff031374dd01c72",
+          "results/raw/t4-scoped-selection-train21-v3.readers.jsonl": "dcaca22ffec94ca35654877b4aa7ba8746b7276ef8a30bcd0e9ce6b6df3adf33",
+          "results/raw/t4-scoped-selection-train21-v3.grades.jsonl": "55a9a6ddf2e0e038ff8840aea5c4a9dbdbac333dd1f4329e9e9cf98aa9c99da6",
+          "results/raw/t4-scoped-selection-train21-v3.gap-grades.jsonl": "40266f9dbe8e47d30c5cf834618afc3767311f3f4cc56a375d2cff5d7e4ac9f5"
+        },
+        "judge_request_sha256": {
+          "original": "4ff887c482b3d16da58f1a73f09dea1da59e6f1abf4bc301250645f75bb67ca8"
+        },
+        "judge_prompt_version": "lme-type-aware-v2",
+        "kind": "historical exact logical requests/responses/output/calculation audit; zero fresh generations"
+      },
+      "context_tokens": 6362,
+      "calculation": null
+    }
+  ],
+  "median_context": 6393,
+  "inputs": {
+    "results/analysis/t4-scoped-selection-train21-v3.execution.json": "8c8246b4e37e3cfbd97dce637a7e7f22157b3fb6c90c62db3ff031374dd01c72",
+    "results/raw/t4-scoped-selection-train21-v3.readers.jsonl": "dcaca22ffec94ca35654877b4aa7ba8746b7276ef8a30bcd0e9ce6b6df3adf33",
+    "results/raw/t4-scoped-selection-train21-v3.grades.jsonl": "55a9a6ddf2e0e038ff8840aea5c4a9dbdbac333dd1f4329e9e9cf98aa9c99da6",
+    "results/raw/t4-scoped-selection-train21-v3.gap-grades.jsonl": "40266f9dbe8e47d30c5cf834618afc3767311f3f4cc56a375d2cff5d7e4ac9f5",
+    "tools/t4_savings_replay_preflight.py": "1401d2f04ce429a7091e8207e58ccc44be5f094b9cc93b5844e8cfd76df3a2e9",
+    "tools/t4_savings_replay.py": "91cd8b31e0481559f304a3fd6ed9dfab4c2649b41825eb0818c30c3c8f379762",
+    "tools/t4_savings_repair.py": "346ee3012db09fdf3e205a7599e986d0d09beb2608976b8d126ce19a3522a32a"
+  },
+  "limitations": "Replay is historical regression evidence, not new model samples. Full comparison must be fresh."
+}

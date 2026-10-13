@@ -6,13 +6,13 @@ import numpy as np
 import pytest
 
 from llm_long_term_memory.conversation import AnswerRequest
-from llm_long_term_memory.runtime.evidence_pages import (
+from llm_long_term_memory.evaluation.grounded.answering import GroundedAnswererV17
+from llm_long_term_memory.evaluation.grounded.evidence_pages import (
     PageSelection,
     PageSelectionError,
     archive_pages,
     select_page,
 )
-from llm_long_term_memory.runtime.grounded_answering import GroundedAnswererV17
 from llm_long_term_memory.store import NumpyFlatIndex, Session, SQLiteMemoryStore, Turn
 
 
@@ -171,7 +171,7 @@ def test_selected_pool_overflow_is_explicit_and_never_runs_final_reader(store, t
     ],
 )
 def test_source_intent_is_distinct_from_first_person_phrasing(question, personal):
-    from llm_long_term_memory.runtime.grounded_answering import personal_archive_review
+    from llm_long_term_memory.evaluation.grounded.answering import personal_archive_review
 
     assert personal_archive_review(question) is personal
 
@@ -195,7 +195,7 @@ def test_oversized_user_turn_is_paged_as_exact_contiguous_spans(store):
 
 
 def test_personal_pages_preserve_roles_and_refuse_assistant_numeric_operands(store, tmp_path):
-    from llm_long_term_memory.runtime.grounded_answering import GroundedAnswererV18
+    from llm_long_term_memory.evaluation.grounded.answering import GroundedAnswererV18
 
     turns = add(
         store,
@@ -224,7 +224,7 @@ def test_personal_pages_preserve_roles_and_refuse_assistant_numeric_operands(sto
 
 
 def test_same_session_context_is_hydrated_before_summary_filler(store, tmp_path):
-    from llm_long_term_memory.runtime.grounded_answering import (
+    from llm_long_term_memory.evaluation.grounded.answering import (
         EvidenceLedger,
         GroundedAnswererV18,
         add_turns,
@@ -271,7 +271,10 @@ def test_same_session_context_is_hydrated_before_summary_filler(store, tmp_path)
     ],
 )
 def test_explicit_free_attendance_is_zero_cost_without_inventing_absent_item(text, quote, valid):
-    from llm_long_term_memory.runtime.grounded_answering import EvidenceSource, explicit_free_price
+    from llm_long_term_memory.evaluation.grounded.answering import (
+        EvidenceSource,
+        explicit_free_price,
+    )
 
     source = EvidenceSource("E1", "raw", "t", text, "user", "2026-10-01")
     assert explicit_free_price(source, quote, 0, "$") is valid
@@ -281,7 +284,7 @@ def test_explicit_free_attendance_is_zero_cost_without_inventing_absent_item(tex
 def test_free_price_calculation_is_opt_in_and_still_requires_user_source():
     import json
 
-    from llm_long_term_memory.runtime.grounded_answering import (
+    from llm_long_term_memory.evaluation.grounded.answering import (
         EvidenceLedger,
         EvidenceSource,
         GroundedVerdict,
@@ -317,7 +320,7 @@ def test_free_price_calculation_is_opt_in_and_still_requires_user_source():
 
 
 def test_past_event_future_month_conflict_discloses_payments_without_fabricating_year():
-    from llm_long_term_memory.runtime.grounded_answering import (
+    from llm_long_term_memory.evaluation.grounded.answering import (
         EvidenceLedger,
         EvidenceSource,
         GroundedAnswererV18,
@@ -388,7 +391,7 @@ def test_past_event_future_month_conflict_discloses_payments_without_fabricating
 
 
 def test_pronoun_operand_quote_expands_only_to_same_source_literal_member():
-    from llm_long_term_memory.runtime.grounded_answering import (
+    from llm_long_term_memory.evaluation.grounded.answering import (
         EvidenceLedger,
         EvidenceSource,
         GroundedAnswererV18,
@@ -434,7 +437,7 @@ def test_pronoun_operand_quote_expands_only_to_same_source_literal_member():
 def test_payment_repetition_is_one_event_but_equal_price_distinct_events_survive():
     from dataclasses import replace
 
-    from llm_long_term_memory.runtime.grounded_answering import (
+    from llm_long_term_memory.evaluation.grounded.answering import (
         EvidenceLedger,
         EvidenceSource,
         scoped_payment_conflict,
@@ -496,7 +499,7 @@ def test_payment_repetition_is_one_event_but_equal_price_distinct_events_survive
 
 
 def test_actual_jewelry_count_verification_excludes_storage_purchase(store, tmp_path):
-    from llm_long_term_memory.runtime.grounded_answering import GroundedAnswererV18
+    from llm_long_term_memory.evaluation.grounded.answering import GroundedAnswererV18
 
     names = ["silver necklace", "emerald earrings", "engagement ring", "wooden dresser"]
     turns = add(store, "alice", "a", [("user", f"I acquired a {name}.") for name in names])

@@ -2,127 +2,76 @@
 
 The evaluation package may wrap this engine and attach gold-only diagnostics, but the
 live API must not construct a benchmark runner or import a judge to answer a user.
+
+What it answers with is named by a profile (`ANSWER_PROFILES`). `t4` is the arm with
+the best exposed-development result (heldout100, three runs: 87.67% against v1's
+81.00%); `tests/test_product_t4_equivalence.py` holds the engine to the exact requests
+the evaluated `two_stage_raw_primary_t4` arm sends, so the measured system and the
+served one cannot drift apart again.
 """
 
 from __future__ import annotations
 
 from datetime import datetime
 from time import perf_counter
+from typing import Any
 
-from llm_long_term_memory.answering import ANSWER_SYSTEM, Answer, AnswerVerdict
+from llm_long_term_memory.answering import (
+    ANSWER_SYSTEM,
+    COUNT_LATEST_SYSTEM,
+    Answer,
+    AnswerVerdict,
+    NotedAnswerVerdict,
+    asks_about_time,
+    asks_for_aggregate,
+    count_time_system,
+)
 from llm_long_term_memory.conversation import AnswerRequest
 from llm_long_term_memory.ingest.extract import _parse_date
-from llm_long_term_memory.retrieve import HybridRetriever
+from llm_long_term_memory.retrieve import (
+    EvidenceHydrator,
+    HybridRetriever,
+    HydrationResult,
+    render_evidence,
+)
 from llm_long_term_memory.retrieve.fallback import RawFallback
+from llm_long_term_memory.runtime.context import (
+    ANSWER_TEMPLATE,
+    FALLBACK_TEMPLATE,
+    TEMPORAL_NOTE,
+    render_context,
+)
 from llm_long_term_memory.store import Memory, MemoryStore, VectorIndex
 
-_TEMPLATE = """\
-Here is what is known about the user, drawn from their chat history.
+__all__ = ["ANSWER_PROFILES", "TEMPORAL_NOTE", "AnswerEngine", "render_context"]
 
-{context}
-
-Today's date is {date}.
-
-Question: {question}
-"""
-
-_FALLBACK_TEMPLATE = """\
-Your earlier attempt could not answer this from structured memory alone:
-{reason}
-
-Here are the original conversation turns those memories were extracted from. They
-are verbatim, so the exact wording, links and figures are present.
-
-{evidence}
-
-Today's date is {date}.
-
-Question: {question}
-"""
-
-TEMPORAL_NOTE = (
-    "Each fact is shown with the period it was true for. `(since <date>)` means it "
-    "is still true now; `(<date> to <date>)` means it was replaced and is no longer "
-    "current. Answer with what is true now unless the question asks about the past."
-)
-
-_SCOPE_HEADINGS: tuple[tuple[str, str], ...] = (
-    ("profile", "About the user"),
-    ("preference", "User preferences"),
-    ("plan", "Current plans"),
-    ("event", "Past events"),
-    ("recommendation", "Previously recommended by the assistant"),
-    ("commitment", "The assistant agreed to"),
-    ("shared_context", "Other people and things discussed"),
-)
-_UNSCOPED_HEADING = "Other things known about the user"
-
-
-def render_memory(memory: Memory, temporal: bool) -> str:
-    if not temporal:
-        return f"- {memory.content}"
-    start = memory.valid_from or memory.occurred_at
-    if start and memory.valid_to:
-        window = f"({start:%Y-%m-%d} to {memory.valid_to:%Y-%m-%d}, no longer current)"
-    elif start:
-        window = f"(since {start:%Y-%m-%d})"
-    else:
-        window = "(date unknown)"
-    return f"- {memory.content} {window}"
-
-
-def render_timelines(memories: list[Memory], temporal: bool) -> tuple[str, list[Memory]]:
-    if not temporal:
-        return "", list(memories)
-    chains: dict[tuple[str, str], list[Memory]] = {}
-    for memory in memories:
-        if memory.subject and memory.predicate:
-            chains.setdefault((memory.subject, memory.predicate), []).append(memory)
-    blocks: list[str] = []
-    claimed: set[str] = set()
-    for (subject, predicate), group in chains.items():
-        if len(group) < 2:
-            continue
-        ordered = sorted(
-            group,
-            key=lambda item: (item.valid_from or item.occurred_at or datetime.max, item.id),
-        )
-        lines = []
-        for memory in ordered:
-            when = memory.valid_from or memory.occurred_at
-            stamp = f"{when:%Y-%m-%d}" if when else "date unknown"
-            mark = "[CURRENT]" if memory.status == "active" and not memory.valid_to else "[was]"
-            lines.append(f"    {stamp}  {memory.content} {mark}")
-            claimed.add(memory.id)
-        label = f"{subject} {predicate}".replace("_", " ").strip()
-        blocks.append(f"{label} — how this changed over time:\n" + "\n".join(lines))
-    remaining = [memory for memory in memories if memory.id not in claimed]
-    return "\n\n".join(blocks), remaining
-
-
-def render_context(memories: list[Memory], temporal: bool) -> str:
-    timelines, remaining = render_timelines(memories, temporal)
-    prefix = [timelines] if timelines else []
-    if not any(memory.scope for memory in remaining):
-        flat = "\n".join(render_memory(memory, temporal) for memory in remaining)
-        body = "\n\n".join([*prefix, flat]) if flat else "\n\n".join(prefix)
-        return f"{TEMPORAL_NOTE}\n\n{body}" if temporal else body
-
-    by_scope: dict[str, list[Memory]] = {}
-    for memory in remaining:
-        by_scope.setdefault(memory.scope or "", []).append(memory)
-    blocks: list[str] = []
-    for scope, heading in _SCOPE_HEADINGS:
-        group = by_scope.pop(scope, None)
-        if group:
-            lines = "\n".join(render_memory(memory, temporal) for memory in group)
-            blocks.append(f"{heading}:\n{lines}")
-    leftovers = [memory for group in by_scope.values() for memory in group]
-    if leftovers:
-        lines = "\n".join(render_memory(memory, temporal) for memory in leftovers)
-        blocks.append(f"{_UNSCOPED_HEADING}:\n{lines}")
-    body = "\n\n".join([*prefix, *blocks])
-    return f"{TEMPORAL_NOTE}\n\n{body}" if temporal else body
+# Engine keyword arguments per profile. `top_k` is left to the caller: the service's
+# inspector and answerer share one value (`ServiceConfig.top_k`).
+ANSWER_PROFILES: dict[str, dict[str, Any]] = {
+    # Frozen v2's answer path: structured memory, raw turns only on a fallback verdict.
+    # About 600 context tokens per question; 72% on the frozen test100.
+    "v2": {
+        "raw_fallback": True,
+        "raw_fallback_max_turns": 3,
+        "raw_fallback_max_chars": 2400,
+    },
+    # Raw-primary t4: v2 plus source sentences behind each memory, 4,000 tokens of the
+    # user's own turns found by the question (user turns first, the period a question
+    # names searched by time, relative dates resolved), a latest-value rule, and notes
+    # before answering counts and date questions. About 6,300 context tokens.
+    "t4": {
+        "raw_fallback": True,
+        "raw_fallback_max_turns": 3,
+        "raw_fallback_max_chars": 2400,
+        "evidence_hydration": True,
+        "raw_primary_tokens": 4000,
+        "raw_primary_time_notes": True,
+        "raw_primary_dated": True,
+        "raw_primary_prefer_user": True,
+        "raw_primary_time_window": True,
+        "answer_policy": "v2_clt",
+    },
+}
 
 
 class AnswerEngine:
@@ -147,46 +96,43 @@ class AnswerEngine:
         max_output_tokens: int = 512,
         chars_per_token: float = 4.6,
         answer_policy: str = "v2",
-        raw_primary_turn_index=None,
+        evidence_hydration: bool = False,
+        hydration_neighbouring_sentences: int = 1,
+        hydration_max_tokens: int = 800,
+        hydration_allocation: str = "ranked",
         raw_primary_tokens: int = 0,
         raw_primary_time_notes: bool = False,
+        raw_primary_dated: bool = False,
+        raw_primary_prefer_user: bool = False,
+        raw_primary_time_window: bool = False,
     ) -> None:
-        self.client = client
-        if raw_primary_time_notes and not raw_primary_tokens:
-            raise ValueError("raw_primary_time_notes needs raw_primary_tokens")
-        self.raw_primary_tokens = raw_primary_tokens
-        self.raw_primary_time_notes = raw_primary_time_notes
-        if answer_policy not in {
-            "v2",
-            "grounded_v1",
-            "grounded_v2",
-            "grounded_v3",
-            "grounded_v4",
-            "grounded_v5",
-            "grounded_v6",
-            "grounded_v7",
-            "grounded_v8",
-            "grounded_v9",
-            "grounded_v10",
-            "grounded_v11",
-            "grounded_v12",
-            "grounded_v13",
-            "grounded_v14",
-            "grounded_v15",
-            "grounded_v16",
-            "grounded_v17",
-            "grounded_v18",
-        }:
+        raw_flags = (
+            raw_primary_time_notes,
+            raw_primary_dated,
+            raw_primary_prefer_user,
+            raw_primary_time_window,
+        )
+        if any(raw_flags) and not raw_primary_tokens:
+            raise ValueError("raw_primary_* options need raw_primary_tokens")
+        if answer_policy not in {"v2", "v2_clt"}:
             raise ValueError(f"unknown answer policy {answer_policy!r}")
-        self.answer_policy = answer_policy
+        self.client = client
         self.model = model
         self.encoder = encoder
         self.store = store
         self.temporal = temporal
         self.top_k = top_k
+        self.answer_policy = answer_policy
         self.max_output_tokens = max_output_tokens
         self.chars_per_token = chars_per_token
         self.raw_fallback_max_chars = raw_fallback_max_chars
+        self.evidence_hydration = evidence_hydration
+        self.hydration_max_tokens = hydration_max_tokens
+        self.raw_primary_tokens = raw_primary_tokens
+        self.raw_primary_time_notes = raw_primary_time_notes
+        self.raw_primary_dated = raw_primary_dated
+        self.raw_primary_prefer_user = raw_primary_prefer_user
+        self.raw_primary_time_window = raw_primary_time_window
         self.retriever = HybridRetriever(
             store,
             index,
@@ -194,83 +140,54 @@ class AnswerEngine:
             candidate_limit=candidate_limit,
             recency_halflife_days=recency_halflife_days,
         )
+        self.hydrator = EvidenceHydrator(
+            store,
+            neighbouring_sentences=hydration_neighbouring_sentences,
+            chars_per_token=chars_per_token,
+            allocation=hydration_allocation,
+        )
         self.fallback = (
             RawFallback(store, max_turns=raw_fallback_max_turns) if raw_fallback else None
         )
-        self.grounded = None
-        if answer_policy in {
-            "grounded_v1",
-            "grounded_v2",
-            "grounded_v3",
-            "grounded_v4",
-            "grounded_v5",
-            "grounded_v6",
-            "grounded_v7",
-            "grounded_v8",
-            "grounded_v9",
-            "grounded_v10",
-            "grounded_v11",
-            "grounded_v12",
-            "grounded_v13",
-            "grounded_v14",
-            "grounded_v15",
-            "grounded_v16",
-            "grounded_v17",
-            "grounded_v18",
-        }:
-            from llm_long_term_memory.runtime.grounded_answering import (
-                OUTPUT_LIMIT,
-                GroundedAnswerer,
-                GroundedAnswererV2,
-                GroundedAnswererV3,
-                GroundedAnswererV4,
-                GroundedAnswererV5,
-                GroundedAnswererV6,
-                GroundedAnswererV7,
-                GroundedAnswererV8,
-                GroundedAnswererV9,
-                GroundedAnswererV10,
-                GroundedAnswererV11,
-                GroundedAnswererV12,
-                GroundedAnswererV13,
-                GroundedAnswererV14,
-                GroundedAnswererV15,
-                GroundedAnswererV16,
-                GroundedAnswererV17,
-                GroundedAnswererV18,
-            )
 
-            cls = {
-                "grounded_v1": GroundedAnswerer,
-                "grounded_v2": GroundedAnswererV2,
-                "grounded_v3": GroundedAnswererV3,
-                "grounded_v4": GroundedAnswererV4,
-                "grounded_v5": GroundedAnswererV5,
-                "grounded_v6": GroundedAnswererV6,
-                "grounded_v7": GroundedAnswererV7,
-                "grounded_v8": GroundedAnswererV8,
-                "grounded_v9": GroundedAnswererV9,
-                "grounded_v10": GroundedAnswererV10,
-                "grounded_v11": GroundedAnswererV11,
-                "grounded_v12": GroundedAnswererV12,
-                "grounded_v13": GroundedAnswererV13,
-                "grounded_v14": GroundedAnswererV14,
-                "grounded_v15": GroundedAnswererV15,
-                "grounded_v16": GroundedAnswererV16,
-                "grounded_v17": GroundedAnswererV17,
-                "grounded_v18": GroundedAnswererV18,
-            }[answer_policy]
-            self.answer_prompt_version = cls.prompt_version
-            self.grounded = cls(
-                client,
-                model=model,
-                encoder=encoder,
-                store=store,
-                turn_index=raw_primary_turn_index,
-                fallback=self.fallback,
-                chars_per_token=chars_per_token,
-                max_output_tokens=OUTPUT_LIMIT if max_output_tokens == 512 else max_output_tokens,
-            )
+    @classmethod
+    def from_profile(cls, profile: str, client, **kwargs) -> AnswerEngine:
+        if profile not in ANSWER_PROFILES:
+            raise ValueError(f"unknown answer profile {profile!r}")
+        return cls(client, **{**ANSWER_PROFILES[profile], **kwargs})
+
+    def _answer_mode(self, question: str):
+        """System prompt, verdict schema and output limit for one question.
+
+        Under v2_clt a count or total, or a question about dates, durations or order, is
+        answered from notes and gets room for them; every other question keeps v2's
+        verdict and output limit.
+        """
+        if self.answer_policy != "v2_clt":
+            return ANSWER_SYSTEM, AnswerVerdict, self.max_output_tokens, None
+        counting = asks_for_aggregate(question)
+        timing = asks_about_time(question)
+        if not (counting or timing):
+            return count_time_system(False, False), AnswerVerdict, self.max_output_tokens, None
+        mode = "_".join(m for m, on in (("count", counting), ("time", timing)) if on) + "_notes"
+        return (
+            count_time_system(counting, timing),
+            NotedAnswerVerdict,
+            max(1024, self.max_output_tokens),
+            mode,
+        )
+
+    def _context(self, memories: list[Memory]) -> tuple[str, HydrationResult]:
+        context = render_context(memories, self.temporal)
+        hydration = HydrationResult()
+        if self.evidence_hydration:
+            hydration = self.hydrator.hydrate(memories, max_tokens=self.hydration_max_tokens)
+            if hydration.evidence:
+                context = (
+                    f"Structured memories:\n{context}\n\n"
+                    f"Verbatim source evidence:\n{render_evidence(hydration.evidence)}"
+                )
+        return context, hydration
 
     def answer_request(
         self,
@@ -280,6 +197,8 @@ class AnswerEngine:
         evidence_session_ids: tuple[str, ...] = (),
     ) -> Answer:
         del evidence_session_ids  # benchmark-only labels never affect product behavior
+        system, schema, max_output_tokens, answer_mode = self._answer_mode(request.question)
+        asked_on: datetime | None = _parse_date(request.asked_on) if request.asked_on else None
         started = perf_counter()
         query = self.encoder.encode_one(request.question)
         retrieved, trace = self.retriever.retrieve_with_trace(
@@ -288,25 +207,16 @@ class AnswerEngine:
             request.user_id,
             temporal=self.temporal,
             limit=limit or self.top_k,
-            as_of=_parse_date(request.asked_on) if request.asked_on else None,
+            as_of=asked_on,
         )
         retrieval_ms = (perf_counter() - started) * 1000
         memories = [hit.memory for hit in retrieved]
-        if self.grounded is not None:
-            answer = self.grounded.answer(request, memories, query)
-            answer.notes.update(
-                {
-                    "top_k": limit or self.top_k,
-                    "temporal": self.temporal,
-                    "retrieval_latency_ms": retrieval_ms,
-                }
-            )
-            return answer
-        context = render_context(memories, self.temporal)
+        context, hydration = self._context(memories)
         excerpts = None
         if self.raw_primary_tokens:
             from llm_long_term_memory.retrieve.excerpts import archive_excerpts
 
+            dated = self.raw_primary_dated or self.raw_primary_time_window
             # Scoped by `request.user_id` inside `search_turns`: another tenant's turns
             # cannot be selected (tests/test_product_raw_primary.py).
             excerpts = archive_excerpts(
@@ -315,15 +225,15 @@ class AnswerEngine:
                 request.question,
                 self.raw_primary_tokens,
                 chars_per_token=self.chars_per_token,
-                asked_on=_parse_date(request.asked_on)
-                if self.raw_primary_time_notes and request.asked_on
-                else None,
+                asked_on=asked_on if dated or self.raw_primary_time_notes else None,
                 time_notes=self.raw_primary_time_notes,
+                prefer_user=self.raw_primary_prefer_user,
+                time_window=self.raw_primary_time_window,
             )
             block = excerpts.render()
             if block:
                 context = f"{context}\n\n{block}" if context else block
-        prompt = _TEMPLATE.format(
+        prompt = ANSWER_TEMPLATE.format(
             context=context or "No relevant long-term memory was found.",
             date=request.asked_on,
             question=request.question,
@@ -332,18 +242,18 @@ class AnswerEngine:
             role="answerer",
             model=self.model,
             prompt=prompt,
-            system=ANSWER_SYSTEM,
-            schema=AnswerVerdict if self.fallback else None,
+            system=system,
             temperature=0.0,
-            max_output_tokens=self.max_output_tokens,
+            max_output_tokens=max_output_tokens,
             est_input_tokens=int(len(prompt) / self.chars_per_token),
+            **({"schema": schema} if self.fallback else {}),
         )
         answer_text = first.text.strip()
         evidence = None
         verdict = None
         if self.fallback is not None:
             try:
-                verdict = AnswerVerdict.model_validate_json(first.text)
+                verdict = schema.model_validate_json(first.text)
             except ValueError:
                 verdict = None
             if verdict is not None:
@@ -356,7 +266,7 @@ class AnswerEngine:
                         memories if verdict.status == "need_source" else [],
                     )
                     if evidence.used:
-                        fallback_prompt = _FALLBACK_TEMPLATE.format(
+                        fallback_prompt = FALLBACK_TEMPLATE.format(
                             reason=verdict.reason or "the requested detail was missing",
                             evidence=evidence.render(max_chars=self.raw_fallback_max_chars),
                             date=request.asked_on,
@@ -366,9 +276,13 @@ class AnswerEngine:
                             role="answerer",
                             model=self.model,
                             prompt=fallback_prompt,
-                            system=ANSWER_SYSTEM,
+                            # The second pass carries no schema, so it never gets a
+                            # prompt that asks for notes it has nowhere to put.
+                            system=COUNT_LATEST_SYSTEM
+                            if self.answer_policy == "v2_clt"
+                            else ANSWER_SYSTEM,
                             temperature=0.0,
-                            max_output_tokens=self.max_output_tokens,
+                            max_output_tokens=max_output_tokens,
                             est_input_tokens=int(len(fallback_prompt) / self.chars_per_token),
                         )
                         answer_text = first.text.strip()
@@ -396,10 +310,13 @@ class AnswerEngine:
                     }
                     for hit in retrieved
                 ],
+                "answer_policy": self.answer_policy,
+                "answer_mode": answer_mode,
                 "answer_status": verdict.status if verdict else None,
                 "fallback_level": evidence.level if evidence else "none",
                 "candidates_considered": len(trace.candidate_ids),
                 "retrieval_latency_ms": retrieval_ms,
+                "hydrated_memory_ids": [item.memory_id for item in hydration.evidence],
                 "raw_primary_turns": len(excerpts.turns) if excerpts else 0,
                 "raw_primary_time_notes": self.raw_primary_time_notes,
             },

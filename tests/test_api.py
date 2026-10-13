@@ -178,9 +178,9 @@ def test_service_fingerprint_reports_the_live_top_k(client):
     from llm_long_term_memory.api.app import get_service
 
     running = get_service()
-    assert running.top_k == 10
-    assert "/top_k=10/" in running.fingerprint()
-    assert running.config.retrieval.top_k == 20, "the benchmark value is deliberately different"
+    # The served t4 profile was measured at k=20, the benchmark's own value.
+    assert running.top_k == 20 == running.config.retrieval.top_k
+    assert "/top_k=20/" in running.fingerprint()
 
 
 def test_search_returns_scored_memories_with_provenance(client):

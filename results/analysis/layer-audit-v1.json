@@ -1,0 +1,233 @@
+{
+ "splits": {
+  "train150": {
+   "store": {
+    "memories": 18519,
+    "assistant_memories": 10643,
+    "superseded": 76,
+    "replaces": 833,
+    "replaces_without_predecessor": 747,
+    "predicates": 5054,
+    "predicates_used_once": 3578
+   },
+   "questions": {
+    "by_type": {
+     "knowledge-update": {
+      "questions": 21,
+      "memory_on_gold_turn": 19,
+      "memory_on_gold_session": 21,
+      "ku_multi_session": 21,
+      "ku_same_key": 6,
+      "ku_superseded": 5
+     },
+     "knowledge-update_abs": {
+      "questions": 2,
+      "memory_on_gold_turn": 0,
+      "memory_on_gold_session": 2
+     },
+     "multi-session": {
+      "questions": 39,
+      "memory_on_gold_turn": 33,
+      "memory_on_gold_session": 39
+     },
+     "multi-session_abs": {
+      "questions": 1,
+      "memory_on_gold_turn": 0,
+      "memory_on_gold_session": 1
+     },
+     "single-session-assistant": {
+      "questions": 17,
+      "memory_on_gold_turn": 9,
+      "memory_on_gold_session": 16
+     },
+     "single-session-preference": {
+      "questions": 9,
+      "memory_on_gold_turn": 3,
+      "memory_on_gold_session": 8,
+      "pref_memory_on_gold_session": 2
+     },
+     "single-session-user": {
+      "questions": 20,
+      "memory_on_gold_turn": 10,
+      "memory_on_gold_session": 20
+     },
+     "single-session-user_abs": {
+      "questions": 1,
+      "memory_on_gold_turn": 0,
+      "memory_on_gold_session": 1
+     },
+     "temporal-reasoning": {
+      "questions": 38,
+      "memory_on_gold_turn": 32,
+      "memory_on_gold_session": 38
+     },
+     "temporal-reasoning_abs": {
+      "questions": 2,
+      "memory_on_gold_turn": 2,
+      "memory_on_gold_session": 2
+     }
+    },
+    "all": {
+     "questions": 150,
+     "memory_on_gold_turn": 108,
+     "memory_on_gold_session": 148,
+     "ku_multi_session": 21,
+     "ku_same_key": 6,
+     "ku_superseded": 5,
+     "pref_memory_on_gold_session": 2
+    }
+   }
+  },
+  "dev100": {
+   "store": {
+    "memories": 12436,
+    "assistant_memories": 7038,
+    "superseded": 55,
+    "replaces": 585,
+    "replaces_without_predecessor": 520,
+    "predicates": 3727,
+    "predicates_used_once": 2682
+   },
+   "questions": {
+    "by_type": {
+     "knowledge-update": {
+      "questions": 16,
+      "memory_on_gold_turn": 16,
+      "memory_on_gold_session": 16,
+      "ku_multi_session": 16,
+      "ku_same_key": 3,
+      "ku_superseded": 1
+     },
+     "multi-session": {
+      "questions": 23,
+      "memory_on_gold_turn": 22,
+      "memory_on_gold_session": 23
+     },
+     "multi-session_abs": {
+      "questions": 4,
+      "memory_on_gold_turn": 2,
+      "memory_on_gold_session": 4
+     },
+     "single-session-assistant": {
+      "questions": 11,
+      "memory_on_gold_turn": 7,
+      "memory_on_gold_session": 10
+     },
+     "single-session-preference": {
+      "questions": 6,
+      "memory_on_gold_turn": 3,
+      "memory_on_gold_session": 6,
+      "pref_memory_on_gold_session": 1
+     },
+     "single-session-user": {
+      "questions": 12,
+      "memory_on_gold_turn": 8,
+      "memory_on_gold_session": 11
+     },
+     "single-session-user_abs": {
+      "questions": 2,
+      "memory_on_gold_turn": 0,
+      "memory_on_gold_session": 1
+     },
+     "temporal-reasoning": {
+      "questions": 25,
+      "memory_on_gold_turn": 20,
+      "memory_on_gold_session": 25
+     },
+     "temporal-reasoning_abs": {
+      "questions": 1,
+      "memory_on_gold_turn": 1,
+      "memory_on_gold_session": 1
+     }
+    },
+    "all": {
+     "questions": 100,
+     "memory_on_gold_turn": 79,
+     "memory_on_gold_session": 97,
+     "pref_memory_on_gold_session": 1,
+     "ku_multi_session": 16,
+     "ku_same_key": 3,
+     "ku_superseded": 1
+    }
+   }
+  },
+  "heldout100": {
+   "store": {
+    "memories": 12402,
+    "assistant_memories": 6911,
+    "superseded": 42,
+    "replaces": 592,
+    "replaces_without_predecessor": 540,
+    "predicates": 3502,
+    "predicates_used_once": 2496
+   },
+   "questions": {
+    "by_type": {
+     "knowledge-update": {
+      "questions": 14,
+      "memory_on_gold_turn": 12,
+      "memory_on_gold_session": 14,
+      "ku_multi_session": 14,
+      "ku_same_key": 2,
+      "ku_superseded": 0
+     },
+     "knowledge-update_abs": {
+      "questions": 1,
+      "memory_on_gold_turn": 0,
+      "memory_on_gold_session": 1
+     },
+     "multi-session": {
+      "questions": 24,
+      "memory_on_gold_turn": 23,
+      "memory_on_gold_session": 24
+     },
+     "multi-session_abs": {
+      "questions": 3,
+      "memory_on_gold_turn": 0,
+      "memory_on_gold_session": 3
+     },
+     "single-session-assistant": {
+      "questions": 11,
+      "memory_on_gold_turn": 2,
+      "memory_on_gold_session": 6
+     },
+     "single-session-preference": {
+      "questions": 6,
+      "memory_on_gold_turn": 3,
+      "memory_on_gold_session": 5,
+      "pref_memory_on_gold_session": 0
+     },
+     "single-session-user": {
+      "questions": 12,
+      "memory_on_gold_turn": 6,
+      "memory_on_gold_session": 12
+     },
+     "single-session-user_abs": {
+      "questions": 2,
+      "memory_on_gold_turn": 0,
+      "memory_on_gold_session": 2
+     },
+     "temporal-reasoning": {
+      "questions": 24,
+      "memory_on_gold_turn": 24,
+      "memory_on_gold_session": 24
+     },
+     "temporal-reasoning_abs": {
+      "questions": 3,
+      "memory_on_gold_turn": 2,
+      "memory_on_gold_session": 3
+     }
+    },
+    "all": {
+     "questions": 100,
+     "memory_on_gold_turn": 72,
+     "memory_on_gold_session": 94,
+     "ku_multi_session": 14,
+     "ku_same_key": 2,
+     "ku_superseded": 0,
+     "pref_memory_on_gold_session": 0
+    }
+   }
+  }
+ }
+}

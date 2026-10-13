@@ -1,0 +1,295 @@
+{
+  "_about": "Assistant review draft of actual changed closures, based on source user turns and surrounding same-session turns. Not maintainer-confirmed gold; uncertain cases remain uncertain. Decision precision and applied-closure precision are different denominators.",
+  "entries": [
+    {
+      "split": "dev100",
+      "question_id": "078150f1",
+      "old": "mem_a91ca37ea9056d81",
+      "new": "mem_ed2bfe2902c7378b",
+      "label": "incorrect",
+      "reason": "目标金额与实际募集金额是不同属性；完成结果不改写历史目标。",
+      "first_loss": "relation_judgment"
+    },
+    {
+      "split": "dev100",
+      "question_id": "078150f1",
+      "old": "mem_cdf342106b0b981f",
+      "new": "mem_ae1d8bd938632fff",
+      "label": "incorrect",
+      "reason": "5月28日计划参加被5月20日考虑参加关闭；原话未表示取消计划，实际时间方向也反了。 缓存判定的A/B时间方向正确（考虑→计划），错误出现在应用/重述折叠，不能全归因关系判定。",
+      "first_loss": "temporal_lifecycle"
+    },
+    {
+      "split": "dev100",
+      "question_id": "07b6f563",
+      "old": "mem_a30838a8a3e13402",
+      "new": "mem_be157670826e59de",
+      "label": "incorrect",
+      "reason": "同一句原话明确完成16节、比20节目标少4节；目标与进展应并存。",
+      "first_loss": "relation_judgment"
+    },
+    {
+      "split": "dev100",
+      "question_id": "07b6f563",
+      "old": "mem_0e3282341756ad2d",
+      "new": "mem_6fe716bf5fa20355",
+      "label": "incorrect",
+      "reason": "同会话turn6的新计划被turn4的通常睡懒觉关闭；没有放弃计划的陈述，时间戳相同不能用ID推断反向更新。",
+      "first_loss": "temporal_ordering_and_relation"
+    },
+    {
+      "split": "dev100",
+      "question_id": "2698e78f",
+      "old": "mem_d1141be8cec33301",
+      "new": "mem_02bd69fc85a2d805",
+      "label": "correct",
+      "reason": "同一医生会面频率由每两周改成每周；全会话turn4明确每周，v2锚点邻域未定位到频率原句。",
+      "first_loss": null
+    },
+    {
+      "split": "dev100",
+      "question_id": "352ab8bd",
+      "old": "mem_5d509ebe1649e28d",
+      "new": "mem_7a5bcd8c3ecdad16",
+      "label": "uncertain",
+      "reason": "新地毯未声明取代旧灰米色地毯；也可能是同一地毯的较笼统重述，证据不够确认关闭。",
+      "first_loss": "insufficient_identity_evidence"
+    },
+    {
+      "split": "dev100",
+      "question_id": "3e321797",
+      "old": "mem_4c4559ff07e4caa8",
+      "new": "mem_621eea654c0a452f",
+      "label": "incorrect",
+      "reason": "同一轮次同时说随身携带并寻找旅行装；购买计划和行李位置可以同时成立。",
+      "first_loss": "relation_judgment"
+    },
+    {
+      "split": "dev100",
+      "question_id": "41698283",
+      "old": "mem_09116145bc57c6a2",
+      "new": "mem_0d887cbd68bca7f6",
+      "label": "correct",
+      "reason": "考虑养两只山羊的待办意图在已获得两只山羊后完成；来源明确已获得，按当前计划状态关闭合理。",
+      "first_loss": null,
+      "temporal_note": "获得时间原话是5月23日前约三周，但记忆event_time仍为5月23日；关闭关系合理不代表有效期日期准确。"
+    },
+    {
+      "split": "dev100",
+      "question_id": "41698283",
+      "old": "mem_1398ea105f8d9563",
+      "new": "mem_2b75ce00753f9d3d",
+      "label": "correct",
+      "reason": "同一相机包的待决选择变为明确选择Think Tank；全会话turn8确认，锚点邻域未包含该轮。",
+      "first_loss": null
+    },
+    {
+      "split": "dev100",
+      "question_id": "4d6b87c8",
+      "old": "mem_0e979750237003d6",
+      "new": "mem_0e5f440c1a98e77e",
+      "label": "correct",
+      "reason": "同一待看片单的当前标题数由20增加到25。",
+      "first_loss": null
+    },
+    {
+      "split": "dev100",
+      "question_id": "4d6b87c8",
+      "old": "mem_b1227a2d0842c555",
+      "new": "mem_d8adb306818cf039",
+      "label": "correct",
+      "reason": "后续原话明确已经找到喜欢的舞蹈工作室，找店状态结束。",
+      "first_loss": null
+    },
+    {
+      "split": "dev100",
+      "question_id": "5d3d2817",
+      "old": "mem_ea7d3446e80fbb3b",
+      "new": "mem_ce107fff9d93cfa1",
+      "label": "uncertain",
+      "reason": "未说明是同一晚宴或取消海鲜主题；冬季主题与海鲜菜单也可能共存。",
+      "first_loss": "insufficient_identity_evidence"
+    },
+    {
+      "split": "dev100",
+      "question_id": "72e3ee87",
+      "old": "mem_cf11c281c62ee117",
+      "new": "mem_1868e63aa34783a0",
+      "label": "correct",
+      "reason": "同一Science系列的观看进度由第10集更新为完成50集。",
+      "first_loss": null
+    },
+    {
+      "split": "dev100",
+      "question_id": "7a87bd0c",
+      "old": "mem_0f9233cf9d1ce5a9",
+      "new": "mem_e8c2e3027d46193c",
+      "label": "correct",
+      "reason": "同一每日整理习惯的当前持续时长由3周变成4周；但会话相隔数月，不能据此推断连续未中断。",
+      "first_loss": null
+    },
+    {
+      "split": "dev100",
+      "question_id": "945e3d21",
+      "old": "mem_55009c4837d2b289",
+      "new": "mem_6557aabdc2da96ff",
+      "label": "incorrect",
+      "reason": "传统雕花风格和木质带储物箱可兼容；原话没有改掉风格偏好。",
+      "first_loss": "relation_judgment"
+    },
+    {
+      "split": "dev100",
+      "question_id": "b01defab",
+      "old": "mem_618cd4f802564455",
+      "new": "mem_40fa89b2a9c63751",
+      "label": "incorrect",
+      "reason": "特定Zen Den课程开始时间与整体瑜伽练习开始时间不同，后文未否定Zen Den事实；不能当成同一状态替换。",
+      "first_loss": "relation_judgment"
+    },
+    {
+      "split": "dev100",
+      "question_id": "b46e15ee",
+      "old": "mem_ca4fc785b447bd97",
+      "new": "mem_d144a0d3bdefe7d2",
+      "label": "uncertain",
+      "reason": "两个月前的新搅拌机可能就是同一KitchenAid，也可能另外购买；未明确旧机器停止拥有。",
+      "first_loss": "insufficient_identity_evidence"
+    },
+    {
+      "split": "dev100",
+      "question_id": "c4ea545c",
+      "old": "mem_4f1e53469749d620",
+      "new": "mem_0dbb252a886faeb8",
+      "label": "correct",
+      "reason": "按原知识更新题标注草稿，旧三天周安排视为完整安排，由每周四次替换；新原话并未给出四个具体星期几。",
+      "first_loss": null
+    },
+    {
+      "split": "dev100",
+      "question_id": "ce6d2d27",
+      "old": "mem_25616a87f400c0f4",
+      "new": "mem_b461bd0ed982796d",
+      "label": "incorrect",
+      "reason": "一次即将到来的周四课程与每周五课程的时间范围不同，原话未表明同一课程改期或取消；独立事件应保留。",
+      "first_loss": "relation_judgment"
+    },
+    {
+      "split": "dev100",
+      "question_id": "d851d5ba",
+      "old": "mem_df77e271e6d05de2",
+      "new": "mem_51dab3541f4a7480",
+      "label": "correct",
+      "reason": "同日相隔44分钟，从考虑慈善骑行变为计划下月参加，按同一意图的状态推进关闭合理；题目评分歧义另行处理。",
+      "first_loss": null
+    },
+    {
+      "split": "dev100",
+      "question_id": "e25c3b8d",
+      "old": "mem_1d6beebb84ca3483",
+      "new": "mem_dc2cac521a738c2a",
+      "label": "correct",
+      "reason": "新原话每周3次、每次平均3-4英里，对应约9-12英里，作为同一用户当前跑量的后续状态与20-25不一致；推导依据保留。",
+      "first_loss": null
+    },
+    {
+      "split": "dev100",
+      "question_id": "e831120c",
+      "old": "mem_cde3c0a37eb1bf04",
+      "new": "mem_b55726c9c2ccc54c",
+      "label": "incorrect",
+      "reason": "希望11:30入睡的目标与通常10:30入睡的习惯是不同属性；未明确取消或修改目标。",
+      "first_loss": "relation_judgment"
+    },
+    {
+      "split": "dev100",
+      "question_id": "gpt4_1a1dc16d",
+      "old": "mem_7526b4a201bd89f2",
+      "new": "mem_d2e2951da6c24a3e",
+      "label": "incorrect",
+      "reason": "同一句原话同时承诺MyFitnessPal追踪和Calendar/应用内提醒；追踪与提醒用途应并存。",
+      "first_loss": "relation_judgment"
+    },
+    {
+      "split": "dev100",
+      "question_id": "gpt4_213fd887",
+      "old": "mem_5712ce22d77bb1ba",
+      "new": "mem_583b341591b46ad2",
+      "label": "incorrect",
+      "reason": "同一会话给Maui行程增加一天，并未取消旅行计划；存在行程与行程时长属于不同信息。",
+      "first_loss": "relation_judgment"
+    },
+    {
+      "split": "dev100",
+      "question_id": "gpt4_59c863d7",
+      "old": "mem_61ed0d72d4ef15b3",
+      "new": "mem_fcc7f744640beb72",
+      "label": "incorrect",
+      "reason": "新列表增加Phoebe Bridgers，未说不再听Sufjan Stevens；非排他的艺人喜好列表不能因漏提某成员关闭旧事实。",
+      "first_loss": "relation_judgment"
+    },
+    {
+      "split": "dev100",
+      "question_id": "gpt4_65aabe59",
+      "old": "mem_b4922f5d82fa990b",
+      "new": "mem_a0839fb32268125c",
+      "label": "uncertain",
+      "reason": "5月25日前三周升级与1月中旬开始使用路由器可能为不同设备或历史事件；未确认同一升级，显式事件时间也不同。",
+      "first_loss": "event_time_and_identity_evidence"
+    },
+    {
+      "split": "dev100",
+      "question_id": "gpt4_76048e76",
+      "old": "mem_ca7d602fcd3238ac",
+      "new": "mem_f32cb3c5e96ec84c",
+      "label": "correct",
+      "reason": "后续明确当前所在邮编30309，更新先前10021的位置；这只支持当前位置，不推断永久搬家。",
+      "first_loss": null
+    },
+    {
+      "split": "heldout100",
+      "question_id": "0977f2af",
+      "old": "mem_13418d6872237fb5",
+      "new": "mem_c4129ac4ded3e75b",
+      "label": "incorrect",
+      "reason": "两条是带日期的比赛事件及完赛时间，不是同一个可变当前属性；个人最好成绩的变化不应关闭过去比赛事实。",
+      "first_loss": "relation_judgment"
+    },
+    {
+      "split": "heldout100",
+      "question_id": "099778bb",
+      "old": "mem_ba21bc905d033721",
+      "new": "mem_2528aeb0f3b1f3ff",
+      "label": "uncertain",
+      "reason": "同年2月满30与4月满32的生日陈述互相矛盾，且都指历史事件；没有明确纠正原话，不把矛盾生日简单当作正常年龄增长。",
+      "first_loss": "event_time_and_relation"
+    },
+    {
+      "split": "heldout100",
+      "question_id": "0f05491a",
+      "old": "mem_fd0f940b0b9ca961",
+      "new": "mem_4fad5b12d6ed1461",
+      "label": "correct",
+      "reason": "同一Rewards app达到Gold所需星数的当前陈述从125改为120。",
+      "first_loss": null
+    },
+    {
+      "split": "heldout100",
+      "question_id": "18bc8abd",
+      "old": "mem_be5540c731084c74",
+      "new": "mem_d8d288844128b8b1",
+      "label": "incorrect",
+      "reason": "早先聚会计划供应Sweet Baby Ray与后来喜欢KC酱可以共存；未说明早先聚会取消或换酱。",
+      "first_loss": "relation_judgment"
+    },
+    {
+      "split": "heldout100",
+      "question_id": "2ebe6c90",
+      "old": "mem_35fd7e2fb8092f1c",
+      "new": "mem_80f1baa81dbb7ace",
+      "label": "incorrect",
+      "reason": "同一会话仍在探索替代咖啡的茶；已喝低因咖啡不等于取消找茶的目标，目标和现状应并存。",
+      "first_loss": "relation_judgment",
+      "user_progress": "incomplete at quota; excluded from completed-user metrics"
+    }
+  ]
+}

@@ -2,7 +2,7 @@ import json
 from dataclasses import replace
 
 from llm_long_term_memory.conversation import AnswerRequest
-from llm_long_term_memory.runtime.grounded_answering import (
+from llm_long_term_memory.evaluation.grounded.answering import (
     EvidenceLedger,
     EvidenceSource,
     GroundedAnswererV11,
@@ -236,7 +236,7 @@ def test_ambiguous_numbered_successor_and_wrong_role_are_not_computed():
 def test_selective_repair_accepts_valid_first_result_and_blindly_repairs_invalid_one(monkeypatch):
     from types import SimpleNamespace
 
-    import llm_long_term_memory.runtime.grounded_answering as runtime
+    import llm_long_term_memory.evaluation.grounded.answering as runtime
 
     ledger = EvidenceLedger(sources=[source("E1", "I bought three rings.")])
     monkeypatch.setattr(runtime, "archive_excerpts", lambda *a, **k: SimpleNamespace(turns=[]))

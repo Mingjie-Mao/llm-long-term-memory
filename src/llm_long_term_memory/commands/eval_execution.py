@@ -89,13 +89,31 @@ def register_run_commands(
             "--experiment-class",
             help="regression | development | unseen; legacy manifests permit regression only",
         ),
+        cache: str | None = typer.Option(
+            None,
+            "--cache",
+            help=(
+                "Response cache (SQLite). Questions whose requests are unchanged reuse the "
+                "stored answer and grade instead of calling the provider. Needs --sample."
+            ),
+        ),
+        sample: str | None = typer.Option(
+            None,
+            "--sample",
+            help=(
+                "Which independent repetition this run is (e.g. rep1). Part of the cache "
+                "key: a different sample never reuses another sample's answers."
+            ),
+        ),
     ) -> None:
         """Evaluate one variant on LongMemEval. Resumes automatically if interrupted."""
         from llm_long_term_memory.evaluation.harness import run_eval
         from llm_long_term_memory.evaluation.report import render_summary
 
+        if cache and not sample:
+            raise typer.BadParameter("--cache needs --sample, e.g. --sample rep1")
         cfg, settings, runner, judge, usage = build_runner(
-            variant, config, store_name, top_k, rerank
+            variant, config, store_name, top_k, rerank, response_cache=cache, sample=sample
         )
         question_limit = limit if limit is not None else cfg.dataset_limit
 
@@ -296,6 +314,11 @@ def register_repeat_command(
         limit: int | None = typer.Option(None, help="Override dataset_limit from config"),
         store_name: str | None = typer.Option(None, help="Memory store filename stem"),
         fresh: bool = typer.Option(False, help="Discard each repeat checkpoint"),
+        cache: str | None = typer.Option(
+            None,
+            "--cache",
+            help="Response cache; repetition N is cached as sample repN, never shared",
+        ),
     ) -> None:
         """Run 2-5 independently checkpointed repetitions of one configuration."""
         from llm_long_term_memory.evaluation.compare import Variability
@@ -303,7 +326,9 @@ def register_repeat_command(
 
         accuracies = []
         for number in range(1, runs + 1):
-            cfg, settings, runner, judge, usage = build_runner(variant, config, store_name)
+            cfg, settings, runner, judge, usage = build_runner(
+                variant, config, store_name, response_cache=cache, sample=f"rep{number}"
+            )
             runner.name = f"{variant}.rep{number}"
             question_limit = limit if limit is not None else cfg.dataset_limit
             with console.status(f"Loading dataset for repeat {number}/{runs}…"):

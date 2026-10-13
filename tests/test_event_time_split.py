@@ -337,7 +337,7 @@ def test_a_store_written_before_the_column_can_still_be_read_read_only(tmp_path)
 
 
 def _rendered(memory, **kwargs) -> str:
-    from llm_long_term_memory.evaluation.runners.memory import render_memory
+    from llm_long_term_memory.runtime.context import render_memory
 
     return render_memory(memory, temporal=True, **kwargs)
 

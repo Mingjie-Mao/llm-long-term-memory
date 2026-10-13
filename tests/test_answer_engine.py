@@ -82,7 +82,7 @@ def test_live_service_no_longer_imports_the_benchmark_memory_runner():
 
 def test_product_context_matches_the_established_default_runner_rendering():
     """Extraction must not simplify the product prompt that the API used before."""
-    from llm_long_term_memory.evaluation.runners.memory import render_grouped
+    from llm_long_term_memory.runtime.context import render_grouped
 
     memories = [
         Memory(

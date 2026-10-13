@@ -95,10 +95,44 @@ def _value(memory: Memory) -> str:
 
 
 _QUANTITY = re.compile(r"\b\d[\d,]*\b")
+# Spelled-out numbers count too. Without them "attended three sessions" and "attended
+# five sessions" share an object and no digit, so the later one was folded away as a
+# restatement of the earlier (train150 `f9e8c073`, found by research/fact-pairs-v1.json).
+_NUMBER_WORDS = {
+    word: str(value)
+    for value, word in enumerate(
+        [
+            "zero",
+            "one",
+            "two",
+            "three",
+            "four",
+            "five",
+            "six",
+            "seven",
+            "eight",
+            "nine",
+            "ten",
+            "eleven",
+            "twelve",
+            "thirteen",
+            "fourteen",
+            "fifteen",
+            "sixteen",
+            "seventeen",
+            "eighteen",
+            "nineteen",
+            "twenty",
+        ]
+    )
+} | {"thirty": "30", "forty": "40", "fifty": "50", "hundred": "100"}
+_NUMBER_WORD = re.compile(r"\b(?:" + "|".join(_NUMBER_WORDS) + r")\b", re.IGNORECASE)
 
 
 def _quantities(memory: Memory) -> set[str]:
-    return {q.replace(",", "") for q in _QUANTITY.findall(memory.content or "")}
+    text = memory.content or ""
+    digits = {q.replace(",", "") for q in _QUANTITY.findall(text)}
+    return digits | {_NUMBER_WORDS[w.lower()] for w in _NUMBER_WORD.findall(text)}
 
 
 def _is_restatement(memory: Memory, owner: Memory) -> bool:

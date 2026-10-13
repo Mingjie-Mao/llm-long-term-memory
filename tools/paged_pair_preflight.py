@@ -17,9 +17,9 @@ def main():
     from llm_long_term_memory import cli
     from llm_long_term_memory.commands.common import manifest_instances
     from llm_long_term_memory.config import Settings
+    from llm_long_term_memory.evaluation.grounded.answering import personal_archive_review
+    from llm_long_term_memory.evaluation.grounded.evidence_pages import archive_pages
     from llm_long_term_memory.evaluation.manifest import load_manifest, require_claim
-    from llm_long_term_memory.runtime.evidence_pages import archive_pages
-    from llm_long_term_memory.runtime.grounded_answering import personal_archive_review
 
     manifest_path = REPO / "results/manifests/dev100.json"
     manifest = load_manifest(manifest_path)

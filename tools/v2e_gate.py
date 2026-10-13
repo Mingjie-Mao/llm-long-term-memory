@@ -34,7 +34,7 @@ MARKER = "states no date"
 
 def _marker_reached(rows: dict[str, dict]) -> dict[str, bool]:
     """Rebuild each question's context and look for the marker."""
-    from llm_long_term_memory.evaluation.runners.memory import render_grouped
+    from llm_long_term_memory.runtime.context import render_grouped
     from llm_long_term_memory.store import SQLiteMemoryStore
 
     store = SQLiteMemoryStore(STORE, read_only=True)

@@ -1,0 +1,471 @@
+{
+ "_about": "Fact-pair annotation set v1 for stage D (research/ROADMAP.md). One entry per multi-session knowledge-update question of train150/dev100/heldout100 (test100 untouched). Memory ids refer to the stores/<split>-anchor-v2 copies (ids are identical to the original stores). label: complete (old and new value both extracted), coexist (both extracted, they should not replace each other), old_missing / new_missing / both_missing (an extraction loss: no pair to judge). Drafted by the assistant on 2026-10-13 from the gold turns and the memories anchored to them; to be confirmed by the maintainer.",
+ "questions": {
+  "031748ae": {
+   "split": "train150",
+   "label": "complete",
+   "pairs": [
+    {
+     "old": "mem_f087baf6905e5fdf",
+     "new": "mem_86a170a3d333de3a",
+     "relation": "replace"
+    }
+   ],
+   "note": "team of 4 -> 5 engineers"
+  },
+  "06db6396": {
+   "split": "train150",
+   "label": "complete",
+   "pairs": [
+    {
+     "old": "mem_c3788e2e6f0b8cca",
+     "new": "mem_5142ad5c9213b055",
+     "relation": "replace"
+    }
+   ],
+   "note": "4 -> 5 painting projects"
+  },
+  "0e4e4c46": {
+   "split": "train150",
+   "label": "complete",
+   "pairs": [
+    {
+     "old": "mem_df4619592607e1ec",
+     "new": "mem_932258104f962ec1",
+     "relation": "replace"
+    }
+   ],
+   "note": "Ticket to Ride high score 124 -> 132"
+  },
+  "10e09553": {
+   "split": "train150",
+   "label": "coexist",
+   "pairs": [
+    {
+     "old": "mem_889dc3f3bc7ff8a3",
+     "new": "mem_c820093ffb69e37b",
+     "relation": "coexist"
+    }
+   ],
+   "note": "two different fishing trips (7/10: 7 bass; 7/22: 9 bass)"
+  },
+  "1cea1afa": {
+   "split": "train150",
+   "label": "complete",
+   "pairs": [
+    {
+     "old": "mem_b2ffcfc22680bbc2",
+     "new": "mem_361966d862fdbd20",
+     "relation": "replace"
+    }
+   ],
+   "note": "500 -> 600 followers"
+  },
+  "22d2cb42": {
+   "split": "train150",
+   "label": "both_missing",
+   "pairs": [],
+   "note": "guitar servicing never extracted"
+  },
+  "45dc21b6": {
+   "split": "train150",
+   "label": "old_missing",
+   "pairs": [],
+   "note": "'tried two of Emma's recipes' not extracted"
+  },
+  "50635ada": {
+   "split": "train150",
+   "label": "complete",
+   "pairs": [
+    {
+     "old": "mem_99d471a25065d23f",
+     "new": "mem_28477bef5ef22355",
+     "relation": "replace"
+    }
+   ],
+   "note": "Premier Silver -> Premier Gold"
+  },
+  "5831f84d": {
+   "split": "train150",
+   "label": "old_missing",
+   "pairs": [],
+   "note": "earlier Crash Course count not extracted"
+  },
+  "603deb26": {
+   "split": "train150",
+   "label": "complete",
+   "pairs": [
+    {
+     "old": "mem_06cc91f37793351d",
+     "new": "mem_1da69401b86d34ed",
+     "relation": "replace"
+    }
+   ],
+   "note": "Negroni 5 -> 10 times"
+  },
+  "6071bd76": {
+   "split": "train150",
+   "label": "complete",
+   "pairs": [
+    {
+     "old": "mem_083f7aab59057c3e",
+     "new": "mem_a6604d9936d44fa3",
+     "relation": "replace"
+    }
+   ],
+   "note": "6 oz -> 5 oz per tablespoon"
+  },
+  "6a1eabeb": {
+   "split": "train150",
+   "label": "complete",
+   "pairs": [
+    {
+     "old": "mem_08d5559eea16c9f6",
+     "new": "mem_0f056d42386249ba",
+     "relation": "replace"
+    }
+   ],
+   "note": "5K personal best 27:12 -> 25:50"
+  },
+  "6aeb4375": {
+   "split": "train150",
+   "label": "old_missing",
+   "pairs": [],
+   "note": "three Korean restaurants not extracted"
+  },
+  "7401057b": {
+   "split": "train150",
+   "label": "new_missing",
+   "pairs": [],
+   "note": "two free nights not extracted"
+  },
+  "9bbe84a2": {
+   "split": "train150",
+   "label": "new_missing",
+   "pairs": [],
+   "note": "level 150 goal not extracted (level 100 memory superseded by something else)"
+  },
+  "9ea5eabc": {
+   "split": "train150",
+   "label": "new_missing",
+   "pairs": [],
+   "note": "Paris trip not extracted; trips are events, not one attribute"
+  },
+  "affe2881": {
+   "split": "train150",
+   "label": "complete",
+   "pairs": [
+    {
+     "old": "mem_97857052b99914d8",
+     "new": "mem_79578fdecd42cf3d",
+     "relation": "replace"
+    }
+   ],
+   "note": "27 -> 32 bird species"
+  },
+  "cc5ded98": {
+   "split": "train150",
+   "label": "complete",
+   "pairs": [
+    {
+     "old": "mem_cc492e156c2c950b",
+     "new": "mem_fe9e8e9a852514b9",
+     "relation": "replace"
+    }
+   ],
+   "note": "one -> two hours of coding a day"
+  },
+  "ed4ddc30": {
+   "split": "train150",
+   "label": "complete",
+   "pairs": [
+    {
+     "old": "mem_841737b67abacded",
+     "new": "mem_3616d03df16eb76e",
+     "relation": "replace"
+    }
+   ],
+   "note": "30 -> 20 dozen eggs"
+  },
+  "f685340e": {
+   "split": "train150",
+   "label": "new_missing",
+   "pairs": [],
+   "note": "'every other week' tennis not extracted"
+  },
+  "f9e8c073": {
+   "split": "train150",
+   "label": "complete",
+   "pairs": [
+    {
+     "old": "mem_9cf0530c4becf7bd",
+     "new": "mem_ea0bdd631dd471b9",
+     "relation": "replace"
+    }
+   ],
+   "note": "3 -> 5 support-group sessions"
+  },
+  "07741c44": {
+   "split": "dev100",
+   "label": "both_missing",
+   "pairs": [],
+   "note": "'under my bed' not extracted; new turn only yields a plan"
+  },
+  "184da446": {
+   "split": "dev100",
+   "label": "complete",
+   "pairs": [
+    {
+     "old": "mem_2b1e8d642a31206d",
+     "new": "mem_a313a7e73dedf60a",
+     "relation": "replace"
+    }
+   ],
+   "note": "page 200 -> 220"
+  },
+  "2698e78f": {
+   "split": "dev100",
+   "label": "new_missing",
+   "pairs": [],
+   "note": "weekly therapy not extracted"
+  },
+  "26bdc477": {
+   "split": "dev100",
+   "label": "new_missing",
+   "pairs": [],
+   "note": "five trips not extracted"
+  },
+  "41698283": {
+   "split": "dev100",
+   "label": "coexist",
+   "pairs": [
+    {
+     "old": "mem_bd564ad4fb657e99",
+     "new": "mem_7e67e35e98af6afe",
+     "relation": "coexist"
+    },
+    {
+     "old": "mem_475e5252b2e43f0f",
+     "new": "mem_7e67e35e98af6afe",
+     "relation": "coexist"
+    }
+   ],
+   "note": "lenses owned together; 'most recent' is an ordering question"
+  },
+  "4d6b87c8": {
+   "split": "dev100",
+   "label": "complete",
+   "pairs": [
+    {
+     "old": "mem_0e979750237003d6",
+     "new": "mem_0e5f440c1a98e77e",
+     "relation": "replace"
+    }
+   ],
+   "note": "20 -> 25 titles"
+  },
+  "59524333": {
+   "split": "dev100",
+   "label": "new_missing",
+   "pairs": [],
+   "note": "6 pm not extracted; the 7 pm memory is an assistant recommendation"
+  },
+  "5a4f22c0": {
+   "split": "dev100",
+   "label": "old_missing",
+   "pairs": [],
+   "note": "Rachel's previous employer never stated as a fact"
+  },
+  "72e3ee87": {
+   "split": "dev100",
+   "label": "complete",
+   "pairs": [
+    {
+     "old": "mem_cf11c281c62ee117",
+     "new": "mem_1868e63aa34783a0",
+     "relation": "replace"
+    }
+   ],
+   "note": "episode 10 -> 50 episodes"
+  },
+  "7a87bd0c": {
+   "split": "dev100",
+   "label": "complete",
+   "pairs": [
+    {
+     "old": "mem_0f9233cf9d1ce5a9",
+     "new": "mem_e8c2e3027d46193c",
+     "relation": "replace"
+    }
+   ],
+   "note": "tidying 3 -> 4 weeks"
+  },
+  "7e974930": {
+   "split": "dev100",
+   "label": "coexist",
+   "pairs": [
+    {
+     "old": "mem_9435367b50588d6c",
+     "new": "mem_083c0181b642263d",
+     "relation": "coexist"
+    },
+    {
+     "old": "mem_a215ef3843d5d337",
+     "new": "mem_083c0181b642263d",
+     "relation": "coexist"
+    }
+   ],
+   "note": "earnings at separate market visits"
+  },
+  "945e3d21": {
+   "split": "dev100",
+   "label": "new_missing",
+   "pairs": [],
+   "note": "yoga three times a week not extracted"
+  },
+  "a1eacc2a": {
+   "split": "dev100",
+   "label": "new_missing",
+   "pairs": [],
+   "note": "seven stories not extracted"
+  },
+  "b01defab": {
+   "split": "dev100",
+   "label": "new_missing",
+   "pairs": [],
+   "note": "finished The Nightingale not extracted"
+  },
+  "c4ea545c": {
+   "split": "dev100",
+   "label": "complete",
+   "pairs": [
+    {
+     "old": "mem_4f1e53469749d620",
+     "new": "mem_0dbb252a886faeb8",
+     "relation": "replace"
+    }
+   ],
+   "note": "Tue/Thu/Sat -> four times a week"
+  },
+  "ce6d2d27": {
+   "split": "dev100",
+   "label": "complete",
+   "pairs": [
+    {
+     "old": "mem_25616a87f400c0f4",
+     "new": "mem_b461bd0ed982796d",
+     "relation": "replace"
+    }
+   ],
+   "note": "class Thursday -> Fridays"
+  },
+  "07741c45": {
+   "split": "heldout100",
+   "label": "old_missing",
+   "pairs": [],
+   "note": "'under my bed' not extracted"
+  },
+  "0977f2af": {
+   "split": "heldout100",
+   "label": "coexist",
+   "pairs": [
+    {
+     "old": "mem_fb40838096103735",
+     "new": "mem_a753f5641368cbf4",
+     "relation": "coexist"
+    }
+   ],
+   "note": "Instant Pot and Air Fryer are both owned"
+  },
+  "0f05491a": {
+   "split": "heldout100",
+   "label": "new_missing",
+   "pairs": [],
+   "note": "120 stars not extracted"
+  },
+  "18bc8abd": {
+   "split": "heldout100",
+   "label": "complete",
+   "pairs": [
+    {
+     "old": "mem_be5540c731084c74",
+     "new": "mem_d8d288844128b8b1",
+     "relation": "replace"
+    }
+   ],
+   "note": "favourite BBQ sauce changed"
+  },
+  "5c40ec5b": {
+   "split": "heldout100",
+   "label": "both_missing",
+   "pairs": [],
+   "note": "meet-up count never a stated value"
+  },
+  "69fee5aa": {
+   "split": "heldout100",
+   "label": "new_missing",
+   "pairs": [],
+   "note": "only 'added a coin' event; 38 never stated as a state"
+  },
+  "71315a70": {
+   "split": "heldout100",
+   "label": "new_missing",
+   "pairs": [],
+   "note": "10-12 hours not extracted"
+  },
+  "852ce960": {
+   "split": "heldout100",
+   "label": "complete",
+   "pairs": [
+    {
+     "old": "mem_6eafc1f2ea214723",
+     "new": "mem_f4dd56f0e173675e",
+     "relation": "replace"
+    }
+   ],
+   "note": "$350k -> $400k pre-approval"
+  },
+  "89941a93": {
+   "split": "heldout100",
+   "label": "old_missing",
+   "pairs": [],
+   "note": "three bikes not extracted"
+  },
+  "8fb83627": {
+   "split": "heldout100",
+   "label": "both_missing",
+   "pairs": [],
+   "note": "issue counts not extracted"
+  },
+  "ba61f0b9": {
+   "split": "heldout100",
+   "label": "old_missing",
+   "pairs": [],
+   "note": "'half are women' not extracted as a count"
+  },
+  "c7dc5443": {
+   "split": "heldout100",
+   "label": "old_missing",
+   "pairs": [],
+   "note": "earlier record not extracted"
+  },
+  "dfde3500": {
+   "split": "heldout100",
+   "label": "new_missing",
+   "pairs": [],
+   "note": "new tutor Maria not extracted"
+  },
+  "e61a7584": {
+   "split": "heldout100",
+   "label": "complete",
+   "pairs": [
+    {
+     "old": "mem_21f773276e8c00f1",
+     "new": "mem_aae320b05ee8e5ea",
+     "relation": "replace"
+    }
+   ],
+   "note": "Luna 6 -> 9 months"
+  }
+ }
+}

@@ -1,0 +1,269 @@
+{
+ "targets": 22,
+ "questions": [
+  {
+   "question_id": "07741c45",
+   "split": "heldout100",
+   "failure": "latest_value",
+   "t4_correct_of_3": 1,
+   "oracle_correct_of_3": 0,
+   "oracle_answers": [
+    "You are planning to organize your closet and store your old sneakers in a shoe rack.",
+    "You are currently planning to store your old sneakers in a shoe rack as part of organizing your closet.",
+    "You are planning to organize your closet and store your old sneakers in a shoe rack."
+   ]
+  },
+  {
+   "question_id": "59524333",
+   "split": "dev100",
+   "failure": "latest_value",
+   "t4_correct_of_3": 0,
+   "oracle_correct_of_3": 3,
+   "oracle_answers": [
+    "You usually go to the gym at 6:00 pm.",
+    "You usually go to the gym at 6:00 pm.",
+    "You usually go to the gym at 6:00 pm."
+   ]
+  },
+  {
+   "question_id": "945e3d21",
+   "split": "dev100",
+   "failure": "latest_value",
+   "t4_correct_of_3": 2,
+   "oracle_correct_of_3": 2,
+   "oracle_answers": [
+    "You currently attend yoga classes twice a week to help with stress and focus.",
+    "You attend yoga classes three times a week to help clear your head and focus.",
+    "You attend yoga classes three times a week to help clear your head and stay focused."
+   ]
+  },
+  {
+   "question_id": "c4ea545c",
+   "split": "dev100",
+   "failure": "latest_value",
+   "t4_correct_of_3": 0,
+   "oracle_correct_of_3": 0,
+   "oracle_answers": [
+    "No, your gym routine has remained consistent at four times a week (on Tuesdays, Thursdays, and Saturdays), which is the same frequency as before.",
+    "You currently go to the gym four times a week (on Tuesdays, Thursdays, and Saturdays), which is the same frequency as when you mentioned your routine in August.",
+    "No, your gym frequency has remained the same at four times a week (on Tuesdays, Thursdays, and Saturdays)."
+   ]
+  },
+  {
+   "question_id": "0977f2af",
+   "split": "heldout100",
+   "failure": "temporal_order",
+   "t4_correct_of_3": 0,
+   "oracle_correct_of_3": 3,
+   "oracle_answers": [
+    "Before getting your Air Fryer, you invested in an Instant Pot, which you used to make Korean Chicken Stew.",
+    "Before getting the Air Fryer, you invested in an Instant Pot, which you used to make Korean Chicken Stew.",
+    "Before getting the Air Fryer, you invested in an Instant Pot, which you used to make Korean Chicken Stew."
+   ]
+  },
+  {
+   "question_id": "gpt4_fe651585",
+   "split": "heldout100",
+   "failure": "temporal_order",
+   "t4_correct_of_3": 2,
+   "oracle_correct_of_3": 3,
+   "oracle_answers": [
+    "Alex became a parent first in January, whereas Rachel's twins Jackson and Julia were born on February 12th.",
+    "Alex became a parent first in January, when they adopted a baby girl, whereas Rachel's twins Jackson and Julia were born on February 12th.",
+    "Alex became a parent first in January, whereas Rachel's twins were born on February 12th."
+   ]
+  },
+  {
+   "question_id": "gpt4_59149c78",
+   "split": "dev100",
+   "failure": "temporal_window",
+   "t4_correct_of_3": 2,
+   "oracle_correct_of_3": 0,
+   "oracle_answers": [
+    "The art-related event you mentioned attending two weeks ago (around mid-January, such as your visit to the Museum of Modern Art or the City Art Museum) was held at the museum itself, like the Museum of Modern Art (MoMA) or the City Art Museum.",
+    "The art-related event two weeks ago (referring to your visit around mid-January) was held at the City Art Museum (where you saw the Impressionist Masterpieces exhibition) or the Museum of Modern Art (MoMA), depending on which specific outing you meant.",
+    "You attended the Impressionist Masterpieces exhibition with your sister at the City Art Museum."
+   ]
+  },
+  {
+   "question_id": "gpt4_e414231f",
+   "split": "dev100",
+   "failure": "temporal_window",
+   "t4_correct_of_3": 1,
+   "oracle_correct_of_3": 0,
+   "oracle_answers": [
+    "You fixed the flat tire on your mountain bike.",
+    "You fixed the flat tire on your mountain bike.",
+    "You fixed a flat tire on your mountain bike recently."
+   ]
+  },
+  {
+   "question_id": "gpt4_f420262d",
+   "split": "dev100",
+   "failure": "temporal_window",
+   "t4_correct_of_3": 0,
+   "oracle_correct_of_3": 0,
+   "oracle_answers": [
+    "I do not know.",
+    "I do not know.",
+    "I do not know."
+   ]
+  },
+  {
+   "question_id": "gpt4_468eb063",
+   "split": "heldout100",
+   "failure": "date_arithmetic",
+   "t4_correct_of_3": 2,
+   "oracle_correct_of_3": 0,
+   "oracle_answers": [
+    "You met Emma (the freelance writer) 16 days ago, on April 4, 2023.",
+    "You met Emma (the freelance writer) 16 days ago, on April 4, 2023.",
+    "You met Emma (the freelance writer you met at a coffee shop near your office) 16 days ago, on April 4, 2023."
+   ]
+  },
+  {
+   "question_id": "gpt4_85da3956",
+   "split": "dev100",
+   "failure": "date_arithmetic",
+   "t4_correct_of_3": 1,
+   "oracle_correct_of_3": 3,
+   "oracle_answers": [
+    "You attended the 'Summer Nights' festival at Universal Studios Hollywood 3 weeks ago, on July 15, 2023.",
+    "You attended the 'Summer Nights' festival at Universal Studios Hollywood 3 weeks ago (on July 15, 2023).",
+    "You attended the 'Summer Nights' festival at Universal Studios Hollywood 3 weeks ago (on July 15, 2023)."
+   ]
+  },
+  {
+   "question_id": "gpt4_93159ced",
+   "split": "dev100",
+   "failure": "derivation",
+   "t4_correct_of_3": 2,
+   "oracle_correct_of_3": 3,
+   "oracle_answers": [
+    "You have been working professionally for 9 years total, and you have been at NovaTech for 4 years and 3 months. That means you worked for approximately 4 years and 9 months before starting your current job at NovaTech.",
+    "You have been working professionally for 9 years total, and with your 4 years and 3 months at NovaTech, you had been working for about 4 years and 9 months before joining them.",
+    "You have been working professionally for 9 years total, and with your 4 years and 3 months at NovaTech, you worked for about 4 years and 9 months before starting there."
+   ]
+  },
+  {
+   "question_id": "9ee3ecd6",
+   "split": "heldout100",
+   "failure": "derivation",
+   "t4_correct_of_3": 0,
+   "oracle_correct_of_3": 0,
+   "oracle_answers": [
+    "I do not know.",
+    "I do not know.",
+    "I do not know."
+   ]
+  },
+  {
+   "question_id": "e6041065",
+   "split": "heldout100",
+   "failure": "derivation",
+   "t4_correct_of_3": 1,
+   "oracle_correct_of_3": 0,
+   "oracle_answers": [
+    "On your last trip, you packed only sneakers and sandals, and you wore all of them (100%), as you didn't end up wearing any extra shoes.",
+    "You wore 100% of the shoes you packed on your last trip—specifically, just your sneakers and sandals, as you decided not to pack any extra shoes.",
+    "You wore 100% of the shoes you packed on your last trip—specifically, just your sneakers and sandals, which were the only pairs you brought."
+   ]
+  },
+  {
+   "question_id": "60159905",
+   "split": "heldout100",
+   "failure": "count_or_sum",
+   "t4_correct_of_3": 2,
+   "oracle_correct_of_3": 1,
+   "oracle_answers": [
+    "You have attended 4 dinner parties or gatherings in the past month: the BBQ at Mike's place on May 6, David's birthday party on May 13, the Italian feast at Sarah's place on May 15, and the potluck at Alex's place on May 21.",
+    "You have attended 4 dinner parties and gatherings in the past month: the BBQ at Mike's place on May 6, David's birthday party on May 13, the Italian feast at Sarah's place on May 15, and the potluck at Alex's place on May 21.",
+    "You have attended 3 dinner parties/gatherings in the past month: the BBQ at Mike's place, the Italian feast at Sarah's place, and the potluck at Alex's place."
+   ]
+  },
+  {
+   "question_id": "bf659f65",
+   "split": "heldout100",
+   "failure": "count_or_sum",
+   "t4_correct_of_3": 0,
+   "oracle_correct_of_3": 0,
+   "oracle_answers": [
+    "You have purchased or downloaded 2 music albums or EPs: Billie Eilish's \"Happier Than Ever\" album on Spotify and The Whiskey Wanderers' EP \"Midnight Sky\".",
+    "You have purchased or downloaded 2 music albums or EPs: Billie Eilish's \"Happier Than Ever\" album on Spotify and The Whiskey Wanderers' EP \"Midnight Sky\".",
+    "You have purchased or downloaded 2 music albums or EPs: Billie Eilish's album 'Happier Than Ever' on Spotify and The Whiskey Wanderers' EP 'Midnight Sky'."
+   ]
+  },
+  {
+   "question_id": "gpt4_59c863d7",
+   "split": "dev100",
+   "failure": "count_or_sum",
+   "t4_correct_of_3": 1,
+   "oracle_correct_of_3": 0,
+   "oracle_answers": [
+    "You have worked on or bought 4 model kits: a 1/72 scale B-29 bomber, a 1/24 scale '69 Camaro, a Revell F-15 Eagle, a 1/16 scale German Tiger I tank, and a Tamiya 1/48 scale Spitfire Mk.V (totaling 5 kits).",
+    "You have worked on or bought 4 model kits: the 1/72 scale B-29 bomber, the 1/24 scale '69 Camaro, the Revell F-15 Eagle, the 1/16 scale German Tiger I tank, and the Tamiya 1/48 scale Spitfire Mk.V (total of 5 model kits).",
+    "You have worked on or bought 4 model kits (the B-29 bomber, '69 Camaro, Revell F-15 Eagle, 1/16 scale German Tiger I tank, and Tamiya Spitfire Mk.V)."
+   ]
+  },
+  {
+   "question_id": "gpt4_e05b82a6",
+   "split": "dev100",
+   "failure": "count_or_sum",
+   "t4_correct_of_3": 1,
+   "oracle_correct_of_3": 0,
+   "oracle_answers": [
+    "You rode rollercoasters 8 times across those events (3 times on Revenge of the Mummy, 1 time on Xcelerator, 3 times on Space Mountain: Ghost Galaxy, and 3 rollercoasters—Mako, Kraken, and Manta—at SeaWorld San Diego).",
+    "You rode rollercoasters 8 times across those events (3 times on Revenge of the Mummy, 1 time on Xcelerator, 3 times on Space Mountain: Ghost Galaxy, and 3 rollercoasters - Mako, Kraken, and Manta - at SeaWorld San Diego).",
+    "You rode rollercoasters 8 times across those events (3 times on Revenge of the Mummy, 1 time on Xcelerator, 3 times on Space Mountain: Ghost Galaxy, and 3 rollercoasters — Mako, Kraken, and Manta — at SeaWorld San Diego)."
+   ]
+  },
+  {
+   "question_id": "gpt4_9a159967",
+   "split": "heldout100",
+   "failure": "count_or_sum",
+   "t4_correct_of_3": 1,
+   "oracle_correct_of_3": 0,
+   "oracle_answers": [
+    "In March and April, you flew with United Airlines (taking a business trip to Chicago on March 10-12), Southwest Airlines (flying to Las Vegas from March 15-18), and American Airlines (flying to Hawaii from April 20-27).",
+    "In March and April, you flew with United Airlines (taking trips to Chicago in March), American Airlines (flying to Honolulu and Maui during your Hawaii vacation from April 20 to 27), and Southwest Airlines (flying to Las Vegas from March 15 to 18). Based on the ride counts and trips mentioned, you flew most frequently with United Airlines and American Airlines.",
+    "In March and April, you flew with United Airlines (to Chicago in March), American Airlines (to Hawaii in April), and Southwest Airlines (to Las Vegas in March)."
+   ]
+  },
+  {
+   "question_id": "5d3d2817",
+   "split": "dev100",
+   "failure": "missed_detail",
+   "t4_correct_of_3": 0,
+   "oracle_correct_of_3": 3,
+   "oracle_answers": [
+    "You were a marketing specialist at a small startup.",
+    "In your previous role before becoming a senior marketing analyst, you were a marketing specialist at a small startup.",
+    "You were a marketing specialist at a small startup."
+   ]
+  },
+  {
+   "question_id": "54026fce",
+   "split": "heldout100",
+   "failure": "preference_use",
+   "t4_correct_of_3": 2,
+   "oracle_correct_of_3": 0,
+   "oracle_answers": [
+    "I do not know.",
+    "I do not know.",
+    "I do not know."
+   ]
+  },
+  {
+   "question_id": "gpt4_2f56ae70",
+   "split": "heldout100",
+   "failure": "temporal_order",
+   "t4_correct_of_3": 1,
+   "oracle_correct_of_3": 0,
+   "oracle_answers": [
+    "You started using Apple TV+ most recently, having used it for a few months compared to the 6 months you've been using Netflix, Hulu, and Amazon Prime.",
+    "You started using Apple TV+ most recently among your current subscriptions (about a few months ago, compared to 6 months for Netflix, Hulu, and Amazon Prime, and a free trial on Disney+ last month).",
+    "You started using Apple TV+ most recently, having used it for a few months compared to the 6 months you've been using Netflix, Hulu, and Amazon Prime."
+   ]
+  }
+ ]
+}

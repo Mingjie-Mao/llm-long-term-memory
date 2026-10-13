@@ -1,0 +1,53 @@
+{
+  "store": "heldout100-anchor-v2",
+  "checkable": 4285,
+  "accuracy": {
+    "stored": 0.9656942823803968,
+    "v1": 0.8704784130688448,
+    "v2": 0.9656942823803968,
+    "v3": 0.9565927654609101
+  },
+  "v1_equals_stored": 0.8891481913652275,
+  "flips": {
+    "v1_wrong_v2_right": 432,
+    "v1_right_v2_wrong": 24
+  },
+  "v2_kept_of_v1_correct": 0.9935656836461126,
+  "v3_kept_of_v1_correct": 0.9831099195710455,
+  "v2_accuracy_by_reference_role": {
+    "user": 0.9785177228786252,
+    "assistant": 0.9621347644603458
+  },
+  "rules": {
+    "v2_at_least_3_points_above_v1": true,
+    "v2_keeps_99pct_of_v1_correct": true
+  },
+  "switch_to_v2": true,
+  "examples": [
+    {
+      "content": "The assistant recommended visiting Shakespeare's birthplace, the Royal Shakespeare Theatre, Anne Hathaway's cottage, and other family homes ",
+      "v1_turn": 0,
+      "reference_turn": 1
+    },
+    {
+      "content": "The assistant recommended Seiko 5 Sports, Citizen BM8475-03E, and Fossil Grant for watches between $100 and $300.",
+      "v1_turn": 3,
+      "reference_turn": 1
+    },
+    {
+      "content": "The most popular exhibit at the College Football Hall of Fame is the Game Day exhibit.",
+      "v1_turn": 0,
+      "reference_turn": 4
+    },
+    {
+      "content": "The assistant recommended the Data Science Certification by DataCamp for the user.",
+      "v1_turn": 1,
+      "reference_turn": 3
+    },
+    {
+      "content": "The assistant summarized a text about Lean Six Sigma (LSS) implementation in an R&D configuration control process.",
+      "v1_turn": 2,
+      "reference_turn": 3
+    }
+  ]
+}

@@ -105,6 +105,14 @@ class IngestConfig(BaseModel):
     """Retain verbatim personal user assertions and repair unique numeric echo anchors.
     Zero extraction calls; increases index size. Opt-in and fingerprinted."""
 
+    update_linking: bool = False
+    """Stage D (research/ROADMAP.md): after a batch is written, judge each new user-stated
+    memory against its most similar facts of any date (similarity >= 0.65, one call per
+    pair) and move a confirmed replacement onto the earlier fact's key, so the resolver
+    can close the old value even when Stage B keyed the two differently. Off by default:
+    about 500 judgments per 100 histories on dev100. Changes what is current, so it is
+    part of the ingest fingerprint."""
+
     checkpoint_every: int = 25
 
 
@@ -220,20 +228,15 @@ class ServiceConfig(BaseModel):
     thing it sits next to.
     """
 
-    top_k: int = 10
-    """Pilot default: k=10 matched naive RAG on 242 median context tokens where k=20
-    spent 439 for no measurable gain (results/rerank-pareto.md). Not frozen — 31
-    questions cannot settle it."""
+    top_k: int = 20
+    """Memories retrieved per question, for the inspector and the answerer alike. 20 is
+    what every raw-primary arm, t4 included, was measured with."""
 
-    raw_primary_tokens: int = 0
-    """Verbatim turns found in the user's archive by the question, added to the memory
-    context before the first answer call — the benchmark's raw-primary arm (v1: 4,000;
-    train150 net +29, heldout100 +14, both exposed development sets). Off (0) by
-    default: the served context grows from about 1,500 to about 5,600 tokens."""
-
-    raw_primary_time_notes: bool = False
-    """With `raw_primary_tokens`: date the excerpts relative to the question and resolve
-    relative dates in the user's turns (raw-primary t1). Unmeasured; off by default."""
+    answer_profile: Literal["v2", "t4"] = "t4"
+    """The answer path (`runtime.answer_engine.ANSWER_PROFILES`). `t4` is the best
+    exposed-development arm (heldout100, 3 runs: 87.67% vs v1 81.00%; development
+    evidence, not an unseen-test result) at about 6,300 context tokens per question.
+    `v2` is frozen v2's memory-first path: about 600 tokens, 72% on the frozen test100."""
 
 
 class ExperimentConfig(BaseModel):

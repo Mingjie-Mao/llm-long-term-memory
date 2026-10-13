@@ -1,0 +1,143 @@
+{
+ "_about": "Stage E targets: the value each knowledge-update question lost at extraction (research/fact-pairs-v1.json labels old_missing/new_missing/both_missing), with a pattern that recognises it in a memory's content. side = whether it is the old or the new value. Excluded: 5a4f22c0, 69fee5aa, 5c40ec5b, whose value is never stated in the conversation. Drafted by the assistant on 2026-10-13 from the gold turns.",
+ "targets": {
+  "22d2cb42": {
+   "split": "train150",
+   "side": "new",
+   "pattern": "main st",
+   "value": "guitar serviced at the music shop on Main St"
+  },
+  "45dc21b6": {
+   "split": "train150",
+   "side": "old",
+   "pattern": "\\b(two|2)\\b[^.]*recipe|recipe[^.]*\\b(two|2)\\b",
+   "value": "tried two of Emma's recipes"
+  },
+  "5831f84d": {
+   "split": "train150",
+   "side": "old",
+   "pattern": "\\b10\\b[^.]*crash course|crash course[^.]*\\b10\\b",
+   "value": "finished 10 Crash Course videos"
+  },
+  "6aeb4375": {
+   "split": "train150",
+   "side": "old",
+   "pattern": "\\b(three|3)\\b[^.]*korean|korean[^.]*\\b(three|3)\\b",
+   "value": "tried three Korean restaurants"
+  },
+  "7401057b": {
+   "split": "train150",
+   "side": "new",
+   "pattern": "\\b(two|2)\\b[^.]*night|night[^.]*\\b(two|2)\\b",
+   "value": "points for two free nights"
+  },
+  "9bbe84a2": {
+   "split": "train150",
+   "side": "new",
+   "pattern": "\\b150\\b",
+   "value": "aiming for level 150"
+  },
+  "9ea5eabc": {
+   "split": "train150",
+   "side": "new",
+   "pattern": "paris",
+   "value": "recent family trip to Paris"
+  },
+  "f685340e": {
+   "split": "train150",
+   "side": "new",
+   "pattern": "every other week|every two weeks|biweekly|fortnight",
+   "value": "tennis every other week"
+  },
+  "07741c44": {
+   "split": "dev100",
+   "side": "old",
+   "pattern": "under (?:their|the|my|his|her) bed",
+   "value": "keeps old sneakers under the bed"
+  },
+  "2698e78f": {
+   "split": "dev100",
+   "side": "new",
+   "pattern": "every week|weekly|once a week",
+   "value": "sees Dr. Smith every week"
+  },
+  "26bdc477": {
+   "split": "dev100",
+   "side": "new",
+   "pattern": "\\b(five|5)\\b[^.]*trip|trip[^.]*\\b(five|5)\\b",
+   "value": "camera taken on five trips"
+  },
+  "59524333": {
+   "split": "dev100",
+   "side": "new",
+   "pattern": "\\b6(?::00)?\\s*(?:pm|p\\.m\\.)",
+   "value": "gym usually at 6:00 pm"
+  },
+  "945e3d21": {
+   "split": "dev100",
+   "side": "new",
+   "pattern": "(three|3) times a week[^.]*yoga|yoga[^.]*(three|3) times",
+   "value": "yoga three times a week"
+  },
+  "a1eacc2a": {
+   "split": "dev100",
+   "side": "new",
+   "pattern": "\\b(seven|7)\\b[^.]*stor|stor[^.]*\\b(seven|7)\\b",
+   "value": "completed 7 short stories"
+  },
+  "b01defab": {
+   "split": "dev100",
+   "side": "new",
+   "pattern": "(finished|completed)[^.]*nightingale|nightingale[^.]*(finished|completed)",
+   "value": "finished The Nightingale"
+  },
+  "07741c45": {
+   "split": "heldout100",
+   "side": "old",
+   "pattern": "under (?:their|the|my|his|her) bed",
+   "value": "keeps old sneakers under the bed"
+  },
+  "0f05491a": {
+   "split": "heldout100",
+   "side": "new",
+   "pattern": "\\b120\\b",
+   "value": "needs 120 stars"
+  },
+  "71315a70": {
+   "split": "heldout100",
+   "side": "new",
+   "pattern": "10\\s*(?:-|to|–)\\s*12",
+   "value": "spent 10-12 hours"
+  },
+  "89941a93": {
+   "split": "heldout100",
+   "side": "old",
+   "pattern": "(three|3) bikes|mountain bike[^.]*commuter|commuter[^.]*mountain bike",
+   "value": "road bike plus two other bikes"
+  },
+  "8fb83627": {
+   "split": "heldout100",
+   "side": "new",
+   "pattern": "\\b(fifth|5th|five|5)\\b[^.]*issue|issue[^.]*\\b(fifth|5th|five|5)\\b",
+   "value": "finished the fifth issue"
+  },
+  "ba61f0b9": {
+   "split": "heldout100",
+   "side": "old",
+   "pattern": "\\bhalf\\b|\\b(five|5)\\b[^.]*women|women[^.]*\\b(five|5)\\b",
+   "value": "half of Rachel's 10-person team are women"
+  },
+  "c7dc5443": {
+   "split": "heldout100",
+   "side": "old",
+   "pattern": "\\b3-2\\b",
+   "value": "volleyball record 3-2"
+  },
+  "dfde3500": {
+   "split": "heldout100",
+   "side": "new",
+   "pattern": "maria",
+   "value": "meeting new tutor Maria on Thursday"
+  }
+ }
+}

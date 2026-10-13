@@ -47,8 +47,8 @@ class CostBoundRunner(BoundRunner):
 
 
 def expected_calls(store, instance, candidate):
-    from llm_long_term_memory.runtime.evidence_pages import archive_pages
-    from llm_long_term_memory.runtime.grounded_answering import personal_archive_review
+    from llm_long_term_memory.evaluation.grounded.answering import personal_archive_review
+    from llm_long_term_memory.evaluation.grounded.evidence_pages import archive_pages
 
     pages = (
         archive_pages(store, instance.store_namespace, roles=("user",), split_oversized=True)

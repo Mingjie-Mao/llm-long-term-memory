@@ -950,6 +950,23 @@ class SQLiteMemoryStore:
                 (_dt(at), memory_id),
             )
 
+    def link_update(
+        self, memory_id: str, *, subject: str, predicate: str, target_object: str
+    ) -> None:
+        """Mark `memory_id` as replacing `target_object` under `(subject, predicate)`.
+
+        Stage D: a confirmed update between two facts the extractor keyed differently
+        moves the later fact onto the earlier fact's key, so the resolver — which only
+        compares facts under one key — can rebuild their timeline together. Validity is
+        left to the resolver.
+        """
+        with self._conn:
+            self._conn.execute(
+                "UPDATE memories SET subject=?, predicate=?, update_op='replaces', "
+                "target_object=?, replaces_previous=1 WHERE id=?",
+                (subject, predicate, target_object, memory_id),
+            )
+
     def set_validity(self, memory_id: str, valid_to: datetime | None) -> None:
         with self._conn:
             self._conn.execute(

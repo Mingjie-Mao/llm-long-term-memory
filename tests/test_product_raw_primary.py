@@ -1,7 +1,7 @@
-"""The product answerer's opt-in raw-primary excerpts (`ServiceConfig.raw_primary_tokens`).
+"""The product answerer's raw-primary excerpts.
 
-Off by default, so the served prompt is unchanged unless a deployment asks for it; when
-on, only the asking tenant's turns may reach the prompt.
+Off in a bare engine; the service's default `t4` profile turns them on. Either way only
+the asking tenant's turns may reach the prompt.
 """
 
 from __future__ import annotations
@@ -82,9 +82,8 @@ def _ask(user):
     )
 
 
-def test_off_by_default_in_the_engine_and_the_service_config(store, tmp_path):
-    assert ServiceConfig().raw_primary_tokens == 0
-    assert ServiceConfig().raw_primary_time_notes is False
+def test_off_in_a_bare_engine_and_on_in_the_served_profile(store, tmp_path):
+    assert ServiceConfig().answer_profile == "t4"
     engine = _engine(store, tmp_path)
     answer = engine.answer_request(_ask("alice"))
     assert "$640" not in engine.client.prompts[0]

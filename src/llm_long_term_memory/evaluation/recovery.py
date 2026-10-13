@@ -6,6 +6,8 @@ import json
 import time
 from pathlib import Path
 
+import httpx
+
 from llm_long_term_memory.llm.client import DailyQuotaExhausted
 
 
@@ -17,7 +19,12 @@ def transient(exc):
     if isinstance(exc, DailyQuotaExhausted):
         return False
     code = getattr(exc, "code", getattr(exc, "status_code", None))
-    return code in {500, 502, 503, 504} or isinstance(exc, (ConnectionError, TimeoutError))
+    # httpx.TransportError covers DNS failures, connect/read timeouts and dropped
+    # connections. None of them subclass the builtin ConnectionError, so before this
+    # an overnight DNS outage was a permanent error that stopped the run outright.
+    return code in {500, 502, 503, 504} or isinstance(
+        exc, (ConnectionError, TimeoutError, httpx.TransportError)
+    )
 
 
 class RecoveringJudge:
@@ -74,8 +81,10 @@ class RecoveringJudge:
         while True:
             if self.state["failures"] > self.max_recoveries:
                 raise RecoveryExhausted("durable judge recovery budget exhausted")
-            while self.clock() < self.state["cooldown_until"]:
-                self.sleep(min(30, self.state["cooldown_until"] - self.clock()))
+            while (remaining := self.state["cooldown_until"] - self.clock()) > 0:
+                # One clock read per check: two reads can straddle the deadline and
+                # hand sleep() a negative number, which raises ValueError.
+                self.sleep(min(30, remaining))
             try:
                 return self.judge.grade(**kwargs)
             except Exception as exc:

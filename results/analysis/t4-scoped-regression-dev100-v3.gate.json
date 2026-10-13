@@ -1,0 +1,64 @@
+{
+  "experiment_class": "exposed-dev100-development-regression",
+  "accuracy": {
+    "mean_correct": {
+      "control": 88.33333333333333,
+      "candidate": 86.0
+    },
+    "per_run_correct": {
+      "control": [
+        88,
+        89,
+        88
+      ],
+      "candidate": [
+        84,
+        91,
+        83
+      ]
+    },
+    "mean_net": -2.333333333333333,
+    "by_type_mean_net": {
+      "knowledge-update": -0.6666666666666666,
+      "multi-session": -1.6666666666666665,
+      "single-session-assistant": 0.0,
+      "single-session-preference": 0.0,
+      "single-session-user": 0.3333333333333333,
+      "temporal-reasoning": -0.3333333333333333
+    },
+    "majority_paired": {
+      "questions": 100,
+      "wins": 0,
+      "losses": 2,
+      "difference_ci95": [
+        -0.08123370856202985,
+        0.04314713468619919
+      ],
+      "method": "Bonferroni 97.5% Wilson win/loss bounds"
+    },
+    "statistical_no_loss_supported": false
+  },
+  "median_candidate_context": 6368.0,
+  "rules": {
+    "mean_net_nonnegative": false,
+    "no_type_loss_below_minus2": true,
+    "median_context_at_most6500": true
+  },
+  "pass": false,
+  "limitations": "Operational regression gate, not a statistical proof of no accuracy loss. Any summary experiment requires its own fresh paired cost/accuracy measurements.",
+  "inventory_sha256": "28e6112efa85263b83d667c434b73b4d2f3a3d3d222da888d555eef789dddb24",
+  "resources_by_model": {
+    "gemini-3.5-flash-lite": {
+      "calls": 648,
+      "failures": 10,
+      "input_tokens": 4722366,
+      "output_tokens": 75569
+    },
+    "gemma-4-31b-it": {
+      "calls": 1266,
+      "failures": 666,
+      "input_tokens": 128379,
+      "output_tokens": 18911
+    }
+  }
+}

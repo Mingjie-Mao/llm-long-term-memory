@@ -232,11 +232,11 @@ def state(value):
 
 
 def build_summaries(split, instances, identity, updates=False):
-    from llm_long_term_memory.llm.usage import UsageTracker
-    from llm_long_term_memory.runtime.grounded_answering import (
+    from llm_long_term_memory.evaluation.grounded.answering import (
         EvidenceSource,
         personal_archive_review,
     )
+    from llm_long_term_memory.llm.usage import UsageTracker
 
     cfg, runner, _, usage = build_runner(split)
     destination = ROOT / split / ("updates" if updates else "")
@@ -329,11 +329,11 @@ def seed_own_cache(cache, instances, split, identity):
 
 
 def qa(split, instances, identity, stage):
+    from llm_long_term_memory.evaluation.grounded.answering import personal_archive_review
     from llm_long_term_memory.evaluation.harness import _exclusive
     from llm_long_term_memory.llm.client import DailyQuotaExhausted
     from llm_long_term_memory.llm.rate_limiter import Wait
     from llm_long_term_memory.llm.usage import UsageTracker
-    from llm_long_term_memory.runtime.grounded_answering import personal_archive_review
 
     selected = {i.question_id: i for i in instances}
     iterations = (
@@ -471,8 +471,8 @@ def require_pilot(identity):
 
 
 def report_dev(instances, identity):
+    from llm_long_term_memory.evaluation.grounded.answering import personal_archive_review
     from llm_long_term_memory.llm.usage import UsageTracker
-    from llm_long_term_memory.runtime.grounded_answering import personal_archive_review
 
     runs, latency, workloads, query_resources, coverage, inputs = {}, {}, {}, {}, {}, {}
     all_usage, coverage_pairs = [], {}

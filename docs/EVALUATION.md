@@ -19,7 +19,7 @@
 | `heldout100` | 早期保留集 | 已用 |
 
 `longmemeval_oracle.json` 带的是**同样 500 个问题**、不同的干扰材料，核对过而不是假定。
-同一批问题换一堆干草不构成新数据，所以 **v4 至今没有终测**，它的每个数字都是开发集数字。
+同一批问题换一堆干草不构成新数据，所以 **v2 之后的版本都没有终测**，它们的每个数字都是开发集数字。
 这是一个已声明的阻塞条件，不是脚注。
 
 切分由 `split_dev_test(seed=0)` 按题型分层产生，确定可复现。
@@ -120,8 +120,39 @@
 | `train150` | 98 | **127** | 32 / 3，净 +29 | `PASS`（中位总上下文 5,686，上限 6,000） |
 
 两次都是单次运行，不宣称显著。之后的负结果：分页通读并逐条核验引用的 grounded v18 在
-`dev100` 上每臂三次，平均 74.33 对 v1 的 77.67，净 −3.33，判 `FAIL`。t3（回答侧）与 t4
-（回答侧＋检索侧）对 v1 的 `heldout100` 三次比较已预注册，正在运行。
+`dev100` 上每臂三次，平均 74.33 对 v1 的 77.67，净 −3.33，判 `FAIL`。
+
+### t3／t4（`heldout100`，每臂三次，**已暴露题集**）
+
+t3 在 v1 上加回答侧改动（相对日期换算、新值优先、计数和日期题先写笔记）；t4 再加检索侧改动
+（用户原话优先、按问题里的时间窗口检索）。
+
+| 臂 | 三次正确数 | 均值 | 中位总上下文 |
+|---|---|---:|---:|
+| v1 原文为主 | 82 / 81 / 80 | 81.00 | — |
+| t3 | 87 / 86 / 87 | 86.67 | — |
+| **t4** | 89 / 86 / 88 | **87.67** | 6,147 |
+
+注册门全部通过：t4 均值净 +6.67（门槛 +4），无题型净值低于 −2，上下文 ≤ 6,500。
+归因：回答侧 +5.67，检索侧 +1.00（未达 +2 的贡献门）。19 题上升、6 题下降，符号检验
+p = 0.0146，不宣称显著。t4 现在是服务默认的回答方式。
+[门判定](../results/analysis/raw-primary-t3-t4-heldout100-gate.md)
+
+### t4 修复版回归（`dev100`，每臂三次，`FAIL`）
+
+原 t4 88 / 89 / 88（88.33），加了选择／计算修复的版本 84 / 91 / 83（86.00），净 −2.33，
+注册门失败；配对区间含零，也不能说是显著变差。逐题诊断发现修复规则被加到了所有请求上。
+[门判定](../results/analysis/t4-scoped-regression-dev100-v3.gate.json) ·
+[逐题诊断](../results/analysis/t4-scoped-dev100-postmortem-v1.md)
+
+原 test100 上旧 v2 对限定范围修复版的新对照完成 4/6 轮后暂停，未计算正确率。
+
+### 当前阶段：在 LongMemEval-S 上开发
+
+2026-10-12 起，用户决定先在这套基准上把已知问题修完，暂不做未见终测。题集已全部暴露，本阶段
+所有数字都是开发证据。做法：先看零调用的单层指标（[`tools/layer_audit.py`](../tools/layer_audit.py)），
+端到端比较用全部有库的 450 题或同一子集跑三次，因为单次 100 题的噪声约 ±7 题。
+计划见[路线图](../research/ROADMAP.md)。
 
 ### 抽取保真度 × 批大小（60 个留出会话，2026-09-16）
 
@@ -191,7 +222,8 @@
 | 失败分层 | [`results/failure-taxonomy.md`](../results/failure-taxonomy.md)、[`results/failure-stages.md`](../results/failure-stages.md) |
 | 检索权重 | [`results/retrieval-weights.md`](../results/retrieval-weights.md) |
 | 抽取保真度曲线 | [`results/batch-size-result.md`](../results/batch-size-result.md) |
-| 原文为主 | [heldout100](../results/raw-primary-heldout100-decision.md)、[train150](../results/analysis/raw-primary-train150-v2-gate.md)、[grounded v18](../results/paged-paired-dev100-v18-v1-decision.md)、[t3/t4 预注册](../results/prereg-raw-primary-t3-t4-heldout100-v1.md) |
+| 原文为主 | [heldout100](../results/raw-primary-heldout100-decision.md)、[train150](../results/analysis/raw-primary-train150-v2-gate.md)、[grounded v18](../results/paged-paired-dev100-v18-v1-decision.md)、[t3/t4 门判定](../results/analysis/raw-primary-t3-t4-heldout100-gate.md)、[t4 dev100 回归](../results/analysis/t4-scoped-regression-dev100-v3.gate.json) |
+| 记忆层审计 | [`results/analysis/layer-audit-v1.md`](../results/analysis/layer-audit-v1.md) |
 | 终测集现状 | [`results/hidden-set-status.md`](../results/hidden-set-status.md) |
 
 `results/` 下的预注册、冻结包与逐题行是这些数字的原始依据。**签过字的预注册不能编辑或删除**，

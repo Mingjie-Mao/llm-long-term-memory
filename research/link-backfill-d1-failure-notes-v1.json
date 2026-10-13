@@ -1,0 +1,43 @@
+{
+  "_about": "Development diagnosis from zero-call cache replay and actual d1 diffs; assistant draft. Preserve failures; unchanged transition-pair-v3 baseline is still running.",
+  "cases": [
+    {
+      "question_id": "078150f1",
+      "layer": "temporal_lifecycle",
+      "memories": [
+        "mem_ae1d8bd938632fff",
+        "mem_cdf342106b0b981f"
+      ],
+      "finding": "Cached judge correctly presents May20 considering then May28 planning and calls replace. Resolver groups equal object triathlon in June as a restatement run and retains earliest owner, folding the later plan under earlier consideration.",
+      "source": "src/llm_long_term_memory/temporal/resolve.py: dated runs and _fold"
+    },
+    {
+      "question_id": "7024f17c",
+      "layer": "temporal_lifecycle",
+      "memories": [
+        "mem_42bc11f020cd57df",
+        "mem_c05d28c658297822",
+        "mem_22049cd3e13cffde"
+      ],
+      "finding": "One later yoga fact is judged against multiple earlier values; apply_update overwrites the single target_object on each edge. Which predecessor remains current differs with batch traversal order. All judgments came from identical cached requests.",
+      "source": "src/llm_long_term_memory/temporal/transition.py: apply_update; offline audit forward/reverse comparison"
+    },
+    {
+      "question_id": "07b6f563",
+      "layer": "temporal_ordering_and_relation",
+      "memories": [
+        "mem_0e3282341756ad2d",
+        "mem_6fe716bf5fa20355"
+      ],
+      "finding": "Same-session turn6 plan versus turn4 usual habit share one timestamp. ID tie-break shows later plan before earlier habit; plan is then incorrectly retired. Session timestamp alone does not preserve utterance order."
+    },
+    {
+      "question_id": "41698283",
+      "layer": "event_time_and_provenance",
+      "memories": [
+        "mem_0d887cbd68bca7f6"
+      ],
+      "finding": "Fact says acquired goats about three weeks before May23, but event_time is May23. A plausible relation verdict does not certify the closure date."
+    }
+  ]
+}

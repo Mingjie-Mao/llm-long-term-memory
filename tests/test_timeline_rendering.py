@@ -14,7 +14,7 @@ from __future__ import annotations
 
 from datetime import datetime
 
-from llm_long_term_memory.evaluation.runners.memory import (
+from llm_long_term_memory.runtime.context import (
     render_grouped,
     render_timelines,
 )

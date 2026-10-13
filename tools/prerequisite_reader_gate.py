@@ -24,11 +24,11 @@ def main():
     from llm_long_term_memory import cli
     from llm_long_term_memory.config import Settings
     from llm_long_term_memory.evaluation.datasets.longmemeval import load
+    from llm_long_term_memory.evaluation.grounded.answering import personal_archive_review
+    from llm_long_term_memory.evaluation.grounded.evidence_pages import archive_pages
     from llm_long_term_memory.evaluation.harness import _exclusive
     from llm_long_term_memory.evaluation.recovery import RecoveringJudge
     from llm_long_term_memory.llm.usage import UsageTracker
-    from llm_long_term_memory.runtime.evidence_pages import archive_pages
-    from llm_long_term_memory.runtime.grounded_answering import personal_archive_review
     from llm_long_term_memory.store import external_session_id
 
     parser = argparse.ArgumentParser()

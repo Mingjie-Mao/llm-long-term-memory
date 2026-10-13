@@ -491,7 +491,10 @@ class MemoryService:
             from llm_long_term_memory.runtime import AnswerEngine
 
             client = self._get_live_client()
-            self._answerer = AnswerEngine(
+            # The profile fixes everything the evaluated arm fixed (context, prompts,
+            # fallback); the config supplies only the model, retrieval weights and k.
+            self._answerer = AnswerEngine.from_profile(
+                self.config.service.answer_profile,
                 client,
                 model=self.config.models.answerer,
                 encoder=self.encoder,
@@ -502,11 +505,6 @@ class MemoryService:
                 retrieval_weights=self.config.retrieval.weights.model_dump(),
                 candidate_limit=self.config.retrieval.candidate_limit,
                 recency_halflife_days=self.config.retrieval.recency_halflife_days,
-                raw_fallback=self.config.fallback.enabled,
-                raw_fallback_max_turns=self.config.fallback.max_turns,
-                raw_fallback_max_chars=self.config.fallback.max_chars,
-                raw_primary_tokens=self.config.service.raw_primary_tokens,
-                raw_primary_time_notes=self.config.service.raw_primary_time_notes,
             )
         return self._answerer
 

@@ -28,7 +28,7 @@
 <rect x="425" y="341" width="350" height="165" rx="7" fill="#EEF4F8" stroke="#345E80" stroke-width="1.3"/>
 <text x="441" y="370" font-family="Helvetica, Arial, sans-serif" font-size="19" font-weight="700" fill="#345E80" text-anchor="start">Service read / write path</text>
 <text x="441" y="398" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="400" fill="#203247" text-anchor="start">Search, raw lookup, timeline</text>
-<text x="441" y="422" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="400" fill="#203247" text-anchor="start">Answer via MemoryRunner</text>
+<text x="441" y="422" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="400" fill="#203247" text-anchor="start">Answer via AnswerEngine (t4)</text>
 <text x="441" y="446" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="400" fill="#203247" text-anchor="start">Lazy batch-extractor adapter</text>
 <text x="441" y="470" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="400" fill="#203247" text-anchor="start">Dedup + temporal resolution</text>
 <rect x="810" y="341" width="350" height="165" rx="7" fill="#FBF5EB" stroke="#96662D" stroke-width="1.3"/>
@@ -85,6 +85,6 @@
 <text x="59" y="909" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="700" fill="#203247" text-anchor="start">Research extensions selected by the runner</text>
 <text x="59" y="936" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="400" fill="#203247" text-anchor="start">Coherent context / oracle   |   v3 evidence hydration   |   v4 arithmetic + relation scan   |   influence / packing</text>
 <polyline points="40,978 1160,978" fill="none" stroke="#CED6DC" stroke-width="1" stroke-linejoin="round"/>
-<text x="40" y="1001" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="400" fill="#586775" text-anchor="start">Current dependency: MemoryService imports MemoryRunner and Instance from evaluation/. The proposed split is not built.</text>
+<text x="40" y="1001" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="400" fill="#586775" text-anchor="start">MemoryService answers through runtime/AnswerEngine and imports nothing from evaluation/; context rendering is shared with evaluation.</text>
 <text x="40" y="1024" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="400" fill="#586775" text-anchor="start">Evaluation gold labels belong to grading and explicit oracle diagnostics; ordinary retrieval does not use them.</text>
 </svg>

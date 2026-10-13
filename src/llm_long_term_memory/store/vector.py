@@ -169,6 +169,11 @@ class NumpyFlatIndex:
     def ids(self) -> tuple[str, ...]:
         return tuple(self._ids)
 
+    def vectors_for(self, memory_ids) -> dict[str, np.ndarray]:
+        """The stored vector of each id that has one (normalised, as indexed)."""
+        wanted = set(memory_ids)
+        return {mid: self._vectors[row] for row, mid in enumerate(self._ids) if mid in wanted}
+
     def validate_ids(self, memory_ids: set[str]) -> None:
         indexed = set(self._ids)
         if len(indexed) != len(self._ids):

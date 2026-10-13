@@ -49,8 +49,8 @@ def main() -> int:
 
     from llm_long_term_memory.config import ExperimentConfig
     from llm_long_term_memory.embed import Encoder
-    from llm_long_term_memory.evaluation.runners.memory import render_memory
     from llm_long_term_memory.retrieve.hybrid import HybridRetriever
+    from llm_long_term_memory.runtime.context import render_memory
     from llm_long_term_memory.store import NumpyFlatIndex, SQLiteMemoryStore
 
     with open(MAP, encoding="utf-8") as handle:

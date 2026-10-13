@@ -123,6 +123,8 @@ def _build(
     client_override=None,
     settings_override=None,
     read_only_store: bool = False,
+    response_cache: str | None = None,
+    sample: str | None = None,
 ):
     """Wire up client, judge, and runner for one variant.
 
@@ -159,6 +161,18 @@ def _build(
         )
     usage = UsageTracker()
     client = client_override or GeminiClient(settings.require_api_key(), quota=quota, usage=usage)
+    if response_cache:
+        from llm_long_term_memory.llm.cache import CachingClient
+
+        # Answerer and judge share the cache; their requests differ by role and prompt.
+        # The store stem is in the scope because a store change need not change every
+        # prompt it could affect.
+        client = CachingClient(
+            client,
+            response_cache,
+            sample=sample or "",
+            scope={"store": store_name or "", "config": cfg_path},
+        )
     judge = Judge(client, model=cfg.models.judge)
 
     if variant == "full_context":
@@ -231,6 +245,8 @@ def _build(
         # Raw-primary t4: t3 with the user's turns packed first and the period a question
         # names searched by time (results/prereg-raw-primary-t3-t4-heldout100-v1.md).
         "two_stage_raw_primary_t4",
+        "two_stage_raw_primary_t4c",
+        "two_stage_raw_primary_t4c2",
         # Raw-primary v2 (results/prereg-raw-primary-dev100-v3.md): the same arm with
         # BM25 fused with a dense turn ranking, conversation dates written relative to
         # the question, and an answerer that lists its evidence before deciding.
@@ -341,6 +357,8 @@ def _build(
                 "two_stage_raw_primary_t2",
                 "two_stage_raw_primary_t3",
                 "two_stage_raw_primary_t4",
+                "two_stage_raw_primary_t4c",
+                "two_stage_raw_primary_t4c2",
                 "two_stage_raw_primary_v2",
                 "two_stage_raw_primary_v4",
             },
@@ -397,6 +415,8 @@ def _build(
                 "two_stage_raw_primary_t2",
                 "two_stage_raw_primary_t3",
                 "two_stage_raw_primary_t4",
+                "two_stage_raw_primary_t4c",
+                "two_stage_raw_primary_t4c2",
                 "two_stage_raw_only",
                 "two_stage_raw_primary_v2",
                 "two_stage_raw_primary_v4",
@@ -432,17 +452,31 @@ def _build(
                 "two_stage_raw_primary_t2",
                 "two_stage_raw_primary_t3",
                 "two_stage_raw_primary_t4",
+                "two_stage_raw_primary_t4c",
+                "two_stage_raw_primary_t4c2",
                 "two_stage_raw_primary_v2",
                 "two_stage_raw_primary_v4",
             },
-            raw_primary_prefer_user=variant == "two_stage_raw_primary_t4",
-            raw_primary_time_window=variant == "two_stage_raw_primary_t4",
+            raw_primary_prefer_user=variant
+            in {
+                "two_stage_raw_primary_t4",
+                "two_stage_raw_primary_t4c",
+                "two_stage_raw_primary_t4c2",
+            },
+            raw_primary_time_window=variant
+            in {
+                "two_stage_raw_primary_t4",
+                "two_stage_raw_primary_t4c",
+                "two_stage_raw_primary_t4c2",
+            },
             raw_primary_time_notes=variant
             in {
                 "two_stage_raw_primary_t1",
                 "two_stage_raw_primary_t2",
                 "two_stage_raw_primary_t3",
                 "two_stage_raw_primary_t4",
+                "two_stage_raw_primary_t4c",
+                "two_stage_raw_primary_t4c2",
             },
             raw_primary_memory_fusion=variant in {"two_stage_raw_primary_v4"} | GROUNDED_VARIANTS,
             raw_primary_fact_keys=variant in {"two_stage_raw_primary_v4"} | GROUNDED_VARIANTS,
@@ -476,6 +510,11 @@ def _build(
                 "two_stage_raw_primary_t2": "v2_cl",
                 "two_stage_raw_primary_t3": "v2_clt",
                 "two_stage_raw_primary_t4": "v2_clt",
+                # Stage C (research/ROADMAP.md): t4 plus code-side counts, intervals and
+                # order for three narrow question shapes; every other request is t4's.
+                "two_stage_raw_primary_t4c": "v2_clt_compute",
+                # t4c v2: plain counts only, computation recorded, never substituted.
+                "two_stage_raw_primary_t4c2": "v2_clt_compute2",
                 "two_stage_raw_primary_grounded": "grounded_v1",
                 "two_stage_raw_primary_grounded_v2": "grounded_v2",
                 "two_stage_raw_primary_grounded_v3": "grounded_v3",

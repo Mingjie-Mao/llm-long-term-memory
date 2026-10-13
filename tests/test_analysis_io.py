@@ -40,6 +40,21 @@ def test_non_ascii_evidence_survives_whatever_the_machine_locale_is(tmp_path):
     assert _module().read_jsonl(path)[0]["hypothesis"] == "一杯拿铁 · café"
 
 
+@pytest.mark.parametrize("separator", ["\u2028", "\u2029", "\x85"])
+def test_unicode_text_separators_do_not_split_jsonl_records(tmp_path, separator):
+    path = tmp_path / "rows.jsonl"
+    rows = [
+        {"question_id": "q1", "hypothesis": "original" + separator + "quote"},
+        {"question_id": "q2", "correct": False},
+    ]
+    path.write_bytes(
+        ("\r\n".join(json.dumps(r, ensure_ascii=False) for r in rows) + "\r\n").encode()
+    )
+    module = _module()
+    assert module.read_jsonl(path) == rows
+    assert module.rows_by_question(path) == {r["question_id"]: r for r in rows}
+
+
 def test_a_duplicated_question_is_an_error_not_a_silently_overwritten_row(tmp_path):
     path = tmp_path / "rows.jsonl"
     path.write_text(

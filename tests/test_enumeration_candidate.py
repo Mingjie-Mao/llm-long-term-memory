@@ -13,17 +13,17 @@ from datetime import datetime
 
 import pytest
 
-from llm_long_term_memory.evaluation.runners.memory import (
-    label_memories,
-    render_grouped,
-    render_memory,
-)
 from llm_long_term_memory.evaluation.runners.synthesis import (
     EnumeratingSynthesisVerdict,
     SynthesisVerdict,
     check_citations,
     compute,
     normalise_label,
+)
+from llm_long_term_memory.runtime.context import (
+    label_memories,
+    render_grouped,
+    render_memory,
 )
 from llm_long_term_memory.store import Memory
 

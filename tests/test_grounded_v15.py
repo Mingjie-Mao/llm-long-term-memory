@@ -2,7 +2,7 @@ from dataclasses import replace
 
 import pytest
 
-from llm_long_term_memory.runtime.grounded_answering import (
+from llm_long_term_memory.evaluation.grounded.answering import (
     EvidenceLedger,
     EvidenceSource,
     named_reading_duration,
@@ -70,7 +70,7 @@ def test_missing_undated_wrong_role_subject_plan_or_reversed_events_refuse(chang
 
 def test_question_selects_duration_despite_wrong_model_sum_or_guess():
     from llm_long_term_memory.conversation import AnswerRequest
-    from llm_long_term_memory.runtime.grounded_answering import (
+    from llm_long_term_memory.evaluation.grounded.answering import (
         GroundedAnswererV15,
         GroundedVerdictV7,
     )

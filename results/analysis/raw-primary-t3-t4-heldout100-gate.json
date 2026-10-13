@@ -1,0 +1,72 @@
+{
+  "scores": {
+    "two_stage_raw_primary.heldout100-t3t4-rep1": 82,
+    "two_stage_raw_primary.heldout100-t3t4-rep2": 81,
+    "two_stage_raw_primary.heldout100-t3t4-rep3": 80,
+    "two_stage_raw_primary_t3.heldout100-t3t4-rep1": 87,
+    "two_stage_raw_primary_t3.heldout100-t3t4-rep2": 86,
+    "two_stage_raw_primary_t3.heldout100-t3t4-rep3": 87,
+    "two_stage_raw_primary_t4.heldout100-t3t4-rep1": 89,
+    "two_stage_raw_primary_t4.heldout100-t3t4-rep2": 86,
+    "two_stage_raw_primary_t4.heldout100-t3t4-rep3": 88
+  },
+  "mean_scores": {
+    "v1": 81,
+    "t3": 86.66666666666667,
+    "t4": 87.66666666666667
+  },
+  "mean_net": 6.666666666666667,
+  "by_type_mean_net": {
+    "knowledge-update": 1.6666666666666667,
+    "multi-session": 2.0,
+    "single-session-assistant": 0.0,
+    "single-session-preference": 0.6666666666666667,
+    "single-session-user": -1.0,
+    "temporal-reasoning": 3.3333333333333335
+  },
+  "type_counts": {
+    "multi-session": 27,
+    "knowledge-update": 15,
+    "single-session-user": 14,
+    "single-session-preference": 6,
+    "temporal-reasoning": 27,
+    "single-session-assistant": 11
+  },
+  "median_context_t4": 6147.0,
+  "median_output_tokens": {
+    "v1": 48.0,
+    "t3": 106.5,
+    "t4": 113.5
+  },
+  "fallback_second_calls_per_run": {
+    "v1": 13.666666666666666,
+    "t3": 7.666666666666667,
+    "t4": 7.666666666666667
+  },
+  "questions_up_down": {
+    "up": 19,
+    "down": 6
+  },
+  "sign_test_p": 0.01463329792022705,
+  "rules": {
+    "t4_mean_net_at_least_4": true,
+    "no_type_loses_more_than_2": true,
+    "median_total_context_at_most_6500": true
+  },
+  "attribution": {
+    "t3_vs_v1_mean_net": 5.666666666666667,
+    "t4_vs_t3_mean_net": 0.9999999999999999,
+    "answering_contributes": true,
+    "retrieval_contributes": false,
+    "t3_by_type_vs_v1": {
+      "knowledge-update": 1.3333333333333335,
+      "multi-session": 1.6666666666666667,
+      "single-session-assistant": 0.0,
+      "single-session-preference": 1.0,
+      "single-session-user": 0.0,
+      "temporal-reasoning": 1.6666666666666667
+    },
+    "median_context_t3": 5739.0
+  },
+  "pass": true
+}
