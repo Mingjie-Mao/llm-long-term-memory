@@ -145,7 +145,30 @@ p = 0.0146，不宣称显著。t4 现在是服务默认的回答方式。
 [门判定](../results/analysis/t4-scoped-regression-dev100-v3.gate.json) ·
 [逐题诊断](../results/analysis/t4-scoped-dev100-postmortem-v1.md)
 
-原 test100 上旧 v2 对限定范围修复版的新对照完成 4/6 轮后暂停，未计算正确率。
+### 原 test100 新对照（回归，尚未完成）
+
+截至 2026-10-15，`original-test100-v2-t4-dispatch-v1` 已保存 **500/600 份回答、404/600 份评分**。
+旧 v2 与限定范围 t4 各跑三次，使用原 100 题及原评分规则：
+
+| 臂 | 第 1 轮（回答／评分） | 第 2 轮 | 第 3 轮 |
+|---|---:|---:|---:|
+| control：旧 v2 | 100／100 | 100／100 | 100／4 |
+| candidate：限定范围 t4 | 100／100 | 100／100 | 0／0 |
+
+当前停点是 Gemma 评分服务连续返回 `500 INTERNAL`。原恢复预算和一次登记的额外恢复均已耗尽，
+状态为 `RECOVERY_EXHAUSTED`。用户选择保留原评分模型，等待服务恢复后再登记有限续跑；
+定时检查已取消。剩余 100 份回答、196 份评分，尚无完整门判定或完成审计，不能更新正确率。
+[进度](../results/analysis/original-test100-v2-t4-dispatch-v1.progress.json) ·
+[恢复停点审计](../results/analysis/original-test100-v2-t4-dispatch-v1.server-recovery-v1.stop-audit.json)
+
+主分支整理后与注册时源码不同，因此续跑使用独立的冻结源码目录，309 个注册文件已逐一核验。
+该目录是未完成评测的必要依赖，不能作为缓存删除，也不能直接用当前主分支替代。
+[源码核验](../results/analysis/original-test100-v2-t4-dispatch-v1.frozen-runtime-v1.json)
+
+完成后须保存两组全部三轮的 600 份回答及 600 份评分，再运行
+`tools/audit_original_test100_dispatch.py` 的零调用完整性审计。通过后报告各轮、平均、净差、
+题型切片、配对不确定性、耗时与调用/token 用量。这是已暴露原题集的回归结果；历史 72% 和
+开发 87.67% 各自保留，不能用它证明未见题从 72% 提升到新成绩。
 
 ### 当前阶段：在 LongMemEval-S 上开发
 

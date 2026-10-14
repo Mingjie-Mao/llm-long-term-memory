@@ -4,6 +4,9 @@
 逐题结果和分析文件为准；本文件不是新的结果报告。过去的运行流水记录已删除，需要时查
 `results/` 下的预注册、修订文件和 git 历史。
 
+历史实验工具可能引用当时的源码路径；复现须使用该实验的冻结源码快照或注册 Git 版本。
+主分支的代码整理不改变历史注册，也不能把旧工具直接跑在当前源码上当成同一实验。
+
 实验分三类：**正式冻结结果**（可在 README 引用，须带口径）、**开发结果**（只用于选方向，
 不能冒充未见终测）、**停止／未晋级**（负结果同样保留）。
 
@@ -23,6 +26,7 @@
 | 2026-10-13 | `link-backfill-d1-resume-20261013` | D：原库副本，`transition-pair-v3`、0.65、K=5；每对一次 | 基于 d02ccdb | dev100 100 用户、heldout100 18 用户 | 497／110 对判定；实际关闭 27／4 处。助手复查草稿分别为 11 合理、12 错误、4 不确定，以及 1／2／1；dev100 两条状态有遍历顺序差异 | **停止扩大当前版本回填**；先人工复核关系错误和生命周期问题，暂不做全量端到端。[运行记录](../results/analysis/link-backfill-d1-resume-20261013.run.json) · [dev100](../results/analysis/link-backfill-d1-dev100-reviewed-20261013.md) · [heldout100 部分](../results/analysis/link-backfill-d1-heldout100-reviewed-20261013.md) |
 | 2026-10-13 | `oracle-evidence-v1` | 只给金标原话，误删原有记忆上下文 | 基于 d02ccdb | 22 题×3 次 | 大量错误弃答 | **设计无效**，保留作失败记录，不据此估计上限。[报告](../results/analysis/oracle-evidence-v1.md) |
 | 2026-10-13 | `oracle-evidence-v2` | 回答侧证据选择诊断：保留 t4 记忆上下文，只替换检索原话 | 基于 d02ccdb | 22 题×3 次 | t4 22/66、金标原话 21/66；题型有得有失 | 暂不投入证据选择模型；不解释为所有方法的上限。[报告](../results/analysis/oracle-evidence-v2.md) |
+| 2026-10-14 | `original-test100-v2-t4-dispatch-v1.server-recovery-v1` | 原评分模型的额外有限恢复；从独立目录加载已核验冻结源码 | 冻结 1339587；当前 f59e2f7 | 对照第 3 轮续存 50 份回答、4 份评分；额外恢复 3 次 | 原 test100 累计 500/600 回答、404/600 评分；额外恢复仍遇 500，`EXHAUSTED_AGAIN` | 保留原评分模型，等待恢复后另行登记有限续跑；未完成、未更新正确率。[停点审计](../results/analysis/original-test100-v2-t4-dispatch-v1.server-recovery-v1.stop-audit.json) · [源码核验](../results/analysis/original-test100-v2-t4-dispatch-v1.frozen-runtime-v1.json) |
 
 ## 主线实验
 
@@ -33,7 +37,7 @@
 | t4 选择／计算修复（固定 21 题组件验收 v1–v4） | 开发组件门 | v1–v3 失败，**v4 通过** | v4：18/18 可答题、3/3 忠实说明缺口，中位上下文 6,393；20 题为严格回放、1 题新回答 | [v4 门判定](../results/analysis/t4-scoped-selection-train21-v4.gate.json) | — |
 | t4 修复版完整回归（dev100，每组 3 次） | 回归级开发比较 | **`FAIL`** | 原 t4 88/89/88（88.33）、修复版 84/91/83（86.00），净 −2.33；配对区间含零。原因：修复规则被加到所有请求上 | [预注册](../results/prereg-t4-scoped-regression-dev100-v3.md) · [门判定](../results/analysis/t4-scoped-regression-dev100-v3.gate.json) · [逐题诊断](../results/analysis/t4-scoped-dev100-postmortem-v1.md) | 改为限定触发范围（`tools/t4_scoped_dispatch.py`） |
 | 限定范围修复的结构回放 | 零调用回放 | 通过 | dev100 原 t4 的 300 份请求与输出逐字回放一致；21 题 18/18 + 3/3 保持 | [预注册](../results/prereg-t4-scoped-dispatch-replay-v1.md) | 只是历史回放，不是新的正确率 |
-| 原 test100：旧 v2 对 限定范围 t4（每组 3 次） | 回归级比较 | **暂停**（4/6 轮完成） | control 第 3 轮在 50 题处停止（`STOPPED`，回答模型当日计数 500/500）。按用户 2026-10-12 的决定，当前阶段不考虑 test；未计算、未报告正确率 | [预注册](../results/prereg-original-test100-v2-t4-dispatch-v1.md) · [进度](../results/analysis/original-test100-v2-t4-dispatch-v1.progress.json) | 回到未见评测阶段时再决定续跑或放弃 |
+| 原 test100：旧 v2 对 限定范围 t4（每组 3 次） | 回归级比较，已暴露题集 | **暂停**（`RECOVERY_EXHAUSTED`） | 截至 2026-10-15，500/600 回答、404/600 评分；前两轮两组均完整，对照第 3 轮 100 回答／4 评分，候选第 3 轮未开始。Gemma 连续 500，原预算和一次额外恢复耗尽；未更新正确率 | [预注册](../results/prereg-original-test100-v2-t4-dispatch-v1.md) · [进度](../results/analysis/original-test100-v2-t4-dispatch-v1.progress.json) · [停点审计](../results/analysis/original-test100-v2-t4-dispatch-v1.server-recovery-v1.stop-audit.json) | 用户选择保留评分模型；服务恢复后另行登记有限续跑。600 回答／600 评分完整并通过审计后报告回归成绩；不是未见终测 |
 | 记忆层审计（零调用） | 开发诊断 | 完成 | 标为替换的记忆约 89–91% 同键无旧值；51 道多会话知识更新题最多 11 道证据记忆共享某个键（线索，非更新正确率）；21 道偏好题 3 道抽到偏好记忆 | [结果](../results/analysis/layer-audit-v1.md) · [工具](../tools/layer_audit.py) | 见[路线图](ROADMAP.md) 阶段 D、E |
 | v2 `test100` | 正式冻结终测 | 完成 | LLTM 72%，整段历史 86%，naive RAG 65%；LLTM 对 naive RAG 的 +7 个点不显著 | [预注册](../results/prereg-v2-final.md) · [汇总](../results/final/test100-aggregate.md) · [冻结包](../results/frozen/v2-final/) · [封存逐题结果](../results/sealed/test100/) | 只能在新的、独立冻结的数据上测新版本；不得回到 `test100` 调参 |
 | v3.3 `dev60` | 冻结开发验证 | 通过但有限定 | 55.0% 对 v2 对照 46.7%，配对 p=0.1797；后续审计发现一个 confidence 门未测到预期含义 | [预注册](../results/prereg-v3-dev60.md) · [验证报告](../results/validation/v3-dev60.md) · [冻结包](../results/frozen/v3-candidate-dev60/) · [封存结果](../results/sealed/v3-dev60/) | 可作为开发证据，不可与 v2 `test100` 排成版本曲线，也不可宣称稳定提升 |

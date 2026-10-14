@@ -1,0 +1,48 @@
+{
+  "audit_provider_calls": 0,
+  "namespace": "original-test100-v2-t4-dispatch-v1.server-recovery-v1",
+  "original_recovery_preserved": true,
+  "saved_answer_preserved": true,
+  "counts": {
+    "readers": 500,
+    "grades": 404
+  },
+  "outcome": "EXHAUSTED_AGAIN",
+  "extra_recovery": {
+    "identity": "92f82eb94696479ee4790fd4063582b92a3e5c5da058b06102bc47c8390d7277",
+    "failures": 4,
+    "wait_seconds": 105,
+    "cooldown_until": 1791969196.607914,
+    "events": [
+      {
+        "at": 1791969083.8138611,
+        "error_type": "ServerError",
+        "code": 500,
+        "exhausted": false
+      },
+      {
+        "at": 1791969102.665807,
+        "error_type": "ServerError",
+        "code": 500,
+        "exhausted": false
+      },
+      {
+        "at": 1791969136.6079118,
+        "error_type": "ServerError",
+        "code": 500,
+        "exhausted": false
+      },
+      {
+        "at": 1791969200.568059,
+        "error_type": "ServerError",
+        "code": 500,
+        "exhausted": true
+      }
+    ],
+    "max_recoveries": 3,
+    "max_wait_seconds": 180
+  },
+  "ledger_sha256": "5351832b144dd9032186c499b05bad2c89c8f334d79b8774b4cdf61df1192e51",
+  "completion_claim": false,
+  "accuracy_updated": false
+}
