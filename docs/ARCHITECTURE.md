@@ -1,7 +1,6 @@
 # 架构说明
 
-本文描述**当前工作区的真实实现**：数据怎么流动、存在哪里、哪些分支默认开着、哪些只是活在代码里。
-它不描述冻结实验运行时的源码快照，也不把尚未实现的分层计划画成现状。
+本文描述当前产品的数据流、存储、默认配置与可选实验路径。冻结评测的源码版本以各实验登记为准。
 
 设计动机与实验结论见[项目报告](PROJECT_REPORT.md)，评测口径与最终结果见[评测说明](EVALUATION.md)，
 部署步骤见 [DEPLOY.md](../DEPLOY.md)。
@@ -151,11 +150,11 @@ SQLite 保存源数据、状态、词法索引以及辅助关系。向量索引�
 | REST、Inspector、MCP | `MemoryService` | 共享搜索、读取、时间线、软遗忘和单轮抽取写入；REST 回答用产品引擎 `runtime.AnswerEngine` |
 | `demo-api/app.py` | `Playground` | 接收显式结构化事实，直接写入、嵌入和 resolve；原始 turns 单独写入；没有 LLM 抽取或自然语言回答 |
 
-`MemoryService.add_message()` 在配置 API key 后按需创建 `LiveTurnExtractor`，适配真实批量抽取器，并执行去重、出处关联、索引保存和可选时序消解；测试仍可注入 adapter。服务使用进程内 `RLock` 串行化共享资源访问，回答的 `limit` 作为参数传递。`/healthz` 在嵌入器不可用时返回 503，`/livez` 单独报告进程存活。上述修复于 2026-09-12 从未合入的审计分支接入当前工作区。
+`MemoryService.add_message()` 在配置 API key 后按需创建 `LiveTurnExtractor`，适配真实批量抽取器，并执行去重、出处关联、索引保存和可选时序消解；测试仍可注入 adapter。服务使用进程内 `RLock` 串行化共享资源访问，回答的 `limit` 作为参数传递。`/healthz` 在嵌入器不可用时返回 503，`/livez` 单独报告进程存活。
 
 REST 另有凭据身份边界、数据导出与命名空间硬删除，不能由“共享 MemoryService”推断这些 HTTP 功能已经暴露为 MCP 工具。参见 [identity.py](../src/llm_long_term_memory/api/identity.py) 和 [app.py](../src/llm_long_term_memory/api/app.py)。
 
-core/research 边界已经部分建立，但尚未完成，下面是当前的准确状态。
+产品与评测的依赖边界如下；仍位于产品包中的评测模块在下文单独列出。
 
 产品自有的对话类型在 [conversation.py](../src/llm_long_term_memory/conversation.py)：
 `ConversationTurn`、`ConversationSession`、`AnswerRequest` 和 `ConversationSource` 协议。
@@ -206,7 +205,7 @@ python3 docs/figures/generate.py --pdf   # 再导出六页英文矢量 PDF，需
 
 源文件：[generate.py](figures/generate.py)、[总览布局](figures/overview.py)。中英文共用一套坐标，只有文案经 `tr()` 分流，所以改版式不会让两版走偏。PDF 只导出英文版：reportlab 内置的 Helvetica 没有中日韩字形，中文页会导成一排空框。PDF 输出到 `output/pdf/architecture-atlas.pdf`；横向总览页使用 2600×1040 画布，其余页保留原尺寸。SVG 保留可选中的文字、形状和路径；图标由路径绘制，不依赖模型品牌标志或外部图片。PDF 同样使用矢量图形，不是截图。论文排版建议每次使用一张图并配对应图注；主文使用总览与回退图，存储细节和实验流程可以放附录。长图适合通栏或单独横页，避免缩小到单栏后文字难读。
 
-此生成器只处理文档，不导入项目运行代码，不读数据库、题目或密钥，也不发出模型请求。未向受冻结的 `scripts/`、`src/`、配置或证据目录增加文件。
+此生成器只处理文档，不导入项目运行代码，不读数据库、题目或密钥，也不发出模型请求。
 
 
 ## 接入方式

@@ -19,15 +19,43 @@
   },
   "engineering": {
     "verified_at": "2026-10-19",
-    "tests": 2287,
+    "tests": 2291,
     "line_coverage": 88,
     "ci_platforms": [
       "ubuntu",
       "windows",
       "macos"
     ],
-    "measured_tree_sha256": "2b4d4cfddb8b557bd2dbbca154c71eaa2390598bca3fd727abe308a8671e40bd",
-    "source_commit_for_reference": "3140005788",
-    "document_checks": 357
+    "measured_tree_sha256": "ff3d42ad40be038cf7bc150cd8cee7c02dcd44d53f434fc8990f6bc06f30026a",
+    "source_commit_for_reference": "7e37ae0694",
+    "document_checks": 356
+  },
+  "regression": {
+    "experiment": "original-test100-v2-t4-dispatch-v1",
+    "evidence_class": "exposed-regression",
+    "questions": 100,
+    "repeats_per_arm": 3,
+    "control_correct": [
+      70,
+      68,
+      68
+    ],
+    "candidate_correct": [
+      86,
+      87,
+      85
+    ],
+    "control_accuracy": 68.66666666666667,
+    "candidate_accuracy": 86.0,
+    "mean_difference_pp": 17.33333333333333,
+    "control_recorded_tokens": 476864,
+    "candidate_recorded_tokens": 2465965,
+    "reader_rows": 600,
+    "grade_rows": 600,
+    "gate_passed": true,
+    "gate_path": "results/analysis/original-test100-v2-t4-dispatch-v1.gate.json",
+    "gate_sha256": "b6ab8ad8681f3828d1a37f08cd85cc5584dc4907554e9ac5891c9b527e6ca2e1",
+    "audit_path": "results/analysis/original-test100-v2-t4-dispatch-v1.completion-audit-v1.json",
+    "audit_sha256": "a8f4516ea5b6deafcde31340ac4a119949363938821ca0ebf1d2ed9009097d49"
   }
 }

@@ -1,107 +1,93 @@
-# LLTM — LLM Long-Term Memory
+# LLTM — 面向 LLM Agent 的长期记忆系统
 
-面向 LLM Agent 的长期记忆系统，用于**跨会话保存用户事实、追踪信息变化，并在需要时找回原始对话**。
+跨会话保存用户事实、追踪信息变化，并为后续问题检索相关记忆。
+通过两阶段结构化抽取、时序事实更新与混合检索，结合原始对话证据构建回答上下文。
 
-系统从历史对话中提取结构化记忆，用时间状态管理维护用户信息，再结合语义检索与原文检索，
-为后续对话提供相关上下文，而不必每次加载完整历史。
+## 核心能力
 
-[在线演示](https://lltm-memory.pages.dev/) · [系统架构](docs/ARCHITECTURE.md) · [实验评测](docs/EVALUATION.md) · [项目报告](docs/PROJECT_REPORT.md)
+- **跨会话检索**：找回历史对话中的用户事实与偏好。
+- **时序事实更新**：区分新增、替换、终止和并存，保留历史版本，支持 `as_of(t)` 查询。
+- **原文证据恢复**：按来源会话与轮次补回原话、数字和日期。
+- **Agent 集成**：通过 REST、MCP、Python 或 CLI 读写用户范围内的长期记忆。
 
-**技术栈**：Python · Gemini · SQLite · NumPy · Sentence Transformers · BM25 · FastAPI · MCP
+## Demo
 
-## 核心功能
+[在线演示 →](https://lltm-memory.pages.dev/)
 
-- **事实抽取**：两阶段 LLM 抽取，把对话转成结构化记忆，并去重、持久化。
-- **时间状态管理**：追踪事实的新增、替换和终止，保留历史版本，支持 `as_of()` 查询过去的状态。
-- **来源追踪**：记录每条记忆的来源会话、时间和原文位置。
-- **混合检索**：记忆用向量语义检索，原始对话用 BM25 检索，并按问题里的时间（如“上周六”）
-  在对应时间段里找原话。
-- **原文为主的回答**：服务默认（`t4` 配置）把检索到的记忆和本用户的 4,000 token 原话一起交给
-  回答模型，相对日期先换算成绝对日期；需要时再按记忆出处找回原始对话。
-- **多用户隔离**：每次写入和检索都限定在当前用户内。
-- **Agent 集成**：提供 REST API 和 MCP 接口。
+保存事实、在新会话中更新信息，并查看检索结果及选择原因。
+Demo 使用规则生成事实和记忆检索，不运行 LLM 抽取或生成。
 
-## 系统架构
+## 技术架构
 
-![LLTM 系统架构](docs/figures/overview.zh-CN.svg)
+![LLTM 架构：两阶段抽取、时序记忆、混合检索与原始对话恢复](docs/figures/overview.zh-CN.svg)
 
-```text
-历史对话 → 两阶段事实抽取 → 去重 → 时间状态更新
-                                      ↓
-                        SQLite（记忆＋原始对话）+ 向量索引
-                                      ↓
-用户问题 → 记忆检索 ＋ 原话检索（用户原话优先、时间窗口）→ 回答上下文 → 必要时再找回原文
-```
+历史对话经两阶段事实抽取、去重与时间状态更新后，写入 SQLite 和 NumPy 向量索引。
+查询结合 BM25 与向量召回选取记忆，再补充相关原文证据。
 
-记忆负责维护事实状态和筛选相关信息，原始对话负责提供精确的数字、日期和原话。
+默认 `t4` 结合结构化长期记忆、约 4,000 token 的选择性原文检索、证据补全和时间处理，
+构建有预算限制的上下文；**t4 不是 Full Context，不会把完整历史对话交给模型**。
 
-## 实验结果
+**技术栈：** Python · FastAPI · Gemini · Sentence Transformers · SQLite / FTS5 · NumPy · MCP · Docker。
 
-### 最新：原 test100 回归（2026-10-19，已暴露题集）
+## 评测结果
 
-保持回答模型与评分模型不变，同一 100 题，两组各三轮，600 份新回答和 600 份新评分完整且审计通过：
+LongMemEval-S 原 test100（100 道题）：最新回归在题目已暴露后，两组各运行三轮，回答与评分模型保持不变；
+历史基准为测试时未见题目的单次评测。
 
-| 方法 | 三轮正确率 | 平均正确率 |
-|---|---|---:|
-| 同期旧 v2 | 70% / 68% / 68% | 68.67% |
-| **限定范围 t4 候选** | **86% / 87% / 85%** | **86.00%** |
+| 评测批次 | 受测配置 | 正确率 | 中位上下文 Token |
+|---|---|---:|---:|
+| 最新回归 · 三轮均值 | LLTM v2 · 同期基线 | 68.67% | 574 |
+| 最新回归 · 三轮均值 | LLTM t4 · 限定范围候选 | **86.00%** | 6,254.5 |
+| 历史基准 · 单次 | Naive RAG | 65% | 12,763 |
+| 历史基准 · 单次 | LLTM v2 | 72% | 574 |
+| 历史基准 · 单次 | Full Context | 86% | 109,059 |
 
-同期配对均值净增 **17.33 个百分点**，注册验收通过。候选中位上下文为 6,254.5 token，
-回答＋评分已记录 token 为 2,465,965（旧版 476,864）；提升伴随更大的上下文与 token 工作量。
-这是已暴露原题集的回归成绩，不能宣称未见题从 72% 提升到 86%，也不能把三轮当成 300 道独立题。
-[完整结果与用量](docs/EVALUATION.md#原-test100-新对照回归已完成) ·
-[完成审计](results/analysis/original-test100-v2-t4-dispatch-v1.completion-audit-v1.json)
+最新回归平均净提升 **17.33 个百分点**，成绩对应冻结 t4 候选配置，不是新的未见终测。
+本轮未重跑 Full Context，两个 86% 来自不同实验，不能据此宣称同期追平或胜出。
 
-### 历史：冻结 v2 未见终测
+最新回归中，t4 与同期 v2 回答＋评分已记录 token 分别为 2,465,965 和 476,864，约为 **5.17 倍**，
+不含既有抽取及服务未报告的失败用量。
 
-在 **LongMemEval-S** 的 100 道冻结终测题上，每种方法运行一次：
+历史基准中 v2 与 Naive RAG 的上下文为字符估算，Full Context 使用服务返回的输入 token。
 
-| 方法 | 正确率 | 回答＋评分 Token |
-|---|---:|---:|
-| **LLTM v2** | **72%** | **159,458** |
-| naive RAG | 65% | 1,352,847 |
-| Full Context | 86% | 10,932,294 |
+## 工程实现
 
-LLTM v2 比 naive RAG 正确率高 7 个百分点，但差异未达到统计显著（p=0.3368）；比 Full Context
-低 14 个百分点。回答与评分阶段的 Token 用量比 naive RAG 少约 **88%**，比 Full Context 少约
-**98.5%**（不含三者共用的记忆抽取开销）。
-
-以上是唯一的未见题终测。后续结果来自已用过的开发／回归题集：服务现在默认的 t4 在
-heldout100 上三次平均 87.67%（v1 原文为主 81.00%），dev100 上 88.33%，每题中位上下文约
-6,100 token。这些是开发证据，不能和上表排成版本曲线。当前问题和计划见
-[路线图](research/ROADMAP.md)。
-
-
-[原始结果](results/final/test100-aggregate.md)
+- **服务与工具接入**：FastAPI 提供写入、检索、回答、时间线、导出与删除接口，附带 OpenAPI 和 Inspector；本地 MCP stdio 提供记忆读写、原文检索、时间线与遗忘工具。
+- **用户隔离**：写入、检索及原文读取限定命名空间；配置认证后，REST Bearer Token 将请求绑定到租户身份。
+- **测试与部署**：GitHub Actions 在 Linux、Windows、macOS 上运行测试，并执行 Ruff 检查；提供 Docker、Render 配置和 Cloudflare Pages 发布说明。
+- **可复现评测**：冻结配置与源码哈希，支持断点续跑、调用及 token 记录和完整性审计。
 
 ## 快速开始
 
-需要 Python 3.11+ 和 [uv](https://docs.astral.sh/uv/)。
+需要 Python 3.11+、uv 和 Gemini API Key。
 
 ```bash
 git clone https://github.com/Mingjie-Mao/llm-long-term-memory.git
 cd llm-long-term-memory
-
 uv sync --group dev --extra api --extra llm --extra embed --extra mcp
 ```
 
-配置 `GEMINI_API_KEY` 以使用 LLM 事实抽取和回答功能。
-
-启动 API 服务：
+在终端设置 `GEMINI_API_KEY`，或参照 `.env.example` 配置 `.env`，然后启动 API：
 
 ```bash
-uv run uvicorn llm_long_term_memory.api.app:app \
-  --host 127.0.0.1 --port 8000
+uv run uvicorn llm_long_term_memory.api.app:app --host 127.0.0.1 --port 8000
 ```
 
-访问 [http://localhost:8000/docs](http://localhost:8000/docs) 查看 API 文档。
+打开 [Inspector](http://localhost:8000/) 或 [API 文档](http://localhost:8000/docs)。
+本地开放模式下，写入与提问使用同一个 `user_id`；对外提供服务前配置 REST 认证。
 
-[部署说明](DEPLOY.md)
+让本地 MCP 客户端在仓库目录启动 stdio 服务：
 
-## 在线演示
+```bash
+uv run lltm mcp
+```
 
-演示展示记忆写入、检索和时间状态变化，使用实际的存储与检索逻辑；其中的事实提取采用规则，
-不调用 LLM。
+## 文档
+
+- [Architecture · 架构说明](docs/ARCHITECTURE.md)
+- [Evaluation · 评测方法与结果](docs/EVALUATION.md)
+- [Project Report · 项目报告](docs/PROJECT_REPORT.md)
+- [Deployment · 部署说明](DEPLOY.md)
 
 ## License
 

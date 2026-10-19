@@ -148,11 +148,33 @@ def main() -> int:
     for key in schema["properties"]["result"]["required"]:
         assert key in result, f"release manifest is missing required result field {key!r}"
 
+    regression = release.get("regression")
+    if regression is not None:
+        for key in schema["properties"]["regression"]["required"]:
+            assert key in regression, f"missing regression field {key!r}"
+        assert regression["evidence_class"] == "exposed-regression"
+        assert regression["gate_passed"] is True
+        assert regression["reader_rows"] == regression["grade_rows"] == 600
+        assert regression["questions"] == 100 and regression["repeats_per_arm"] == 3
+        assert any(attrs.get("id") == "historicalResult" for _, attrs in elements)
+        for arm in ("control", "candidate"):
+            values = regression[f"{arm}_correct"]
+            assert len(values) == 3 and all(type(n) is int and 0 <= n <= 100 for n in values)
+            assert abs(sum(values) / 3 - regression[f"{arm}_accuracy"]) < 1e-8
+        assert (
+            abs(
+                regression["candidate_accuracy"]
+                - regression["control_accuracy"]
+                - regression["mean_difference_pp"]
+            )
+            < 1e-8
+        )
+
     app = (SITE / "app.js").read_text(encoding="utf-8")
     assert "renderMetrics();" in app, "language changes do not re-render manifest copy"
     # No measured figure may be typed into the page. Everything shown comes from the
     # manifest, which records the commit it was measured at.
-    for figure in ("72%", "574", "65%", "12,763", "12763", "109,059"):
+    for figure in ("72%", "574", "65%", "12,763", "12763", "109,059", "86%", "68.67", "17.33"):
         assert figure not in app, f"measured figure {figure!r} hard-coded outside release.json"
         assert figure not in index, f"measured figure {figure!r} hard-coded in index.html"
     # Whether the gap is significant is a claim, so it is driven by the manifest rather

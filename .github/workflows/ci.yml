@@ -53,9 +53,8 @@ jobs:
       # `llm` is required: the tests exercise real provider quirks (a 429 quota
       # body, a generic 400 on thinking_budget) and construct the SDK's own error
       # and config types to do it. `api` and `mcp` are here because without them
-      # the service and protocol tests skip, and a matrix that silently skips two
-      # thirds of the suite reports platform support it never checked — 101 tests
-      # ran where 354 exist. Neither extra pulls torch.
+      # the service and protocol tests would skip. Both extras are needed to verify
+      # the API and MCP boundaries on every platform. Neither extra pulls torch.
       #
       # `embed` stays out: ~2GB of torch, and `Encoder` loads sentence-transformers
       # lazily inside a property, so nothing imported at collection time needs it.
@@ -74,3 +73,6 @@ jobs:
       - name: Release figures match what was measured
         if: matrix.os == 'ubuntu-latest'
         run: uv run python public-demo/check_release_figures.py
+      - name: Public regression matches audited evidence
+        if: matrix.os == 'ubuntu-latest'
+        run: uv run python public-demo/update_regression_figures.py --check

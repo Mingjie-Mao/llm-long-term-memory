@@ -42,6 +42,8 @@ jobs:
         run: uv run --no-project python public-demo/check_site.py
       - name: Check accidental upload regressions
         run: uv run --no-project python -m unittest discover -s public-demo -p 'test_*.py'
+      - name: Verify published regression against its completion audit
+        run: uv run --no-project python public-demo/update_regression_figures.py --check
 
   deploy-environment:
     name: imports under the declared dependencies

@@ -148,6 +148,114 @@
           "description": "The commit checked out when the figures were taken. A human pointer only; it may not survive a history rewrite, which is why it is not the record of record."
         }
       }
+    },
+    "regression": {
+      "type": "object",
+      "description": "Optional audited regression; result remains the historical frozen one-shot comparison.",
+      "additionalProperties": false,
+      "required": [
+        "experiment",
+        "evidence_class",
+        "questions",
+        "repeats_per_arm",
+        "control_correct",
+        "candidate_correct",
+        "control_accuracy",
+        "candidate_accuracy",
+        "mean_difference_pp",
+        "control_recorded_tokens",
+        "candidate_recorded_tokens",
+        "reader_rows",
+        "grade_rows",
+        "gate_passed",
+        "gate_path",
+        "gate_sha256",
+        "audit_path",
+        "audit_sha256"
+      ],
+      "properties": {
+        "experiment": {
+          "type": "string",
+          "minLength": 1
+        },
+        "evidence_class": {
+          "const": "exposed-regression"
+        },
+        "questions": {
+          "const": 100
+        },
+        "repeats_per_arm": {
+          "const": 3
+        },
+        "control_correct": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 3,
+          "items": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100
+          }
+        },
+        "candidate_correct": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 3,
+          "items": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100
+          }
+        },
+        "control_accuracy": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "candidate_accuracy": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "mean_difference_pp": {
+          "type": "number",
+          "minimum": -100,
+          "maximum": 100
+        },
+        "control_recorded_tokens": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "candidate_recorded_tokens": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "reader_rows": {
+          "const": 600
+        },
+        "grade_rows": {
+          "const": 600
+        },
+        "gate_passed": {
+          "const": true
+        },
+        "gate_path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "gate_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "audit_path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "audit_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
     }
   }
 }
