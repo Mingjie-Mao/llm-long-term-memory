@@ -30,6 +30,12 @@
 
 ## 主线实验
 
+2026-10-19 原 test100 已完成并通过零调用完整性审计。新 `server-recovery-v3` 独立阶段
+给此前卡住的同一份答案评分成功后，父流程保存全部 600 回答／600 评分并生成通过的注册门。
+`server-recovery-v2` 原型仅零调用预检，因账本路径问题不执行。模型、旧失败记录和旧预算保留。
+[门判定](../results/analysis/original-test100-v2-t4-dispatch-v1.gate.json) ·
+[完成审计](../results/analysis/original-test100-v2-t4-dispatch-v1.completion-audit-v1.json)
+
 | 实验 | 类型 | 状态 | 核心结论 | 主要入口 | 允许的下一步 |
 |---|---|---|---|---|---|
 | 原文为主 t3／t4 对 v1（heldout100，每组 3 次） | 回归级开发比较 | **`PASS`** | v1 82/81/80、t3 87/86/87、t4 89/86/88，均值 81.00 / 86.67 / 87.67；t4 净 +6.67。回答侧 +5.67 达贡献门，检索侧 +1.00 未达 +2。t4 中位总上下文 6,147 | [预注册](../results/prereg-raw-primary-t3-t4-heldout100-v1.md) · [门判定](../results/analysis/raw-primary-t3-t4-heldout100-gate.md) · [完成审计](../results/analysis/t3t4-completion-audit-v1.json) | t4 已是服务默认配置（`answer_profile=t4`） |
@@ -37,7 +43,7 @@
 | t4 选择／计算修复（固定 21 题组件验收 v1–v4） | 开发组件门 | v1–v3 失败，**v4 通过** | v4：18/18 可答题、3/3 忠实说明缺口，中位上下文 6,393；20 题为严格回放、1 题新回答 | [v4 门判定](../results/analysis/t4-scoped-selection-train21-v4.gate.json) | — |
 | t4 修复版完整回归（dev100，每组 3 次） | 回归级开发比较 | **`FAIL`** | 原 t4 88/89/88（88.33）、修复版 84/91/83（86.00），净 −2.33；配对区间含零。原因：修复规则被加到所有请求上 | [预注册](../results/prereg-t4-scoped-regression-dev100-v3.md) · [门判定](../results/analysis/t4-scoped-regression-dev100-v3.gate.json) · [逐题诊断](../results/analysis/t4-scoped-dev100-postmortem-v1.md) | 改为限定触发范围（`tools/t4_scoped_dispatch.py`） |
 | 限定范围修复的结构回放 | 零调用回放 | 通过 | dev100 原 t4 的 300 份请求与输出逐字回放一致；21 题 18/18 + 3/3 保持 | [预注册](../results/prereg-t4-scoped-dispatch-replay-v1.md) | 只是历史回放，不是新的正确率 |
-| 原 test100：旧 v2 对 限定范围 t4（每组 3 次） | 回归级比较，已暴露题集 | **暂停**（`RECOVERY_EXHAUSTED`） | 截至 2026-10-15，500/600 回答、404/600 评分；前两轮两组均完整，对照第 3 轮 100 回答／4 评分，候选第 3 轮未开始。Gemma 连续 500，原预算和一次额外恢复耗尽；未更新正确率 | [预注册](../results/prereg-original-test100-v2-t4-dispatch-v1.md) · [进度](../results/analysis/original-test100-v2-t4-dispatch-v1.progress.json) · [停点审计](../results/analysis/original-test100-v2-t4-dispatch-v1.server-recovery-v1.stop-audit.json) | 用户选择保留评分模型；服务恢复后另行登记有限续跑。600 回答／600 评分完整并通过审计后报告回归成绩；不是未见终测 |
+| 原 test100：旧 v2 对 限定范围 t4（每组 3 次） | 回归级比较，已暴露题集 | **PASS，审计通过** | 旧版 70/68/68（68.67%）；新版 86/87/85（86.00%），平均净 +17.33；600 回答／600 评分完整，中位上下文 6,254.5；模型不变 | [注册门](../results/analysis/original-test100-v2-t4-dispatch-v1.gate.json) · [完成审计](../results/analysis/original-test100-v2-t4-dispatch-v1.completion-audit-v1.json) · [资源与口径](../docs/EVALUATION.md#原-test100-新对照回归已完成) | 允许进入摘要总成本与正确率的独立预注册；保留历史 72% 和开发 87.67%，不是未见终测 |
 | 记忆层审计（零调用） | 开发诊断 | 完成 | 标为替换的记忆约 89–91% 同键无旧值；51 道多会话知识更新题最多 11 道证据记忆共享某个键（线索，非更新正确率）；21 道偏好题 3 道抽到偏好记忆 | [结果](../results/analysis/layer-audit-v1.md) · [工具](../tools/layer_audit.py) | 见[路线图](ROADMAP.md) 阶段 D、E |
 | v2 `test100` | 正式冻结终测 | 完成 | LLTM 72%，整段历史 86%，naive RAG 65%；LLTM 对 naive RAG 的 +7 个点不显著 | [预注册](../results/prereg-v2-final.md) · [汇总](../results/final/test100-aggregate.md) · [冻结包](../results/frozen/v2-final/) · [封存逐题结果](../results/sealed/test100/) | 只能在新的、独立冻结的数据上测新版本；不得回到 `test100` 调参 |
 | v3.3 `dev60` | 冻结开发验证 | 通过但有限定 | 55.0% 对 v2 对照 46.7%，配对 p=0.1797；后续审计发现一个 confidence 门未测到预期含义 | [预注册](../results/prereg-v3-dev60.md) · [验证报告](../results/validation/v3-dev60.md) · [冻结包](../results/frozen/v3-candidate-dev60/) · [封存结果](../results/sealed/v3-dev60/) | 可作为开发证据，不可与 v2 `test100` 排成版本曲线，也不可宣称稳定提升 |

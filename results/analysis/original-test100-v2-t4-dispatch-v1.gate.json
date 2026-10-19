@@ -1,0 +1,113 @@
+{
+  "experiment_class": "exposed-original-test100-regression",
+  "inventory_sha256": "1e23d26d1f1d6cb1d05d779c77c1c3c2034e4b929a1a735055316ab4e976e0ad",
+  "questions": 100,
+  "reader_rows": 600,
+  "grade_rows": 600,
+  "accuracy": {
+    "mean_correct": {
+      "control": 68.66666666666667,
+      "candidate": 86.0
+    },
+    "per_run_correct": {
+      "control": [
+        70,
+        68,
+        68
+      ],
+      "candidate": [
+        86,
+        87,
+        85
+      ]
+    },
+    "mean_net": 17.333333333333332,
+    "by_type_mean_net": {
+      "knowledge-update": 3.6666666666666665,
+      "multi-session": 6.333333333333333,
+      "single-session-assistant": 1.0,
+      "single-session-preference": 1.0,
+      "single-session-user": 0.6666666666666667,
+      "temporal-reasoning": 4.666666666666667
+    },
+    "majority_paired": {
+      "questions": 100,
+      "wins": 21,
+      "losses": 2,
+      "difference_ci95": [
+        0.05248112061066637,
+        0.3093413312097249
+      ],
+      "method": "Bonferroni 97.5% Wilson win/loss bounds"
+    },
+    "statistical_no_loss_supported": true
+  },
+  "accuracy_percent": {
+    "control": 68.66666666666667,
+    "candidate": 86.0
+  },
+  "historical_v2_one_shot_accuracy": 72.0,
+  "median_context": {
+    "control": 574.0,
+    "candidate": 6254.5
+  },
+  "answer_end_to_end_latency": {
+    "control": {
+      "p50_ms": 1961.3265837542713,
+      "p95_ms": 38924.22195803374,
+      "max_ms": 43672.78629168868
+    },
+    "candidate": {
+      "p50_ms": 1966.9141666963696,
+      "p95_ms": 31566.3924170658,
+      "max_ms": 39358.25120843947
+    }
+  },
+  "resources_by_model": {
+    "gemini-3.5-flash-lite": {
+      "calls": 733,
+      "failures": 13,
+      "input_tokens": 2739314,
+      "output_tokens": 54704
+    },
+    "gemma-4-31b-it": {
+      "calls": 1227,
+      "failures": 627,
+      "input_tokens": 129711,
+      "output_tokens": 19100
+    }
+  },
+  "resources_by_arm_and_model": {
+    "control": {
+      "gemini-3.5-flash-lite": {
+        "calls": 409,
+        "failures": 7,
+        "input_tokens": 381637,
+        "output_tokens": 19599
+      },
+      "gemma-4-31b-it": {
+        "calls": 633,
+        "failures": 333,
+        "input_tokens": 65928,
+        "output_tokens": 9700
+      }
+    },
+    "candidate": {
+      "gemini-3.5-flash-lite": {
+        "calls": 324,
+        "failures": 6,
+        "input_tokens": 2357677,
+        "output_tokens": 35105
+      },
+      "gemma-4-31b-it": {
+        "calls": 594,
+        "failures": 294,
+        "input_tokens": 63783,
+        "output_tokens": 9400
+      }
+    }
+  },
+  "failed_call_tokens_may_be_unreported": true,
+  "pass": true,
+  "limitations": "Exposed same-question regression, not unseen final. Historical72 and contemporaneous control are separate. Three repeats are100 unique questions, not300 independent samples; hosted weights cannot be hashed."
+}
