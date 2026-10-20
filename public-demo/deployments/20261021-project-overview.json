@@ -1,0 +1,170 @@
+{
+  "schema_version": 1,
+  "deployed_at_utc": "2026-10-20T20:00:36.062348+00:00",
+  "provider": "cloudflare-pages",
+  "project": "lltm-memory",
+  "branch": "main",
+  "deployment_id": "c39959e9",
+  "deployment_url": "https://c39959e9.lltm-memory.pages.dev",
+  "production_url": "https://lltm-memory.pages.dev",
+  "git_head": "a0afe736ab1af72af57de7d1a89deea2f81114dd",
+  "dirty_worktree": false,
+  "deploy_root": "public-demo/site",
+  "files": [
+    {
+      "path": "404.html",
+      "sha256": "aba2017a3b9f7b34bc3923b00bafca4aa1bfd61534e383e88656065b60688732"
+    },
+    {
+      "path": "app.js",
+      "sha256": "18236087dc226c1fe6dd9d24c142b9f2262c38b7e4f7671f437b12af96ef614e"
+    },
+    {
+      "path": "content.js",
+      "sha256": "fad0ec99b25f7a15c74c2cc97de5cc78556dc25d27e04dfecc193c43c035eb7f"
+    },
+    {
+      "path": "index.html",
+      "sha256": "01a4b9fc8a6600023b3f7663360eead7ea12c01af9665c22dfb5d8335c29383a"
+    },
+    {
+      "path": "playground.html",
+      "sha256": "f8685c6ab83cbca75c4bae77d69dacd130337f43e4ba5bcbd057d5b8c53d7d90"
+    },
+    {
+      "path": "release.json",
+      "sha256": "9cd7bc74fdb44aa377e512a2464147f16981e81fdcfdf2431f4c6f34bdfcddfa"
+    },
+    {
+      "path": "release.schema.json",
+      "sha256": "43140f5ffecc104848fe0b61d3efe9aff738cbe8826907dd6f9732013eceb6ad"
+    },
+    {
+      "path": "styles.css",
+      "sha256": "8b4980a47c9eab8267d862acde5f0779ad461dd2ceabee009b031ea0c3db450c"
+    }
+  ],
+  "note": "Phase 3: bilingual write/read architecture with conditional source recovery; separate concurrent regression and historical accuracy tables; capabilities and manifest-driven engineering figures. No backend, model, prompt or benchmark changes.",
+  "predeploy_checks": [
+    "node --check public-demo/site/app.js: passed.",
+    "python public-demo/check_site.py: passed (8 deploy files, 4 labelled fields); section anchors, separate table bodies and manifest-driven engineering fields checked.",
+    "python -m unittest discover -s public-demo -p 'test_*.py': 7 passed.",
+    "pytest tests/test_public_regression_figures.py tests/test_release_manifest.py: 12 passed.",
+    "python public-demo/update_regression_figures.py --check: passed; gate and completion-audit hashes verified.",
+    "ruff check . and ruff format --check .: passed; 897 files formatted. git diff --check: passed.",
+    "python public-demo/check_release_figures.py: 2669 passed, 76 warnings; no failed or skipped tests. 2313 engineering tests and 356 document checks, line coverage 89%; measured source/test tree unchanged (8a6ab617f0ac...).",
+    "Local browser: English and Chinese sections, desktop architecture, mobile vertical flow and horizontally scrollable regression table. Page width does not exceed the mobile viewport. Sections render with the local backend offline.",
+    "public-demo CI for a0afe73 passed: https://github.com/Mingjie-Mao/llm-long-term-memory/actions/runs/39487985623"
+  ],
+  "postdeploy_checks": [
+    {
+      "url": "https://lltm-memory.pages.dev/404.html",
+      "sha256_matches": true
+    },
+    {
+      "url": "https://lltm-memory.pages.dev/app.js",
+      "sha256_matches": true
+    },
+    {
+      "url": "https://lltm-memory.pages.dev/content.js",
+      "sha256_matches": true
+    },
+    {
+      "url": "https://lltm-memory.pages.dev/index.html",
+      "sha256_matches": true
+    },
+    {
+      "url": "https://lltm-memory.pages.dev/playground.html",
+      "sha256_matches": true
+    },
+    {
+      "url": "https://lltm-memory.pages.dev/release.json",
+      "sha256_matches": true
+    },
+    {
+      "url": "https://lltm-memory.pages.dev/release.schema.json",
+      "sha256_matches": true
+    },
+    {
+      "url": "https://lltm-memory.pages.dev/styles.css",
+      "sha256_matches": true
+    },
+    {
+      "url": "https://c39959e9.lltm-memory.pages.dev/404.html",
+      "sha256_matches": true
+    },
+    {
+      "url": "https://c39959e9.lltm-memory.pages.dev/app.js",
+      "sha256_matches": true
+    },
+    {
+      "url": "https://c39959e9.lltm-memory.pages.dev/content.js",
+      "sha256_matches": true
+    },
+    {
+      "url": "https://c39959e9.lltm-memory.pages.dev/index.html",
+      "sha256_matches": true
+    },
+    {
+      "url": "https://c39959e9.lltm-memory.pages.dev/playground.html",
+      "sha256_matches": true
+    },
+    {
+      "url": "https://c39959e9.lltm-memory.pages.dev/release.json",
+      "sha256_matches": true
+    },
+    {
+      "url": "https://c39959e9.lltm-memory.pages.dev/release.schema.json",
+      "sha256_matches": true
+    },
+    {
+      "url": "https://c39959e9.lltm-memory.pages.dev/styles.css",
+      "sha256_matches": true
+    }
+  ],
+  "model_calls": 0,
+  "benchmark_scope": "Presentation only. release.json unchanged; exposed regression and historical frozen one-shot results remain separate. Regression token usage excludes existing extraction and unreported failed-call usage; no new experiment or cost claim.",
+  "verification_environment": {
+    "initial_sandbox_run": "2668 passed, 76 warnings, 1 setup error: tests/test_client_timeout.py::test_a_stalled_connection_raises_instead_of_hanging could not bind 127.0.0.1 (PermissionError). An isolated replay confirmed the same restriction (3 passed, 1 setup error).",
+    "resolved_run": "Full check_release_figures rerun with localhost socket access passed all 2669 checks; no code or manifest changes were needed."
+  },
+  "browser_postdeploy_checks": [
+    "Production URL rendered architecture, separate benchmark tables, capability cards and engineering figures; English-to-Chinese switch updates headings, table labels, figures and accessible region names. No write/answer requests were submitted.",
+    "Production backend reached Live LLM ready (t4); verification did not invoke generation."
+  ],
+  "backend": {
+    "changed": false,
+    "note": "Static presentation only; existing demo API and its model paths are unchanged."
+  },
+  "source_commit_ci": {
+    "checked_at_utc": "2026-10-20T20:03:24.245358+00:00",
+    "url": "https://github.com/Mingjie-Mao/llm-long-term-memory/actions/runs/39487985448",
+    "status": "queued",
+    "conclusion": "",
+    "jobs": [
+      {
+        "name": "lint",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "test (windows-latest)",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "test (ubuntu-latest)",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "test (macos-latest)",
+        "status": "queued",
+        "conclusion": ""
+      }
+    ]
+  },
+  "postdeploy_document_checks": [
+    "pytest tests/test_markdown_renders.py -k DEPLOY: 1 passed, 357 deselected."
+  ]
+}
