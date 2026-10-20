@@ -163,7 +163,16 @@ def render_batch(sessions: list[ConversationSession]) -> str:
 
 
 def _parse_date(raw: str) -> datetime | None:
-    for fmt in ("%Y/%m/%d (%a) %H:%M", "%Y/%m/%d", "%Y-%m-%d %H:%M", "%Y-%m-%d"):
+    # Live turns can update a fact within one minute. Preserve their observation
+    # precision so an ID tie-break cannot reverse two known ordered statements.
+    for fmt in (
+        "%Y-%m-%d %H:%M:%S.%f",
+        "%Y-%m-%d %H:%M:%S",
+        "%Y/%m/%d (%a) %H:%M",
+        "%Y/%m/%d",
+        "%Y-%m-%d %H:%M",
+        "%Y-%m-%d",
+    ):
         try:
             return datetime.strptime(raw.strip(), fmt)
         except ValueError:

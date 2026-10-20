@@ -5,10 +5,12 @@ Two things get deployed and they are not the same thing.
 | | what it is | where | holds data? |
 |---|---|---|---|
 | **the page** | a static demo, no backend of its own | Cloudflare Pages | no |
-| **the playground API** | the LLM-free half: retrieval and temporal updates, no extraction | Render, free plan | no — `/tmp`, wiped on restart by design |
+| **the playground API** | retrieval and temporal updates; opt-in LLM extraction and t4 answers | Render, free plan | no — `/tmp`, wiped on restart by design |
 | **the memory service** | the whole system: extraction, writes, budgets, erasure | not yet deployed | **yes** — needs a disk |
 
-The first two are live. The third is configured and has never been deployed, because it
+The first two have public deployments; live LLM availability is reported by `/demo/health`.
+Backend activation and capacity settings are documented in [the demo guide](public-demo/README.md#live-memory-playground).
+The third is configured and has never been deployed, because it
 holds real data and that changes what it needs.
 
 ---
@@ -79,10 +81,9 @@ resolves by default — nvidia/ at 2.9GB and triton/ at 649MB, measured inside t
 Render's current plans and pick one with at least 2GB.
 
 *The alternative is a code change, not a configuration one.* The playground fits the
-free plan because it runs ONNX (162MB against 565MB of wheels), but that encoder lives
-in `demo-api/onnx_encoder.py` and the engine package has no path to it. Giving
-`llm_long_term_memory.embed.Encoder` an ONNX backend would let the service run free —
-and it is a real candidate, not a workaround, since nothing in the read path needs torch.
+free plan because it runs ONNX (162MB against 565MB of wheels), and the opt-in playground now injects that encoder into `MemoryService` through
+`demo-api/demo_live.py`. The full REST image still defaults to torch. Verify memory
+use on the target host rather than assuming the whole service fits the free plan.
 
 **2. It needs a disk.** A memory service on ephemeral storage forgets everything on
 every restart. The blueprint mounts 1GB at `/data`, which is where the image already

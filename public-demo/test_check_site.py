@@ -43,6 +43,23 @@ class DeploySurfaceTests(unittest.TestCase):
         with self.assertRaisesRegex(AssertionError, "not directories or symlinks"):
             self.check()
 
+    def test_live_answer_cannot_be_replaced_with_retrieval(self) -> None:
+        path = self.site / "app.js"
+        path.write_text(
+            path.read_text(encoding="utf-8").replace('"/demo/answer"', '"/demo/search"'),
+            encoding="utf-8",
+        )
+        with self.assertRaises(AssertionError):
+            self.check()
+
+    def test_legacy_backend_cannot_enable_the_live_interface(self) -> None:
+        path = self.site / "app.js"
+        path.write_text(
+            path.read_text(encoding="utf-8").replace("health.llm_enabled", "true"), encoding="utf-8"
+        )
+        with self.assertRaises(AssertionError):
+            self.check()
+
 
 if __name__ == "__main__":
     unittest.main()

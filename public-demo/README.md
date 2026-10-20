@@ -4,16 +4,79 @@ Source for <https://lltm-memory.pages.dev>. Deploy **only `public-demo/site`**.
 The seven files in that folder are the complete public surface; documentation,
 Python tools, credentials, datasets and stores stay outside it.
 
-## What it shows
+## Live Memory Playground
 
-The worked example and the interactive box call `demo-api` in separate user
-namespaces. Facts are created by sentence patterns; answers come from memory
-retrieval. The page does not run LLM extraction or generation. A new conversation
-keeps the same user namespace and creates a new source session.
+The page sends raw natural language to `POST /demo/messages`, which uses the product's
+`MemoryService` / `TwoStageExtractor`. Questions go to `POST /demo/answer`, using the
+product `t4` profile: structured memory, selective raw turns, evidence hydration and
+conditional recovery. Presets contain utterances only, not precomputed facts or answers.
 
-Demo access expires after 60 minutes. Explicit deletion removes the namespace;
-expiry is persisted and swept by the backend. This is not a production retention
-policy. The page loads no third-party fonts or analytics.
+The Inspector shows extracted facts and their validity intervals, source spans for
+selected memories, and the actual answer-request prompts (including a fallback pass).
+These spans are source references, not independently verified citations. The benchmark
+section describes separate recorded experiments, not a score for the live visitor data.
+
+Enable on the **backend** only:
+
+```bash
+export LLTM_DEMO_LLM_ENABLED=1
+export GEMINI_API_KEY=your-server-side-key
+.venv/bin/python -m uvicorn app:app --app-dir demo-api --host 127.0.0.1 --port 8100
+```
+
+Install the project extras locally, or use the separately locked
+`demo-api/requirements.txt` on the deployment. The live mode uses the existing ONNX
+encoder when present; verify it with `demo-api/fetch_encoder.py` before serving it.
+ONNX is checked against the reference embeddings and uses a separate demo store;
+it is not mixed into a benchmark index.
+
+With the flag absent, the UI explicitly reports that LLM service is not enabled.
+Provider errors, exhausted capacity and timeouts never substitute rule-generated
+answers. Legacy `/demo/facts` and retrieval routes remain for engine smoke tests.
+No model calls occur during page load, health checks or session creation.
+
+### Identity, data and capacity
+
+The server issues a signed anonymous namespace token. New conversations retain that
+namespace but do not submit the old browser transcript. Presets explicitly delete the
+current namespace and create a new one. Each namespace expires after 60 minutes;
+expiry sweeps and explicit deletion remove memories, turns, replay responses and vectors.
+Counts without user text remain for admission control. Prompts captured for the
+Inspector are cleared from backend memory after each operation.
+
+| Backend setting | Default | Meaning |
+|---|---:|---|
+| `LLTM_DEMO_SESSION_CALLS` | 32 | Reserved attempt capacity per namespace per UTC day |
+| `LLTM_DEMO_SESSION_TOKENS` | 300,000 | Reserved token capacity per namespace per UTC day |
+| `LLTM_DEMO_DAILY_CALLS` | 100 | Reserved attempt capacity across all namespaces per UTC day |
+| `LLTM_DEMO_DAILY_TOKENS` | 1,000,000 | Reserved token capacity across all namespaces per UTC day |
+
+Reservations happen before each model step: two provider attempts total, shared by
+one backoff retry for transient API errors and any compatibility retry. Failed and
+unused reservations are not refunded. SDK and transport
+retries are disabled, calls time out at 30 seconds, and no new step starts after the
+operation's 60-second admission window. The client exposes recorded usage separately;
+reservations are conservative capacity bounds, not a monetary billing meter.
+
+The capacity ledger is SQLite-backed, survives process restarts while the store is
+retained, and is not cleared by visitor deletion. Render's free ephemeral disk can
+lose it on redeploy: use retained storage and a separate model project for a public
+LLM deployment whose budget must survive store loss. The ONNX + SDK runtime still
+needs memory verification on the chosen host; no production deployment is implied.
+
+### Verification
+
+```bash
+.venv/bin/pytest tests/test_live_playground.py
+.venv/bin/python demo-api/check_imports.py
+.venv/bin/python demo-api/smoke.py
+node --check public-demo/site/app.js
+.venv/bin/python public-demo/check_site.py
+```
+
+The route tests use scripted model transport with real extraction, deduplication,
+temporal resolution and answering code. The isolated dependency probe constructs
+both live paths without contacting a model; neither is a real-provider quality test.
 
 ## Results and evidence
 

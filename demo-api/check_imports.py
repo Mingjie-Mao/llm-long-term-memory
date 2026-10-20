@@ -6,7 +6,8 @@ Takes about a minute and needs network — it creates a virtualenv and installs 
 **Why this exists.** The first Render deploy failed on line 55 of `app.py`, importing
 `llm_long_term_memory.ingest.schemas` for a list of four predicate names. The package
 initializer used to reach the extractor and its provider SDK. The initializer is now
-lazy, so this check also proves the LLM-free service does not need `google-genai`.
+lazy, so disabled mode must not load the SDK. The second probe constructs the
+opt-in LLM paths under the same dependency lock without making provider calls.
 
 The defect was not the missing line. It was that `smoke.py` ran in a development
 checkout with every optional extra installed, so all 27 of its assertions passed
@@ -31,14 +32,33 @@ HERE = Path(__file__).resolve().parent
 REPO = HERE.parent
 
 PROBE = """
+import os
 import sys
+import tempfile
+from pathlib import Path
 sys.path.insert(0, {demo!r})
 sys.path.insert(0, {src!r})
 import app
-assert "google.genai" not in sys.modules, "demo import unexpectedly loaded Google SDK"
-print("imported app.py")
-print("  routes:", len([r for r in app.app.routes if getattr(r, "methods", None)]))
-print("  Google SDK loaded: no")
+assert "google.genai" not in sys.modules, "disabled demo import unexpectedly loaded SDK"
+print("app imports without loading Google SDK")
+
+class Encoder:
+    dim = 384
+
+with tempfile.TemporaryDirectory() as tmp:
+    app.DEMO_STORE = Path(tmp) / "live"
+    app.build_encoder = lambda: (Encoder(), "dependency-probe")
+    os.environ["LLTM_DEMO_LLM_ENABLED"] = "1"
+    os.environ["GEMINI_API_KEY"] = "dependency-probe-not-a-real-key"
+    app._start()
+    try:
+        app.pg.service._require_extractor()
+        assert app.pg.service.answerer.answer_policy == "v2_clt"
+        assert app.health(app.pg)["llm_enabled"]
+        assert not app.pg.live_client.usage.records
+        print("enabled two-stage extractor and t4 construct; zero model calls")
+    finally:
+        app._stop()
 """
 
 

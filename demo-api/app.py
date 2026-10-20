@@ -1,35 +1,15 @@
-"""A public playground over the parts of the memory engine that cost nothing to run.
+"""Public playground: signed disposable namespaces and opt-in product LLM paths.
 
-**Why this lives outside `src/`.** The v2 experiment freeze hashes
-`src/llm_long_term_memory/**/*.py`, `src/**/*.sql`, `scripts/*.py`, `pyproject.toml`
-and `uv.lock` file by file. Editing any of them makes the in-flight `dev100` store
-unable to prove it was produced under the frozen system — which has already cost this
-project 408 extractor calls once. This module therefore *imports* the engine and adds
-nothing to it, lives in a directory the freeze does not glob, and uses only
-dependencies `pyproject.toml` already declares. Nothing here may be moved into `src/`
-before the final test run.
-
-**Why only half the engine.** Two operations need a model: turning prose into facts
-(the extractor) and turning memories into an answer (the answerer). Both draw on a
-free-tier pool of 500 requests per day that the experiments are currently spending.
-Everything else the engine does — storing a fact, closing the previous value on the
-same key, ranking, saying *why* a memory was rejected, BM25 over the raw archive,
-rebuilding a supersession chain — is local computation with no API call and no
-per-request cost. That is also the half a reader does not believe from a static page,
-so it is the half worth serving live first.
-
-**Identity is issued, never accepted.** The engine reads `user_id` from the request
-body, which the README lists under its limitations. A public deployment cannot do
-that: anyone could type another namespace and read it. Here the server mints an
-opaque namespace, signs it, and hands back a token; every later call derives the
-namespace from the token's signature. The client never names a namespace and cannot
-forge one without the secret.
+Natural-language extraction and t4 generation reuse MemoryService. Legacy explicit
+fact endpoints remain available for local engine smoke tests; the live UI never
+substitutes those operations for LLM output.
 """
 
 from __future__ import annotations
 
 import hashlib
 import hmac
+import logging
 import os
 import re
 import secrets
@@ -174,6 +154,8 @@ class Playground:
     lock: Any = field(default_factory=threading.RLock)
     stop_event: threading.Event = field(default_factory=threading.Event)
     sweeper: threading.Thread | None = None
+    service: Any = None
+    live_client: Any = None
 
     def namespace_alive(self, namespace: str) -> bool:
         made = self.created.get(namespace)
@@ -420,6 +402,15 @@ def _start() -> None:
         created=created,
         encoder_id=encoder_id,
     )
+    from demo_live import attach, enabled
+
+    try:
+        if enabled():
+            pg.service, pg.live_client = attach(pg, DEMO_STORE)
+    except BaseException:
+        pg.store.close()
+        pg = None
+        raise
     sweep_orphans(pg)
     sweep(pg)
     pg.sweeper = threading.Thread(
@@ -437,7 +428,11 @@ def _stop() -> None:
     if pg.sweeper is not None:
         pg.sweeper.join(timeout=2)
     with pg.lock:
-        pg.store.close()
+        if pg.service is not None:
+            pg.live_client.base._client.close()
+            pg.service.close()
+        else:
+            pg.store.close()
     pg = None
 
 
@@ -447,9 +442,13 @@ def health(p: Playground = Depends(engine)) -> dict[str, Any]:
         return {
             "status": "ok",
             "live_sessions": sum(1 for ns in p.created if p.namespace_alive(ns)),
-            "llm_required": False,
+            "llm_required": p.service is not None,
+            "llm_enabled": p.service is not None,
+            "answer_profile": "t4" if p.service else None,
+            "llm_limits": p.live_client.limits() if p.live_client else None,
             "encoder": p.encoder_id,
-            "capabilities": [
+            "capabilities": (["llm_extract", "llm_answer", "model_inputs"] if p.service else [])
+            + [
                 "add_fact",
                 "supersession",
                 "search",
@@ -704,7 +703,7 @@ def timeline(
     chain = p.store.find_by_predicate(
         ns, subject, normalize_predicate(predicate), include_superseded=True
     )
-    chain.sort(key=lambda m: (m.event_time or datetime.min, m.id))
+    chain.sort(key=lambda m: (m.occurred_at or datetime.min, m.id))
     entries = [_serialise(m) for m in chain]
     # Only claim a replacement when an entry actually names the next as its successor.
     # Rendering an arrow between every consecutive pair invented a history on
@@ -744,3 +743,125 @@ def raw_search(
             for t in turns
         ],
     }
+
+
+# ---------------------------------------------------------------- live LLM routes
+
+
+class LiveMessageIn(BaseModel):
+    model_config = {"extra": "forbid"}
+    content: str = Field(min_length=1, max_length=MAX_CHARS)
+    session_id: str = Field(min_length=1, max_length=100)
+    request_id: str = Field(min_length=1, max_length=100)
+
+
+class LiveQuestionIn(BaseModel):
+    model_config = {"extra": "forbid"}
+    query: str = Field(min_length=1, max_length=500)
+
+
+def _live(p: Playground):
+    from demo_live import unavailable
+
+    if p.service is None or p.live_client is None:
+        raise unavailable()
+    return p.service, p.live_client
+
+
+def _live_failure(exc: Exception):
+    from demo_live import CapacityExceeded, unavailable
+
+    from llm_long_term_memory.api.service import IdempotencyConflict, WriteInProgress
+
+    if isinstance(exc, CapacityExceeded):
+        raise HTTPException(429, detail={"error": "demo_capacity", "message": str(exc)}) from None
+    if isinstance(exc, (IdempotencyConflict, WriteInProgress)):
+        raise HTTPException(409, "Message identity conflicts with an existing write.") from None
+    logging.getLogger(__name__).warning(
+        "Live demo failed: type=%s provider_code=%s",
+        type(exc).__name__,
+        getattr(exc, "code", None),
+    )
+    # Provider exception bodies may include request content: never reflect them.
+    raise unavailable() from None
+
+
+@app.post("/demo/messages")
+@locked_endpoint
+def extract_message(
+    message: LiveMessageIn,
+    ns: str = Depends(session_namespace),
+    p: Playground = Depends(engine),
+) -> dict:
+    service, client = _live(p)
+    try:
+        scoped_session_id(ns, message.session_id)
+    except ValueError:
+        raise HTTPException(422, "Invalid conversation identity.") from None
+    turns = p.store._conn.execute(
+        "SELECT COUNT(*) FROM turns JOIN sessions ON turns.session_id=sessions.id "
+        "WHERE sessions.user_id=?",
+        (ns,),
+    ).fetchone()[0]
+    if turns >= MAX_TURNS_PER_SESSION:
+        raise HTTPException(429, "Demo turn limit reached.")
+    try:
+        with client.operation(ns):
+            result = service.add_message(
+                ns,
+                "user",
+                message.content,
+                message.session_id,
+                idempotency_key=message.request_id,
+            )
+            return {
+                "mode": "llm",
+                "operation": "extract",
+                "session_id": result["session_id"],
+                "extracted": [
+                    _serialise(m) if isinstance(m, Memory) else m for m in result["memories"]
+                ],
+                "memories": [_serialise(m) for m in p.store.iter_all(ns)],
+                "usage": client.usage.summary(),
+                "capacity_reserved": client.reserved(ns),
+                "capacity_limits": client.limits(),
+            }
+    except Exception as exc:
+        _live_failure(exc)
+
+
+@app.post("/demo/answer")
+@locked_endpoint
+def generate_answer(
+    question: LiveQuestionIn,
+    ns: str = Depends(session_namespace),
+    p: Playground = Depends(engine),
+) -> dict:
+    service, client = _live(p)
+    try:
+        with client.operation(ns):
+            result = service.answer(ns, question.query)
+            sources = []
+            for item in result["selected"]:
+                memory = service.get(ns, item["id"])
+                sources.append(
+                    {
+                        "memory": _serialise(memory),
+                        "score": item["score"],
+                        "source": service.evidence(ns, memory.id),
+                    }
+                )
+            return {
+                **result,
+                "mode": "llm",
+                "answer_profile": "t4",
+                "selected_sources": sources,
+                # Exact provider-bound answer prompts, including any fallback pass.
+                # These are transient and cleared from the client after the response.
+                "model_inputs": [dict(item) for item in client.inputs],
+                "usage": client.usage.summary(),
+                "capacity_reserved": client.reserved(ns),
+                "capacity_limits": client.limits(),
+            }
+    except Exception as exc:
+        _live_failure(exc)

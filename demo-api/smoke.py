@@ -18,6 +18,7 @@ scratch = Path(tempfile.mkdtemp())
 # Never inherit a real demo store: this suite exercises destructive expiry and delete.
 os.environ["LLTM_DEMO_STORE"] = str(scratch / "playground")
 os.environ["LLTM_DEMO_SECRET"] = "smoke-secret-not-for-deployment"
+os.environ["LLTM_DEMO_LLM_ENABLED"] = "0"
 # Some native runtime dependencies persist process-local telemetry beside the
 # current directory. Keep every smoke-test artefact inside the same disposable
 # directory as its database instead of dirtying the repository root.

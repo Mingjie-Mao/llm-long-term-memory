@@ -203,7 +203,7 @@ class LiveTurnExtractor:
             [
                 ConversationSession(
                     session_id=session_id,
-                    date=now.strftime("%Y-%m-%d %H:%M"),
+                    date=now.strftime("%Y-%m-%d %H:%M:%S.%f"),
                     turns=[
                         *(ConversationTurn(role=t.role, content=t.content) for t in window),
                         ConversationTurn(role=role, content=content),
@@ -214,7 +214,7 @@ class LiveTurnExtractor:
         if self.repair is not None:
             session = ConversationSession(
                 session_id=session_id,
-                date=now.strftime("%Y-%m-%d %H:%M"),
+                date=now.strftime("%Y-%m-%d %H:%M:%S.%f"),
                 turns=[
                     *(ConversationTurn(role=t.role, content=t.content) for t in window),
                     ConversationTurn(role=role, content=content),

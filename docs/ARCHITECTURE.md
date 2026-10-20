@@ -148,9 +148,17 @@ SQLite 保存源数据、状态、词法索引以及辅助关系。向量索引�
 |---|---|---|
 | `lltm ingest run` | 配置 → Extractor/TwoStageExtractor → IngestionPipeline | 完整批量抽取、去重、持久化、可选时序消解与检查点 |
 | REST、Inspector、MCP | `MemoryService` | 共享搜索、读取、时间线、软遗忘和单轮抽取写入；REST 回答用产品引擎 `runtime.AnswerEngine` |
-| `demo-api/app.py` | `Playground` | 接收显式结构化事实，直接写入、嵌入和 resolve；原始 turns 单独写入；没有 LLM 抽取或自然语言回答 |
+| `demo-api/app.py` | `Playground`＋可选 `MemoryService` | 保留显式事实烟测接口；启用 LLM 后通过产品两阶段抽取与 t4 回答，并返回来源及实际回答请求提示词 |
 
 `MemoryService.add_message()` 在配置 API key 后按需创建 `LiveTurnExtractor`，适配真实批量抽取器，并执行去重、出处关联、索引保存和可选时序消解；测试仍可注入 adapter。服务使用进程内 `RLock` 串行化共享资源访问，回答的 `limit` 作为参数传递。`/healthz` 在嵌入器不可用时返回 503，`/livez` 单独报告进程存活。
+
+公开 Playground 的可选 LLM 接线位于 [demo_live.py](../demo-api/demo_live.py)：向 `MemoryService`
+注入已有 ONNX 编码器，使用独立临时存储、签名命名空间和调用前容量预留。默认不启用；
+页面不回退到规则答案。早期图 6 中的无需 LLM 路径仍用于烟测，完整启用与额度口径见
+[Demo 说明](../public-demo/README.md)。
+
+实时写入的会话观测时间保留秒与微秒，避免同一分钟内的更新因 ID 排序而反向覆盖；
+事实明确给出的 `event_time` 仍优先于观测时间，历史批量会话日期格式保持兼容。
 
 REST 另有凭据身份边界、数据导出与命名空间硬删除，不能由“共享 MemoryService”推断这些 HTTP 功能已经暴露为 MCP 工具。参见 [identity.py](../src/llm_long_term_memory/api/identity.py) 和 [app.py](../src/llm_long_term_memory/api/app.py)。
 

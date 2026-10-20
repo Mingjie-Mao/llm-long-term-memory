@@ -177,3 +177,18 @@ def test_every_extract_turn_stand_in_accepts_the_context(stub):
         for line in path.read_text(encoding="utf-8").splitlines():
             if re.search(r"def extract_turn\(self, \*,", line):
                 assert "context_turns" in line, f"{path.name}: {line.strip()}"
+
+
+def test_live_session_keeps_subminute_observation_precision():
+    from llm_long_term_memory.ingest.extract import _parse_date
+
+    recorder = _Recorder()
+    now = datetime(2026, 10, 20, 10, 15, 7, 123456)
+    _extractor(recorder).extract_turn(
+        user_id="alice",
+        session_id="s1",
+        role="user",
+        content="I live in Canberra.",
+        now=now,
+    )
+    assert _parse_date(recorder.sessions[-1].date) == now

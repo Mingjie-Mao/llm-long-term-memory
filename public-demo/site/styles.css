@@ -267,3 +267,17 @@ a { color: var(--accent); }
   .composer input { flex-basis: 100%; }
   .row { flex-wrap: wrap; }
 }
+
+/* Live model input and evidence inspector. Model/user text is rendered as text. */
+.live-composer { display: grid; grid-template-columns: 1fr; gap: 8px; }
+.live-composer textarea, .live-composer select {
+  width: 100%; padding: 10px; color: var(--ink); background: var(--panel);
+  border: 1px solid var(--line); border-radius: 8px; font: inherit;
+}
+.live-composer textarea { resize: vertical; }
+.evidence-card { font-size: 13px; border-left: 2px solid var(--accent); padding-left: 10px; overflow-wrap: anywhere; }
+#modelInputs pre { white-space: pre-wrap; overflow-wrap: anywhere; max-height: 360px; overflow-y: auto; font-size: 12px; }
+#memoryState .row { flex-wrap: wrap; }
+#memoryState small { width: 100%; overflow-wrap: anywhere; }
+details { margin-top: 16px; font-size: 13px; }
+.bubble.error { border-left: 3px solid var(--warn); }

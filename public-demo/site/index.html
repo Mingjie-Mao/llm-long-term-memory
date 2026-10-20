@@ -3,109 +3,72 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>LLTM — long-term memory across conversations</title>
-<meta name="description" content="Store user facts across conversations, track changes, and retrieve source evidence.">
+<title>LLTM — Live Memory Playground</title>
+<meta name="description" content="Explore LLM extraction, temporal memory, and answers grounded in retrieved conversation evidence.">
 <link rel="stylesheet" href="./styles.css">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ctext y='26' font-size='26'%3E🧠%3C/text%3E%3C/svg%3E">
 </head>
 <body>
 <a class="skip" href="#main" data-zh="跳到主要内容" data-en="Skip to content">Skip to content</a>
-
 <header class="topbar">
   <span class="wordmark">LLTM</span>
-  <div class="lang" role="group" aria-label="Language" data-aria-zh="语言" data-aria-en="Language">
+  <div class="lang" role="group" aria-label="Language">
     <button type="button" id="bzh" aria-pressed="false">中文</button>
     <button type="button" id="ben" aria-pressed="true">EN</button>
   </div>
 </header>
-
 <main id="main">
+  <h1 data-zh="看见长期记忆如何形成与变化。" data-en="Live Memory Playground. See memory form and change.">Live Memory Playground. See memory form and change.</h1>
+  <p class="hero-note" data-zh="自然语言 → 两阶段 LLM 抽取 → 时序记忆 → t4 回答与原文证据。模型不可用时明确报错，不以规则答案替代。" data-en="Natural language → two-stage LLM extraction → temporal memory → t4 answers and source evidence. Unavailable models produce an error, never a rule-based substitute.">Natural language → two-stage LLM extraction → temporal memory → t4 answers and source evidence. Unavailable models produce an error, never a rule-based substitute.</p>
 
-  <h1 id="hero-title"
-      data-zh="跨对话记住事实，也记住事实何时改变。"
-      data-en="Remember facts across conversations—and when they change.">Remember facts across conversations—and when they change.</h1>
-  <p class="hero-note" data-zh="这里演示写入、检索和时间状态。事实由句式规则生成；不运行 LLM 抽取或回答。"
-     data-en="This demo shows writes, retrieval, and fact updates. Sentence patterns create the facts; no LLM extracts or answers here.">This demo shows writes, retrieval, and fact updates. Sentence patterns create the facts; no LLM extracts or answers here.</p>
-
-  <!-- ------------------------------------------------------ the worked example -->
-  <section class="demo" aria-labelledby="walk-title">
-    <div class="demo-head">
-      <h2 id="walk-title" data-zh="一个例子" data-en="One example">One example</h2>
-      <div class="engine-status" id="engineStatus" aria-busy="true">
-        <span class="dot" id="dot" aria-hidden="true"></span>
-        <span id="statusText" role="status" aria-live="polite">Waking the live engine…</span>
-        <button class="ghost hidden" id="retry" type="button" data-zh="重试" data-en="Retry">Retry</button>
-      </div>
-    </div>
-
-    <div class="split">
-      <div class="pane">
-        <h3 class="pane-title" data-zh="对话" data-en="Conversation">Conversation</h3>
-        <ol class="chat" id="walkChat">
-          <li class="empty" data-zh="点下面的按钮，看三轮对话如何改变记忆。" data-en="Press the button below to watch three turns change the memory.">Press the button below to watch three turns change the memory.</li>
-        </ol>
-        <div class="ask" id="walkAsk" hidden>
-          <p class="bubble user" id="walkQuestion"></p>
-          <p class="bubble answer" id="walkAnswer"></p>
-        </div>
-      </div>
-
-      <div class="pane">
-        <h3 class="pane-title" data-zh="LLTM 内部状态" data-en="LLTM internal state">LLTM internal state</h3>
-        <ul class="state" id="walkState">
-          <li class="empty" data-zh="等待引擎…" data-en="Waiting for the engine…">Waiting for the engine…</li>
-        </ul>
-        <p class="pane-foot" data-zh="真实服务返回的状态，不是录像。" data-en="State returned by the real service, not a recording.">State returned by the real service, not a recording.</p>
-      </div>
-    </div>
-
-    <div class="demo-actions">
-      <button class="primary" id="walkRun" type="button" data-live="walkthrough" aria-pressed="false" disabled data-requires-live
-              data-zh="运行这个例子" data-en="Run this example">Run this example</button>
-      <button class="ghost" id="walkReset" type="button" hidden data-zh="重置" data-en="Reset">Reset</button>
-    </div>
-    <p class="sr-only" id="walkAnnounce" role="status" aria-live="polite"></p>
-  </section>
-
-  <!-- ------------------------------------------------------ the interactive box -->
   <section class="demo" aria-labelledby="try-title">
     <div class="demo-head">
-      <h2 id="try-title" data-zh="自己试" data-en="Try it yourself">Try it yourself</h2>
-      <p class="lede" data-zh="写入一件事，换个说法更新它，再开新对话提问。"
-         data-en="Add a fact, update it, then ask in a new conversation.">Add a fact, update it, then ask in a new conversation.</p>
+      <h2 id="try-title" data-zh="与长期记忆交互" data-en="Interact with long-term memory">Interact with long-term memory</h2>
+      <div class="engine-status" id="engineStatus" aria-busy="true">
+        <span class="dot" aria-hidden="true"></span>
+        <span id="statusText" role="status" aria-live="polite">Connecting…</span>
+        <button class="ghost" id="retry" type="button" data-zh="重试" data-en="Retry">Retry</button>
+      </div>
     </div>
-
+    <div class="chips" id="scenarios">
+      <button class="chip" type="button" data-live="recall" aria-pressed="false" disabled data-requires-live data-zh="跨会话记忆" data-en="Cross-session recall">Cross-session recall</button>
+      <button class="chip" type="button" data-live="update" aria-pressed="false" disabled data-requires-live data-zh="事实变化" data-en="Fact updates">Fact updates</button>
+      <button class="chip" type="button" data-live="temporal" aria-pressed="false" disabled data-requires-live data-zh="时间推理" data-en="Temporal reasoning">Temporal reasoning</button>
+    </div>
+    <p class="pane-foot" data-zh="运行预设会新建演示空间并清除当前空间。也可以直接输入自己的自然语言。" data-en="Presets start a fresh demo namespace and delete the current one. You can also enter your own natural language.">Presets start a fresh demo namespace and delete the current one. You can also enter your own natural language.</p>
     <div class="split">
       <div class="pane">
         <div class="pane-head">
-          <h3 class="pane-title" id="tryConversationTitle">Conversation 1</h3>
-          <button class="ghost small" id="tryNewConversation" type="button" disabled data-requires-live
-                  data-zh="新对话" data-en="New conversation">New conversation</button>
+          <h3 id="conversationTitle" class="pane-title">Conversation 1</h3>
+          <button id="newConversation" class="ghost small" type="button" disabled data-requires-live data-zh="新对话" data-en="New conversation">New conversation</button>
         </div>
-        <ol class="chat" id="tryChat">
-          <li class="empty" data-zh="还没有内容。" data-en="Nothing yet.">Nothing yet.</li>
-        </ol>
-        <form class="composer" id="tryForm">
-          <label class="sr-only" for="tryInput" data-zh="你的消息" data-en="Your message">Your message</label>
-          <input id="tryInput" type="text" autocomplete="off" maxlength="160" disabled data-requires-live
-                 data-placeholder-zh="例如：I live in Canberra." data-placeholder-en="e.g. I live in Canberra."
-                 placeholder="e.g. I live in Canberra.">
-          <button class="primary" id="trySend" type="submit" disabled data-requires-live data-zh="发送" data-en="Send">Send</button>
+        <ol class="chat" id="chat" aria-live="polite"></ol>
+        <form class="composer live-composer" id="messageForm">
+          <label for="operation" data-zh="操作" data-en="Action">Action</label>
+          <select id="operation" disabled data-requires-live>
+            <option value="remember" data-zh="记住这段话" data-en="Remember this">Remember this</option>
+            <option value="ask" data-zh="向记忆提问" data-en="Ask memory">Ask memory</option>
+          </select>
+          <label class="sr-only" for="message" data-zh="消息" data-en="Message">Message</label>
+          <textarea id="message" rows="3" maxlength="2000" required disabled data-requires-live placeholder="I have switched from TensorFlow to PyTorch." data-placeholder-zh="例如：我最近从 TensorFlow 换到了 PyTorch。" data-placeholder-en="I have switched from TensorFlow to PyTorch."></textarea>
+          <button class="primary" type="submit" disabled data-requires-live data-zh="发送" data-en="Send">Send</button>
         </form>
-        <div class="chips" id="trySuggestions" aria-label="Suggestions" data-aria-zh="示例句子" data-aria-en="Example sentences"></div>
+        <p id="usage" class="pane-foot" role="status" aria-live="polite"></p>
+        <button class="ghost small" id="deleteSession" type="button" data-zh="删除本次演示数据" data-en="Delete this demo's data">Delete this demo's data</button>
+        <p class="pane-foot" data-zh="写入与提问会向后端模型提供相关文本；密钥仅保存在后端。新对话保留长期记忆，不发送页面中的旧聊天记录。" data-en="Writes and questions send relevant text to the backend model. API keys stay on the server. A new conversation retains long-term memory without sending the old on-screen transcript.">Writes and questions send relevant text to the backend model. API keys stay on the server. A new conversation retains long-term memory without sending the old on-screen transcript.</p>
       </div>
-
       <div class="pane">
-        <h3 class="pane-title" data-zh="LLTM 内部状态" data-en="LLTM internal state">LLTM internal state</h3>
-        <ul class="state" id="tryState">
-          <li class="empty" data-zh="还没有事实。" data-en="No facts yet.">No facts yet.</li>
-        </ul>
-        <p class="pane-foot" data-zh="答案由记忆检索读出，不是模型生成。" data-en="Answers are read from memory retrieval, not generated by a model.">Answers are read from memory retrieval, not generated by a model.</p>
+        <h3 class="pane-title" data-zh="Memory Inspector · 抽取事实与时间线" data-en="Memory Inspector · facts and timeline">Memory Inspector · facts and timeline</h3>
+        <ul class="state" id="memoryState"><li class="empty" data-zh="保存一段话后，在这里查看抽取的事实。" data-en="Save a message to inspect extracted facts here.">Save a message to inspect extracted facts here.</li></ul>
+        <h3 class="pane-title" data-zh="本次选中记忆的原文出处" data-en="Sources of selected memories">Sources of selected memories</h3>
+        <div id="sources"><p class="empty" data-zh="提问后展示本次选中记忆的原文出处。" data-en="Ask a question to inspect the sources of selected memories.">Ask a question to inspect the sources of selected memories.</p></div>
+        <details>
+          <summary data-zh="实际回答请求的提示词（含原文补全与回退）" data-en="Answer request prompts, including raw evidence and fallback">Answer request prompts, including raw evidence and fallback</summary>
+          <div id="modelInputs"></div>
+        </details>
       </div>
     </div>
-    <p class="sr-only" id="tryAnnounce" role="status" aria-live="polite"></p>
   </section>
-
   <!-- ------------------------------------------------------ the result, in one line -->
   <section class="result" aria-labelledby="result-title">
     <h2 id="result-title" class="sr-only" data-zh="结果" data-en="Result">Result</h2>
@@ -120,12 +83,10 @@
   </section>
 
   <footer class="foot">
-    <p data-zh="演示会话 60 分钟后过期；这不是生产留存保证。"
-       data-en="Demo sessions expire after 60 minutes; this is not a production retention guarantee.">Demo sessions expire after 60 minutes; this is not a production retention guarantee.</p>
-    <p><a href="https://github.com/Mingjie-Mao/llm-long-term-memory" rel="noopener" data-zh="代码与限制" data-en="Code and limitations">Code and limitations</a></p>
+    <p data-zh="演示空间 60 分钟后过期；不构成生产留存保证。基准来自独立记录的评测，不是本次访客会话的成绩。" data-en="Demo namespaces expire after 60 minutes; this is not a production retention guarantee. Benchmark results describe separate recorded evaluations, not this visitor session.">Demo namespaces expire after 60 minutes; this is not a production retention guarantee. Benchmark results describe separate recorded evaluations, not this visitor session.</p>
+    <p><a href="https://github.com/Mingjie-Mao/llm-long-term-memory" rel="noopener">GitHub</a></p>
   </footer>
 </main>
-
 <script type="module" src="./app.js"></script>
 </body>
 </html>
