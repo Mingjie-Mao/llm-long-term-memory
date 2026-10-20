@@ -166,5 +166,34 @@
   },
   "postdeploy_document_checks": [
     "pytest tests/test_markdown_renders.py -k DEPLOY: 1 passed, 357 deselected."
-  ]
+  ],
+  "source_commit_ci_final": {
+    "checked_at_utc": "2026-10-20T20:06:16.640878+00:00",
+    "url": "https://github.com/Mingjie-Mao/llm-long-term-memory/actions/runs/39487985448",
+    "status": "completed",
+    "conclusion": "success",
+    "jobs": [
+      {
+        "name": "lint",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "test (windows-latest)",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "test (ubuntu-latest)",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "test (macos-latest)",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ],
+    "note": "All source-commit jobs passed. GitHub annotated that macOS arm64 runners had capacity-related queue delays. Earlier status snapshot is retained above."
+  }
 }
