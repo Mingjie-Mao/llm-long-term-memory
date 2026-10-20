@@ -104,6 +104,14 @@ both live paths without contacting a model; neither is a real-provider quality t
 2 without changing the historical `result` or the engineering-count definitions.
 The page renders values from this manifest in English and Chinese.
 
+The overview below the playground separates the write and read paths, with a
+conditional source-recovery path. The benchmark tables keep the concurrent
+exposed-set regression apart from the historical one-shot comparison; recorded
+answer-and-grading token usage is shown only for the regression, with its exclusions.
+The capabilities section reads engineering test counts, line coverage, CI platforms
+and verification date from the same manifest. Document checks remain separate.
+No model calls are needed to render these sections, even when the backend is offline.
+
 Refresh regression figures from the gate and completion audit, then verify them:
 
 ```bash

@@ -69,59 +69,78 @@ function applyLanguage() {
   }
   $("bzh").setAttribute("aria-pressed", String(lang === "zh"));
   $("ben").setAttribute("aria-pressed", String(lang === "en"));
+  for (const el of document.querySelectorAll("[data-aria-zh][data-aria-en]")) {
+    el.setAttribute("aria-label", el.dataset[lang === "zh" ? "ariaZh" : "ariaEn"]);
+  }
   title();
   renderMetrics();
   if (statusRecord) status(statusRecord.state, statusRecord.pair);
 }
+// Only the release manifest supplies measured values. Each table keeps its own
+// experiment scope; recorded provider usage is never mixed with context estimates.
+function metricRows(id, rows) {
+  $(id).replaceChildren(...rows.map((values) => {
+    const row = document.createElement("tr");
+    for (const [index, value] of values.entries()) {
+      const cell = document.createElement(index === 0 ? "th" : "td");
+      if (index === 0) cell.scope = "row";
+      cell.textContent = value;
+      row.append(cell);
+    }
+    return row;
+  }));
+}
 function renderMetrics() {
   if (!manifest) return;
-  const { result, release, regression } = manifest;
-  const acc = result.accuracy;
-  const rag = result.naive_rag_accuracy;
-  const full = result.full_context_accuracy;
-  const significance = result.significant_vs_naive_rag
-    ? { zh: "显著", en: "significant" }
-    : { zh: "不显著", en: "not significant" };
+  const { result, release, regression, engineering } = manifest;
+  const percent = (n) => `${Number(n.toFixed(2))}%`;
+  const number = (n) => n.toLocaleString("en-US");
   const link = $("releaseCommit");
-  const history = $("historicalResult");
-  history.hidden = !regression;
+  $("regressionComparison").hidden = !regression;
   if (regression) {
-    const percent = (n) => Number(n.toFixed(2));
-    const tokens = (n) => n.toLocaleString("en-US");
-    $("headline").textContent = lang === "zh"
-      ? `原 test100 回归：${percent(regression.candidate_accuracy)}% 正确率；同期旧版 ${percent(regression.control_accuracy)}%，提升 ${percent(regression.mean_difference_pp)} 个百分点。`
-      : `Original test100 regression: ${percent(regression.candidate_accuracy)}% accuracy; ${percent(regression.control_accuracy)}% for the concurrent baseline, a ${percent(regression.mean_difference_pp)}-point gain.`;
-    $("footnote").textContent = lang === "zh"
-      ? `已暴露题集，${regression.questions} 道独立题，每组重复 ${regression.repeats_per_arm} 次；模型未换，${regression.reader_rows} 份回答与 ${regression.grade_rows} 份评分通过完整性审计。回答＋评分已记录 token：新版 ${tokens(regression.candidate_recorded_tokens)}，旧版 ${tokens(regression.control_recorded_tokens)}；不含原有记忆抽取和未报告的失败用量。`
-      : `An exposed set of ${regression.questions} unique questions, ${regression.repeats_per_arm} repeats per arm; models unchanged, ${regression.reader_rows} answers and ${regression.grade_rows} grades audited. Recorded answer + grading tokens: ${tokens(regression.candidate_recorded_tokens)} candidate, ${tokens(regression.control_recorded_tokens)} baseline; excludes prior extraction and unreported failed-call usage.`;
-    history.textContent = lang === "zh"
-      ? `历史冻结单次终测：v2 ${acc}%，naive RAG ${rag}%，整段历史 ${full}%；v2 相对 RAG 的差异${significance.zh}（p=${result.vs_naive_rag_p_value}）。历史终测与这次回归分别报告。`
-      : `Historical frozen one-shot test: v2 ${acc}%, naive RAG ${rag}%, full history ${full}%; v2's difference from RAG was ${significance.en} (p=${result.vs_naive_rag_p_value}). Historical and regression results are reported separately.`;
-    $("releaseMeta").textContent = lang === "zh"
-      ? "LongMemEval-S · 已暴露题集回归"
-      : "LongMemEval-S · exposed-set regression";
+    $("headline").textContent = t(
+      `原 test100 回归：${percent(regression.candidate_accuracy)} 正确率；同期旧版 ${percent(regression.control_accuracy)}，提升 ${Number(regression.mean_difference_pp.toFixed(2))} 个百分点。`,
+      `Original test100 regression: ${percent(regression.candidate_accuracy)} accuracy; ${percent(regression.control_accuracy)} for the concurrent baseline, a ${Number(regression.mean_difference_pp.toFixed(2))}-point gain.`,
+    );
+    metricRows("regressionRows", [
+      [t("同期旧 v2", "Concurrent v2 control"), `${regression.control_correct.join(" / ")} (${t("每轮", "each out of")} ${regression.questions})`, percent(regression.control_accuracy), number(regression.control_recorded_tokens)],
+      [t("限定范围 t4 候选", "Scoped t4 candidate"), `${regression.candidate_correct.join(" / ")} (${t("每轮", "each out of")} ${regression.questions})`, percent(regression.candidate_accuracy), number(regression.candidate_recorded_tokens)],
+    ]);
+    $("footnote").textContent = t(
+      `已暴露题集，${regression.questions} 道独立题，每组重复 ${regression.repeats_per_arm} 次；模型未换，${regression.reader_rows} 份回答与 ${regression.grade_rows} 份评分通过完整性审计。上表为回答＋评分已记录 token，不含原有记忆抽取和未报告的失败用量。`,
+      `An exposed set of ${regression.questions} unique questions, ${regression.repeats_per_arm} repeats per arm; models unchanged, ${regression.reader_rows} answers and ${regression.grade_rows} grades audited. Tokens above cover recorded answer + grading usage; they exclude prior extraction and unreported failed-call usage.`,
+    );
+    $("releaseMeta").textContent = t("LongMemEval-S · 已暴露题集回归", "LongMemEval-S · exposed-set regression");
     link.href = `https://github.com/Mingjie-Mao/llm-long-term-memory/blob/main/${regression.gate_path}`;
-    link.textContent = lang === "zh" ? "完整结果与审计口径" : "full results and audit scope";
-    return;
+    link.textContent = t("完整结果与审计口径", "full results and audit scope");
+  } else {
+    $("releaseMeta").textContent = t(`${release} · 历史终测`, `${release} · archived final test`);
+    link.href = "https://github.com/Mingjie-Mao/llm-long-term-memory/blob/main/results/final/test100-aggregate.md";
+    link.textContent = t("实验报告", "full report");
   }
-
-  $("headline").textContent = lang === "zh"
-    ? `冻结 v2：${acc}% 正确率；naive RAG ${rag}%，整段历史 ${full}%。`
-    : `Frozen v2: ${acc}% accuracy; naive RAG ${rag}%, full history ${full}%.`;
-
-  $("footnote").textContent = result.significant_vs_naive_rag
-    ? (lang === "zh"
-        ? `LongMemEval-S ${result.questions} 题，每臂一次；相对 naive RAG 的差异显著（p=${result.vs_naive_rag_p_value}）。`
-        : `LongMemEval-S, ${result.questions} questions, one run per arm; the difference from naive RAG was significant (p=${result.vs_naive_rag_p_value}).`)
-    : (lang === "zh"
-        ? `LongMemEval-S ${result.questions} 题，每臂一次；相对 naive RAG 的差异不显著（p=${result.vs_naive_rag_p_value}）。`
-        : `LongMemEval-S, ${result.questions} questions, one run per arm; the difference from naive RAG was not significant (p=${result.vs_naive_rag_p_value}).`);
-
-  $("releaseMeta").textContent = lang === "zh"
-    ? `${release} · 历史终测`
-    : `${release} · archived final test`;
-  link.href = "https://github.com/Mingjie-Mao/llm-long-term-memory/blob/main/results/final/test100-aggregate.md";
-  link.textContent = lang === "zh" ? "实验报告" : "full report";
+  $("historicalCaption").textContent = t(
+    `历史冻结单次终测 · ${result.dataset} · ${result.questions} 题`,
+    `Historical frozen one-shot test · ${result.dataset} · ${result.questions} questions`,
+  );
+  metricRows("historicalRows", [
+    ["Naive RAG", percent(result.naive_rag_accuracy)],
+    [t("LLTM v2 · 记忆与条件回退", "LLTM v2 · memory + conditional recovery"), percent(result.accuracy)],
+    [t("Full Context · 整段历史", "Full Context · full history"), percent(result.full_context_accuracy)],
+  ]);
+  const significance = result.significant_vs_naive_rag
+    ? t("显著", "significant") : t("不显著", "not significant");
+  $("historicalResult").textContent = t(
+    `每臂只运行一次；v2 相对 Naive RAG 的差异${significance}（p=${result.vs_naive_rag_p_value}）。历史基准与上面的回归分别报告，不能排成版本进步曲线。`,
+    `One run per arm; v2’s difference from Naive RAG was ${significance} (p=${result.vs_naive_rag_p_value}). Historical benchmarks and the regression above are separate experiments, not a version-progress curve.`,
+  );
+  $("engineeringTests").textContent = number(engineering.tests);
+  $("engineeringCoverage").textContent = `${engineering.line_coverage}%`;
+  const platformNames = { ubuntu: "Linux", windows: "Windows", macos: "macOS" };
+  $("engineeringPlatforms").textContent = engineering.ci_platforms.map((p) => platformNames[p] || p).join(" / ");
+  $("engineeringNote").textContent = t(
+    `工程数据核验于 ${engineering.verified_at}；另有 ${number(engineering.document_checks)} 项文档检查，不计入工程测试数。指标对应发布清单记录的源码树，不代表生产可用性保证。`,
+    `Engineering figures verified ${engineering.verified_at}; ${number(engineering.document_checks)} document checks are counted separately. Figures refer to the source tree recorded in the manifest, not a production availability guarantee.`,
+  );
 }
 
 async function loadManifest() {

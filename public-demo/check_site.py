@@ -77,6 +77,17 @@ def main() -> int:
     assert "not a production retention guarantee" in index
     assert any(attrs.get("id") == "releaseMeta" for _, attrs in elements)
     assert any(attrs.get("id") == "releaseCommit" for _, attrs in elements)
+    for section in ("architecture-title", "result-title", "highlights-title"):
+        assert any(tag == "h2" and attrs.get("id") == section for tag, attrs in elements), (
+            f"missing public overview section {section}"
+        )
+    for table in ("regressionRows", "historicalRows"):
+        assert any(tag == "tbody" and attrs.get("id") == table for tag, attrs in elements), (
+            f"missing separate comparison table {table}"
+        )
+    for _, attrs in elements:
+        if (attrs.get("href") or "").startswith("#"):
+            assert attrs["href"][1:] in ids, f"broken section link: {attrs['href']}"
     assert any((attrs.get("href") or "").startswith("./release.json") for _, attrs in elements), (
         "release manifest is not linked from the evidence block"
     )
@@ -170,7 +181,22 @@ def main() -> int:
     assert "renderMetrics();" in app, "language changes do not re-render manifest copy"
     # No measured figure may be typed into the page. Everything shown comes from the
     # manifest, which records the commit it was measured at.
-    for figure in ("72%", "574", "65%", "12,763", "12763", "109,059", "86%", "68.67", "17.33"):
+    for figure in (
+        "72%",
+        "574",
+        "65%",
+        "12,763",
+        "12763",
+        "109,059",
+        "86%",
+        "68.67",
+        "17.33",
+        "2313",
+        "2,313",
+        "89%",
+        "476,864",
+        "2,465,965",
+    ):
         assert figure not in app, f"measured figure {figure!r} hard-coded outside release.json"
         assert figure not in index, f"measured figure {figure!r} hard-coded in index.html"
     # Whether the gap is significant is a claim, so it is driven by the manifest rather
@@ -184,6 +210,16 @@ def main() -> int:
     assert "median_context_tokens" not in app, (
         "the page must not compare context estimates with provider input tokens"
     )
+    for field in (
+        "engineering.tests",
+        "engineering.line_coverage",
+        "engineering.ci_platforms",
+        "engineering.verified_at",
+        "engineering.document_checks",
+        "regression.control_correct",
+        "regression.candidate_correct",
+    ):
+        assert field in app, f"public overview does not read manifest field {field}"
     scenario_body = re.search(
         r"async function runLiveScenario\(name\) \{(?P<body>.*?)\n\}", app, re.DOTALL
     )
