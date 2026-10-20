@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "deployed_date_utc": "2026-10-20",
+  "verified_at_utc": "2026-10-20T17:44:40.545996+00:00",
+  "provider": "cloudflare-pages",
+  "project": "lltm-memory",
+  "branch": "main",
+  "deployment_id": "c029ad18",
+  "deployment_url": "https://c029ad18.lltm-memory.pages.dev",
+  "production_url": "https://lltm-memory.pages.dev",
+  "git_head": "cca3d128d19204f3c21c1d2a585d2e526fb5e10b",
+  "dirty_worktree": false,
+  "deploy_root": "public-demo/site",
+  "note": "Conversation dates (session time) on live writes, as_of over stored intervals, answer evidence (raw fallback, recovered turns, memories not used), step progress, and failure class/provider status on 503s. temporal.as_of now starts intervals at occurred_at. Models, prompts, extractor and answer text are unchanged; runtime answer notes gained reporting-only fields.",
+  "files": [
+    {
+      "path": "404.html",
+      "sha256": "aba2017a3b9f7b34bc3923b00bafca4aa1bfd61534e383e88656065b60688732"
+    },
+    {
+      "path": "app.js",
+      "sha256": "a01cfda7aec1710735b4058a0799d3b3e71304da5ab447cee9e3db694822b1b7"
+    },
+    {
+      "path": "content.js",
+      "sha256": "daa3eb74322030b8b8a06bfe6b95f4fb7a5e1cbbc37803ba2199c65b7d53e634"
+    },
+    {
+      "path": "index.html",
+      "sha256": "baa56fff96c9d3896aa91f1e38a32a5e305fcc51dbcccaf48bc0afb16783549a"
+    },
+    {
+      "path": "playground.html",
+      "sha256": "f8685c6ab83cbca75c4bae77d69dacd130337f43e4ba5bcbd057d5b8c53d7d90"
+    },
+    {
+      "path": "release.json",
+      "sha256": "355cb0d5381a87f4fcbecfd10b85fad61626e8a346960e38790b324aa646a37f"
+    },
+    {
+      "path": "release.schema.json",
+      "sha256": "43140f5ffecc104848fe0b61d3efe9aff738cbe8826907dd6f9732013eceb6ad"
+    },
+    {
+      "path": "styles.css",
+      "sha256": "782b1be3754ba7b4ec9855b906b0be1cb69bcbecef4344157115a4bcea26ac26"
+    }
+  ],
+  "backend": {
+    "provider": "render",
+    "service": "lltm-playground",
+    "url": "https://lltm-playground.onrender.com",
+    "changed": true,
+    "deploy": "autoDeploy from main (render.yaml); health reports conversation_dates and as_of capabilities. The exact Render deploy id and whether it already runs cca3d12 (503 diagnostics) were not observable without Render access."
+  },
+  "predeploy_checks": [
+    "Full pytest suite: 2313 passed (run by check_release_figures --update, line coverage 89%).",
+    "tests/test_live_playground.py: 20 passed, including out-of-order dated writes converging with chronological ones and agreeing on as_of, date validation before calls and in the write fingerprint, as_of/answer exclusions confined to the namespace, recovered turns, and the 503 diagnostic fields.",
+    "tests/test_temporal.py: new as_of gap case failed before the fix and passes after.",
+    "check_site.py, public-demo unittests, update_regression_figures --check, ruff check and format --check passed.",
+    "Local browser with a placeholder key: dated preset flow with mocked model responses (payload carries observed_on, progress, as_of, recovery, not-used list, zh/en switching); as_of form against the real local backend; 375px layout without horizontal scroll.",
+    "CI for 8af9f86 and cca3d12: ci (Linux, macOS, Windows after a rerun of a Windows job cancelled before any step ran, lint) and public-demo workflows passed."
+  ],
+  "postdeploy_checks": [
+    "Production and deployment URL: all eight files sha256-matched the repository.",
+    "Production preset 'Fact updates' with real models: both dated writes succeeded; timeline TensorFlow 2024-03-10 -> 2026-09-01 superseded, PyTorch active; the first answer attempt returned 503 llm_unavailable (cause not observable before the diagnostic change); asking again succeeded (1 call, 741 tokens, 17.0 s backend latency) with the correct answer; as_of 2025-01-01 returned TensorFlow; the not-used list showed the superseded TensorFlow fact; raw fallback not triggered."
+  ],
+  "real_model_usage": "One preset (two writes; the second recorded 3 calls / 2,568 tokens), one failed answer attempt, one successful answer (1 call / 741 tokens).",
+  "known_open_issue": "Intermittent 503 on model calls (2 observed on 2026-10-20: one write, one answer). The page and API now report the failure class and provider status, which the next occurrence will name.",
+  "benchmark_scope": "Historical frozen one-shot results and exposed original-test100 regression figures are unchanged; the live visitor session is not a benchmark."
+}

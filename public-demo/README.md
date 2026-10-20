@@ -17,7 +17,16 @@ conditional recovery. Presets contain utterances only, not precomputed facts or 
 
 The Inspector shows extracted facts and their validity intervals, source spans for
 selected memories, and the actual answer-request prompts (including a fallback pass).
-These spans are source references, not independently verified citations. The benchmark
+These spans are source references, not independently verified citations.
+
+A conversation can carry a date (`observed_on` on `/demo/messages`). It is the session
+time — what relative dates resolve against and what `valid_from` records — never a
+fact's event time, and it cannot be in the future. `GET /demo/as_of?at=YYYY-MM-DD` returns
+the facts in force at the end of that day from the stored intervals, with no model call.
+`/demo/answer` also returns the memories the answer did not receive (`not_selected`, with
+`not_current` or `not_ranked`) and the archived turns the raw fallback attached
+(`recovered_turns`). A failed model call is a 503 naming the exception class and the
+provider status, never the provider's body. The benchmark
 section describes separate recorded experiments, not a score for the live visitor data.
 
 Enable on the **backend** only:

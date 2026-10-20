@@ -17,12 +17,13 @@ holds real data and that changes what it needs.
 
 ## B2 · Redeploy the page
 
-The live page was deployed from `11afb07` on 2026-10-20 UTC, a front-end reliability
-update to the live LLM playground first deployed from `606a659`. Its
-[deployment record](public-demo/deployments/20261021-demo-reliability.json) binds the
+The live page was deployed from `cca3d12` on 2026-10-20 UTC: conversation dates,
+`as_of`, answer evidence and 503 diagnostics on the live LLM playground first deployed
+from `606a659`. Its
+[deployment record](public-demo/deployments/20261021-dated-conversations.json) binds the
 eight published files to their hashes and records the checks; the
-[earlier record](public-demo/deployments/20261020-live-memory.json) holds the backend
-and resource checks. All deployment records are retained in `public-demo/deployments/`.
+[first live record](public-demo/deployments/20261020-live-memory.json) holds the backend
+resource checks. All deployment records are retained in `public-demo/deployments/`.
 
 ```bash
 # 1. Check the deploy root is complete and self-consistent. Stdlib only, no install.
