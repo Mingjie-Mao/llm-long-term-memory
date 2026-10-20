@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "deployed_date_utc": "2026-10-20",
+  "verified_at_utc": "2026-10-20T15:24:59.212156+00:00",
+  "provider": "cloudflare-pages",
+  "project": "lltm-memory",
+  "branch": "main",
+  "deployment_id": "13ae6d81",
+  "deployment_url": "https://13ae6d81.lltm-memory.pages.dev",
+  "production_url": "https://lltm-memory.pages.dev",
+  "git_head": "11afb07631f8eff9606f249d98d9e7a3fd220078",
+  "dirty_worktree": false,
+  "deploy_root": "public-demo/site",
+  "note": "Front-end reliability only: waking state, 150 s connect timeout, localized timeout/network/non-JSON errors, session kept after a failed model call, sessionStorage restore on refresh, 404.html. Backend, models, prompts and benchmark results are unchanged.",
+  "files": [
+    {
+      "path": "404.html",
+      "sha256": "aba2017a3b9f7b34bc3923b00bafca4aa1bfd61534e383e88656065b60688732"
+    },
+    {
+      "path": "app.js",
+      "sha256": "80ac63fb8198afa2b9640363087d7542c81bd009078dde5450f44182266152d0"
+    },
+    {
+      "path": "content.js",
+      "sha256": "8a0abc64aaf08a200ea38fe0714928e0ac1f39edc0b624e951542a18fc4def33"
+    },
+    {
+      "path": "index.html",
+      "sha256": "57f86cc168456a7f0ffb9f2adf58915bf24a51a6b1fe77fca6474fd690efe83f"
+    },
+    {
+      "path": "playground.html",
+      "sha256": "f8685c6ab83cbca75c4bae77d69dacd130337f43e4ba5bcbd057d5b8c53d7d90"
+    },
+    {
+      "path": "release.json",
+      "sha256": "a07b3bd272cf27270a7eb9c5af8c7d60b6cc6d57dfd50957083f612148d6ae4b"
+    },
+    {
+      "path": "release.schema.json",
+      "sha256": "43140f5ffecc104848fe0b61d3efe9aff738cbe8826907dd6f9732013eceb6ad"
+    },
+    {
+      "path": "styles.css",
+      "sha256": "dd2208da47bc39a0061fbd07b5f6a1655ae2e64ed16d0ec70d197f210f07d764"
+    }
+  ],
+  "backend": {
+    "provider": "render",
+    "service": "lltm-playground",
+    "url": "https://lltm-playground.onrender.com",
+    "changed": false
+  },
+  "predeploy_checks": [
+    "public-demo/check_site.py passed (8 deploy files).",
+    "python -m unittest discover -s public-demo: 7 tests passed.",
+    "update_regression_figures.py --check and check_release_figures.py passed; ruff check and ruff format --check passed.",
+    "Local browser against demo-api with a placeholder key (no successful model calls): no backend shows a localized network error; waking state counts seconds; HTML 502 shows a localized message; failed model call (provider 400) keeps the session usable and the message in the composer; refresh restores the namespace, memories and conversation number; forged stored token starts a fresh namespace; deletion clears storage; zh/en switch re-renders status and bubbles; 375px dark layout has no horizontal scroll.",
+    "CI for this commit: ci and public-demo workflows passed."
+  ],
+  "postdeploy_checks": [
+    "Production and deployment URL: all eight files fetched and sha256-compared with the repository; all matched.",
+    "Unknown path returns 404.",
+    "Production browser: backend reached ready state; reload kept the same demo token; deletion cleared stored session. No model calls were made in post-deploy checks."
+  ],
+  "known_open_issue": "An intermittent 503 llm_unavailable on the first write was observed on 2026-10-20 before this deploy; its provider-side cause is only in Render logs and is not diagnosed here.",
+  "benchmark_scope": "Historical frozen one-shot results and exposed original-test100 regression figures are unchanged; the live visitor session is not a benchmark."
+}

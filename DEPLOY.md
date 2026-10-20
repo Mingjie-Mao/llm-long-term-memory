@@ -17,11 +17,12 @@ holds real data and that changes what it needs.
 
 ## B2 · Redeploy the page
 
-The live page was deployed from `606a659` on 2026-10-20 UTC, with real LLM extraction
-and t4 answers enabled on the existing Render playground. The
-[deployment record](public-demo/deployments/20261020-live-memory.json) binds the seven
-published files to their hashes and records the functional and resource checks.
-Earlier deployment records are retained in `public-demo/deployments/`.
+The live page was deployed from `11afb07` on 2026-10-20 UTC, a front-end reliability
+update to the live LLM playground first deployed from `606a659`. Its
+[deployment record](public-demo/deployments/20261021-demo-reliability.json) binds the
+eight published files to their hashes and records the checks; the
+[earlier record](public-demo/deployments/20261020-live-memory.json) holds the backend
+and resource checks. All deployment records are retained in `public-demo/deployments/`.
 
 ```bash
 # 1. Check the deploy root is complete and self-consistent. Stdlib only, no install.
