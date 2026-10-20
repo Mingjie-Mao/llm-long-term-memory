@@ -52,6 +52,24 @@ class DeploySurfaceTests(unittest.TestCase):
         with self.assertRaises(AssertionError):
             self.check()
 
+    def test_waking_backend_cannot_be_shown_as_down(self) -> None:
+        path = self.site / "app.js"
+        path.write_text(
+            path.read_text(encoding="utf-8").replace('status("waking"', 'status("down"'),
+            encoding="utf-8",
+        )
+        with self.assertRaisesRegex(AssertionError, "shown as down"):
+            self.check()
+
+    def test_refresh_cannot_lose_the_demo_namespace(self) -> None:
+        path = self.site / "app.js"
+        path.write_text(
+            path.read_text(encoding="utf-8").replace("sessionStorage.setItem", "void "),
+            encoding="utf-8",
+        )
+        with self.assertRaises(AssertionError):
+            self.check()
+
     def test_legacy_backend_cannot_enable_the_live_interface(self) -> None:
         path = self.site / "app.js"
         path.write_text(

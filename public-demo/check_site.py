@@ -10,6 +10,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 SITE = HERE / "site"
 EXPECTED_FILES = {
+    "404.html",
     "app.js",
     "content.js",
     "index.html",
@@ -194,6 +195,11 @@ def main() -> int:
     assert 'result.mode !== "llm"' in app and 'result.answer_profile !== "t4"' in app
     assert "health.llm_enabled" in app, "UI enables generation without a live backend"
     assert "session_id: conversationId()" in app
+    # A sleeping backend is waking, not down, and its HTML error pages are not JSON.
+    assert 'status("waking"' in app, "connecting backend is shown as down"
+    assert 'get("content-type")' in app, "non-JSON backend responses reach the visitor raw"
+    # A refresh must return to the same namespace, and deletion must forget it.
+    assert "sessionStorage.setItem" in app and "sessionStorage.removeItem" in app
     assert "input.prompt" in app and "pre.textContent" in app, "model input is not shown safely"
     css = (SITE / "styles.css").read_text(encoding="utf-8")
     narrow = re.search(r"@media \(max-width: 920px\) \{(?P<body>.*?)\n\}", css, re.DOTALL)

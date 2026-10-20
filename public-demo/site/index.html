@@ -18,16 +18,16 @@
   </div>
 </header>
 <main id="main">
-  <h1 data-zh="看见长期记忆如何形成与变化。" data-en="Live Memory Playground. See memory form and change.">Live Memory Playground. See memory form and change.</h1>
+  <h1 data-zh="看见长期记忆如何形成与变化。" data-en="Live Memory Playground: watch long-term memory form and change.">Live Memory Playground: watch long-term memory form and change.</h1>
   <p class="hero-note" data-zh="自然语言 → 两阶段 LLM 抽取 → 时序记忆 → t4 回答与原文证据。模型不可用时明确报错，不以规则答案替代。" data-en="Natural language → two-stage LLM extraction → temporal memory → t4 answers and source evidence. Unavailable models produce an error, never a rule-based substitute.">Natural language → two-stage LLM extraction → temporal memory → t4 answers and source evidence. Unavailable models produce an error, never a rule-based substitute.</p>
 
   <section class="demo" aria-labelledby="try-title">
     <div class="demo-head">
       <h2 id="try-title" data-zh="与长期记忆交互" data-en="Interact with long-term memory">Interact with long-term memory</h2>
-      <div class="engine-status" id="engineStatus" aria-busy="true">
+      <div class="engine-status" id="engineStatus" data-state="waking" aria-busy="true">
         <span class="dot" aria-hidden="true"></span>
         <span id="statusText" role="status" aria-live="polite">Connecting…</span>
-        <button class="ghost" id="retry" type="button" data-zh="重试" data-en="Retry">Retry</button>
+        <button class="ghost" id="retry" type="button" hidden data-zh="重试" data-en="Retry">Retry</button>
       </div>
     </div>
     <div class="chips" id="scenarios">

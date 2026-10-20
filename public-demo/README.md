@@ -1,7 +1,7 @@
 # Public demo
 
 Source for <https://lltm-memory.pages.dev>. Deploy **only `public-demo/site`**.
-The seven files in that folder are the complete public surface; documentation,
+The eight files in that folder are the complete public surface; documentation,
 Python tools, credentials, datasets and stores stay outside it.
 
 The live LLM playground was enabled on 2026-10-20 UTC. Its
@@ -130,6 +130,6 @@ npx wrangler@4 pages deploy public-demo/site --project-name lltm-memory --branch
 
 Authenticate separately with `npx wrangler@4 login` when needed. Verify that links
 to GitHub evidence already exist on `origin/main` before deploying. The upload
-must contain exactly the seven files checked by `check_site.py`.
+must contain exactly the eight files checked by `check_site.py`.
 
 The repository's Inspector is a separate authenticated tool, not this public demo.
