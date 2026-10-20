@@ -312,6 +312,14 @@ def test_fallback_inputs_are_the_actual_second_model_request(live):
     assert len(data["model_inputs"]) == 2
     assert data["model_inputs"][1]["prompt"] == provider.requests[-1]["prompt"]
     assert "VX-928173" in data["model_inputs"][1]["prompt"]
+    assert data["fallback_level"] != "none"
+    assert data["recovered_turns"] == [
+        {
+            "session_id": "conversation-1",
+            "turn_index": 0,
+            "text": "I live in Canberra; my booking reference is VX-928173.",
+        }
+    ]
 
 
 def test_onnx_product_attach_configures_finite_sdk_transport_without_a_model_call(
@@ -443,3 +451,149 @@ def test_precise_observation_does_not_override_stated_event_date(live):
     assert memory.event_time.date().isoformat() == "2020-01-10"
     assert memory.observed_at.year >= 2026
     assert memory.event_time != memory.observed_at
+
+
+def framework_replies(value, op="coexists", target=""):
+    return [
+        {
+            "sessions": [
+                {
+                    "session_index": 0,
+                    "facts": [
+                        {
+                            "content": f"The user uses {value} for personal projects.",
+                            "source_role": "user",
+                            "subject": "user",
+                            "scope": "profile",
+                        }
+                    ],
+                }
+            ]
+        },
+        {
+            "facts": [
+                {
+                    "index": 0,
+                    "temporal_key": "uses_framework",
+                    "object": value,
+                    "update_op": op,
+                    "target_object": target,
+                }
+            ]
+        },
+    ]
+
+
+def dated_write(http, header, content, session, request_id, observed_on):
+    return http.post(
+        "/demo/messages",
+        headers=header,
+        json={
+            "content": content,
+            "session_id": session,
+            "request_id": request_id,
+            "observed_on": observed_on,
+        },
+    )
+
+
+def timeline_shape(http, header):
+    rows = http.get("/demo/memories", headers=header).json()
+    memories = rows["active"] + rows["superseded"]
+    names = {m["id"]: m["object"] for m in memories}
+    return sorted(
+        (
+            m["object"],
+            m["status"],
+            names.get(m["superseded_by"]),
+            (m["valid_to"] or "")[:10],
+            m["observed_at"][:10],
+        )
+        for m in memories
+    )
+
+
+def test_dated_conversations_converge_out_of_order_and_answer_as_of(live):
+    _, _, provider, http, header = live
+    old = ("I use TensorFlow for my personal projects.", "conversation-1", "2024-03-10")
+    new = ("I switched from TensorFlow to PyTorch.", "conversation-2", "2026-09-01")
+
+    provider.replies.extend(framework_replies("TensorFlow"))
+    assert dated_write(http, header, *old[:2], "a1", old[2]).status_code == 200
+    provider.replies.extend(framework_replies("PyTorch", "replaces", "TensorFlow"))
+    provider.replies.append({"verdict": "UPDATE", "reason": "The user switched."})
+    assert dated_write(http, header, *new[:2], "a2", new[2]).status_code == 200
+
+    reverse = {"x-demo-token": http.post("/demo/session").json()["token"]}
+    provider.replies.extend(framework_replies("PyTorch", "replaces", "TensorFlow"))
+    assert dated_write(http, reverse, *new[:2], "b1", new[2]).status_code == 200
+    provider.replies.extend(framework_replies("TensorFlow"))
+    provider.replies.append({"verdict": "DISTINCT", "reason": "An earlier framework."})
+    assert dated_write(http, reverse, *old[:2], "b2", old[2]).status_code == 200
+
+    chronological = timeline_shape(http, header)
+    assert chronological == timeline_shape(http, reverse)
+    assert chronological == [
+        ("PyTorch", "active", None, "", "2026-09-01"),
+        ("TensorFlow", "superseded", "PyTorch", "2026-09-01", "2024-03-10"),
+    ]
+    for token in (header, reverse):
+
+        def held(day, token=token):
+            response = http.get("/demo/as_of", headers=token, params={"at": day})
+            assert response.status_code == 200, response.text
+            return [m["object"] for m in response.json()["memories"]]
+
+        assert held("2023-12-31") == []
+        assert held("2025-01-01") == ["TensorFlow"]
+        assert held("2026-10-01") == ["PyTorch"]
+
+
+def test_conversation_dates_are_validated_before_calls_and_bound_to_the_write_key(live):
+    _, _, provider, http, header = live
+    future = (datetime.now() + timedelta(days=2)).date().isoformat()
+    response = dated_write(http, header, "I live in Canberra.", "conversation-1", "k1", future)
+    assert response.status_code == 422
+    assert provider.requests == []
+    provider.replies.extend(fact_replies("Canberra"))
+    assert (
+        dated_write(http, header, "I live in Canberra.", "conversation-1", "k1", "2025-05-01")
+    ).status_code == 200
+    # The same key with another date is another request, not a replay of the first.
+    moved = dated_write(http, header, "I live in Canberra.", "conversation-1", "k1", "2025-06-01")
+    assert moved.status_code == 409
+    assert len(provider.requests) == 2
+
+
+def test_as_of_and_answer_exclusions_stay_inside_the_namespace(live):
+    _, _, provider, http, header = live
+    provider.replies.extend(fact_replies("SecretCity"))
+    assert (
+        dated_write(http, header, "I live in SecretCity.", "conversation-1", "s1", "2025-01-01")
+    ).status_code == 200
+    other = {"x-demo-token": http.post("/demo/session").json()["token"]}
+    response = http.get("/demo/as_of", headers=other, params={"at": "2026-01-01"})
+    assert response.status_code == 200 and response.json()["memories"] == []
+    assert http.get("/demo/as_of", params={"at": "2026-01-01"}).status_code == 401
+    provider.replies.append({"status": "no_evidence", "answer": "I do not know."})
+    answer = http.post("/demo/answer", headers=other, json={"query": "Where do I live?"})
+    assert answer.status_code == 200
+    assert answer.json()["not_selected"] == []
+    assert "SecretCity" not in json.dumps(answer.json())
+
+
+def test_answer_lists_the_memories_it_did_not_receive(live):
+    _, _, provider, http, header = live
+    provider.replies.extend(fact_replies("Canberra"))
+    assert write(http, header, "I live in Canberra.").status_code == 200
+    provider.replies.extend(fact_replies("Melbourne"))
+    provider.replies.append({"verdict": "UPDATE", "reason": "The user moved."})
+    assert (
+        write(http, header, "I moved to Melbourne.", session="conversation-2", request_id="r2")
+    ).status_code == 200
+    provider.replies.append({"status": "answer", "answer": "Melbourne.", "notes": "source"})
+    payload = http.post("/demo/answer", headers=header, json={"query": "Where do I live?"}).json()
+    selected = {item["id"] for item in payload["selected"]}
+    excluded = {row["object"]: row["reason"] for row in payload["not_selected"]}
+    assert excluded == {"Canberra": "not_current"}
+    assert not selected & {row["id"] for row in payload["not_selected"]}

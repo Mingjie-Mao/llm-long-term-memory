@@ -41,7 +41,7 @@ from llm_long_term_memory.runtime.context import (
     TEMPORAL_NOTE,
     render_context,
 )
-from llm_long_term_memory.store import Memory, MemoryStore, VectorIndex
+from llm_long_term_memory.store import Memory, MemoryStore, VectorIndex, external_session_id
 
 __all__ = ["ANSWER_PROFILES", "TEMPORAL_NOTE", "AnswerEngine", "render_context"]
 
@@ -314,6 +314,13 @@ class AnswerEngine:
                 "answer_mode": answer_mode,
                 "answer_status": verdict.status if verdict else None,
                 "fallback_level": evidence.level if evidence else "none",
+                # Which archived turns the fallback attached, so a caller can show them.
+                # Reporting only: the answer and its prompt are unchanged.
+                "fallback_reason": evidence.reason if evidence and evidence.used else None,
+                "fallback_turns": [
+                    f"{external_session_id(t.session_id)}:{t.turn_index}"
+                    for t in (evidence.turns if evidence else [])
+                ],
                 "candidates_considered": len(trace.candidate_ids),
                 "retrieval_latency_ms": retrieval_ms,
                 "hydrated_memory_ids": [item.memory_id for item in hydration.evidence],

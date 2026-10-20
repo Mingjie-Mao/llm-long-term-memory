@@ -193,10 +193,15 @@ function emptyState(id, zh, en, tag = "p") {
   $(id).append(element);
 }
 function clearInspector() {
-  for (const id of ["chat", "memoryState", "sources", "modelInputs"]) $(id).replaceChildren();
+  for (const id of ["chat", "memoryState", "sources", "modelInputs", "asOfState", "recovery", "notSelected"]) $(id).replaceChildren();
   $("usage").textContent = "";
+  $("progress").textContent = "";
+  delete $("progress").dataset.zh;
+  delete $("progress").dataset.en;
   emptyState("memoryState", "保存一段话后查看抽取事实。", "Save a message to inspect extracted facts.", "li");
+  emptyState("asOfState", "选一个日期，查看那天结束时成立的事实。只读取已存的时间区间，不调用模型。", "Pick a date to see the facts in force at the end of that day. Reads stored intervals only; no model call.", "li");
   emptyState("sources", "提问后查看选中的来源。", "Ask a question to inspect selected sources.");
+  emptyState("notSelected", "提问后展示。", "Shown after a question.", "li");
 }
 async function freshSession() {
   // Delete before replacing the credential; a failed deletion keeps the old token.
@@ -256,29 +261,105 @@ async function connect() {
 // Server timestamps carry microseconds; seconds are kept because demo writes land
 // seconds apart and the order is the point. The raw value stays in the tooltip.
 const when = (value) => value ? String(value).replace("T", " ").replace(/\.\d+$/, "") : "?";
+const day = (value) => value ? String(value).slice(0, 10) : "?";
+// The visitor's calendar date, which is what a date input shows and compares against.
+const today = () => { const d = new Date(); return new Date(d - d.getTimezoneOffset() * 60000).toISOString().slice(0, 10); };
+// `tag` is plain text, or a [zh, en] pair that follows language switches.
+function factRow(memory, tag) {
+  const li = document.createElement("li");
+  li.className = `row ${memory.status}`;
+  const key = document.createElement("code");
+  key.textContent = `${memory.predicate || "fact"} = ${memory.object || memory.content}`;
+  const label = document.createElement("span");
+  label.className = "tag";
+  if (Array.isArray(tag)) [label.dataset.zh, label.dataset.en] = tag;
+  label.textContent = Array.isArray(tag) ? t(...tag) : tag;
+  li.append(key, label);
+  return li;
+}
 function renderMemories(memories) {
   $("memoryState").replaceChildren();
   if (!memories.length) emptyState("memoryState", "本次未抽取到事实。", "No facts extracted yet.", "li");
-  for (const memory of [...memories].sort((a, b) => String(a.valid_from || "").localeCompare(String(b.valid_from || "")))) {
-    const li = document.createElement("li");
-    li.className = `row ${memory.status}`;
-    const key = document.createElement("code");
-    key.textContent = `${memory.predicate || "fact"} = ${memory.object || memory.content}`;
-    const label = document.createElement("span");
-    label.className = "tag";
-    label.textContent = `${memory.status}${memory.scope ? " · " + memory.scope : ""}`;
-    const time = document.createElement("small");
-    time.className = "origin-note";
-    time.textContent = `${memory.session_id || ""} · ${when(memory.valid_from)} → ${memory.valid_to ? when(memory.valid_to) : (memory.status === "active" ? t("至今", "present") : "—")}`;
-    time.title = `valid_from=${memory.valid_from || ""} valid_to=${memory.valid_to || ""}`;
+  const start = (m) => m.occurred_at || m.valid_from || "";
+  for (const memory of [...memories].sort((a, b) => String(start(a)).localeCompare(String(start(b))))) {
+    const li = factRow(memory, `${memory.status}${memory.scope ? " · " + memory.scope : ""}`);
     const fact = document.createElement("small");
     fact.className = "origin-note";
     fact.textContent = memory.content;
-    li.append(key, label, fact, time);
+    // The interval the timeline uses runs from the fact's own time; the conversation it
+    // was said in is shown separately when the two differ.
+    const time = document.createElement("small");
+    time.className = "origin-note";
+    const end = memory.valid_to ? when(memory.valid_to) : (memory.status === "active" ? t("至今", "present") : "—");
+    const said = memory.observed_at && day(memory.observed_at) !== day(start(memory))
+      ? t(` · 说于 ${day(memory.observed_at)}`, ` · said ${day(memory.observed_at)}`) : "";
+    time.textContent = `${memory.session_id || ""} · ${when(start(memory))} → ${end}${said}`;
+    time.title = `occurred_at=${memory.occurred_at || ""} observed_at=${memory.observed_at || ""} valid_from=${memory.valid_from || ""} valid_to=${memory.valid_to || ""}`;
+    li.append(fact, time);
     $("memoryState").append(li);
   }
 }
+function renderAsOf(results) {
+  $("asOfState").replaceChildren();
+  for (const { at, memories } of results) {
+    const head = document.createElement("li");
+    head.className = "as-of-day";
+    head.textContent = at;
+    $("asOfState").append(head);
+    if (!memories.length) emptyState("asOfState", "那天还没有已知事实。", "Nothing known yet on that day.", "li");
+    for (const memory of memories) $("asOfState").append(factRow(memory, [`自 ${day(memory.occurred_at || memory.valid_from)}`, `since ${day(memory.occurred_at || memory.valid_from)}`]));
+  }
+}
+async function showAsOf(dates) {
+  const results = [];
+  for (const at of dates) results.push(await api("GET", `/demo/as_of?at=${encodeURIComponent(at)}`));
+  renderAsOf(results);
+}
+function renderRecovery(data) {
+  $("recovery").replaceChildren();
+  const summary = document.createElement("p");
+  summary.className = "recovery";
+  const selected = data.memories_selected ?? (data.selected || []).length;
+  const level = data.fallback_level || "none";
+  const recovered = data.recovered_turns || [];
+  let zh = `结构化记忆：选中 ${selected} 条（候选 ${data.candidates_considered ?? "?"} 条）。`;
+  let en = `Structured memory: ${selected} selected of ${data.candidates_considered ?? "?"} candidates. `;
+  if (level === "none") {
+    zh += "原文回退：未触发，结构化记忆已足够回答。";
+    en += "Raw fallback: not triggered; structured memory was enough.";
+  } else if (recovered.length) {
+    summary.classList.add("used");
+    zh += `原文回退：已触发（${level}），从对话存档恢复了 ${recovered.length} 段原话，再次请求模型。`;
+    en += `Raw fallback: triggered (${level}); ${recovered.length} archived ${recovered.length === 1 ? "turn was" : "turns were"} recovered and the model was asked again.`;
+  } else {
+    summary.classList.add("used");
+    zh += `原文回退：已触发（${level}），但没有找到新的原话。`;
+    en += `Raw fallback: triggered (${level}), but no new archived turn was found.`;
+  }
+  [summary.dataset.zh, summary.dataset.en] = [zh, en];
+  summary.textContent = t(zh, en);
+  $("recovery").append(summary);
+  for (const turn of recovered) {
+    const p = document.createElement("p");
+    p.className = "evidence-card";
+    const body = `${turn.session_id} · turn ${turn.turn_index}: ${turn.text}`;
+    [p.dataset.zh, p.dataset.en] = [`恢复的原话 · ${body}`, `Recovered · ${body}`];
+    p.textContent = t(p.dataset.zh, p.dataset.en);
+    $("recovery").append(p);
+  }
+}
+function renderNotSelected(rows) {
+  $("notSelected").replaceChildren();
+  if (!rows.length) emptyState("notSelected", "所有记忆都进入了本次回答。", "Every memory reached this answer.", "li");
+  const reasons = {
+    not_current: ["已被替代或结束，不作为当前事实", "replaced or ended; not current"],
+    not_ranked: ["当前有效，但没有排进本次上下文", "current, but not ranked into this context"],
+  };
+  for (const row of rows) $("notSelected").append(factRow(row, reasons[row.reason] || row.reason));
+}
 function renderAnswer(data) {
+  renderRecovery(data);
+  renderNotSelected(data.not_selected || []);
   $("sources").replaceChildren();
   if (!(data.selected_sources || []).length) emptyState("sources", "没有选中结构化记忆；原文恢复见下方实际请求。", "No structured memory selected; see the request below for raw recovery.");
   for (const item of data.selected_sources || []) {
@@ -301,14 +382,23 @@ function renderAnswer(data) {
 }
 function renderUsage(data) {
   const used = data.usage || {};
+  const seconds = data.latency_ms ? ` · ${(data.latency_ms / 1000).toFixed(1)}s` : "";
   $("usage").textContent = t(
-    `本步模型调用 ${used.total_requests || 0} 次，已记录 ${used.total_tokens || 0} tokens。额度按保守预留计量，重试与失败也占额度。`,
-    `This step: ${used.total_requests || 0} model calls, ${used.total_tokens || 0} recorded tokens. Capacity is conservatively reserved; retries and failures consume it too.`,
+    `本步模型调用 ${used.total_requests || 0} 次，已记录 ${used.total_tokens || 0} tokens${seconds}。额度按保守预留计量，重试与失败也占额度。`,
+    `This step: ${used.total_requests || 0} model calls, ${used.total_tokens || 0} recorded tokens${seconds}. Capacity is conservatively reserved; retries and failures consume it too.`,
   );
 }
+// Today is sent as no date, so the server's own clock decides it; a visitor ahead of
+// the server's timezone would otherwise be told their today is in the future.
+function conversationDate() {
+  const value = $("conversationDate").value;
+  return value && value !== today() ? value : null;
+}
 async function remember(content) {
-  if (!pendingWrite || pendingWrite.content !== content || pendingWrite.session_id !== conversationId()) {
-    pendingWrite = { content, session_id: conversationId(), request_id: crypto.randomUUID() };
+  const observed = conversationDate();
+  if (!pendingWrite || pendingWrite.content !== content || pendingWrite.session_id !== conversationId()
+      || (pendingWrite.observed_on || null) !== observed) {
+    pendingWrite = { content, session_id: conversationId(), request_id: crypto.randomUUID(), ...(observed ? { observed_on: observed } : {}) };
   }
   const result = await api("POST", "/demo/messages", pendingWrite);
   pendingWrite = null;
@@ -338,19 +428,56 @@ async function action(work) {
     if (error.key === "expired" || error.key === "capacity") { ready = false; status("down", pairOf(error)); }
   } finally { busy = false; controls(); }
 }
+// Progress the page can actually know: which request is running and for how long. The
+// backend does one synchronous request per step, so finer stages would be invented.
+let progressTimer = null;
+function progress(step, total, label) {
+  clearInterval(progressTimer);
+  delete $("progress").dataset.zh;
+  delete $("progress").dataset.en;
+  const started = Date.now();
+  const render = () => {
+    const seconds = Math.round((Date.now() - started) / 1000);
+    $("progress").textContent = `${t("步骤", "Step")} ${step}/${total} · ${t(...label)} · ${seconds}s`;
+  };
+  render();
+  progressTimer = setInterval(render, 1000);
+}
+function progressDone(started) {
+  clearInterval(progressTimer);
+  const seconds = Math.round((Date.now() - started) / 1000);
+  const element = $("progress");
+  [element.dataset.zh, element.dataset.en] = [`完成 · 共 ${seconds}s`, `Done · ${seconds}s total`];
+  element.textContent = t(element.dataset.zh, element.dataset.en);
+}
 async function runLiveScenario(name) {
+  const scenario = SCENARIOS[name];
+  const started = Date.now();
+  const total = scenario.turns.length + 1;
   await action(async () => {
     await freshSession();
-    for (const text of SCENARIOS[name].turns) {
-      say("user", text);
-      await remember(text);
-      conversation += 1;
-      save();
-      title();
+    try {
+      for (const [i, turn] of scenario.turns.entries()) {
+        const { text, on } = typeof turn === "string" ? { text: turn } : turn;
+        $("conversationDate").value = on || "";
+        progress(i + 1, total, [`写入对话 ${conversation}${on ? `（${on}）` : ""}：抽取与时间线`, `Writing conversation ${conversation}${on ? ` (${on})` : ""}: extraction and timeline`]);
+        say("user", on ? `[${on}] ${text}` : text);
+        await remember(text);
+        conversation += 1;
+        save();
+        title();
+      }
+      $("conversationDate").value = "";
+      progress(total, total, ["检索与回答", "Retrieval and answer"]);
+      say("user", scenario.question);
+      await ask(scenario.question);
+      if (scenario.asOf) await showAsOf(scenario.asOf);
+      progressDone(started);
+    } catch (error) {
+      clearInterval(progressTimer);
+      $("progress").textContent = "";
+      throw error;
     }
-    const query = SCENARIOS[name].question;
-    say("user", query);
-    await ask(query);
   });
 }
 $("messageForm").addEventListener("submit", (event) => {
@@ -366,6 +493,7 @@ $("messageForm").addEventListener("submit", (event) => {
 });
 $("newConversation").addEventListener("click", () => {
   conversation += 1; pendingWrite = null; save(); title(); $("chat").replaceChildren();
+  $("conversationDate").value = "";
 });
 $("deleteSession").addEventListener("click", async () => {
   if (!token || busy) return;
@@ -378,9 +506,15 @@ $("deleteSession").addEventListener("click", async () => {
   finally { busy = false; controls(); }
 });
 for (const button of document.querySelectorAll("[data-live]")) button.addEventListener("click", () => runLiveScenario(button.dataset.live));
+$("asOfForm").addEventListener("submit", (event) => {
+  event.preventDefault();
+  const at = $("asOfDate").value;
+  if (at) action(() => showAsOf([at]));
+});
 $("retry").addEventListener("click", connect);
 $("bzh").addEventListener("click", () => { lang = "zh"; applyLanguage(); });
 $("ben").addEventListener("click", () => { lang = "en"; applyLanguage(); });
+for (const id of ["conversationDate", "asOfDate"]) $(id).max = today();
 const saved = loadSaved();
 if (saved) ({ token, conversation } = saved);
 applyLanguage();

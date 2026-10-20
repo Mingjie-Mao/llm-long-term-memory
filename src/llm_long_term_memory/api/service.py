@@ -62,14 +62,21 @@ class IdempotencyConflict(RuntimeError):
 PENDING_WRITE_TAKEOVER = timedelta(minutes=15)
 
 
-def _request_fingerprint(role: str, content: str, session_id: str | None) -> str:
+def _request_fingerprint(
+    role: str, content: str, session_id: str | None, observed_at: datetime | None = None
+) -> str:
     """What the key was claimed for.
 
     Everything that changes what gets written, and nothing that does not: the same message
     retried into the same session is the same request whatever its transport details. A
     hash rather than the body itself, because this is stored and the body is user content.
+    The conversation time changes every interval the write produces, so it is part of
+    the request; it is left out when absent so keys claimed before it existed still match.
     """
-    payload = json.dumps([role, content, session_id], ensure_ascii=False, sort_keys=True)
+    fields = [role, content, session_id]
+    if observed_at is not None:
+        fields.append(observed_at.isoformat())
+    payload = json.dumps(fields, ensure_ascii=False, sort_keys=True)
     return hashlib.sha256(payload.encode("utf-8")).hexdigest()
 
 
@@ -779,6 +786,19 @@ class MemoryService:
         return sorted(chain, key=lambda m: (m.valid_from or m.ingested_at or datetime.min, m.id))
 
     @_synchronised
+    def state_as_of(self, user_id: str, when: datetime) -> list[Memory]:
+        """The facts in force at `when`, from the intervals the resolver wrote.
+
+        Reads stored intervals only: no model call and no re-resolution, so it shows the
+        timeline the answer path sees rather than a second opinion of it.
+        """
+        from llm_long_term_memory.temporal import as_of
+
+        self._require_namespace(user_id)
+        held = as_of(list(self.store.iter_all(user_id)), when)
+        return sorted(held, key=lambda m: (m.occurred_at or datetime.min, m.id))
+
+    @_synchronised
     def evidence(self, user_id: str, memory_id: str) -> dict[str, Any] | None:
         """The source turn a memory was extracted from, with its span."""
         memory = self.get(user_id, memory_id)
@@ -835,8 +855,14 @@ class MemoryService:
         content: str,
         session_id: str | None = None,
         idempotency_key: str | None = None,
+        observed_at: datetime | None = None,
     ) -> dict[str, Any]:
         """Persist one turn and extract memories from it.
+
+        `observed_at` is when the conversation took place, for a message written after the
+        fact (an import, or a demo replaying a dated conversation). It is the session
+        time — what relative dates resolve against and what `valid_from` records — and
+        never the event time a fact states. Omitted, it is now.
 
         Requires an extractor, which requires an API key. Read-only deployments can
         run the whole service without one.
@@ -867,7 +893,9 @@ class MemoryService:
         self._require_extractor()
         if idempotency_key is not None:
             replay = self._claim_write_key(
-                user_id, idempotency_key, _request_fingerprint(role, content, session_id)
+                user_id,
+                idempotency_key,
+                _request_fingerprint(role, content, session_id, observed_at),
             )
             if replay is not None:
                 return replay
@@ -888,7 +916,7 @@ class MemoryService:
             raise
         started = self._provider_attempts()
         try:
-            reply = self._add_message(user_id, role, content, session_id)
+            reply = self._add_message(user_id, role, content, session_id, observed_at)
         except Exception as failure:
             # Charged for what reached the provider; see `_charge_write`. A budget that
             # excused failures is one a retry loop walks straight through, and a retry loop
@@ -1085,13 +1113,18 @@ class MemoryService:
         ]
 
     def _add_message(
-        self, user_id: str, role: str, content: str, session_id: str | None
+        self,
+        user_id: str,
+        role: str,
+        content: str,
+        session_id: str | None,
+        observed_at: datetime | None = None,
     ) -> dict[str, Any]:
         """The write itself, with no idempotency or budget bookkeeping.
 
         Expects `_require_extractor` to have run; `add_message` calls it before claiming.
         """
-        now = datetime.now()
+        now = observed_at or datetime.now()
         external_id = session_id or f"s_{uuid.uuid4().hex[:12]}"
         session_id = scoped_session_id(user_id, external_id)
         existing = self.store.get_session(session_id)

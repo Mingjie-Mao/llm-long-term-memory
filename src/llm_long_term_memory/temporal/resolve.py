@@ -217,9 +217,15 @@ def as_of(memories: list[Memory], when: datetime) -> list[Memory]:
     The query the baselines cannot answer at all: "what framework was I using in
     April?" needs the interval a fact held, not just whether it is current.
     """
+    # The interval starts at `occurred_at`, not `valid_from`. The resolver closes a
+    # predecessor at its successor's `occurred_at`, while `valid_from` stays the
+    # conversation time. Starting at `valid_from` left a gap whenever a fact stated an
+    # earlier time than the conversation: "I moved to Sydney two months ago", said in
+    # March, ended the old city in January and began Sydney in March, so nothing held
+    # in February.
     out = []
     for m in memories:
-        start = m.valid_from or m.occurred_at
+        start = m.occurred_at or m.valid_from
         if start is None or start > when:
             continue
         if m.valid_to is not None and m.valid_to <= when:

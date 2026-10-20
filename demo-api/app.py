@@ -19,7 +19,7 @@ import time
 import uuid
 from collections import defaultdict, deque
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 from functools import wraps
 from itertools import pairwise
 from pathlib import Path
@@ -447,7 +447,11 @@ def health(p: Playground = Depends(engine)) -> dict[str, Any]:
             "answer_profile": "t4" if p.service else None,
             "llm_limits": p.live_client.limits() if p.live_client else None,
             "encoder": p.encoder_id,
-            "capabilities": (["llm_extract", "llm_answer", "model_inputs"] if p.service else [])
+            "capabilities": (
+                ["llm_extract", "llm_answer", "model_inputs", "conversation_dates", "as_of"]
+                if p.service
+                else []
+            )
             + [
                 "add_fact",
                 "supersession",
@@ -507,6 +511,10 @@ def _serialise(m: Memory) -> dict[str, Any]:
         "status": m.status,
         "superseded_by": m.superseded_by,
         "event_time": m.event_time.isoformat() if m.event_time else None,
+        # When it was said, and the start the timeline orders by: the stated event time,
+        # else the conversation time. They differ for "I moved here two months ago".
+        "observed_at": m.observed_at.isoformat() if m.observed_at else None,
+        "occurred_at": m.occurred_at.isoformat() if m.occurred_at else None,
         "valid_from": m.valid_from.isoformat() if m.valid_from else None,
         "valid_to": m.valid_to.isoformat() if m.valid_to else None,
         "replaces_previous": m.replaces_previous,
@@ -753,6 +761,25 @@ class LiveMessageIn(BaseModel):
     content: str = Field(min_length=1, max_length=MAX_CHARS)
     session_id: str = Field(min_length=1, max_length=100)
     request_id: str = Field(min_length=1, max_length=100)
+    # The day the conversation took place, for replaying a dated conversation. It is the
+    # session time, never a fact's event time; omitted, the conversation is today.
+    observed_on: date | None = None
+
+
+def _conversation_time(observed_on: date | None) -> datetime | None:
+    """The visitor picks the day; the time of day is the real one.
+
+    Keeping the wall-clock time preserves the order of messages written on one chosen
+    day, which a fixed midnight would turn into ties the resolver cannot order.
+    """
+    if observed_on is None:
+        return None
+    now = datetime.now()
+    if observed_on > now.date():
+        raise HTTPException(422, "A conversation date cannot be in the future.")
+    if observed_on.year < 1900:
+        raise HTTPException(422, "A conversation date must be 1900 or later.")
+    return datetime.combine(observed_on, now.time())
 
 
 class LiveQuestionIn(BaseModel):
@@ -798,6 +825,7 @@ def extract_message(
         scoped_session_id(ns, message.session_id)
     except ValueError:
         raise HTTPException(422, "Invalid conversation identity.") from None
+    observed_at = _conversation_time(message.observed_on)
     turns = p.store._conn.execute(
         "SELECT COUNT(*) FROM turns JOIN sessions ON turns.session_id=sessions.id "
         "WHERE sessions.user_id=?",
@@ -813,6 +841,7 @@ def extract_message(
                 message.content,
                 message.session_id,
                 idempotency_key=message.request_id,
+                observed_at=observed_at,
             )
             return {
                 "mode": "llm",
@@ -828,6 +857,60 @@ def extract_message(
             }
     except Exception as exc:
         _live_failure(exc)
+
+
+def _not_selected(p: Playground, ns: str, selected: set[str]) -> list[dict[str, Any]]:
+    """The namespace's memories this answer did not receive, and why.
+
+    Derived from the answer's own selection rather than a second retrieval, so it
+    explains this run. A retired fact is excluded by the timeline before ranking; an
+    active one simply did not rank into the answer's context.
+    """
+    rows = []
+    for m in p.store.iter_all(ns):
+        if m.id in selected:
+            continue
+        rows.append(
+            {
+                **_serialise(m),
+                "reason": "not_current" if m.status != "active" else "not_ranked",
+            }
+        )
+    return rows
+
+
+def _recovered_turns(p: Playground, ns: str, refs: list[str]) -> list[dict[str, Any]]:
+    """The archived turns the raw fallback attached, as text the visitor can read.
+
+    The answer reports them as `conversation:turn` references. Each is resolved inside
+    this namespace only; a reference that does not resolve here is dropped, not looked
+    up elsewhere.
+    """
+    turns = []
+    for ref in refs:
+        external, _, index = str(ref).rpartition(":")
+        try:
+            session = scoped_session_id(ns, external)
+            wanted = int(index)
+        except ValueError:
+            continue
+        for turn in p.store.turns_for_session(session):
+            if turn.turn_index == wanted:
+                turns.append({"session_id": external, "turn_index": wanted, "text": turn.content})
+    return turns
+
+
+@app.get("/demo/as_of")
+@locked_endpoint
+def state_as_of(
+    at: date,
+    ns: str = Depends(session_namespace),
+    p: Playground = Depends(engine),
+) -> dict[str, Any]:
+    """Which facts were in force at the end of a given day. No model is called."""
+    service, _ = _live(p)
+    held = service.state_as_of(ns, datetime.combine(at, datetime.max.time()))
+    return {"at": at.isoformat(), "memories": [_serialise(m) for m in held]}
 
 
 @app.post("/demo/answer")
@@ -859,6 +942,8 @@ def generate_answer(
                 # Exact provider-bound answer prompts, including any fallback pass.
                 # These are transient and cleared from the client after the response.
                 "model_inputs": [dict(item) for item in client.inputs],
+                "not_selected": _not_selected(p, ns, {item["id"] for item in result["selected"]}),
+                "recovered_turns": _recovered_turns(p, ns, result.get("fallback_turns") or []),
                 "usage": client.usage.summary(),
                 "capacity_reserved": client.reserved(ns),
                 "capacity_limits": client.limits(),

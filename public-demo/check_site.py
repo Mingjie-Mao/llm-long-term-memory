@@ -200,6 +200,10 @@ def main() -> int:
     assert 'get("content-type")' in app, "non-JSON backend responses reach the visitor raw"
     # A refresh must return to the same namespace, and deletion must forget it.
     assert "sessionStorage.setItem" in app and "sessionStorage.removeItem" in app
+    # Dated conversations are the session time sent to the extractor, and as_of reads
+    # stored intervals; neither may be computed in the page.
+    assert "observed_on" in app and "/demo/as_of" in app, "conversation dates or as_of missing"
+    assert "recovered_turns" in app and "not_selected" in app, "answer evidence is not shown"
     assert "input.prompt" in app and "pre.textContent" in app, "model input is not shown safely"
     css = (SITE / "styles.css").read_text(encoding="utf-8")
     narrow = re.search(r"@media \(max-width: 920px\) \{(?P<body>.*?)\n\}", css, re.DOTALL)

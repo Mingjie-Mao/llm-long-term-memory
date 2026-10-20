@@ -316,6 +316,24 @@ def test_as_of_returns_what_was_true_then(store):
     assert as_of(everything, datetime(2022, 1, 1)) == []
 
 
+def test_as_of_has_no_gap_when_a_fact_states_an_earlier_time_than_its_conversation(store):
+    canberra = fact("old", "Canberra", 1, predicate="lives_in")
+    # Said in March: "I moved to Sydney two months ago". The event is January-ish; the
+    # conversation, and therefore valid_from, is March.
+    sydney = fact("new", "Sydney", 3, predicate="lives_in")
+    sydney.event_time = datetime(2023, 1, 15)
+    sydney.observed_at = datetime(2023, 3, 15)
+    sydney.valid_from = datetime(2023, 3, 15)
+    store.add_memories([canberra, sydney])
+    TemporalResolver(store).resolve_all("u1")
+
+    everything = store.find_by_predicate("u1", "user", "lives_in", include_superseded=True)
+    assert [m.object for m in as_of(everything, datetime(2023, 1, 10))] == ["Canberra"]
+    # Between the stated move and the conversation that reported it.
+    assert [m.object for m in as_of(everything, datetime(2023, 2, 1))] == ["Sydney"]
+    assert [m.object for m in as_of(everything, datetime(2023, 4, 1))] == ["Sydney"]
+
+
 def test_resolve_memories_only_touches_keys_in_the_batch(store):
     store.add_memories(
         [
