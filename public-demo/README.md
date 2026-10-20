@@ -4,6 +4,10 @@ Source for <https://lltm-memory.pages.dev>. Deploy **only `public-demo/site`**.
 The seven files in that folder are the complete public surface; documentation,
 Python tools, credentials, datasets and stores stay outside it.
 
+The live LLM playground was enabled on 2026-10-20 UTC. Its
+[deployment record](deployments/20261020-live-memory.json) includes the published
+file hashes and the scope of the real-provider and resource checks.
+
 ## Live Memory Playground
 
 The page sends raw natural language to `POST /demo/messages`, which uses the product's

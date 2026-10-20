@@ -1,6 +1,6 @@
 # Deploying
 
-Two things get deployed and they are not the same thing.
+Three components have different deployment requirements.
 
 | | what it is | where | holds data? |
 |---|---|---|---|
@@ -17,9 +17,11 @@ holds real data and that changes what it needs.
 
 ## B2 · Redeploy the page
 
-The live page was deployed from `12f1536` on 2026-10-08
-(`public-demo/deployments/20261008T155407Z.json`). One earlier deployment, `61a91b6a`
-from `4f06c77` on 2026-09-25, went out without a record; record every deploy as below.
+The live page was deployed from `606a659` on 2026-10-20 UTC, with real LLM extraction
+and t4 answers enabled on the existing Render playground. The
+[deployment record](public-demo/deployments/20261020-live-memory.json) binds the seven
+published files to their hashes and records the functional and resource checks.
+Earlier deployment records are retained in `public-demo/deployments/`.
 
 ```bash
 # 1. Check the deploy root is complete and self-consistent. Stdlib only, no install.

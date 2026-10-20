@@ -1,0 +1,76 @@
+{
+  "schema_version": 1,
+  "deployed_date_utc": "2026-10-20",
+  "verified_at_utc": "2026-10-20T13:01:56.940176+00:00",
+  "provider": "cloudflare-pages",
+  "project": "lltm-memory",
+  "branch": "main",
+  "deployment_id": "ac721ebd-5559-4b8f-8ab7-bc3fccea48e6",
+  "deployment_url": "https://ac721ebd.lltm-memory.pages.dev",
+  "production_url": "https://lltm-memory.pages.dev",
+  "git_head": "606a659dc13c3d045d88a10b285fdde13e00cbef",
+  "dirty_worktree": false,
+  "deploy_root": "public-demo/site",
+  "note": "Real two-stage extraction and t4 answers replace the rule-driven public UI. Models and benchmark results are unchanged. Functional checks do not establish benchmark accuracy or production availability.",
+  "files": [
+    {
+      "path": "app.js",
+      "sha256": "2cf5983f30cab2394fec6ff3bf154e6b32267844de89dfc91d0bf410f670dc5f"
+    },
+    {
+      "path": "content.js",
+      "sha256": "8a0abc64aaf08a200ea38fe0714928e0ac1f39edc0b624e951542a18fc4def33"
+    },
+    {
+      "path": "index.html",
+      "sha256": "205943c1c433433fbf6307fdfe78ec78cc0ea3111cb6486b57cadf417bb8b64c"
+    },
+    {
+      "path": "playground.html",
+      "sha256": "f8685c6ab83cbca75c4bae77d69dacd130337f43e4ba5bcbd057d5b8c53d7d90"
+    },
+    {
+      "path": "release.json",
+      "sha256": "a07b3bd272cf27270a7eb9c5af8c7d60b6cc6d57dfd50957083f612148d6ae4b"
+    },
+    {
+      "path": "release.schema.json",
+      "sha256": "43140f5ffecc104848fe0b61d3efe9aff738cbe8826907dd6f9732013eceb6ad"
+    },
+    {
+      "path": "styles.css",
+      "sha256": "f2ab605b482fcc346693c7e29779a86b42a9983356317fc11247fc9b1a108bb7"
+    }
+  ],
+  "backend": {
+    "provider": "render",
+    "service": "lltm-playground",
+    "deployment_id": "dep-dbbi6ee7bikc738lctbg",
+    "git_head": "606a659dc13c3d045d88a10b285fdde13e00cbef",
+    "url": "https://lltm-playground.onrender.com",
+    "llm_enabled": true,
+    "plan": "free",
+    "memory_limit_mb": 512,
+    "key_location": "server-side environment only",
+    "session_attempt_capacity": 32,
+    "session_reserved_tokens": 300000,
+    "daily_attempt_capacity": 100,
+    "daily_reserved_tokens": 1000000
+  },
+  "predeploy_checks": [
+    "Three real-provider presets passed: cross-session recall, replacement/current-versus-history, 21-day/3-week duration. The coffee question was clarified to explicitly ask all three preferences after a preserved incomplete-answer failure.",
+    "Linux amd64 Python 3.12 container with exact deployment lock, 0.1 CPU, 512MiB hard limit and no swap: latest peak 383.68MiB, cold start 81.503s, no OOM. This is not a production peak measurement.",
+    "153 targeted live, extraction, temporal, rollback and idempotency tests passed.",
+    "Full CI for 606a659: Linux, macOS, Windows and lint passed; public-demo workflow passed.",
+    "Site structure, seven-file surface, JavaScript syntax, secret absence and audited regression binding passed."
+  ],
+  "postdeploy_checks": [
+    "Production and deployment URL: all seven files fetched and byte/sha256-compared with the repository; all matched.",
+    "Live backend synthetic coffee write and t4 answer returned HTTP 200; saved raw evidence reached the actual model input.",
+    "CORS allow/deny, free idempotent replay, signed namespace isolation, rejected user override and hard deletion passed.",
+    "Production browser: preset extracted two facts, answered all three preferences, displayed original sources and the actual provider-bound answer prompt; no browser console errors."
+  ],
+  "resource_scope": "Render free plan does not expose application usage graphs. Production success is evidenced by deployment/health and real requests within its 512MB plan; numeric peak comes only from the constrained local container.",
+  "benchmark_scope": "Historical frozen one-shot results and exposed original-test100 regression figures are unchanged; the live visitor session is not a benchmark.",
+  "assets_verified_at_utc": "2026-10-20T12:57:01.051740+00:00"
+}
