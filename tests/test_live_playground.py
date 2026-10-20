@@ -152,6 +152,14 @@ def test_natural_language_reaches_two_stages_and_t4_across_conversations(live):
     assert "settled in Canberra" in payload["model_inputs"][0]["prompt"]
     assert payload["model_inputs"][0]["prompt"] == provider.requests[-1]["prompt"]
     assert payload["selected_sources"][0]["source"]["session_id"] == "conversation-1"
+    # The first prompt carried the archived turn itself, and the response names it.
+    assert payload["raw_primary_turns"] == [
+        {
+            "session_id": "conversation-1",
+            "turn_index": 0,
+            "text": "After years in Sydney, I have settled in Canberra.",
+        }
+    ]
     assert p.live_client.inputs == [] and p.live_client.owner is None
     assert p.live_client.usage.records == []
 

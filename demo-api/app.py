@@ -879,8 +879,8 @@ def _not_selected(p: Playground, ns: str, selected: set[str]) -> list[dict[str, 
     return rows
 
 
-def _recovered_turns(p: Playground, ns: str, refs: list[str]) -> list[dict[str, Any]]:
-    """The archived turns the raw fallback attached, as text the visitor can read.
+def _turn_texts(p: Playground, ns: str, refs: list[str]) -> list[dict[str, Any]]:
+    """Archived turns an answer used, as text the visitor can read.
 
     The answer reports them as `conversation:turn` references. Each is resolved inside
     this namespace only; a reference that does not resolve here is dropped, not looked
@@ -943,7 +943,8 @@ def generate_answer(
                 # These are transient and cleared from the client after the response.
                 "model_inputs": [dict(item) for item in client.inputs],
                 "not_selected": _not_selected(p, ns, {item["id"] for item in result["selected"]}),
-                "recovered_turns": _recovered_turns(p, ns, result.get("fallback_turns") or []),
+                "recovered_turns": _turn_texts(p, ns, result.get("fallback_turns") or []),
+                "raw_primary_turns": _turn_texts(p, ns, result.get("raw_primary_turns") or []),
                 "usage": client.usage.summary(),
                 "capacity_reserved": client.reserved(ns),
                 "capacity_limits": client.limits(),

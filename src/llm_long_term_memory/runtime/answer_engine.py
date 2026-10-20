@@ -325,6 +325,11 @@ class AnswerEngine:
                 "retrieval_latency_ms": retrieval_ms,
                 "hydrated_memory_ids": [item.memory_id for item in hydration.evidence],
                 "raw_primary_turns": len(excerpts.turns) if excerpts else 0,
+                # Which archived turns went into the first prompt beside the memories.
+                "raw_primary_refs": [
+                    f"{external_session_id(t.session_id)}:{t.turn_index}"
+                    for t in (excerpts.turns if excerpts else [])
+                ],
                 "raw_primary_time_notes": self.raw_primary_time_notes,
             },
         )

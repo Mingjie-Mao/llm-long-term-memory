@@ -23,6 +23,8 @@ const COPY = {
   badResponse: ["后端返回了非预期的响应（可能仍在启动），请稍后重试。", "The backend returned an unexpected response (it may still be starting). Retry in a moment."],
   expired: ["演示空间已过期或失效，点击重试可新建演示。", "This demo namespace expired. Retry to start a new demo."],
   capacity: ["演示额度已用完，请在 UTC 日切换后再试。", "Demo capacity is exhausted; try again after the UTC day resets."],
+  rateLimited: ["模型每分钟调用次数已达上限（所有访客共用），请约一分钟后重试。", "The per-minute model limit (shared by all visitors) was reached. Retry in about a minute."],
+  operationTimeout: ["这一步超过了 60 秒的处理上限，请重试。", "This step exceeded its 60-second limit. Please retry."],
 };
 const waking = (seconds) => [
   `正在唤醒后端 · ${seconds}s（免费实例休眠后首次唤醒可能需要 1–2 分钟）`,
@@ -161,7 +163,10 @@ async function api(method, path, body) {
         throw error;
       }
       // demo_capacity also covers transient rate limits and deadlines; only exhaustion is final.
-      if (detail?.error === "demo_capacity" && /exhausted/.test(detail.message)) throw failure("capacity", response.status);
+      if (detail?.error === "demo_capacity") {
+        const kind = /exhausted/.test(detail.message) ? "capacity" : /rate limit/.test(detail.message) ? "rateLimited" : /timed out/.test(detail.message) ? "operationTimeout" : null;
+        if (kind) throw failure(kind, response.status);
+      }
       if (response.status === 401 || response.status === 410) throw failure("expired", response.status);
       const error = new Error(Array.isArray(detail) ? detail.map((item) => item.msg).join("; ") : detail?.message || detail || response.statusText);
       error.status = response.status;
@@ -332,11 +337,16 @@ function renderRecovery(data) {
   const selected = data.memories_selected ?? (data.selected || []).length;
   const level = data.fallback_level || "none";
   const recovered = data.recovered_turns || [];
+  const primary = data.raw_primary_turns || [];
   let zh = `结构化记忆：选中 ${selected} 条（候选 ${data.candidates_considered ?? "?"} 条）。`;
   let en = `Structured memory: ${selected} selected of ${data.candidates_considered ?? "?"} candidates. `;
+  if (primary.length) {
+    zh += `首轮请求同时附带了 ${primary.length} 段相关原话。`;
+    en += `The first request also carried ${primary.length} relevant archived ${primary.length === 1 ? "turn" : "turns"}. `;
+  }
   if (level === "none") {
-    zh += "原文回退：未触发，结构化记忆已足够回答。";
-    en += "Raw fallback: not triggered; structured memory was enough.";
+    zh += "原文回退：未触发，第一次请求的证据已足够回答。";
+    en += "Raw fallback: not triggered; the first request had enough evidence.";
   } else if (recovered.length) {
     summary.classList.add("used");
     zh += `原文回退：已触发（${level}），从对话存档恢复了 ${recovered.length} 段原话，再次请求模型。`;
@@ -349,14 +359,16 @@ function renderRecovery(data) {
   [summary.dataset.zh, summary.dataset.en] = [zh, en];
   summary.textContent = t(zh, en);
   $("recovery").append(summary);
-  for (const turn of recovered) {
+  const card = (turn, zh, en) => {
     const p = document.createElement("p");
     p.className = "evidence-card";
     const body = `${turn.session_id} · turn ${turn.turn_index}: ${turn.text}`;
-    [p.dataset.zh, p.dataset.en] = [`恢复的原话 · ${body}`, `Recovered · ${body}`];
+    [p.dataset.zh, p.dataset.en] = [`${zh} · ${body}`, `${en} · ${body}`];
     p.textContent = t(p.dataset.zh, p.dataset.en);
     $("recovery").append(p);
-  }
+  };
+  for (const turn of primary) card(turn, "首轮附带的原话", "Archived turn in the first request");
+  for (const turn of recovered) card(turn, "回退恢复的原话", "Recovered by the fallback");
 }
 function renderNotSelected(rows) {
   $("notSelected").replaceChildren();
@@ -398,6 +410,18 @@ function renderUsage(data) {
     `This step: ${used.total_requests || 0} model calls, ${used.total_tokens || 0} recorded tokens${seconds}. Capacity is conservatively reserved; retries and failures consume it too.`,
   );
 }
+// A provider 503 is the model being overloaded, seen several times in a day even after
+// the backend's own two attempts. One more try after a pause costs a call only when it
+// is needed; writes are idempotent by request_id, and questions write nothing.
+async function retryOverloaded(run) {
+  try { return await run(); }
+  catch (error) {
+    if (error.key !== "modelFailed" || !/\b503\b/.test(error.diagnostic || "")) throw error;
+    say("assistant", ["模型服务繁忙（503），5 秒后自动重试一次…", "The model service is busy (503); retrying once in 5 s…"]);
+    await new Promise((resolve) => setTimeout(resolve, 5000));
+    return await run();
+  }
+}
 // Today is sent as no date, so the server's own clock decides it; a visitor ahead of
 // the server's timezone would otherwise be told their today is in the future.
 function conversationDate() {
@@ -410,7 +434,7 @@ async function remember(content) {
       || (pendingWrite.observed_on || null) !== observed) {
     pendingWrite = { content, session_id: conversationId(), request_id: crypto.randomUUID(), ...(observed ? { observed_on: observed } : {}) };
   }
-  const result = await api("POST", "/demo/messages", pendingWrite);
+  const result = await retryOverloaded(() => api("POST", "/demo/messages", pendingWrite));
   pendingWrite = null;
   if (result.mode !== "llm") throw new Error("Unexpected non-LLM extraction response.");
   renderMemories(result.memories);
@@ -419,7 +443,7 @@ async function remember(content) {
   say("assistant", [`抽取完成：${n} 条事实。`, `Extraction complete: ${n} ${n === 1 ? "fact" : "facts"}.`]);
 }
 async function ask(query) {
-  const result = await api("POST", "/demo/answer", { query });
+  const result = await retryOverloaded(() => api("POST", "/demo/answer", { query }));
   if (result.mode !== "llm" || result.answer_profile !== "t4") throw new Error("Unexpected non-LLM answer response.");
   say("answer", `${t("LLM 回答", "LLM answer")}: ${result.answer}`);
   renderAnswer(result);
@@ -468,7 +492,8 @@ async function runLiveScenario(name) {
     await freshSession();
     try {
       for (const [i, turn] of scenario.turns.entries()) {
-        const { text, on } = typeof turn === "string" ? { text: turn } : turn;
+        const text = turn.text[lang];
+        const on = turn.on;
         $("conversationDate").value = on || "";
         progress(i + 1, total, [`写入对话 ${conversation}${on ? `（${on}）` : ""}：抽取与时间线`, `Writing conversation ${conversation}${on ? ` (${on})` : ""}: extraction and timeline`]);
         say("user", on ? `[${on}] ${text}` : text);
@@ -479,8 +504,9 @@ async function runLiveScenario(name) {
       }
       $("conversationDate").value = "";
       progress(total, total, ["检索与回答", "Retrieval and answer"]);
-      say("user", scenario.question);
-      await ask(scenario.question);
+      const question = scenario.question[lang];
+      say("user", question);
+      await ask(question);
       if (scenario.asOf) await showAsOf(scenario.asOf);
       progressDone(started);
     } catch (error) {

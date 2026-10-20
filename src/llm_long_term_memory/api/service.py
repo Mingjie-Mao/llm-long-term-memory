@@ -691,6 +691,9 @@ class MemoryService:
             "fallback_level": notes.get("fallback_level", "none"),
             "fallback_reason": notes.get("fallback_reason"),
             "fallback_turns": notes.get("fallback_turns", []),
+            # Archived turns the first prompt carried beside the memories. With a small
+            # archive these usually hold the detail already, so the fallback never runs.
+            "raw_primary_turns": notes.get("raw_primary_refs", []),
             "memories_selected": len(selected),
             "candidates_considered": notes.get("candidates_considered", 0),
             "context_tokens": result.context_tokens,

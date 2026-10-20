@@ -204,6 +204,8 @@ def main() -> int:
     # stored intervals; neither may be computed in the page.
     assert "observed_on" in app and "/demo/as_of" in app, "conversation dates or as_of missing"
     assert "recovered_turns" in app and "not_selected" in app, "answer evidence is not shown"
+    # Only an overloaded provider is retried, and only through the idempotent write key.
+    assert 'retryOverloaded(() => api("POST", "/demo/messages", pendingWrite))' in app
     assert "input.prompt" in app and "pre.textContent" in app, "model input is not shown safely"
     css = (SITE / "styles.css").read_text(encoding="utf-8")
     narrow = re.search(r"@media \(max-width: 920px\) \{(?P<body>.*?)\n\}", css, re.DOTALL)
