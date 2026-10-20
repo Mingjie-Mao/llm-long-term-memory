@@ -196,6 +196,8 @@ def test_provider_failure_is_sanitised_and_keeps_capacity_charge(live):
     response = write(http, header, "I live in Canberra.")
     assert response.status_code == 503
     assert "api-key" not in response.text and "private-provider" not in response.text
+    detail = response.json()["detail"]
+    assert detail["kind"] == "RuntimeError" and detail["provider_code"] is None
     ns = header["x-demo-token"].split(".")[0]
     assert p.live_client.reserved(ns)["calls"] == 2
     assert p.live_client.inputs == [] and p.live_client.usage.records == []

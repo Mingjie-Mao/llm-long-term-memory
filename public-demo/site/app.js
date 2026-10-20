@@ -34,7 +34,13 @@ function failure(key, status) {
   error.status = status;
   return error;
 }
-const pairOf = (error) => error.key ? COPY[error.key] : [error.message, error.message];
+// A diagnostic suffix (the failure's class and provider status) is shown verbatim in
+// both languages, so a visitor's report names the cause.
+const pairOf = (error) => {
+  if (!error.key) return [error.message, error.message];
+  const extra = error.diagnostic ? ` (${error.diagnostic})` : "";
+  return COPY[error.key].map((text) => text + extra);
+};
 
 // The token lives in this tab's sessionStorage so a refresh returns to the same memories.
 // Storage can be unavailable (private mode, blocked site data); the demo then works for
@@ -149,7 +155,11 @@ async function api(method, path, body) {
     if (data === null) throw failure("badResponse", response.status);
     if (!response.ok) {
       const detail = data.detail;
-      if (detail?.error === "llm_unavailable") throw failure("modelFailed", response.status);
+      if (detail?.error === "llm_unavailable") {
+        const error = failure("modelFailed", response.status);
+        error.diagnostic = [detail.kind, detail.provider_code].filter(Boolean).join(" ");
+        throw error;
+      }
       // demo_capacity also covers transient rate limits and deadlines; only exhaustion is final.
       if (detail?.error === "demo_capacity" && /exhausted/.test(detail.message)) throw failure("capacity", response.status);
       if (response.status === 401 || response.status === 410) throw failure("expired", response.status);

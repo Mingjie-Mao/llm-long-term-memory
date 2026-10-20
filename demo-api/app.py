@@ -804,13 +804,13 @@ def _live_failure(exc: Exception):
         raise HTTPException(429, detail={"error": "demo_capacity", "message": str(exc)}) from None
     if isinstance(exc, (IdempotencyConflict, WriteInProgress)):
         raise HTTPException(409, "Message identity conflicts with an existing write.") from None
+    code = getattr(exc, "code", None)
+    code = code if isinstance(code, int) else None
     logging.getLogger(__name__).warning(
-        "Live demo failed: type=%s provider_code=%s",
-        type(exc).__name__,
-        getattr(exc, "code", None),
+        "Live demo failed: type=%s provider_code=%s", type(exc).__name__, code
     )
     # Provider exception bodies may include request content: never reflect them.
-    raise unavailable() from None
+    raise unavailable(type(exc).__name__, code) from None
 
 
 @app.post("/demo/messages")

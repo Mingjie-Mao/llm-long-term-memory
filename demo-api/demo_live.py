@@ -183,11 +183,17 @@ def attach(playground, store_path: Path):
         raise
 
 
-def unavailable() -> HTTPException:
+def unavailable(kind: str | None = None, provider_code: int | None = None) -> HTTPException:
+    """The model path failed. `kind` and `provider_code` are the exception's class name and
+    the provider's HTTP status, the two fields the server log already records: enough to
+    tell a timeout from an overloaded or refusing provider, and never the provider's body,
+    which can echo request content."""
     return HTTPException(
         503,
         detail={
             "error": "llm_unavailable",
             "message": "Live LLM service is unavailable. No rule-based answer will be substituted.",
+            "kind": kind,
+            "provider_code": provider_code,
         },
     )
