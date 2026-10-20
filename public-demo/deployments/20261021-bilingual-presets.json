@@ -1,0 +1,232 @@
+{
+  "schema_version": 1,
+  "deployed_date_utc": "2026-10-20",
+  "verified_at_utc": "2026-10-20T18:57:41.184868+00:00",
+  "provider": "cloudflare-pages",
+  "project": "lltm-memory",
+  "branch": "main",
+  "deployment_id": "427232df",
+  "deployment_url": "https://427232df.lltm-memory.pages.dev",
+  "production_url": "https://lltm-memory.pages.dev",
+  "git_head": "9f87930765664f556dcef5c6e35eaa07a31fc31a",
+  "dirty_worktree": false,
+  "deploy_root": "public-demo/site",
+  "note": "Bilingual presets (each wording verified against real models before publishing), the 'said later, happened earlier' event-time preset replacing weeks-elapsed, one page-side retry on provider 503, localized 429 kinds, and first-prompt archived turns in the evidence panel. Models, prompts, extractor and answer text unchanged.",
+  "files": [
+    {
+      "path": "404.html",
+      "sha256": "aba2017a3b9f7b34bc3923b00bafca4aa1bfd61534e383e88656065b60688732"
+    },
+    {
+      "path": "app.js",
+      "sha256": "ab7f56e7f1b5cf3538a72515d4d6d38a79a7977661cb42b79e5a6bb402b0adab"
+    },
+    {
+      "path": "content.js",
+      "sha256": "fad0ec99b25f7a15c74c2cc97de5cc78556dc25d27e04dfecc193c43c035eb7f"
+    },
+    {
+      "path": "index.html",
+      "sha256": "fb8e953646e3c2ac4c55a1f542acf6ce02cfebee809baaeb5cf12f5c7845719d"
+    },
+    {
+      "path": "playground.html",
+      "sha256": "f8685c6ab83cbca75c4bae77d69dacd130337f43e4ba5bcbd057d5b8c53d7d90"
+    },
+    {
+      "path": "release.json",
+      "sha256": "9cd7bc74fdb44aa377e512a2464147f16981e81fdcfdf2431f4c6f34bdfcddfa"
+    },
+    {
+      "path": "release.schema.json",
+      "sha256": "43140f5ffecc104848fe0b61d3efe9aff738cbe8826907dd6f9732013eceb6ad"
+    },
+    {
+      "path": "styles.css",
+      "sha256": "782b1be3754ba7b4ec9855b906b0be1cb69bcbecef4344157115a4bcea26ac26"
+    }
+  ],
+  "backend": {
+    "provider": "render",
+    "service": "lltm-playground",
+    "changed": true,
+    "deploy": "autoDeploy from main; the production answer response carried raw_primary_turns, which only 9f87930 returns."
+  },
+  "failure_diagnosis": {
+    "observed": "Intermittent 503 llm_unavailable on writes and answers (2 on production before diagnostics, 1 in local validation, 1 on production after).",
+    "cause": "Provider google.genai ServerError with HTTP 503 after the backend's two attempts (local server log: 'Live demo failed: type=ServerError provider_code=503'; production response detail kind=ServerError provider_code=503 on the post-deploy run).",
+    "also": "A 429 'Model rate limit reached' in local validation came from the 10-requests-per-minute limiter when presets ran back to back; production shares the same per-minute limit across visitors.",
+    "mitigation": "The page retries a provider 503 once after 5 s; writes reuse their request_id. The backend attempt count was left at two because capacity is reserved per maximum attempt and never refunded."
+  },
+  "preset_validation": {
+    "environment": "local demo-api (this commit's backend code before the final reporting change), real Gemini key from the local .env, configs/fallback.yaml models, separate scratch store; not the production quota",
+    "runs": [
+      {
+        "candidate": "event_vs_session_en",
+        "write_status": [
+          200,
+          200
+        ],
+        "failure_kinds": [],
+        "answer_status": 200,
+        "answer": "On 1 September 2026, you lived in Sydney, having moved there on 15 August 2026.",
+        "as_of": {
+          "2026-07-01": [
+            [
+              "home_city",
+              "Canberra"
+            ]
+          ],
+          "2026-09-01": [
+            [
+              "home_city",
+              "Sydney"
+            ]
+          ]
+        },
+        "recorded_calls": 6,
+        "recorded_tokens": 5850
+      },
+      {
+        "candidate": "recovery_en",
+        "write_status": [
+          200
+        ],
+        "failure_kinds": [],
+        "answer_status": 200,
+        "answer": "The confirmation code for your booking at the Harbour View Hotel in Hobart is HV-48213-K.",
+        "as_of": {},
+        "recorded_calls": 3,
+        "recorded_tokens": 3538
+      },
+      {
+        "candidate": "recall_zh",
+        "write_status": [
+          200
+        ],
+        "failure_kinds": [],
+        "answer_status": 200,
+        "answer": "你喜欢安静且带有户外座位的咖啡馆氛围。你目前的饮食限制是不消费任何乳制品（dairy products）。",
+        "as_of": {},
+        "recorded_calls": 3,
+        "recorded_tokens": 3070
+      },
+      {
+        "candidate": "update_zh",
+        "write_status": [
+          503,
+          200
+        ],
+        "failure_kinds": [
+          "ServerError"
+        ],
+        "answer_status": 200,
+        "answer": "你现在使用的是 PyTorch，之前使用的是 TensorFlow。",
+        "as_of": {
+          "2025-01-01": [],
+          "2026-09-30": [
+            [
+              "ml_framework",
+              "PyTorch"
+            ]
+          ]
+        },
+        "recorded_calls": 3,
+        "recorded_tokens": 2985
+      },
+      {
+        "candidate": "event_vs_session_zh",
+        "write_status": [
+          200,
+          429
+        ],
+        "failure_kinds": [
+          "Model rate limit reached; retry later."
+        ],
+        "answer_status": 200,
+        "answer": "2026 年 9 月 1 日你住在堪培拉（Canberra）。你是从 2026 年 3 月 1 日开始住在那里的。",
+        "as_of": {
+          "2026-07-01": [
+            [
+              "home_city",
+              "Canberra"
+            ]
+          ],
+          "2026-09-01": [
+            [
+              "home_city",
+              "Canberra"
+            ]
+          ]
+        },
+        "recorded_calls": 5,
+        "recorded_tokens": 2935
+      },
+      {
+        "candidate": "update_zh",
+        "write_status": [
+          200,
+          200
+        ],
+        "failure_kinds": [],
+        "answer_status": 200,
+        "answer": "你现在使用的是 PyTorch，之前使用的是 TensorFlow。",
+        "as_of": {
+          "2025-01-01": [
+            [
+              "ml_framework",
+              "TensorFlow"
+            ]
+          ],
+          "2026-09-30": [
+            [
+              "ml_framework",
+              "PyTorch"
+            ]
+          ]
+        },
+        "recorded_calls": 5,
+        "recorded_tokens": 5527
+      },
+      {
+        "candidate": "event_vs_session_zh",
+        "write_status": [
+          200,
+          200
+        ],
+        "failure_kinds": [],
+        "answer_status": 200,
+        "answer": "2026 年 9 月 1 日你住在悉尼。你是在 2026 年 8 月 15 日搬过去的。",
+        "as_of": {
+          "2026-07-01": [
+            [
+              "home_city",
+              "Canberra"
+            ]
+          ],
+          "2026-09-01": [
+            [
+              "home_city",
+              "Sydney"
+            ]
+          ]
+        },
+        "recorded_calls": 5,
+        "recorded_tokens": 5675
+      }
+    ],
+    "excluded_from_publish": "recovery_en: the extractor kept the confirmation code and the first prompt already held the turn, so the raw fallback did not run; no 'fallback' preset was published because a small demo archive rarely needs it."
+  },
+  "predeploy_checks": [
+    "Full pytest suite: 2313 passed (check_release_figures --update, line coverage 89%).",
+    "tests/test_live_playground.py includes the first-prompt archived turn assertion.",
+    "check_site.py (including the retry-path guard), public-demo unittests, update_regression_figures --check, ruff check and format --check passed.",
+    "Local browser against the real-key local backend: zh 'said later, happened earlier' preset end to end (said 2026-10-01, interval from 2026-08-15, as_of 2026-09-01 = Sydney, correct answer); zh recall preset.",
+    "CI for 9f87930: ci (Linux, macOS, Windows, lint) and public-demo workflows passed."
+  ],
+  "postdeploy_checks": [
+    "Production and deployment URL: all eight files sha256-matched the repository.",
+    "Production en 'said later, happened earlier' preset with real models: both dated writes succeeded; the answer's first attempt got a provider 503, the page retried once and the answer was correct; as_of 2026-07-01 = Canberra, 2026-09-01 = Sydney; evidence panel listed 2 archived turns from the first request."
+  ],
+  "benchmark_scope": "Historical frozen one-shot results and exposed original-test100 regression figures are unchanged; preset runs are functional checks, not benchmarks."
+}

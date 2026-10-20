@@ -25,8 +25,9 @@ fact's event time, and it cannot be in the future. `GET /demo/as_of?at=YYYY-MM-D
 the facts in force at the end of that day from the stored intervals, with no model call.
 `/demo/answer` also returns the memories the answer did not receive (`not_selected`, with
 `not_current` or `not_ranked`) and the archived turns the raw fallback attached
-(`recovered_turns`). A failed model call is a 503 naming the exception class and the
-provider status, never the provider's body. The benchmark
+(`recovered_turns`), as well as the archived turns the first prompt already carried
+(`raw_primary_turns`). A failed model call is a 503 naming the exception class and the
+provider status, never the provider's body; the page retries a provider 503 once. The benchmark
 section describes separate recorded experiments, not a score for the live visitor data.
 
 Enable on the **backend** only:

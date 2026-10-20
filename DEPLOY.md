@@ -17,11 +17,12 @@ holds real data and that changes what it needs.
 
 ## B2 · Redeploy the page
 
-The live page was deployed from `cca3d12` on 2026-10-20 UTC: conversation dates,
-`as_of`, answer evidence and 503 diagnostics on the live LLM playground first deployed
-from `606a659`. Its
-[deployment record](public-demo/deployments/20261021-dated-conversations.json) binds the
-eight published files to their hashes and records the checks; the
+The live page was deployed from `9f87930` on 2026-10-20 UTC: bilingual verified presets,
+an event-time preset and a page-side retry on provider 503, on the live LLM playground
+first deployed from `606a659`. Its
+[deployment record](public-demo/deployments/20261021-bilingual-presets.json) binds the
+eight published files to their hashes, records the preset validation runs and the
+diagnosed cause of the intermittent 503; the
 [first live record](public-demo/deployments/20261020-live-memory.json) holds the backend
 resource checks. All deployment records are retained in `public-demo/deployments/`.
 
