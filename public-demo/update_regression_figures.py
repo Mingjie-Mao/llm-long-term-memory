@@ -33,7 +33,7 @@ def regression_figures(root: Path) -> dict:
     ):
         raise ValueError("complete, passing, source-bound regression audit required")
     inputs = audit["inputs"]
-    if inputs.get(str(gate_path.relative_to(root))) != sha256(gate_path):
+    if inputs.get(gate_path.relative_to(root).as_posix()) != sha256(gate_path):
         raise ValueError("gate is not bound to the completion audit")
     for name, digest in inputs.items():
         path = root / name
@@ -71,9 +71,9 @@ def regression_figures(root: Path) -> dict:
         "reader_rows": 600,
         "grade_rows": 600,
         "gate_passed": True,
-        "gate_path": str(gate_path.relative_to(root)),
+        "gate_path": gate_path.relative_to(root).as_posix(),
         "gate_sha256": sha256(gate_path),
-        "audit_path": str(audit_path.relative_to(root)),
+        "audit_path": audit_path.relative_to(root).as_posix(),
         "audit_sha256": sha256(audit_path),
     }
 

@@ -36,6 +36,8 @@ def test_publication_keeps_historical_comparison_and_binds_new_evidence(publicat
     }
     assert after["regression"]["gate_sha256"] == tool.sha256(root / gate)
     assert after["regression"]["audit_sha256"] == tool.sha256(root / audit)
+    assert after["regression"]["gate_path"] == gate
+    assert after["regression"]["audit_path"] == audit
 
 
 def test_gate_modified_after_audit_cannot_be_published(publication):
