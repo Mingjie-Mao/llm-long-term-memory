@@ -123,7 +123,7 @@ def main() -> int:
         )
         assert "open" not in attrs, f"advanced inspector panel {identity} must start collapsed"
     video = next(attrs for tag, attrs in elements if tag == "video")
-    assert "controls" in video and "autoplay" not in video and video.get("preload") == "none"
+    assert "controls" in video and "autoplay" not in video and video.get("preload") == "metadata"
     assert "recorded run" in index.lower() and "not current service status" in index
     import hashlib
 
