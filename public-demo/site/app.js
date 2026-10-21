@@ -9,6 +9,7 @@ const SAVED = "lltm-demo-session";
 const $ = (id) => document.getElementById(id);
 let lang = "en", ready = false, busy = false, token = null, conversation = 1;
 let manifest = null, pendingWrite = null, statusRecord = null, wakingTimer = null;
+let scenarioRun = null, cooldownUntil = 0, cooldownTimer = null, recording = null;
 const t = (zh, en) => lang === "zh" ? zh : en;
 const conversationId = () => `conversation-${conversation}`;
 
@@ -23,7 +24,7 @@ const COPY = {
   badResponse: ["后端返回了非预期的响应（可能仍在启动），请稍后重试。", "The backend returned an unexpected response (it may still be starting). Retry in a moment."],
   expired: ["演示空间已过期或失效，点击重试可新建演示。", "This demo namespace expired. Retry to start a new demo."],
   capacity: ["演示额度已用完，请在 UTC 日切换后再试。", "Demo capacity is exhausted; try again after the UTC day resets."],
-  rateLimited: ["模型每分钟调用次数已达上限（所有访客共用），请约一分钟后重试。", "The per-minute model limit (shared by all visitors) was reached. Retry in about a minute."],
+  rateLimited: ["模型请求触发限流，请等倒计时结束再试；若仍失败，可先看录制演示。", "Model requests are rate limited. Wait for the countdown, then retry; if it persists, watch the recording."],
   operationTimeout: ["这一步超过了 60 秒的处理上限，请重试。", "This step exceeded its 60-second limit. Please retry."],
 };
 const waking = (seconds) => [
@@ -74,6 +75,8 @@ function applyLanguage() {
   }
   title();
   renderMetrics();
+  renderRecording();
+  renderCooldown();
   if (statusRecord) status(statusRecord.state, statusRecord.pair);
 }
 // Only the release manifest supplies measured values. Each table keeps its own
@@ -177,14 +180,19 @@ async function api(method, path, body) {
     if (!response.ok) {
       const detail = data.detail;
       if (detail?.error === "llm_unavailable") {
-        const error = failure("modelFailed", response.status);
+        const error = failure(detail.provider_code === 429 ? "rateLimited" : "modelFailed", response.status);
         error.diagnostic = [detail.kind, detail.provider_code].filter(Boolean).join(" ");
         throw error;
       }
       // demo_capacity also covers transient rate limits and deadlines; only exhaustion is final.
       if (detail?.error === "demo_capacity") {
         const kind = /exhausted/.test(detail.message) ? "capacity" : /rate limit/.test(detail.message) ? "rateLimited" : /timed out/.test(detail.message) ? "operationTimeout" : null;
-        if (kind) throw failure(kind, response.status);
+        if (kind) {
+          const error = failure(kind, response.status);
+          const after = Number(response.headers.get("retry-after"));
+          error.retryAfter = Number.isFinite(after) && after > 0 ? Math.min(after, 300) : 60;
+          throw error;
+        }
       }
       if (response.status === 401 || response.status === 410) throw failure("expired", response.status);
       const error = new Error(Array.isArray(detail) ? detail.map((item) => item.msg).join("; ") : detail?.message || detail || response.statusText);
@@ -196,10 +204,52 @@ async function api(method, path, body) {
 }
 
 function controls() {
-  for (const element of document.querySelectorAll("[data-requires-live]")) element.disabled = !ready || busy;
+  const cooling = cooldownUntil > Date.now();
+  for (const element of document.querySelectorAll("[data-requires-live]")) element.disabled = !ready || busy || cooling || !!scenarioRun;
   $("deleteSession").disabled = !token || busy;
-  $("retry").disabled = busy;
+  $("retry").disabled = busy || cooling;
+  $("scenarioActions").hidden = !scenarioRun;
+  $("resumeScenario").disabled = !ready || busy || cooling;
+  $("leaveScenario").disabled = busy;
 }
+function renderCooldown() {
+  const seconds = Math.max(0, Math.ceil((cooldownUntil - Date.now()) / 1000));
+  $("cooldown").textContent = seconds ? t(
+    `模型调用已限流，约 ${seconds}s 后可重试。已完成的预设步骤会保留。`,
+    `Model calls are rate limited. Retry in about ${seconds}s; completed preset steps are kept.`,
+  ) : "";
+  if (!seconds) { clearInterval(cooldownTimer); cooldownTimer = null; }
+  controls();
+}
+function startCooldown(seconds) {
+  cooldownUntil = Date.now() + seconds * 1000;
+  clearInterval(cooldownTimer);
+  cooldownTimer = setInterval(renderCooldown, 1000);
+  renderCooldown();
+}
+function renderRecording() {
+  if (!recording) return;
+  $("recordingTranscript").replaceChildren();
+  const meta = document.createElement("p");
+  meta.textContent = t(`录制于 ${recording.recorded_at_utc}；场景：${recording.scenario}；语言：${recording.language}。`, `Recorded ${recording.recorded_at_utc}; scenario: ${recording.scenario}; language: ${recording.language}.`);
+  $("recordingTranscript").append(meta);
+  for (const item of recording.transcript) {
+    const p = document.createElement("p");
+    p.textContent = `${item.role}: ${item.text}`;
+    $("recordingTranscript").append(p);
+  }
+}
+async function loadRecording() {
+  try {
+    const response = await fetch("./recording.json");
+    if (!response.ok) throw new Error("Recording metadata unavailable");
+    recording = await response.json();
+    renderRecording();
+  } catch {
+    $("recordingTranscript").textContent = t("录制信息暂不可用，请稍后重试。", "Recording details unavailable; retry later.");
+  }
+}
+
 function title() { $("conversationTitle").textContent = t(`对话 ${conversation}`, `Conversation ${conversation}`); }
 // state: "waking" while connecting, "up" when live, "down" otherwise. Retry is offered
 // only when there is something to retry.
@@ -230,6 +280,7 @@ function clearInspector() {
   for (const id of ["chat", "memoryState", "sources", "modelInputs", "asOfState", "recovery", "notSelected"]) $(id).replaceChildren();
   $("usage").textContent = "";
   $("progress").textContent = "";
+  for (const id of ["historyDetails", "selectionDetails", "promptDetails"]) $(id).open = false;
   delete $("progress").dataset.zh;
   delete $("progress").dataset.en;
   emptyState("memoryState", "保存一段话后查看抽取事实。", "Save a message to inspect extracted facts.", "li");
@@ -238,6 +289,7 @@ function clearInspector() {
   emptyState("notSelected", "提问后展示。", "Shown after a question.", "li");
 }
 async function freshSession() {
+  scenarioRun = null;
   // Delete before replacing the credential; a failed deletion keeps the old token.
   // An already expired namespace has nothing left to delete.
   if (token) {
@@ -425,8 +477,8 @@ function renderUsage(data) {
   const used = data.usage || {};
   const seconds = data.latency_ms ? ` · ${(data.latency_ms / 1000).toFixed(1)}s` : "";
   $("usage").textContent = t(
-    `本步模型调用 ${used.total_requests || 0} 次，已记录 ${used.total_tokens || 0} tokens${seconds}。额度按保守预留计量，重试与失败也占额度。`,
-    `This step: ${used.total_requests || 0} model calls, ${used.total_tokens || 0} recorded tokens${seconds}. Capacity is conservatively reserved; retries and failures consume it too.`,
+    `本步模型调用 ${used.total_requests || 0} 次，已记录 ${used.total_tokens || 0} tokens${seconds}。本空间返回时剩余预留调用额度：${Math.max(0, (data.capacity_limits?.calls || 0) - (data.capacity_reserved?.calls || 0))}；全站额度另行共享，重试与失败也占额度。`,
+    `This step: ${used.total_requests || 0} model calls, ${used.total_tokens || 0} recorded tokens${seconds}. Namespace attempt capacity remaining at this response: ${Math.max(0, (data.capacity_limits?.calls || 0) - (data.capacity_reserved?.calls || 0))}. Global capacity is shared separately; retries and failures consume it too.`,
   );
 }
 // A provider 503 is the model being overloaded, seen several times in a day even after
@@ -469,16 +521,17 @@ async function ask(query) {
   renderUsage(result);
 }
 async function action(work) {
-  if (!ready || busy) return;
+  if (!ready || busy || cooldownUntil > Date.now()) return;
   busy = true; controls();
   try { await work(); }
   catch (error) {
     say("error", pairOf(error));
+    if (error.key === "rateLimited") startCooldown(error.retryAfter || 60);
     // A failed model call leaves the session usable: the backend already retried it, and
     // a resend reuses the write's request_id. Only a lost namespace or spent capacity
     // ends the session.
     if (error.key === "expired") { token = null; save(); }
-    if (error.key === "expired" || error.key === "capacity") { ready = false; status("down", pairOf(error)); }
+    if (error.key === "expired" || error.key === "capacity" || !token) { scenarioRun = null; ready = false; status("down", pairOf(error)); }
   } finally { busy = false; controls(); }
 }
 // Progress the page can actually know: which request is running and for how long. The
@@ -504,41 +557,71 @@ function progressDone(started) {
   element.textContent = t(element.dataset.zh, element.dataset.en);
 }
 async function runLiveScenario(name) {
-  const scenario = SCENARIOS[name];
-  const started = Date.now();
-  const total = scenario.turns.length + 1;
+  if (scenarioRun) return;
   await action(async () => {
     await freshSession();
-    try {
-      for (const [i, turn] of scenario.turns.entries()) {
-        const text = turn.text[lang];
-        const on = turn.on;
-        $("conversationDate").value = on || "";
-        progress(i + 1, total, [`写入对话 ${conversation}${on ? `（${on}）` : ""}：抽取与时间线`, `Writing conversation ${conversation}${on ? ` (${on})` : ""}: extraction and timeline`]);
-        say("user", on ? `[${on}] ${text}` : text);
-        await remember(text);
-        conversation += 1;
-        save();
-        title();
-      }
-      $("conversationDate").value = "";
-      progress(total, total, ["检索与回答", "Retrieval and answer"]);
-      const question = scenario.question[lang];
-      say("user", question);
-      await ask(question);
-      if (scenario.asOf) await showAsOf(scenario.asOf);
-      progressDone(started);
-    } catch (error) {
-      clearInterval(progressTimer);
-      $("progress").textContent = "";
-      throw error;
-    }
+    scenarioRun = { name, language: lang, nextTurn: 0, answerDone: false, announced: null, started: Date.now() };
+    await advanceScenario();
   });
 }
+// Only advance after a successful response. A paused write retains pendingWrite's
+// identity; a completed answer is never called again just to retry as_of reads.
+async function advanceScenario() {
+  const run = scenarioRun;
+  const scenario = SCENARIOS[run.name];
+  const total = scenario.turns.length + 1;
+  try {
+    while (run.nextTurn < scenario.turns.length) {
+      const turn = scenario.turns[run.nextTurn];
+      const text = turn.text[run.language];
+      const on = turn.on;
+      $("conversationDate").value = on || "";
+      progress(run.nextTurn + 1, total, [`写入对话 ${conversation}${on ? `（${on}）` : ""}：抽取与时间线`, `Writing conversation ${conversation}${on ? ` (${on})` : ""}: extraction and timeline`]);
+      if (run.announced !== run.nextTurn) {
+        say("user", on ? `[${on}] ${text}` : text);
+        run.announced = run.nextTurn;
+      }
+      await remember(text);
+      run.nextTurn += 1;
+      conversation += 1;
+      save(); title();
+    }
+    $("conversationDate").value = "";
+    if (!run.answerDone) {
+      progress(total, total, ["检索与回答", "Retrieval and answer"]);
+      const question = scenario.question[run.language];
+      if (run.announced !== "answer") { say("user", question); run.announced = "answer"; }
+      await ask(question);
+      run.answerDone = true;
+    }
+    if (scenario.asOf) {
+      await showAsOf(scenario.asOf);
+      $("historyDetails").open = true;
+    }
+    progressDone(run.started);
+    scenarioRun = null;
+  } catch (error) {
+    clearInterval(progressTimer);
+    const element = $("progress");
+    [element.dataset.zh, element.dataset.en] = ["预设已暂停；可继续未完成步骤。离开或刷新页面后无法恢复进度。", "Preset paused; resume the unfinished step. Progress cannot resume after leaving or refreshing the page."];
+    element.textContent = t(element.dataset.zh, element.dataset.en);
+    throw error;
+  }
+}
+$("resumeScenario").addEventListener("click", () => { if (scenarioRun) action(advanceScenario); });
+$("leaveScenario").addEventListener("click", () => {
+  if (busy) return;
+  scenarioRun = null;
+  $("progress").textContent = "";
+  delete $("progress").dataset.zh;
+  delete $("progress").dataset.en;
+  controls();
+});
+
 $("messageForm").addEventListener("submit", (event) => {
   event.preventDefault();
   const text = $("message").value.trim();
-  if (!text) return;
+  if (!text || scenarioRun) return;
   action(async () => {
     say("user", text);
     if ($("operation").value === "remember") await remember(text);
@@ -555,7 +638,7 @@ $("deleteSession").addEventListener("click", async () => {
   busy = true; controls();
   try {
     await api("DELETE", "/demo/session");
-    token = null; ready = false; pendingWrite = null; save(); clearInspector();
+    token = null; ready = false; pendingWrite = null; scenarioRun = null; save(); clearInspector();
     status("down", COPY.deleted);
   } catch (error) { status("down", pairOf(error)); }
   finally { busy = false; controls(); }
@@ -574,4 +657,5 @@ const saved = loadSaved();
 if (saved) ({ token, conversation } = saved);
 applyLanguage();
 loadManifest();
+loadRecording();
 connect();

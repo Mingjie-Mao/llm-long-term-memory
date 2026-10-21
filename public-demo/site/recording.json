@@ -1,0 +1,521 @@
+{
+  "schema_version": 1,
+  "evidence_class": "functional-demo-recording",
+  "scenario": "fact updates / 事实变化",
+  "language": "zh-CN",
+  "recorded_at_utc": "2026-10-21T11:15:38.683223+00:00",
+  "environment": "Local real demo backend, ONNX encoder, dedicated scratch namespace, local .env key; no production model quota. Dialogue is fictional sample data.",
+  "source_commit": "bf61d26d857e0a14f23bf9436cd5409674358441",
+  "dirty_frontend": true,
+  "source_hashes": {
+    "public-demo/site/app.js": "c988df3e91dd0b2f6778edb54bd56c171a84d6c97407dc68dc33cfd61a25a1a1",
+    "public-demo/site/index.html": "0bb5bdea236d4fc9bbbb35c27aa68d15353bea8ff3aa46b16eae0fbe9896f476",
+    "public-demo/site/styles.css": "88990f7ace391936a867189ae9109cec6f52f5b5cf9030374c57a638bfdd8dba",
+    "configs/fallback.yaml": "397c0c59908079c965a96a690206c27320a3e0c0eb3b6a30eadc1ada19d8a0e8",
+    "src/llm_long_term_memory/runtime/answer_engine.py": "e9a738ab6693f89aa3ea9980d49334ebab5a734342e6cb3ed3129bf377eaad48"
+  },
+  "config": "configs/fallback.yaml",
+  "models": {
+    "extractor": "gemini-3.1-flash-lite",
+    "answerer": "gemini-3.5-flash-lite"
+  },
+  "sample_count": 1,
+  "selection": "One prespecified fact-update preset run, no alternate successful run selected. The run completed without page-level errors.",
+  "seed": null,
+  "prompt_or_extractor_changes": false,
+  "transcript": [
+    {
+      "role": "user",
+      "text": "[2024-03-10] 我的个人项目用的是 TensorFlow。"
+    },
+    {
+      "role": "status",
+      "text": "抽取完成：1 条事实。"
+    },
+    {
+      "role": "user",
+      "text": "[2026-09-01] 我的个人项目已经从 TensorFlow 换成了 PyTorch。"
+    },
+    {
+      "role": "status",
+      "text": "抽取完成：1 条事实。"
+    },
+    {
+      "role": "user",
+      "text": "我现在用什么框架？之前用的是什么？"
+    },
+    {
+      "role": "answer",
+      "text": "LLM 回答: 你现在使用的是 PyTorch，之前使用的是 TensorFlow。"
+    }
+  ],
+  "observed_results": {
+    "memories": "ml_framework = TensorFlow\nSUPERSEDED · PREFERENCE\nThe user uses TensorFlow for their personal project.\nconversation-1 · 2024-03-10 22:15:38 → 2026-09-01 22:15:58\nml_framework = PyTorch\nACTIVE · PREFERENCE\nThe user switched their personal project from TensorFlow to PyTorch.\nconversation-2 · 2026-09-01 22:15:58 → 至今",
+    "as_of": "2025-01-01\nml_framework = TensorFlow\n自 2024-03-10\n2026-09-30\nml_framework = PyTorch\n自 2026-09-01",
+    "progress": "完成 · 共 52s",
+    "source": "conversation-2 · turn 0: 我的个人项目已经从 TensorFlow 换成了 PyTorch。"
+  },
+  "usage": {
+    "by_model": [
+      {
+        "day": "2026-10-21",
+        "model": "gemini-3.1-flash-lite",
+        "operation": "extractor",
+        "calls": 4,
+        "failed_calls": 0,
+        "input_tokens": 4806,
+        "output_tokens": 298
+      },
+      {
+        "day": "2026-10-21",
+        "model": "gemini-3.5-flash-lite",
+        "operation": "answerer",
+        "calls": 2,
+        "failed_calls": 1,
+        "input_tokens": 396,
+        "output_tokens": 27
+      }
+    ],
+    "calls": 6,
+    "failed_calls": 1,
+    "recorded_tokens": 5527,
+    "scope": "Recorded usage includes failed attempts where reported; unreported provider usage and monetary billing are unavailable."
+  },
+  "failure_note": "One failed answer-model attempt was counted by the backend ledger; the request ultimately succeeded. Its exception class/status was not retained, so no specific provider failure cause is asserted.",
+  "editing": {
+    "capture": "Actual browser screenshots sampled during the real run; no generated UI states or replacement answers. No audio.",
+    "speedup": 4,
+    "final_result_hold_seconds": 8,
+    "post_run_cut": "Post-run idle inspection time omitted; final screenshot scrolled to show answer and as_of results.",
+    "source_frames": 83,
+    "raw_elapsed_seconds": 52.682,
+    "frame_hashes": [
+      {
+        "frame": "0000.jpg",
+        "at_ms": 0,
+        "sha256": "13d379d65cc9ed8905ac15f0c0fe344c77c1a1c7045f9a73cdd5d7a907266783"
+      },
+      {
+        "frame": "0001.jpg",
+        "at_ms": 596,
+        "sha256": "2d417c2196011f8bbc03f42274160ccc035b417dfd8cb8f5813e2634ac2e5fe5"
+      },
+      {
+        "frame": "0002.jpg",
+        "at_ms": 1138,
+        "sha256": "7d0d1f80fbf32fa29f75e18e8e20687f2e9a05cb50aeb1192c6a074a65f67108"
+      },
+      {
+        "frame": "0003.jpg",
+        "at_ms": 1754,
+        "sha256": "700692b02ea7921a6736b7520d708c8eedf7f167c6b1e0c471e838bde9551409"
+      },
+      {
+        "frame": "0004.jpg",
+        "at_ms": 2359,
+        "sha256": "a56fb863696ef2775281b9bb91f3e79ed7a3c69442d1b8e50e01ce06f2240104"
+      },
+      {
+        "frame": "0005.jpg",
+        "at_ms": 2894,
+        "sha256": "a56fb863696ef2775281b9bb91f3e79ed7a3c69442d1b8e50e01ce06f2240104"
+      },
+      {
+        "frame": "0006.jpg",
+        "at_ms": 3478,
+        "sha256": "3753ab01b5d5e8432f9ca95cd6dadedd717c0875a00221a16cc40aa76035ba12"
+      },
+      {
+        "frame": "0007.jpg",
+        "at_ms": 4011,
+        "sha256": "3753ab01b5d5e8432f9ca95cd6dadedd717c0875a00221a16cc40aa76035ba12"
+      },
+      {
+        "frame": "0008.jpg",
+        "at_ms": 4594,
+        "sha256": "b05bf090f6754dd0f03267377550130c5a2617de93d3a72a6238d73ef524a820"
+      },
+      {
+        "frame": "0009.jpg",
+        "at_ms": 5152,
+        "sha256": "b05bf090f6754dd0f03267377550130c5a2617de93d3a72a6238d73ef524a820"
+      },
+      {
+        "frame": "0010.jpg",
+        "at_ms": 5712,
+        "sha256": "816be1dac8bdae73eca6b55b7d8e7dd13c4f184c714045e69436e9d12bbdc7ff"
+      },
+      {
+        "frame": "0011.jpg",
+        "at_ms": 6319,
+        "sha256": "83eee275963f2eead22e738e46643f2c3c4abf777abb9895a98b8bdd67d60ae8"
+      },
+      {
+        "frame": "0012.jpg",
+        "at_ms": 6855,
+        "sha256": "83eee275963f2eead22e738e46643f2c3c4abf777abb9895a98b8bdd67d60ae8"
+      },
+      {
+        "frame": "0013.jpg",
+        "at_ms": 7422,
+        "sha256": "a46cb75aab6dbf4877e0e2ff60eb45c5d315429dca1d4941961116d0e450f66b"
+      },
+      {
+        "frame": "0014.jpg",
+        "at_ms": 8044,
+        "sha256": "a46cb75aab6dbf4877e0e2ff60eb45c5d315429dca1d4941961116d0e450f66b"
+      },
+      {
+        "frame": "0015.jpg",
+        "at_ms": 8654,
+        "sha256": "4bd0540d43b726c2d3d23d565f1e47939a8ab9e3ae8a721ef139c9ac83765bda"
+      },
+      {
+        "frame": "0016.jpg",
+        "at_ms": 9264,
+        "sha256": "77ac49355c41ca01281fe7379ce999ad1673955462f42a85fb03ba6563424c6c"
+      },
+      {
+        "frame": "0017.jpg",
+        "at_ms": 9793,
+        "sha256": "77ac49355c41ca01281fe7379ce999ad1673955462f42a85fb03ba6563424c6c"
+      },
+      {
+        "frame": "0018.jpg",
+        "at_ms": 10379,
+        "sha256": "9bcf750f474577cf0d6375e22f851fadafa6e1edb16f01b7b76a38062d77cecf"
+      },
+      {
+        "frame": "0019.jpg",
+        "at_ms": 10939,
+        "sha256": "9bcf750f474577cf0d6375e22f851fadafa6e1edb16f01b7b76a38062d77cecf"
+      },
+      {
+        "frame": "0020.jpg",
+        "at_ms": 11497,
+        "sha256": "ec68f434d5433d062df284c525bad81576cb9c0b951088ca738169205b6f8be2"
+      },
+      {
+        "frame": "0021.jpg",
+        "at_ms": 12106,
+        "sha256": "ec68f434d5433d062df284c525bad81576cb9c0b951088ca738169205b6f8be2"
+      },
+      {
+        "frame": "0022.jpg",
+        "at_ms": 12644,
+        "sha256": "fcf2b311d8717ed91c373031ff8c146d82bf29f2f9de12f5fae97bba4a42c452"
+      },
+      {
+        "frame": "0023.jpg",
+        "at_ms": 13202,
+        "sha256": "fcf2b311d8717ed91c373031ff8c146d82bf29f2f9de12f5fae97bba4a42c452"
+      },
+      {
+        "frame": "0024.jpg",
+        "at_ms": 13836,
+        "sha256": "64c9c50b952bcea679b32ac65c80d5b9486074288e3e9d2f600c1200e4f2c91a"
+      },
+      {
+        "frame": "0025.jpg",
+        "at_ms": 14447,
+        "sha256": "3ffc354af4d84ba744c841463f83295752ea0012fc29d5e4a30c466575cd2939"
+      },
+      {
+        "frame": "0026.jpg",
+        "at_ms": 15057,
+        "sha256": "3ffc354af4d84ba744c841463f83295752ea0012fc29d5e4a30c466575cd2939"
+      },
+      {
+        "frame": "0027.jpg",
+        "at_ms": 15662,
+        "sha256": "6155949446c678a96ca4e56acd8481f1952aeff2d44edf5a6b8a5501dc41fe46"
+      },
+      {
+        "frame": "0028.jpg",
+        "at_ms": 16212,
+        "sha256": "3f311fb431dd6008af814f2dac9b4e10c121971d5d919eebb51264cf9865f707"
+      },
+      {
+        "frame": "0029.jpg",
+        "at_ms": 16753,
+        "sha256": "3f311fb431dd6008af814f2dac9b4e10c121971d5d919eebb51264cf9865f707"
+      },
+      {
+        "frame": "0030.jpg",
+        "at_ms": 17391,
+        "sha256": "2fdfddce81d349a043238a3d0c7c4c999648f99cb94943f282d957fa734b83f0"
+      },
+      {
+        "frame": "0031.jpg",
+        "at_ms": 17973,
+        "sha256": "2fdfddce81d349a043238a3d0c7c4c999648f99cb94943f282d957fa734b83f0"
+      },
+      {
+        "frame": "0032.jpg",
+        "at_ms": 18597,
+        "sha256": "35ae30fec3b35a553daaaa1cacf139b9fe62ee66b356b22a4858db0668b29cb1"
+      },
+      {
+        "frame": "0033.jpg",
+        "at_ms": 19208,
+        "sha256": "0f1c3cc8149c000bb006afb22f3223d89ad1ca492c2590548aedf8e91870ffb1"
+      },
+      {
+        "frame": "0034.jpg",
+        "at_ms": 19822,
+        "sha256": "e8e20363265fe21ff24aa6ad9c4c007fa399db288e25f2840ad49b4d86f33680"
+      },
+      {
+        "frame": "0035.jpg",
+        "at_ms": 20399,
+        "sha256": "e8e20363265fe21ff24aa6ad9c4c007fa399db288e25f2840ad49b4d86f33680"
+      },
+      {
+        "frame": "0036.jpg",
+        "at_ms": 20933,
+        "sha256": "62247755d593e8cf974ac803eec82591efcc5bbe18c94ea13429e211102a6b62"
+      },
+      {
+        "frame": "0037.jpg",
+        "at_ms": 21498,
+        "sha256": "62247755d593e8cf974ac803eec82591efcc5bbe18c94ea13429e211102a6b62"
+      },
+      {
+        "frame": "0038.jpg",
+        "at_ms": 22030,
+        "sha256": "bf06e7d4643025024631d7a5bccad336880d0cbac63f6bcb7cc7ad9e5d4627b8"
+      },
+      {
+        "frame": "0039.jpg",
+        "at_ms": 22660,
+        "sha256": "bf06e7d4643025024631d7a5bccad336880d0cbac63f6bcb7cc7ad9e5d4627b8"
+      },
+      {
+        "frame": "0040.jpg",
+        "at_ms": 23215,
+        "sha256": "b125c1357f283191a68d6696ac727d87383d0fc400ba8a525ade62eda75c0132"
+      },
+      {
+        "frame": "0041.jpg",
+        "at_ms": 23763,
+        "sha256": "911d59715ffa01f5e920a79cab851e7efa387bdf5956eee3769c1fdb33d05780"
+      },
+      {
+        "frame": "0042.jpg",
+        "at_ms": 24378,
+        "sha256": "911d59715ffa01f5e920a79cab851e7efa387bdf5956eee3769c1fdb33d05780"
+      },
+      {
+        "frame": "0043.jpg",
+        "at_ms": 24986,
+        "sha256": "a40c371ab6f351ac9bf987555a0a42fc55cf29c24c2f7f7b5f3246d9b750288c"
+      },
+      {
+        "frame": "0044.jpg",
+        "at_ms": 25523,
+        "sha256": "a40c371ab6f351ac9bf987555a0a42fc55cf29c24c2f7f7b5f3246d9b750288c"
+      },
+      {
+        "frame": "0045.jpg",
+        "at_ms": 26104,
+        "sha256": "d6bbb355f8a80eb8217ee30c29f1735c85bcc73505bd7414c6f4a613165d728b"
+      },
+      {
+        "frame": "0046.jpg",
+        "at_ms": 26721,
+        "sha256": "cce050c5cd71326aeae689d0cd3f31bf26dd4245486b3fbe4b96dc276e633d65"
+      },
+      {
+        "frame": "0047.jpg",
+        "at_ms": 27260,
+        "sha256": "cce050c5cd71326aeae689d0cd3f31bf26dd4245486b3fbe4b96dc276e633d65"
+      },
+      {
+        "frame": "0048.jpg",
+        "at_ms": 27828,
+        "sha256": "96743134588a0dae38c040d859db16ac6c0a317088791ba46827f404648457e6"
+      },
+      {
+        "frame": "0049.jpg",
+        "at_ms": 28437,
+        "sha256": "96743134588a0dae38c040d859db16ac6c0a317088791ba46827f404648457e6"
+      },
+      {
+        "frame": "0050.jpg",
+        "at_ms": 29041,
+        "sha256": "1dcb486389d4e0007b1eaeac986f7bfe91237ca5618dae8f7c29f13a60652847"
+      },
+      {
+        "frame": "0051.jpg",
+        "at_ms": 29653,
+        "sha256": "1dcb486389d4e0007b1eaeac986f7bfe91237ca5618dae8f7c29f13a60652847"
+      },
+      {
+        "frame": "0052.jpg",
+        "at_ms": 30262,
+        "sha256": "5350fa650e44c1e93ebd03ff9e3eaa94206a78637250bd6c641799e921d359e0"
+      },
+      {
+        "frame": "0053.jpg",
+        "at_ms": 30799,
+        "sha256": "85c01f5d2415495fceb712c2c154231f6106447ee783e61093b6fd17797acc39"
+      },
+      {
+        "frame": "0054.jpg",
+        "at_ms": 31377,
+        "sha256": "85c01f5d2415495fceb712c2c154231f6106447ee783e61093b6fd17797acc39"
+      },
+      {
+        "frame": "0055.jpg",
+        "at_ms": 31987,
+        "sha256": "0c320b659c11a6e0116d61950d2efb2657801bfcf20f5ff32ff46aab11bee289"
+      },
+      {
+        "frame": "0056.jpg",
+        "at_ms": 32559,
+        "sha256": "0c320b659c11a6e0116d61950d2efb2657801bfcf20f5ff32ff46aab11bee289"
+      },
+      {
+        "frame": "0057.jpg",
+        "at_ms": 33103,
+        "sha256": "4ae7739cd206429b15e3b600ca09076f7816c043421db1145bd1c9fcefbfa8c2"
+      },
+      {
+        "frame": "0058.jpg",
+        "at_ms": 33714,
+        "sha256": "facba6236de30a5ecb156f6beded138bbdaec556923898505aad86b1226c1500"
+      },
+      {
+        "frame": "0059.jpg",
+        "at_ms": 34313,
+        "sha256": "facba6236de30a5ecb156f6beded138bbdaec556923898505aad86b1226c1500"
+      },
+      {
+        "frame": "0060.jpg",
+        "at_ms": 34930,
+        "sha256": "f2aa1fe5073264c1504a5f0a7b3b0cd85ccc210f927226ad9beb655d66edb5ba"
+      },
+      {
+        "frame": "0061.jpg",
+        "at_ms": 35457,
+        "sha256": "f2aa1fe5073264c1504a5f0a7b3b0cd85ccc210f927226ad9beb655d66edb5ba"
+      },
+      {
+        "frame": "0062.jpg",
+        "at_ms": 36046,
+        "sha256": "9a4c93fa5d2b1837282f8332bb374e93f5f77225790c661aa11db78f2959db2c"
+      },
+      {
+        "frame": "0063.jpg",
+        "at_ms": 36597,
+        "sha256": "9a4c93fa5d2b1837282f8332bb374e93f5f77225790c661aa11db78f2959db2c"
+      },
+      {
+        "frame": "0064.jpg",
+        "at_ms": 37165,
+        "sha256": "08c51c20ff90bba6d33000fcb7f6feadd3078fb8efa42c8e9afbb66253791b70"
+      },
+      {
+        "frame": "0065.jpg",
+        "at_ms": 37769,
+        "sha256": "aea681b0720e4b919cf9cb62955d7911a02891e5148a542025fa96dc869d6ce5"
+      },
+      {
+        "frame": "0066.jpg",
+        "at_ms": 45026,
+        "sha256": "34a18784e2d4a64b56016665935876e5035e7135f916141ad20fbd43241f9346"
+      },
+      {
+        "frame": "0067.jpg",
+        "at_ms": 45587,
+        "sha256": "34a18784e2d4a64b56016665935876e5035e7135f916141ad20fbd43241f9346"
+      },
+      {
+        "frame": "0068.jpg",
+        "at_ms": 46135,
+        "sha256": "1952eec61df47cb126ab7dbc421a2dde3e9ecc5c48076a0aad78cb1ba284a9df"
+      },
+      {
+        "frame": "0069.jpg",
+        "at_ms": 46697,
+        "sha256": "1952eec61df47cb126ab7dbc421a2dde3e9ecc5c48076a0aad78cb1ba284a9df"
+      },
+      {
+        "frame": "0070.jpg",
+        "at_ms": 47305,
+        "sha256": "4ec54bedb30be419986bb7821649daf8156020255e56d64b4c1ad631302571de"
+      },
+      {
+        "frame": "0071.jpg",
+        "at_ms": 47890,
+        "sha256": "d9e7c551bd7d8979f085acf25c80c98cb6e1986d18d1e20244a90a6445bcffb2"
+      },
+      {
+        "frame": "0072.jpg",
+        "at_ms": 48421,
+        "sha256": "d9e7c551bd7d8979f085acf25c80c98cb6e1986d18d1e20244a90a6445bcffb2"
+      },
+      {
+        "frame": "0073.jpg",
+        "at_ms": 48952,
+        "sha256": "6d3c7bb3f01314b90f682987fd33df3210ea4f148e45aecb58253146a22ed930"
+      },
+      {
+        "frame": "0074.jpg",
+        "at_ms": 49482,
+        "sha256": "6d3c7bb3f01314b90f682987fd33df3210ea4f148e45aecb58253146a22ed930"
+      },
+      {
+        "frame": "0075.jpg",
+        "at_ms": 50013,
+        "sha256": "d7d3e4fcd5195b9fcbdc025db1d539755e6294c034c43fb21d5725320e680279"
+      },
+      {
+        "frame": "0076.jpg",
+        "at_ms": 50541,
+        "sha256": "d7d3e4fcd5195b9fcbdc025db1d539755e6294c034c43fb21d5725320e680279"
+      },
+      {
+        "frame": "0077.jpg",
+        "at_ms": 51075,
+        "sha256": "89d3848078ba825c33d536bcee26fbc04376c542b874892e0645f07c315f3794"
+      },
+      {
+        "frame": "0078.jpg",
+        "at_ms": 51609,
+        "sha256": "89d3848078ba825c33d536bcee26fbc04376c542b874892e0645f07c315f3794"
+      },
+      {
+        "frame": "0079.jpg",
+        "at_ms": 52142,
+        "sha256": "3906b90bde58c9a0d74e1dd0f23b5cba0b0156607ef9bbd32b1d89f5b8f4ae8a"
+      },
+      {
+        "frame": "0080.jpg",
+        "at_ms": 52682,
+        "sha256": "8b5fd74a1ce38601efb77b4563280a06adb78dfeb00ec038f9426eb6e6860f1e"
+      },
+      {
+        "frame": "0081.jpg",
+        "at_ms": 62236,
+        "sha256": "8b5fd74a1ce38601efb77b4563280a06adb78dfeb00ec038f9426eb6e6860f1e"
+      },
+      {
+        "frame": "0082.jpg",
+        "at_ms": 78441,
+        "sha256": "3273a67adc371b924413f5c8b15090715e7bcbc495096627b06af15354c57006"
+      }
+    ],
+    "encoded_duration_seconds": 24.666667
+  },
+  "assets": {
+    "demo-run.mp4": "7605a186914ab8e3294c67c2e275ea4f8d64993587e8997328b107d0237f23f2",
+    "demo-poster.jpg": "3273a67adc371b924413f5c8b15090715e7bcbc495096627b06af15354c57006"
+  },
+  "scope": "Demonstrates a recorded functional flow, not current service availability, a success-rate estimate, a benchmark or an unseen test result.",
+  "source_archive": {
+    "path": "public-demo/recordings/20261021-fact-updates-zh-source.zip",
+    "sha256": "cf2a2a66b7a6a8f96fbfabf13d76c9f700c4bec6a6dd80cc5611ccf5a937a377",
+    "note": "Capture-time source snapshot; presentation-only refinements after recording may differ from the deployed page."
+  }
+}

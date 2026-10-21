@@ -1,7 +1,7 @@
 # Public demo
 
 Source for <https://lltm-memory.pages.dev>. Deploy **only `public-demo/site`**.
-The eight files in that folder are the complete public surface; documentation,
+The eleven files in that folder are the complete public surface; documentation,
 Python tools, credentials, datasets and stores stay outside it.
 
 The live LLM playground was enabled on 2026-10-20 UTC. Its
@@ -49,6 +49,29 @@ Provider errors, exhausted capacity and timeouts never substitute rule-generated
 answers. Legacy `/demo/facts` and retrieval routes remain for engine smoke tests.
 No model calls occur during page load, health checks or session creation.
 
+### Interrupted runs and recorded walkthrough
+
+A failed preset can resume its unfinished step within the same page. Successful
+writes are kept; failed writes retain the original request identity, and a completed
+answer is not called again to retry an `as_of` read. Reloading or leaving the page
+loses this in-memory progress. Leaving the preset keeps saved memories and restores
+free input. Provider 503 still has one page retry; 429 pauses calls with a countdown
+instead of automatic retries. Shared quota and provider outages can still prevent a
+live run from completing.
+
+A labelled, silent real-model recording remains available while the backend wakes
+or is unavailable. It uses fictional preset dialogue on a local backend, not a live
+visitor session. `recording.json` records transcript, model usage, capture-time source
+hashes, editing and video/poster hashes. Waiting is accelerated; the actual final
+result is held for reading. A failed internal attempt remains in the usage record.
+The capture-time source snapshot is retained under `public-demo/recordings/` and is
+outside the deploy root. This is functional evidence, not a success-rate benchmark.
+
+The Inspector starts with facts and answer sources visible; historical queries,
+unused memories and prompts are collapsed. A dated preset opens its historical result
+after completion. Python engineering figures in `release.json` keep their existing
+measurement definition; Node browser-flow tests run separately in CI.
+
 ### Identity, data and capacity
 
 The server issues a signed anonymous namespace token. New conversations retain that
@@ -85,6 +108,7 @@ needs memory verification on the chosen host; no production deployment is implie
 .venv/bin/python demo-api/check_imports.py
 .venv/bin/python demo-api/smoke.py
 node --check public-demo/site/app.js
+node --test public-demo/test_app.mjs
 .venv/bin/python public-demo/check_site.py
 ```
 
@@ -148,6 +172,6 @@ npx wrangler@4 pages deploy public-demo/site --project-name lltm-memory --branch
 
 Authenticate separately with `npx wrangler@4 login` when needed. Verify that links
 to GitHub evidence already exist on `origin/main` before deploying. The upload
-must contain exactly the eight files checked by `check_site.py`.
+must contain exactly the eleven files checked by `check_site.py`.
 
 The repository's Inspector is a separate authenticated tool, not this public demo.

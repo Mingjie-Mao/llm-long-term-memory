@@ -348,3 +348,17 @@ td { font-variant-numeric: tabular-nums; }
   .engineering > div:last-child { grid-column: 1 / -1; }
   th, td { padding: 10px 12px; }
 }
+
+/* Recorded walkthrough stays available while the live backend starts. */
+.recording { margin: 0 0 28px; padding: 14px 18px; background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); }
+.recording > summary { color: var(--accent); font-weight: 600; cursor: pointer; }
+.recording .lede { margin: 12px 0; font-size: 13px; }
+.recording-outcome { font-size: 13px; }
+.recording video { display: block; width: 100%; max-height: 560px; background: #14201E; border-radius: 8px; }
+#recordingTranscript { font-size: 13px; overflow-wrap: anywhere; }
+.capacity-note { font-size: 12px; color: var(--muted); margin: 14px 0; max-width: 78ch; }
+#scenarioActions { margin: 0 0 16px; }
+#cooldown:empty { display: none; }
+.pane > details { border-top: 1px solid var(--line); padding-top: 12px; }
+.pane > details > summary { color: var(--muted); cursor: pointer; }
+.pane > details[open] > summary { margin-bottom: 14px; }

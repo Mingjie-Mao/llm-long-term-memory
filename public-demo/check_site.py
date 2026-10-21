@@ -11,6 +11,9 @@ HERE = Path(__file__).resolve().parent
 SITE = HERE / "site"
 EXPECTED_FILES = {
     "404.html",
+    "demo-run.mp4",
+    "demo-poster.jpg",
+    "recording.json",
     "app.js",
     "content.js",
     "index.html",
@@ -109,10 +112,31 @@ def main() -> int:
     )
 
     for _, attrs in elements:
-        asset = attrs.get("href") or attrs.get("src")
+        asset = attrs.get("href") or attrs.get("src") or attrs.get("poster")
         if asset and asset.startswith("./") and not asset.startswith("./#"):
             target = asset.removeprefix("./").split("?", 1)[0].split("#", 1)[0]
             assert (SITE / target).exists(), f"missing local asset: {asset}"
+
+    for identity in ("historyDetails", "selectionDetails", "promptDetails"):
+        attrs = next(
+            attrs for tag, attrs in elements if tag == "details" and attrs.get("id") == identity
+        )
+        assert "open" not in attrs, f"advanced inspector panel {identity} must start collapsed"
+    video = next(attrs for tag, attrs in elements if tag == "video")
+    assert "controls" in video and "autoplay" not in video and video.get("preload") == "none"
+    assert "recorded run" in index.lower() and "not current service status" in index
+    import hashlib
+
+    recording = json.loads((SITE / "recording.json").read_text(encoding="utf-8"))
+    assert recording["evidence_class"] == "functional-demo-recording"
+    assert recording["transcript"] and recording["usage"]["calls"] > 0
+    assert recording["usage"]["failed_calls"] >= 0
+    for name, digest in recording["assets"].items():
+        assert (
+            name in EXPECTED_FILES
+            and hashlib.sha256((SITE / name).read_bytes()).hexdigest() == digest
+        ), f"recording asset differs from its provenance: {name}"
+    assert 0 < (SITE / "demo-run.mp4").stat().st_size < 10_000_000
 
     release = json.loads((SITE / "release.json").read_text(encoding="utf-8"))
     schema = json.loads((SITE / "release.schema.json").read_text(encoding="utf-8"))
@@ -225,7 +249,7 @@ def main() -> int:
     )
     assert scenario_body, "runLiveScenario is missing"
     body = scenario_body.group("body")
-    assert body.index("await freshSession();") < body.index("await remember(text);")
+    assert body.index("await freshSession();") < body.index("await advanceScenario();")
     assert '"/demo/messages"' in app and '"/demo/answer"' in app
     assert '"/demo/facts"' not in app and "PATTERNS" not in app, "UI bypasses LLM extraction"
     assert 'result.mode !== "llm"' in app and 'result.answer_profile !== "t4"' in app

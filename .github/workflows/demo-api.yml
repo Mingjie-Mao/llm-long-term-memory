@@ -42,6 +42,10 @@ jobs:
         run: uv run --no-project python public-demo/check_site.py
       - name: Check accidental upload regressions
         run: uv run --no-project python -m unittest discover -s public-demo -p 'test_*.py'
+      - name: Check browser flow recovery with scripted HTTP (no model calls)
+        run: |
+          node --check public-demo/site/app.js
+          node --test public-demo/test_app.mjs
       - name: Verify published regression against its completion audit
         run: uv run --no-project python public-demo/update_regression_figures.py --check
 

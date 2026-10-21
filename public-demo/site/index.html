@@ -26,6 +26,14 @@
   <h1 data-zh="看见长期记忆如何形成与变化。" data-en="Live Memory Playground: watch long-term memory form and change.">Live Memory Playground: watch long-term memory form and change.</h1>
   <p class="hero-note" data-zh="自然语言 → 两阶段 LLM 抽取 → 时序记忆 → t4 回答与原文证据。模型不可用时明确报错，不以规则答案替代。" data-en="Natural language → two-stage LLM extraction → temporal memory → t4 answers and source evidence. Unavailable models produce an error, never a rule-based substitute.">Natural language → two-stage LLM extraction → temporal memory → t4 answers and source evidence. Unavailable models produce an error, never a rule-based substitute.</p>
 
+  <details class="recording" id="recordedDemo">
+    <summary data-zh="不必等后端唤醒：先看真实运行录屏" data-en="While the backend wakes: watch a recorded real run">While the backend wakes: watch a recorded real run</summary>
+    <p class="lede" data-zh="已录制演示：中文事实变化预设，使用本地真实模型和虚构对话。等待已加速，无音频。这不是当前服务状态，也不消耗访客的模型额度。" data-en="A recorded run of the Chinese fact-update preset, using real models on a local backend and fictional dialogue. Waiting is sped up; no audio. This is not current service status and uses no visitor model quota.">A recorded run of the Chinese fact-update preset, using real models on a local backend and fictional dialogue. Waiting is sped up; no audio. This is not current service status and uses no visitor model quota.</p>
+    <p class="recording-outcome" data-zh="录制结果：从 TensorFlow 更新为 PyTorch；历史查询在更新前返回 TensorFlow、更新后返回 PyTorch。" data-en="Recorded outcome: TensorFlow changes to PyTorch. Historical queries return TensorFlow before the update and PyTorch after it.">Recorded outcome: TensorFlow changes to PyTorch. Historical queries return TensorFlow before the update and PyTorch after it.</p>
+    <video id="demoVideo" poster="./demo-poster.jpg" controls playsinline preload="none" aria-label="Recorded real model demonstration" data-aria-zh="真实模型运行录屏" data-aria-en="Recorded real model demonstration"><source src="./demo-run.mp4" type="video/mp4"><a href="./demo-run.mp4" data-zh="下载录屏" data-en="Download the recording">Download the recording</a></video>
+    <details><summary data-zh="文字记录与录制信息" data-en="Transcript and recording details">Transcript and recording details</summary><div id="recordingTranscript"></div><a href="./recording.json" data-zh="查看录制来源与用量" data-en="Recording provenance and usage">Recording provenance and usage</a></details>
+  </details>
+
   <section class="demo" aria-labelledby="try-title">
     <div class="demo-head">
       <h2 id="try-title" data-zh="与长期记忆交互" data-en="Interact with long-term memory">Interact with long-term memory</h2>
@@ -41,6 +49,12 @@
       <button class="chip" type="button" data-live="temporal" aria-pressed="false" disabled data-requires-live data-zh="对话时间与事实时间" data-en="Said later, happened earlier">Said later, happened earlier</button>
     </div>
     <p class="pane-foot" data-zh="运行预设会新建演示空间并清除当前空间。也可以直接输入自己的自然语言。" data-en="Presets start a fresh demo namespace and delete the current one. You can also enter your own natural language.">Presets start a fresh demo namespace and delete the current one. You can also enter your own natural language.</p>
+    <p class="capacity-note" data-zh="所有访客共享模型额度。预设失败后可继续未完成步骤；遇到限流请按倒计时等待，也可先看上方已录制演示。" data-en="Visitors share model quota. Resume an interrupted preset from its unfinished step; wait for the countdown after a rate limit, or watch the recording above.">Visitors share model quota. Resume an interrupted preset from its unfinished step; wait for the countdown after a rate limit, or watch the recording above.</p>
+    <p id="cooldown" class="note" role="status" aria-live="polite"></p>
+    <div id="scenarioActions" class="demo-actions" hidden>
+      <button id="resumeScenario" class="primary" type="button" disabled data-zh="继续未完成的预设" data-en="Resume interrupted preset">Resume interrupted preset</button>
+      <button id="leaveScenario" class="ghost" type="button" disabled data-zh="结束预设，保留已写入记忆" data-en="Leave preset, keep saved memories">Leave preset, keep saved memories</button>
+    </div>
     <div class="split">
       <div class="pane">
         <div class="pane-head">
@@ -71,6 +85,11 @@
       <div class="pane">
         <h3 class="pane-title" data-zh="Memory Inspector · 抽取事实与时间线" data-en="Memory Inspector · facts and timeline">Memory Inspector · facts and timeline</h3>
         <ul class="state" id="memoryState"><li class="empty" data-zh="保存一段话后，在这里查看抽取的事实。" data-en="Save a message to inspect extracted facts here.">Save a message to inspect extracted facts here.</li></ul>
+        <h3 class="pane-title" data-zh="本次回答用到的证据" data-en="Evidence behind this answer">Evidence behind this answer</h3>
+        <div id="recovery"></div>
+        <div id="sources"><p class="empty" data-zh="提问后展示本次选中记忆的原文出处。" data-en="Ask a question to inspect the sources of selected memories.">Ask a question to inspect the sources of selected memories.</p></div>
+        <details id="historyDetails">
+          <summary data-zh="按日期查看历史状态 · as_of" data-en="Historical state by date · as_of">Historical state by date · as_of</summary>
         <h3 class="pane-title" data-zh="某一天成立的事实 · as_of" data-en="Facts in force on a date · as_of">Facts in force on a date · as_of</h3>
         <form id="asOfForm" class="as-of">
           <label class="sr-only" for="asOfDate" data-zh="查询日期" data-en="Date to inspect">Date to inspect</label>
@@ -78,12 +97,13 @@
           <button class="ghost small" type="submit" disabled data-requires-live data-zh="查看" data-en="Show">Show</button>
         </form>
         <ul class="state" id="asOfState"><li class="empty" data-zh="选一个日期，查看那天结束时成立的事实。只读取已存的时间区间，不调用模型。" data-en="Pick a date to see the facts in force at the end of that day. Reads stored intervals only; no model call.">Pick a date to see the facts in force at the end of that day. Reads stored intervals only; no model call.</li></ul>
-        <h3 class="pane-title" data-zh="本次回答用到的证据" data-en="Evidence behind this answer">Evidence behind this answer</h3>
-        <div id="recovery"></div>
-        <div id="sources"><p class="empty" data-zh="提问后展示本次选中记忆的原文出处。" data-en="Ask a question to inspect the sources of selected memories.">Ask a question to inspect the sources of selected memories.</p></div>
+        </details>
+        <details id="selectionDetails">
+          <summary data-zh="没有进入本次回答的记忆" data-en="Memories this answer did not use">Memories this answer did not use</summary>
         <h3 class="pane-title" data-zh="没有进入本次回答的记忆" data-en="Memories this answer did not use">Memories this answer did not use</h3>
         <ul class="state" id="notSelected"><li class="empty" data-zh="提问后展示。" data-en="Shown after a question.">Shown after a question.</li></ul>
-        <details>
+        </details>
+        <details id="promptDetails">
           <summary data-zh="实际回答请求的提示词（含原文补全与回退）" data-en="Answer request prompts, including raw evidence and fallback">Answer request prompts, including raw evidence and fallback</summary>
           <div id="modelInputs"></div>
         </details>
@@ -168,7 +188,7 @@
       <article><h3 data-zh="按用户隔离与工具接入" data-en="User isolation + tool access">User isolation + tool access</h3><p data-zh="记忆与原文读取限定用户命名空间，通过 REST、MCP、Python 和 CLI 接入。当前会话上下文由调用方管理。" data-en="Memory and source reads stay within the user namespace. Integrate through REST, MCP, Python or CLI; the caller manages current conversation context.">Memory and source reads stay within the user namespace. Integrate through REST, MCP, Python or CLI; the caller manages current conversation context.</p></article>
     </div>
     <dl class="engineering" aria-describedby="engineeringNote">
-      <div><dt data-zh="自动化工程测试" data-en="Automated engineering tests">Automated engineering tests</dt><dd id="engineeringTests">—</dd></div>
+      <div><dt data-zh="Python 工程测试" data-en="Python engineering tests">Python engineering tests</dt><dd id="engineeringTests">—</dd></div>
       <div><dt data-zh="行覆盖率" data-en="Line coverage">Line coverage</dt><dd id="engineeringCoverage">—</dd></div>
       <div><dt data-zh="CI 平台" data-en="CI platforms">CI platforms</dt><dd id="engineeringPlatforms">—</dd></div>
     </dl>
