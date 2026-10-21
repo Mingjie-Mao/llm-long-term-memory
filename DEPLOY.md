@@ -17,15 +17,18 @@ holds real data and that changes what it needs.
 
 ## B2 · Redeploy the page
 
-The live page was deployed from `a0afe73` on 2026-10-20 UTC: bilingual write/read
-architecture, separately scoped benchmark tables, project capabilities and engineering
-figures read from the unchanged release manifest. Its
-[deployment record](public-demo/deployments/20261021-project-overview.json) binds the
-eight published files to their hashes and records the local and production checks.
-The [previous bilingual-preset record](public-demo/deployments/20261021-bilingual-presets.json)
-retains preset validation and the intermittent provider-503 diagnosis; the
-[first live record](public-demo/deployments/20261020-live-memory.json) holds the backend
-resource checks. All deployment records are retained in `public-demo/deployments/`.
+The live page was deployed from `67356f3` on 2026-10-21 UTC: interrupted presets
+resume their unfinished step, rate limits show a cooldown, advanced Inspector panels
+start collapsed, and a labelled real-model recording is available while the backend
+wakes. The [deployment record](public-demo/deployments/20261021-visitor-experience.json)
+binds the eleven published files (including video, poster and recording provenance)
+to their hashes and records the functional checks and local model usage.
+The [previous overview record](public-demo/deployments/20261021-project-overview.json)
+retains the architecture and benchmark presentation checks; the
+[bilingual-preset record](public-demo/deployments/20261021-bilingual-presets.json)
+retains the provider-503 diagnosis, and the
+[first live record](public-demo/deployments/20261020-live-memory.json) holds backend
+resource checks. All records remain in `public-demo/deployments/`.
 
 ```bash
 # 1. Check the deploy root is complete and self-consistent. Stdlib only, no install.

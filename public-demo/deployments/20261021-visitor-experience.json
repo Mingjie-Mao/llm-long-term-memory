@@ -1,0 +1,225 @@
+{
+  "schema_version": 1,
+  "deployed_at_utc": "2026-10-21T11:28:12.476595+00:00",
+  "provider": "cloudflare-pages",
+  "project": "lltm-memory",
+  "branch": "main",
+  "deployment_id": "ca2cd3ae",
+  "deployment_url": "https://ca2cd3ae.lltm-memory.pages.dev",
+  "production_url": "https://lltm-memory.pages.dev",
+  "git_head": "67356f32f420de71d190dcbf882b8b9670dbc609",
+  "dirty_worktree": false,
+  "deploy_root": "public-demo/site",
+  "files": [
+    {
+      "path": "404.html",
+      "sha256": "aba2017a3b9f7b34bc3923b00bafca4aa1bfd61534e383e88656065b60688732"
+    },
+    {
+      "path": "app.js",
+      "sha256": "cb8b2b985be1bff71c1012fa031ff8c342f6802c54172f4a688b9c18c5ee344b"
+    },
+    {
+      "path": "content.js",
+      "sha256": "fad0ec99b25f7a15c74c2cc97de5cc78556dc25d27e04dfecc193c43c035eb7f"
+    },
+    {
+      "path": "demo-poster.jpg",
+      "sha256": "3273a67adc371b924413f5c8b15090715e7bcbc495096627b06af15354c57006"
+    },
+    {
+      "path": "demo-run.mp4",
+      "sha256": "7605a186914ab8e3294c67c2e275ea4f8d64993587e8997328b107d0237f23f2"
+    },
+    {
+      "path": "index.html",
+      "sha256": "3d25df8696d2a445850eeb6640438d3f30391eeea4de6fbeb0e2864bdf515bee"
+    },
+    {
+      "path": "playground.html",
+      "sha256": "f8685c6ab83cbca75c4bae77d69dacd130337f43e4ba5bcbd057d5b8c53d7d90"
+    },
+    {
+      "path": "recording.json",
+      "sha256": "549ab48cfd57dfc3f2fdbfe5827ae232009a4363d75a7d6a6761dd8abd33c691"
+    },
+    {
+      "path": "release.json",
+      "sha256": "9cd7bc74fdb44aa377e512a2464147f16981e81fdcfdf2431f4c6f34bdfcddfa"
+    },
+    {
+      "path": "release.schema.json",
+      "sha256": "43140f5ffecc104848fe0b61d3efe9aff738cbe8826907dd6f9732013eceb6ad"
+    },
+    {
+      "path": "styles.css",
+      "sha256": "862a4736cfe413fd665c35728b884ff9f0b5f4995971bb913dfe9569df81a9af"
+    }
+  ],
+  "note": "Visitor experience: resume interrupted presets without replaying successful writes or answers; rate-limit countdown without automatic 429 retries; collapsed advanced Inspector panels; labelled real-model recording with transcript and provenance, available independently of the backend.",
+  "backend": {
+    "changed": false,
+    "server_retry_attempts": 2,
+    "shared_capacity_changed": false,
+    "note": "No model/prompt/extractor/storage/retrieval changes. No new claim of provider reliability or production readiness."
+  },
+  "predeploy_checks": [
+    "node --check public-demo/site/app.js: passed.",
+    "node --test public-demo/test_app.mjs: 7 passed, no failed/skipped tests. Includes failed write identity, original preset language, answer retry, as_of-only retry, 429 cooldown, exhausted capacity and bounded 503 retry.",
+    "pytest tests/test_live_playground.py: 20 passed, 76 deprecation warnings; includes idempotent replay, bounded retry/capacity accounting and namespace isolation.",
+    "pytest tests/test_public_regression_figures.py tests/test_release_manifest.py: 12 passed.",
+    "python -m unittest discover -s public-demo -p 'test_*.py': 7 passed.",
+    "python public-demo/check_site.py: passed (11 files, 4 labelled fields); recording/video/poster hashes and initially collapsed advanced panels verified.",
+    "python public-demo/update_regression_figures.py --check: passed.",
+    "python public-demo/check_release_figures.py with localhost access: 2669 passed, 76 warnings; 2313 Python engineering tests + 356 document checks, line coverage 89%, measured tree unchanged; no failed/skipped tests.",
+    "ruff check . and ruff format --check .: passed (897 formatted files). git diff --check passed.",
+    "Local browser: real Chinese fact-update preset completed; TensorFlow superseded by PyTorch, both historical states and the answer correct. Video plays (H.264, 24.667 seconds, no audio).",
+    "Local browser with backend stopped: recording and transcript load, controls stay disabled for live calls; 390px mobile page has no horizontal overflow. History, unused memories and prompts initially collapsed.",
+    "public-demo CI for 67356f3 passed: https://github.com/Mingjie-Mao/llm-long-term-memory/actions/runs/39591893771"
+  ],
+  "postdeploy_checks": [
+    {
+      "url": "https://lltm-memory.pages.dev/404.html",
+      "sha256_matches": true
+    },
+    {
+      "url": "https://lltm-memory.pages.dev/app.js",
+      "sha256_matches": true
+    },
+    {
+      "url": "https://lltm-memory.pages.dev/content.js",
+      "sha256_matches": true
+    },
+    {
+      "url": "https://lltm-memory.pages.dev/demo-poster.jpg",
+      "sha256_matches": true
+    },
+    {
+      "url": "https://lltm-memory.pages.dev/demo-run.mp4",
+      "sha256_matches": true
+    },
+    {
+      "url": "https://lltm-memory.pages.dev/index.html",
+      "sha256_matches": true
+    },
+    {
+      "url": "https://lltm-memory.pages.dev/playground.html",
+      "sha256_matches": true
+    },
+    {
+      "url": "https://lltm-memory.pages.dev/recording.json",
+      "sha256_matches": true
+    },
+    {
+      "url": "https://lltm-memory.pages.dev/release.json",
+      "sha256_matches": true
+    },
+    {
+      "url": "https://lltm-memory.pages.dev/release.schema.json",
+      "sha256_matches": true
+    },
+    {
+      "url": "https://lltm-memory.pages.dev/styles.css",
+      "sha256_matches": true
+    },
+    {
+      "url": "https://ca2cd3ae.lltm-memory.pages.dev/404.html",
+      "sha256_matches": true
+    },
+    {
+      "url": "https://ca2cd3ae.lltm-memory.pages.dev/app.js",
+      "sha256_matches": true
+    },
+    {
+      "url": "https://ca2cd3ae.lltm-memory.pages.dev/content.js",
+      "sha256_matches": true
+    },
+    {
+      "url": "https://ca2cd3ae.lltm-memory.pages.dev/demo-poster.jpg",
+      "sha256_matches": true
+    },
+    {
+      "url": "https://ca2cd3ae.lltm-memory.pages.dev/demo-run.mp4",
+      "sha256_matches": true
+    },
+    {
+      "url": "https://ca2cd3ae.lltm-memory.pages.dev/index.html",
+      "sha256_matches": true
+    },
+    {
+      "url": "https://ca2cd3ae.lltm-memory.pages.dev/playground.html",
+      "sha256_matches": true
+    },
+    {
+      "url": "https://ca2cd3ae.lltm-memory.pages.dev/recording.json",
+      "sha256_matches": true
+    },
+    {
+      "url": "https://ca2cd3ae.lltm-memory.pages.dev/release.json",
+      "sha256_matches": true
+    },
+    {
+      "url": "https://ca2cd3ae.lltm-memory.pages.dev/release.schema.json",
+      "sha256_matches": true
+    },
+    {
+      "url": "https://ca2cd3ae.lltm-memory.pages.dev/styles.css",
+      "sha256_matches": true
+    }
+  ],
+  "recorded_run": {
+    "metadata_path": "public-demo/site/recording.json",
+    "metadata_sha256": "549ab48cfd57dfc3f2fdbfe5827ae232009a4363d75a7d6a6761dd8abd33c691",
+    "environment": "Local .env key, independent scratch namespace; not the production visitor quota. Fictional preset dialogue.",
+    "model_calls": 6,
+    "failed_calls": 1,
+    "recorded_tokens": 5527,
+    "failure_note": "One failed answer-model attempt was counted by the backend ledger; the request ultimately succeeded. Its exception class/status was not retained, so no specific provider failure cause is asserted.",
+    "source_archive": {
+      "path": "public-demo/recordings/20261021-fact-updates-zh-source.zip",
+      "sha256": "cf2a2a66b7a6a8f96fbfabf13d76c9f700c4bec6a6dd80cc5611ccf5a937a377",
+      "note": "Capture-time source snapshot; presentation-only refinements after recording may differ from the deployed page."
+    }
+  },
+  "limitations": [
+    "Provider 503, shared quota exhaustion and cold starts remain possible. This change does not establish a measured success-rate improvement.",
+    "Preset progress can resume only within the current page lifetime; successful memories remain in the namespace, but the progress cursor is not restored after reload.",
+    "Recorded content is one historical functional run, not current service availability or benchmark evidence."
+  ],
+  "benchmark_scope": "release.json and all benchmark figures unchanged. Python engineering figures retain the same measured source/test tree; seven Node flow tests are tracked separately.",
+  "source_commit_ci": {
+    "checked_at_utc": "2026-10-21T11:30:29.972143+00:00",
+    "url": "https://github.com/Mingjie-Mao/llm-long-term-memory/actions/runs/39591893865",
+    "status": "completed",
+    "conclusion": "success",
+    "jobs": [
+      {
+        "name": "test (ubuntu-latest)",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "lint",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "test (windows-latest)",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "test (macos-latest)",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ]
+  },
+  "experiment_class": "development-functional-check",
+  "question_set": "SCENARIOS.update zh-CN; public preset already inspected. One functional recording, no benchmark split or variant comparison.",
+  "browser_postdeploy_checks": [
+    "Production video plays: paused=false, currentTime advances, duration=24.666667, error=null; transcript and recording information expand correctly.",
+    "Historical state, unused memories and prompts all initially closed; playback is not automatic. Production backend reached Live LLM ready (t4).",
+    "No production write/answer requests were submitted; model calls were limited to the recorded local run."
+  ]
+}
